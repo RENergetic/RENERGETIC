@@ -1,0 +1,14 @@
+# Backdb Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backdb-np
+spec:
+  selector:
+    app: backdb
+  type: NodePort
+  externalIPs:
+  - 192.168.0.10
+  ports:
+    - port: 8082
+      targetPort: 8082
