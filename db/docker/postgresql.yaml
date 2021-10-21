@@ -23,7 +23,7 @@ spec:
           # Config from ConfigMap
           envFrom:
           - configMapRef:
-              name: postgres-db-config
+              name: postgresql-db-config
   # Volume Claim
   volumeClaimTemplates:
     - metadata:

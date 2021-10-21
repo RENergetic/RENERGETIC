@@ -2,13 +2,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-db-np
+  name: postgresql-db-sv
 spec:
   selector:
     app: postgresql-db
   type: NodePort
-  externalIPs:
-  - 192.168.0.10
   ports:
     - port: 5432
       targetPort: 5432
