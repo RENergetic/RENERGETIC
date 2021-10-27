@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title>Renergetic</title>
+
+    <style>
+        * {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        header {
+            padding: 2vh 1vw;
+            background: rgb(0, 0, 0);
+        }
+
+        header img {
+            max-height:20%;
+            min-height:20%;
+            width:5%;/*valor inicial*/
+        }
+
+        h1 {
+            padding: 0;
+            margin: 0;
+            font-size: calc(0.8vw + 2.3em);
+            font-weight: bolder;
+            text-align: center;
+            color: white;
+        }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header_logo">
+        <img src="<%= BASE_URL %>logo.svg" />
+      </div>
+      <div class="header_text">
+        <h1 id="title">Islas</h1>
+      </div>
+    </header>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
