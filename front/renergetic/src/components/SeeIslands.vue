@@ -1,29 +1,30 @@
 <template>
-    <section>
-        <section>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Datos del servidor</th>
-                        <th>Isla</th>
-                        <th>Ubicaci&oacute;n</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="isle of islands" :key="isle.id">
-                        <td>{{isle}}</td>
-                        <td>{{isle.name}}</td>
-                        <td>{{isle.location}}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            <button @click="listIslands">Actualizar tabla</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-    </section>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Datos del servidor</th>
+                    <th>Isla</th>
+                    <th>Ubicaci&oacute;n</th>
+                </tr>
+                <tr>
+                    <th colspan="3"> <hr/> </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="isle of islands" :key="isle.id">
+                    <td>{{isle}}</td>
+                    <td>{{isle.name}}</td>
+                    <td>{{isle.location}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <button @click="listIslands">Actualizar tabla</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </template>
 
 <script>
@@ -47,28 +48,63 @@ export default {
             .get(this.ip, {
                 headers: {"Access-Control-Allow-Origin": "*"}
             })
-            .then(response => (this.islands = response.data));
+            .then(response => (this.islands = response.data))
+            .catch(error => {
+                console.warn(error.message);
+                    console.warn(`No se puede conectar a ${this.ip}`);
+                this.islands = [];
+            });
         }
     },
+
+    mounted() {
+        this.listIslands();
+    },
+
+    watch: {
+        ip: function() {this.listIslands();}
+    }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-    section {
+    div {
         display: flex;
         align-items: center;
         flex-direction: column;
+
+        padding: 2vh 2vw;
+        overflow: auto;
+        flex: 0 1 auto;
+        flex-wrap: nowrap;
     }
 
     table {
-        border: 3px solid wheat;
+        flex: 1 0 auto;
+        border: 3px inset dimgray;
+        background: black;
         border-radius: 2vw;
+        border-collapse: separate;
         padding: 1em;
     }
 
-    thead th{
-        border-bottom: 3px solid wheat;
+    table hr {
+        border-top: 2px inset dimgray;
+    }
+
+    table:hover th {
+        color: #94ba3a;
+        transition: 0.75s;
+    }
+
+    table:hover, table:hover hr{
+        border-color: #a4ca4a;
+        transition: 0.75s;
+    }
+
+    table *{
+        color: white;
     }
 
     tr, td {
@@ -94,18 +130,22 @@ export default {
         height: calc(0.5vh + 2em);
         font-weight: bold;
         text-align: center;
-        border: 2px solid wheat;
-        border-radius: 2em;
+        background: black;
+        border: 2px inset gray;
+        border-radius: 0.75em;
         outline: none;
         cursor: pointer;
     }
 
     button:hover {
-        outline: 2px solid wheat;
+        border-color: #a4ca4a;
+        outline: 2px solid #a4ca4a;
         offset: 1px;
+        transition: 0.15s;
     }
 
     button:active {
-        background: wheat;
+        color: #94ba3a;
+        transition: 0.75s;
     }
 </style>
