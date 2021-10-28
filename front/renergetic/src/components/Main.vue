@@ -3,14 +3,14 @@
     <article id='main'>
       <section>
         <header>
-          <h2>Insertar isla</h2>
+          <h2>Island Management</h2>
         </header>
         <NewIsland :ip='ip' @event-add='eventAddTag'></NewIsland>
       </section>
 
       <section>
         <header>
-          <h2>Listar islas</h2>
+          <h2>Islands</h2>
         </header>
         <SeeIslands :ip='ip' ref='seeTag'></SeeIslands>
       </section>
@@ -38,13 +38,13 @@ export default {
 
     changeip(){
       if (this.ip === 'http://127.0.0.1:8082/api/islands')
-        this.ip = 'backdb-np:8082';
+        this.ip = 'http://backdb-np:8082/api/islands';
       else this.ip = 'http://127.0.0.1:8082/api/islands';
     }
   },
   data() {
     return {
-      ip: /*'http://127.0.0.1:8082/api/islands'*/'backdb-np:8082'
+      ip: /*'http://127.0.0.1:8082/api/islands'*/'http://backdb-np:8082/api/islands'
     }
   },
   mounted() {

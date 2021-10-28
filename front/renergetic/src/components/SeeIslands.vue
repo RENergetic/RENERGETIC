@@ -3,9 +3,9 @@
         <table>
             <thead>
                 <tr>
-                    <th>Datos del servidor</th>
-                    <th>Isla</th>
-                    <th>Ubicaci&oacute;n</th>
+                    <th>Saved data</th>
+                    <th>Island</th>
+                    <th>Location</th>
                 </tr>
                 <tr>
                     <th colspan="3"> <hr/> </th>
@@ -19,7 +19,7 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <button @click="listIslands">Actualizar tabla</button>
+                        <button @click="listIslands">Update</button>
                     </td>
                 </tr>
             </tbody>
