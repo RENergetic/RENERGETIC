@@ -1,0 +1,14 @@
+# Backdb Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontvue-sv
+spec:
+  selector:
+    app: frontvue
+  type: NodePort
+  externalIPs:
+  - 192.168.0.10
+  ports:
+    - port: 80
+      targetPort: 80

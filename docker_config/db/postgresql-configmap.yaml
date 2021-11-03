@@ -1,0 +1,12 @@
+# PostgreSQL StatefulSet ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-db-config
+  labels:
+    app: postgresql-db
+data:
+  POSTGRES_DB: renerdb
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  PGDATA: /data/pgdata

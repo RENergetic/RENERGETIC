@@ -1,2 +1,2 @@
-kubectl port-forward service/postgresql-db-sv 5432:5432
+kubectl port-forward service/postgres-db-np 5432:5432
 PAUSE

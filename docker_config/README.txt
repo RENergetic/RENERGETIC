@@ -1,13 +1,11 @@
-*Before to execute this script you need to have docker and minikube installed
 
+To execute the script installerWindows.sh, we need:
+	- a console which accept Linux commands and that will be able to access to the Windows environment variables (the git bash console for example).
+	- to be located on the same directory than the script
 
-Execute installerWindows.sh from a Linux console able to access to the Win environment variables (GIT bash for example)
-Do the execution on the directory of the file
-At the begining of the script, you can stablish some variables:
- - java -> path where the Spring project is
- - javafile -> jar name after the maven execution
+At the begining of the script, we can find these three variables, than let us to set which part of our application we need to mount:
  - installdb -> 'true' if you want to generate image and deploy postgres in minikube, 'false' if you don't need it
  - installapi -> 'true' to compile, generate image and deploy it to minikube
+ - installfront -> 'true' to compile, generate image and deploy it to minikube
  
-The script starts also minikube if needed
- 
+ The script starts also minikube if needed
