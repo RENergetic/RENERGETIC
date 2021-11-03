@@ -4,7 +4,7 @@ java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
 
-installdb='true'
+installdb='false'
 installapi='true'
 installfront='true'
 
@@ -12,41 +12,46 @@ minikube start --driver=docker
 
 if [[ $installdb = 'true' ]]
 then
-    cd  "${current}\..\db\docker"
-    # DOCKERIZING THE DATABASE
+    cd  "${current}\db"
+    # DATABASE INSTALATION
+    # create kubernetes resources
     kubectl apply -f postgresql-configmap.yaml
     kubectl apply -f postgresql.yaml
     kubectl apply -f postgresql-service.yaml
-	echo "Postgresql database successfully dockerized!"
 fi
 
 if [[ $installapi = 'true' ]]
 then
     if [[ $java != '' ]]
     then
-        # PACKAGING API
+        # API COMPILE TO JAR
         cd "${current}\..\services\backdb"
         mvn clean package -Dmaven.test.skip
         cp ".\\target\\${javafile}" "${current}\\api"
     fi
 
     cd  "${current}\\api"
-    # DOCKERIZING API SPRING
+    # API INSTALLATION
+    # set environment variables
     eval $(minikube docker-env)
+
+    # delete kubernetes resources if exists
+    kubectl delete deployments/backdb
+    kubectl delete services/backdb-sv
+
+    # create docker image
     docker build --no-cache --force-rm --tag=backdb:latest .
+    
+    # create kubernetes resources
     kubectl apply -f backdb-deployment.yaml --force=true
     kubectl apply -f backdb-service.yaml
-	echo "***********************************"
-	echo "Spring API successfully dockerized!"
-	echo "***********************************"
-    clear
 fi
 
 if [[ $installfront = 'true' ]]
 then
     if [[ $vue != '' ]]
     then
-        # PREPARACION DEL JAR
+        # COMPILE VUE FILES TO PRODUCTION
         cd "${current}\..\front\renergetic"
         npm run build --prod
         rm -f -r "${current}\\front\\dist"
@@ -54,17 +59,23 @@ then
     fi
 
     cd  "${current}\\front"
-    # INSTALACION DE API SPRING
+    # FRONTEND INSTALLATION
+    # set environment variables
     eval $(minikube docker-env)
+
+    # delete kubernetes resources if exists
+    kubectl delete deployments/frontvue
+    kubectl delete services/frontvue-sv
+
+    # create docker image
     docker build --no-cache --force-rm --tag=frontvue:latest .
+
+    # create kubernetes resources
     kubectl apply -f frontvue-deployment.yaml --force=true
     kubectl apply -f frontvue-service.yaml
-	echo "*****************************************"
-	echo "Vue.js component successfully dockerized!"
-	echo "*****************************************"
-    clear
 fi
-	echo "Installation has finished :). Remember to execute in a different console:"
-	echo "	kubectl port-forward service/backdb-sv 8082:8082"
+
+echo "Installation has finished :). Remember to execute in a different console:"
 	echo "	minikube service frontvue-sv"
     read -p "Press any key to end ..."
+clear

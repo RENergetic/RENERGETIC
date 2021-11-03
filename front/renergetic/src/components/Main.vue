@@ -38,13 +38,13 @@ export default {
 
     changeip(){
       if (this.ip === 'http://127.0.0.1:8082/api/islands')
-        this.ip = 'http://backdb-np:8082/api/islands';
+        this.ip = 'http://127.0.0.1/api/islands';
       else this.ip = 'http://127.0.0.1:8082/api/islands';
     }
   },
   data() {
     return {
-      ip: /*'http://127.0.0.1:8082/api/islands'*/'http://backdb-np:8082/api/islands'
+      ip: /*'http://127.0.0.1:8082/api/islands'*/'http://127.0.0.1/api/islands'
     }
   },
   mounted() {

@@ -6,9 +6,7 @@ metadata:
 spec:
   selector:
     app: frontvue
-  type: NodePort
-  externalIPs:
-  - 192.168.0.10
   ports:
     - port: 80
       targetPort: 80
+  type: NodePort
