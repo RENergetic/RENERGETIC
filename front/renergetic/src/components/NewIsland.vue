@@ -1,13 +1,14 @@
 <template>
     <div>
-        <input type="text" v-model="inputName" placeholder="Name"/><br>
-        <input type="text" v-model="inputLocation" placeholder="Location" @keyup.enter="addIsland"/><br>
-        <button @click="addIsland">Add</button>
+        <input type="text" v-model="inputName" placeholder="Nombre de la isla"/><br>
+        <input type="text" v-model="inputLocation" placeholder="Ubicacion de la isla" @keyup.enter="addIsland"/><br>
+        <button @click="addIsland">A&ntilde;adir</button>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
+
 export default {
     name: 'NewIsland',
 
@@ -24,18 +25,23 @@ export default {
     methods: {
         addIsland(){
             if (this.inputName && this.inputLocation) {
+                axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+                axios.defaults.headers.post['Access-Control-Allow-Credentials'] = 'true';
+                axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+                axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+
                 axios
                 .post(this.ip, 
-                    {name:this.inputName, location:this.inputLocation},
-                    {headers: {"Access-Control-Allow-Origin": "*"}})
+                    {name:this.inputName, location:this.inputLocation})
                 .then(() => {
                     this.inputName = "";
                     this.inputLocation = "";
                     this.$emit("event-add");
                     })
-                .catch(error => {
-                    console.warn(error.message);
-                    console.warn(`No se puede conectar a ${this.ip}`);
+                .catch(/*error*/() => {
+                    alert('Hola')
+                    /*console.warn(error.message);
+                    console.warn(`No se puede conectar a ${this.ip}`);*/
                 });
             }
         }

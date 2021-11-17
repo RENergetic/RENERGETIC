@@ -1,14 +1,15 @@
 <template>
     <div>
         <table>
+            <caption style='display: none'>Listado de islas</caption>
             <thead>
                 <tr>
-                    <th>Saved data</th>
-                    <th>Island</th>
-                    <th>Location</th>
+                    <th scope='col'>Datos del servidor</th>
+                    <th scope='col'>Isla</th>
+                    <th scope='col'>Ubicaci&oacute;n</th>
                 </tr>
                 <tr>
-                    <th colspan="3"> <hr/> </th>
+                    <th colspan="3" scope='row'> <hr/> </th>
                 </tr>
             </thead>
             <tbody>
@@ -19,7 +20,7 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <button @click="listIslands">Update</button>
+                        <button @click="listIslands">Actualizar tabla</button>
                     </td>
                 </tr>
             </tbody>
@@ -43,15 +44,19 @@ export default {
     },
 
     methods: {
+        
         listIslands(){
             axios
             .get(this.ip, {
-                headers: {"Access-Control-Allow-Origin": "*"}
+                headers: {'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Credentials': 'true',
+                            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                            'Access-Control-Allow-Headers': 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type'}
             })
             .then(response => (this.islands = response.data))
             .catch(error => {
                 console.warn(error.message);
-                    console.warn(`No se puede conectar a ${this.ip}`);
+                console.warn(`No se puede conectar a ${this.ip}`);
                 this.islands = [];
             });
         }
