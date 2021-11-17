@@ -1,5 +1,7 @@
 current=$(pwd -W tr / \\)
 
+namespace='app'
+
 java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
@@ -14,10 +16,15 @@ if [[ $installdb = 'true' ]]
 then
     cd  "${current}\db"
     # DATABASE INSTALATION
+	# delete kubernetes resources if exists
+    kubectl delete configmaps/postgres-db-config --namespace=$namespace
+    kubectl delete statefulsets/postgresql-db --namespace=$namespace
+    kubectl delete services/postgres-db-sv --namespace=$namespace
+	
     # create kubernetes resources
-    kubectl apply -f postgresql-configmap.yaml
-    kubectl apply -f postgresql.yaml
-    kubectl apply -f postgresql-service.yaml
+    kubectl apply -f postgresql-configmap.yaml --namespace=$namespace
+    kubectl apply -f postgresql.yaml --namespace=$namespace
+    kubectl apply -f postgresql-service.yaml --namespace=$namespace
 fi
 
 if [[ $installapi = 'true' ]]
@@ -36,15 +43,15 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/backdb
-    kubectl delete services/backdb-sv
+    kubectl delete deployments/backdb --namespace=$namespace
+    kubectl delete services/backdb-sv --namespace=$namespace
 
     # create docker image
     docker build --no-cache --force-rm --tag=backdb:latest .
     
     # create kubernetes resources
-    kubectl apply -f backdb-deployment.yaml --force=true
-    kubectl apply -f backdb-service.yaml
+    kubectl apply -f backdb-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f backdb-service.yaml --namespace=$namespace
 fi
 
 if [[ $installfront = 'true' ]]
@@ -64,15 +71,15 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/frontvue
-    kubectl delete services/frontvue-sv
+    kubectl delete deployments/frontvue --namespace=$namespace
+    kubectl delete services/frontvue-sv --namespace=$namespace
 
     # create docker image
     docker build --no-cache --force-rm --tag=frontvue:latest .
 
     # create kubernetes resources
-    kubectl apply -f frontvue-deployment.yaml --force=true
-    kubectl apply -f frontvue-service.yaml
+    kubectl apply -f frontvue-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f frontvue-service.yaml --namespace=$namespace
 fi
 
 echo "Installation has finished :). Remember to execute in a different console:"
