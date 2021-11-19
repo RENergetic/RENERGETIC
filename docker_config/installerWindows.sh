@@ -7,8 +7,9 @@ javafile='backdb-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
 
 installdb='false'
-installapi='true'
+installapi='false'
 installfront='true'
+installkeycloak='false'
 
 minikube start --driver=docker
 
@@ -60,6 +61,7 @@ then
     then
         # COMPILE VUE FILES TO PRODUCTION
         cd "${current}\..\front\renergetic"
+        npm install
         npm run build --prod
         rm -f -r "${current}\\front\\dist"
         cp -f -r ".\\dist" "${current}\\front\\dist"
@@ -71,15 +73,42 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/frontvue --namespace=$namespace
-    kubectl delete services/frontvue-sv --namespace=$namespace
+    kubectl delete deployments/frontvue #--namespace=$namespace
+    kubectl delete services/frontvue-sv #--namespace=$namespace
 
     # create docker image
     docker build --no-cache --force-rm --tag=frontvue:latest .
 
     # create kubernetes resources
-    kubectl apply -f frontvue-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f frontvue-service.yaml --namespace=$namespace
+    kubectl apply -f frontvue-deployment.yaml --force=true #--namespace=$namespace
+    kubectl apply -f frontvue-service.yaml #--namespace=$namespace
+fi
+
+if [[ $installkeycloak = 'true' ]]
+then
+    if [[ $vue != '' ]]
+    then
+        # COMPILE KEYCLOAK FILES TO PRODUCTION
+        cd "${current}\..\keycloak\themes"
+        rm -f -r "${current}\\keycloak\\themes\\renergetic"
+        cp -f -r ".\\renergetic" "${current}\\keycloak\\themes\\renergetic"
+    fi
+
+    cd  "${current}\\keycloak"
+    # FRONTEND INSTALLATION
+    # set environment variables
+    eval $(minikube docker-env)
+
+    # delete kubernetes resources if exists
+    kubectl delete deployments/keycloak --namespace=$namespace
+    kubectl delete services/keycloak-sv --namespace=$namespace
+
+    # create docker image
+    docker build --no-cache --force-rm --tag=keycloak:latest .
+
+    # create kubernetes resources
+    kubectl apply -f keycloak-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f keycloak-service.yaml --namespace=$namespace
 fi
 
 echo "Installation has finished :). Remember to execute in a different console:"
