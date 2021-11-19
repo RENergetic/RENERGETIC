@@ -6,10 +6,10 @@ java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
 
-installdb='false'
-installapi='false'
+installdb='true'
+installapi='true'
 installfront='true'
-installkeycloak='false'
+installkeycloak='true'
 
 minikube start --driver=docker
 
@@ -73,15 +73,15 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/frontvue #--namespace=$namespace
-    kubectl delete services/frontvue-sv #--namespace=$namespace
+    kubectl delete deployments/frontvue --namespace=$namespace
+    kubectl delete services/frontvue-sv --namespace=$namespace
 
     # create docker image
     docker build --no-cache --force-rm --tag=frontvue:latest .
 
     # create kubernetes resources
-    kubectl apply -f frontvue-deployment.yaml --force=true #--namespace=$namespace
-    kubectl apply -f frontvue-service.yaml #--namespace=$namespace
+    kubectl apply -f frontvue-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f frontvue-service.yaml --namespace=$namespace
 fi
 
 if [[ $installkeycloak = 'true' ]]

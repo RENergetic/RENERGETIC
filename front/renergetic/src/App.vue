@@ -1,4 +1,5 @@
 <template>
+    <router-view />
     <header id = 'lytheader'><Header/></header>
     <div>
         <nav id = 'lytleftmenu'><LeftMenu/></nav>

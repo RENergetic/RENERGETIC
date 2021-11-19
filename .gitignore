@@ -1,3 +1,4 @@
+docker_config/front/
 keycloak/Dockerfile
 keycloak/LICENSE.txt
 keycloak/bin/
