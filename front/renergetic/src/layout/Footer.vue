@@ -1,4 +1,4 @@
-(<template>
+<template>
     <div  @click="showLeftMenu">Click to {{!showMenu?'show':'hide'}} left menu</div>
 </template>
 

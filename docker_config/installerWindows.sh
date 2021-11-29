@@ -6,12 +6,20 @@ java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
 
-installdb='true'
-installapi='true'
-installfront='true'
+installdb='false'
+installapi='false'
+installfront='false'
 installkeycloak='true'
 
+while getopts n: flag
+do
+    case "${flag}" in
+        n) namespace=${OPTARG};
+    esac
+done
+
 minikube start --driver=docker
+kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]
 then
@@ -91,6 +99,7 @@ then
         # COMPILE KEYCLOAK FILES TO PRODUCTION
         cd "${current}\..\keycloak\themes"
         rm -f -r "${current}\\keycloak\\themes\\renergetic"
+        mkdir -p "${current}\\keycloak\\themes\\renergetic"
         cp -f -r ".\\renergetic" "${current}\\keycloak\\themes\\renergetic"
     fi
 

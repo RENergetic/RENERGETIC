@@ -1,17 +1,13 @@
 <template>
-    <Islands :ip='ip'></Islands>
+    <router-view />
 </template>
 
 <script>
-import Islands from '@/pages/Islands.vue'
 
 export default {
     name: 'Main',
     props: {
         ip: String
-    },
-    components: {
-        Islands
     }
 }
 </script>

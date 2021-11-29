@@ -1,5 +1,6 @@
 import { createRouter as createVueRouter, createWebHistory } from 'vue-router'
 import Islands from "@/pages/Islands.vue";
+import HeatDemand from "@/pages/HeatDemand.vue";
 import Forbidden from "@/pages/Forbidden.vue";
 import NotFound from "@/pages/NotFound.vue";
 
@@ -8,7 +9,13 @@ const createRoutes = () => [
     path: "/",
     name: "Islands",
     component: Islands,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: false },
+  },
+  {
+    path: "/graphs",
+    name: "HeatDemand",
+    component: HeatDemand,
+    meta: { requiresAuth: false },
   },
   {
     path: "/forbidden",

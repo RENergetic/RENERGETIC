@@ -1,4 +1,6 @@
-docker_config/front/
+docker_config/api/backdb-0.0.1-SNAPSHOT.jar
+docker_config/front/dist
+docker_config/keycloak/themes
 keycloak/Dockerfile
 keycloak/LICENSE.txt
 keycloak/bin/

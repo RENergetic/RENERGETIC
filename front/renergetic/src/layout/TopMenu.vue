@@ -1,5 +1,8 @@
 <template>
-    <div id="changeip" @click='changeip'>{{ip}}</div>
+    <select name="screen" id='screen' @change="goToScreen($event)">
+        <option value="islands">Administrar islas energ&eacute;ticas</option>
+        <option value="graphs">Ver estad&iacute;siticas</option>
+    </select>
 </template>
 
 <script>
@@ -9,23 +12,24 @@ export default {
         ip: String
     },
     methods: {
-        changeip(){
-            if (this.ip === 'http://127.0.0.1/api/islands')
-                this.$emit('changeip', 'http://backdb-np/api/islands');
-            else if (this.ip === 'http://backdb-np/api/islands') 
-                this.$emit('changeip', 'http://backdb/api/islands');
-            else
-                this.$emit('changeip', 'http://127.0.0.1/api/islands');
+        goToScreen(event){
+            console.log(this.$router)
+            if (event.target.value == 'islands'){
+                this.$router.replace({ name: "Islands" });
+            }else if (event.target.value == 'graphs'){
+                this.$router.replace({ name: "HeatDemand" });
+            }
         }
     }
 }
 </script>
 
 <style scoped>
-    #changeip {
+    #screen {
         flex: 1 1 100%;
         text-align: center;
         background:black;
         color: #a4ca4a;
+        border: #a4ca4a;
     }
 </style>
