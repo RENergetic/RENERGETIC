@@ -23,7 +23,7 @@ kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]
 then
-    cd  "${current}\db"
+    cd  "${current}\\db"
     # DATABASE INSTALATION
 	# delete kubernetes resources if exists
     kubectl delete configmaps/postgres-db-config --namespace=$namespace
@@ -41,7 +41,7 @@ then
     if [[ $java != '' ]]
     then
         # API COMPILE TO JAR
-        cd "${current}\..\services\backdb"
+        cd "${current}\\..\\..\\services\\backdb"
         mvn clean package -Dmaven.test.skip
         cp ".\\target\\${javafile}" "${current}\\api"
     fi
@@ -68,7 +68,7 @@ then
     if [[ $vue != '' ]]
     then
         # COMPILE VUE FILES TO PRODUCTION
-        cd "${current}\..\front\renergetic"
+        cd "${current}\\..\\..\\front\\renergetic"
         npm install
         npm run build --prod
         rm -f -r "${current}\\front\\dist"
@@ -97,7 +97,7 @@ then
     if [[ $vue != '' ]]
     then
         # COMPILE KEYCLOAK FILES TO PRODUCTION
-        cd "${current}\..\keycloak\themes"
+        cd "${current}\\..\\..\\keycloak\\themes"
         rm -f -r "${current}\\keycloak\\themes\\renergetic"
         mkdir -p "${current}\\keycloak\\themes\\renergetic"
         cp -f -r ".\\renergetic" "${current}\\keycloak\\themes\\renergetic"

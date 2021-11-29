@@ -52,7 +52,7 @@ fi
 
 if [[ $installgrafana = 'true' ]]
 then
-    cd  "${current}\grafana"
+    cd  "${current}\\grafana"
     # GRAFANA INSTALATION
     # delete kubernetes resources if exists
     kubectl delete deployments/grafana --namespace=$namespace
