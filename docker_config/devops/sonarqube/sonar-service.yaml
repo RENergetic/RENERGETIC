@@ -1,0 +1,12 @@
+# Backdb Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonarqube-sv
+spec:
+  selector:
+    app: sonarqube
+  ports:
+    - port: 9000
+      targetPort: 9000
+  type: NodePort
