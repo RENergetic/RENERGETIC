@@ -1,9 +1,11 @@
 <template>
+    <div @click="logout">Logout</div>
     <div  @click="showLeftMenu">Click to {{!showMenu?'show':'hide'}} left menu</div>
 </template>
 
 <script>
 import layoutBus from '@/events/layout.js';
+import Keycloak from '@/plugins/authentication.js'
 
 export default {
     name: 'Footer',
@@ -15,6 +17,9 @@ export default {
             this.showMenu = !this.showMenu;
             
             layoutBus.emit('show', {view: 'leftmenu', show: this.showMenu});
+        },
+        logout () {
+            Keycloak.logout({ redirectUri: window.location.origin })
         }
     },
     mounted(){

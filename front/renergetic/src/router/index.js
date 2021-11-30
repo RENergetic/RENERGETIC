@@ -7,15 +7,19 @@ import NotFound from "@/pages/NotFound.vue";
 const createRoutes = () => [
   {
     path: "/",
+    meta: { requiresAuth: false },
+  },
+  {
+    path: "/islands",
     name: "Islands",
     component: Islands,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: true },
   },
   {
     path: "/graphs",
     name: "HeatDemand",
     component: HeatDemand,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: true },
   },
   {
     path: "/forbidden",
@@ -36,13 +40,25 @@ export const createRouter = (app) => {
     })
 
     router.beforeEach((to, from, next) => {
-        //const basePath = window.location.toString()               
-        const authenticated = app.config.globalProperties.$keycloak?.authenticated
-        if (to.meta.requiresAuth && !authenticated) {
-            //next({ name: 'Login' })
-            //keycloak.login({ redirectUri: basePath.slice(0, -1) + to.path })
+        const basePath = window.location.toString()
+        const $keycloak = app.component('keycloak')
+        const data = JSON.parse(localStorage.getItem("data"))
+        if (to.meta.requiresAuth) {
+            if (!$keycloak.authenticated && data && !data.authenticated) {
+              // The page is protected and the user is not authenticated. Force a login.
+              $keycloak.login({ redirectUri: basePath.slice(0, -1) + to.path })
+            /*} else if (data.appRoles.indexOf('manager')!==-1){ // hasResourceRole('manager')) {
+              next()*/
+            } else { // The user was authenticated, but did not have the correct role (is not authorized) redirect the user to an error page
+              //next({ name: 'Forbidden' })
+              next()
+            }
         } else {
+          if (!$keycloak.authenticated && data && !data.authenticated) {
+            $keycloak.login({ redirectUri: window.location.origin })
+          }else{
             next()
+          }
         }
     })
     return router
