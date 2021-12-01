@@ -2,9 +2,10 @@ current=$(pwd -W tr / \\)
 
 namespace='data'
 
-installdb='true'
+installdb='false'
 installback='false'
-installgrafana='true'
+installkafka='true'
+installgrafana='false'
 
 while getopts n: flag
 do
@@ -21,7 +22,7 @@ then
     cd  "${current}\db"
     # DATABASE INSTALATION
     # delete kubernetes resources if exists
-    kubectl delete statefulsets/influx-db --namespace=$namespace
+    kubectl delete deployment/influx-db --namespace=$namespace
     kubectl delete services/influx-db-sv --namespace=$namespace
 
     # create kubernetes resources
@@ -48,6 +49,22 @@ then
     #-kubectl apply -f nifi-deployment.yaml --force=true --namespace=$namespace
     #-kubectl apply -f nifi-service.yaml --namespace=$namespace
     kubectl apply -f nifi.yaml --force=true --namespace=$namespace
+fi
+
+if [[ $installkafka = 'true' ]]
+then
+    cd  "${current}\\kafka"
+    # KAFKA INSTALATION
+    # delete kubernetes resources if exists
+    kubectl delete deployments/zookeeper --namespace=$namespace
+    kubectl delete services/zookeeper-sv --namespace=$namespace
+
+    kubectl delete deployments/kafka-broker --namespace=$namespace
+    kubectl delete services/kafka-sv --namespace=$namespace
+
+    # create kubernetes resources
+    kubectl apply -f zookeeper.yaml --namespace=$namespace
+    kubectl apply -f kafka.yaml --namespace=$namespace
 fi
 
 if [[ $installgrafana = 'true' ]]

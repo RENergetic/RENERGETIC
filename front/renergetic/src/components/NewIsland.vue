@@ -38,10 +38,10 @@ export default {
                     this.inputLocation = "";
                     this.$emit("event-add");
                     })
-                .catch(/*error*/() => {
+                .catch((error) => {
                     alert('Hola')
-                    /*console.warn(error.message);
-                    console.warn(`No se puede conectar a ${this.ip}`);*/
+                    console.warn(error.message);
+                    console.warn(`No se puede conectar a ${this.ip}`);
                 });
             }
         }
@@ -89,8 +89,8 @@ export default {
 
         font-weight: bold;
         text-align: center;
-        color: white;
-        background: black;
+        color: dimgray;
+        background: var(--background);
         border: 2px inset gray;
 
         border-radius: 10px;

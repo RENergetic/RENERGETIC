@@ -7,7 +7,9 @@ import NotFound from "@/pages/NotFound.vue";
 const createRoutes = () => [
   {
     path: "/",
-    meta: { requiresAuth: false },
+    name: "Home",
+    component: Islands,
+    meta: { requiresAuth: true },
   },
   {
     path: "/islands",

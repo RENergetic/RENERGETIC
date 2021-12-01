@@ -8,7 +8,7 @@
     export default {
         data() {
             return {
-                graphicUrl: 'http://localhost:3000/d-solo/dAXoahpnz/renergetic?orgId=2&from=1635579454128&to=1638175054128&panelId=2',
+                graphicUrl: 'http://localhost:3000/d-solo/VrjTEltnz/renergetic?orgId=2&from=1635753118065&to=1638345118065&theme=light&panelId=2',
             }
         }
     }
@@ -19,7 +19,7 @@
         display: flex;
         flex: 1 0 100%;
         flex-direction: row;
-        background: black;
+        background: var(--background);
         align-items: center;
     }
     iframe {

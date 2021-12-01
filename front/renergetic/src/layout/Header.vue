@@ -15,7 +15,7 @@ export default {
     header {
         width: 100%;
         padding: 2vh 1vw;
-        background: black;
+        background: var(--background);
         border-bottom: 3px solid #a4ca4a;
         flex: 0 1 auto;
 
@@ -36,7 +36,7 @@ export default {
         font-size: calc(0.8vw + 2.3em);
         font-weight: bold;
         text-align: center;
-        color: white;
+        color: black;
       flex: 1 0 auto;
     }
 

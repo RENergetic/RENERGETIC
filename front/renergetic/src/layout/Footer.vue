@@ -35,7 +35,7 @@ export default {
     div {
         flex: 1 1 100%;
         text-align: center;
-        background:black;
+        background:var(--background);
         color: #a4ca4a;
         border-top: 2px solid #a4ca4a;
     }

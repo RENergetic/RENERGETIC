@@ -88,7 +88,7 @@ export default {
     table {
         flex: 1 0 auto;
         border: 3px inset dimgray;
-        background: black;
+        background: var(--background);
         border-radius: 2vw;
         border-collapse: separate;
         padding: 1em;
@@ -109,7 +109,7 @@ export default {
     }
 
     table *{
-        color: white;
+        color: dimgray;
     }
 
     tr, td {
@@ -135,7 +135,7 @@ export default {
         height: calc(0.5vh + 2em);
         font-weight: bold;
         text-align: center;
-        background: black;
+        background: var(--background);
         border: 2px inset gray;
         border-radius: 0.75em;
         outline: none;

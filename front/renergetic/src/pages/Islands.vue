@@ -21,8 +21,10 @@ import SeeIslands from '@/components/SeeIslands.vue'
 
 export default {
     name: 'Main',
-    props: {
-        ip: String
+    data() {
+        return {
+            ip: 'http://127.0.0.1/api/islands'
+        }
     },
     components: {
         NewIsland,
@@ -64,7 +66,7 @@ export default {
     }
 
     section {
-        background: linear-gradient(black, dimgray);
+        background: linear-gradient(var(--background), #cde29acc);
         display: flex;
         flex-direction: column;
     }
@@ -81,8 +83,8 @@ export default {
     section > header {
             padding: 0vh 0.2vw;
             margin-bottom: 3vh;
-            background: black;
-            border-bottom: 3px solid black;
+            background: var(--background);
+            border-bottom: 3px solid dimgray;
             flex:    1 0 10%;
             max-height: 10%;
 
@@ -100,7 +102,7 @@ export default {
     section > header h2 {
         padding: 1px;
         margin: 0;
-        color: white;
+        color: #a4ca4a;
 
         display: flex;
         flex-direction: row;

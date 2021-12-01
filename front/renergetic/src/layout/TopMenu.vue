@@ -28,8 +28,8 @@ export default {
     #screen {
         flex: 1 1 100%;
         text-align: center;
-        background:black;
-        color: #a4ca4a;
-        border: #a4ca4a;
+        background:var(--background);
+        color: dimgray;
+        border: 2px solid #a4ca4a;
     }
 </style>
