@@ -3,9 +3,11 @@ current=$(pwd -W tr / \\)
 namespace='data'
 
 installdb='false'
+installapi='true'
 installback='false'
-installkafka='true'
+installkafka='false'
 installgrafana='false'
+javafile='backinflux-0.0.1-SNAPSHOT.jar'
 
 while getopts n: flag
 do
@@ -29,6 +31,30 @@ then
     kubectl apply -f influx-volume.yaml --namespace=$namespace
     kubectl apply -f influx-deployment.yaml --namespace=$namespace
     kubectl apply -f influx-service.yaml --namespace=$namespace
+fi
+
+if [[ $installapi = 'true' ]]
+then
+    # API COMPILE TO JAR
+    cd "${current}\\..\\..\\services\\backinflux"
+    mvn clean package -Dmaven.test.skip
+    cp ".\\target\\${javafile}" "${current}\\api"
+
+    cd  "${current}\\api"
+    # API INSTALLATION
+    # set environment variables
+    eval $(minikube docker-env)
+
+    # delete kubernetes resources if exists
+    kubectl delete deployments/backinflux --namespace=$namespace
+    kubectl delete services/backinflux-sv --namespace=$namespace
+
+    # create docker image
+    docker build --no-cache --force-rm --tag=backinflux:latest .
+    
+    # create kubernetes resources
+    kubectl apply -f backinflux-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f backinflux-service.yaml --namespace=$namespace
 fi
 
 if [[ $installback = 'true' ]]
