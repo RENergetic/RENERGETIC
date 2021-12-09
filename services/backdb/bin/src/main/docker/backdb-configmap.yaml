@@ -1,0 +1,13 @@
+# backdb ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backdb-config
+  labels:
+    app: backdb
+data:
+  POSTGRES_DB_HOST: "127.0.0.1"
+  POSTGRES_DB_PORT: "5432"
+  POSTGRES_DB_NAME: renerdb
+  POSTGRESQL_DB_USERNAME: postgres
+  POSTGRESQL_DB_PASSWORD: postgres

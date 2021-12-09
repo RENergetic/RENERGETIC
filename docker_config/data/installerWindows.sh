@@ -2,11 +2,11 @@ current=$(pwd -W tr / \\)
 
 namespace='data'
 
-installdb='false'
+installdb='true'
 installapi='true'
-installback='false'
-installkafka='false'
-installgrafana='false'
+installback='true'
+installkafka='true'
+installgrafana='true'
 javafile='backinflux-0.0.1-SNAPSHOT.jar'
 
 while getopts n: flag

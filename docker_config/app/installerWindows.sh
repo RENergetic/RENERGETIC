@@ -6,10 +6,10 @@ java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
 
-installdb='false'
-installapi='false'
+installdb='true'
+installapi='true'
 installfront='true'
-installkeycloak='false'
+installkeycloak='true'
 
 while getopts n: flag
 do
