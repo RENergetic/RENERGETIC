@@ -1,10 +1,10 @@
 <template>
     <div>
-        <table>
+        <table v-if="!show_builds">
             <caption style='display: none'>Listado de islas</caption>
             <thead>
                 <tr>
-                    <th scope='col'>Datos del servidor</th>
+                    <th scope='col'></th>
                     <th scope='col'>Isla</th>
                     <th scope='col'>Ubicaci&oacute;n</th>
                 </tr>
@@ -13,14 +13,37 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="isle of islands" :key="isle.id">
-                    <td>{{isle}}</td>
+                <tr v-for="isle of islands" :key="isle.id" :id="'isle'+isle.id">
+                    <td><button class="show_builds" @click="showBuilds(isle.id)">Ver Construcciones</button></td>
                     <td>{{isle.name}}</td>
                     <td>{{isle.location}}</td>
                 </tr>
                 <tr>
                     <td colspan="3">
                         <button @click="listIslands">Actualizar tabla</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table v-else>
+            <caption style='display: none'>Listado de islas</caption>
+            <thead>
+                <tr>
+                    <th scope='col'>Building</th>
+                    <th scope='col'>Ubicaci&oacute;n</th>
+                </tr>
+                <tr>
+                    <th colspan="3" scope='row'> <hr/> </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="isle of islands" :key="isle.id" :id="'isle'+isle.id">
+                    <td>Build1</td>
+                    <td>Ubicacion: {{isle.location}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <button @click="hideBuilds()">Volver atras</button>
                     </td>
                 </tr>
             </tbody>
@@ -39,7 +62,8 @@ export default {
     
     data() {
         return{
-            islands:[]
+            islands:[],
+            show_builds: false
         }
     },
 
@@ -59,6 +83,13 @@ export default {
                 console.warn(`No se puede conectar a ${this.ip}`);
                 this.islands = [];
             });
+        },
+        showBuilds(island_id) {
+            this.show_builds = true;
+            console.log(island_id);
+        },
+        hideBuilds() {
+            this.show_builds = false;
         }
     },
 
@@ -125,6 +156,11 @@ export default {
         text-align: center;
         padding: 0;
         margin: 0;
+    }
+
+    .show_builds {
+        width: max-content;
+        margin-top: 0.3em;
     }
 
     button {

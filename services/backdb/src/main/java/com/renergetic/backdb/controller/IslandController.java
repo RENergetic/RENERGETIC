@@ -16,15 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 import com.renergetic.backdb.model.Island;
 import com.renergetic.backdb.repository.IslandRepository;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @CrossOrigin(origins = "*")
 @RestController
+@Tag(name = "Islands Controller", description = "Allows add and see Islands")
 @RequestMapping("/api")
 public class IslandController {
 	
 	@Autowired
 	IslandRepository islandRepository;
 	
-	@GetMapping("islands")
+	@Operation(summary = "Get All Islands")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "islands", produces = "application/json")
 	public ResponseEntity<List<Island>> getAllIslands (){
 		List<Island> islands = new ArrayList<Island>();
 		
@@ -33,8 +44,13 @@ public class IslandController {
 		return new ResponseEntity<List<Island>>(islands, HttpStatus.OK);
 	}
 	
-	
-	@PostMapping("/islands")
+	@Operation(summary = "Create a new Island")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Island save correctly"),
+			@ApiResponse(responseCode = "500", description = "Error saving island")
+		}
+	)
+	@PostMapping(path = "/islands", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<Island> createIsland(@RequestBody Island island) {
 		try {
 			Island _island = islandRepository
