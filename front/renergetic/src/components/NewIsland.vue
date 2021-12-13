@@ -1,8 +1,8 @@
 <template>
     <div>
-        <input type="text" v-model="inputName" placeholder="Nombre de la isla"/><br>
-        <input type="text" v-model="inputLocation" placeholder="Ubicacion de la isla" @keyup.enter="addIsland"/><br>
-        <button @click="addIsland">A&ntilde;adir</button>
+        <input type="text" v-model="inputName" placeholder="Name"/><br>
+        <input type="text" v-model="inputLocation" placeholder="Location" @keyup.enter="addIsland"/><br>
+        <button @click="addIsland">Create</button>
     </div>
 </template>
 

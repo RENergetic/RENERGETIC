@@ -2,14 +2,14 @@
     <article id='main'>
         <section>
             <header>
-                <h2>Insertar isla</h2>
+                <h2>Create island</h2>
             </header>
             <NewIsland :ip='ip' @event-add='eventAddTag'></NewIsland>
         </section>
 
         <section>
             <header>
-                <h2>Listar islas</h2>
+                <h2>List islands</h2>
             </header>
             <SeeIslands :ip='ip' ref='seeTag'></SeeIslands>
         </section>
