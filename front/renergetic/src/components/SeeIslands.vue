@@ -1,6 +1,6 @@
 <template>
     <div>
-        <table v-if="!show_builds">
+        <table v-if="show_builds == -1">
             <caption style='display: none'>Listado de islas</caption>
             <thead>
                 <tr>
@@ -59,33 +59,43 @@ export default {
     name: 'SeeIslands',
 
     props: {
-        ip: String
+        ip: String,
+        show_builds: Number
     },
     
     data() {
         return{
             islands:[],
-            builds:[],
-            show_builds: false
+            builds:[]
         }
     },
 
     methods: {
         
         listIslands(){
-            axios
-            .get(this.ip + 'islands', {
-                headers: {'Access-Control-Allow-Origin': '*',
-                            'Access-Control-Allow-Credentials': 'true',
-                            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                            'Access-Control-Allow-Headers': 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type'}
-            })
-            .then(response => (this.islands = response.data))
-            .catch(error => {
-                console.warn(error.message);
-                console.warn(`No se puede conectar a ${this.ip}`);
-                this.islands = [];
-            });
+            if (this.show_builds == -1)
+                axios
+                .get(this.ip + 'islands', {
+                    headers: {'Access-Control-Allow-Origin': '*',
+                                'Access-Control-Allow-Credentials': 'true',
+                                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                                'Access-Control-Allow-Headers': 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type'}
+                })
+                .then(response => (this.islands = response.data))
+                .catch(error => {
+                    console.warn(error.message);
+                    console.warn(`No se puede conectar a ${this.ip}`);
+                    this.islands = [];
+                });
+            else
+                axios
+                .get(this.ip + 'buildings', {params: {islandId:this.show_builds}})
+                .then(response => (this.builds = response.data))
+                .catch(error => {
+                    console.warn(error.message);
+                    console.warn(`No se puede conectar a ${this.ip}`);
+                    this.builds = [];
+                });
         },
         showBuilds(island_id) {
             axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
@@ -93,7 +103,7 @@ export default {
             axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
             axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
 
-            this.show_builds = true;
+            this.$emit('event-builds', island_id);
             
             axios
             .get(this.ip + 'buildings', {params: {islandId: island_id}})
@@ -105,7 +115,7 @@ export default {
             });
         },
         hideBuilds() {
-            this.show_builds = false;
+            this.$emit('event-builds', -1);
         }
     },
 

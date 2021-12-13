@@ -2,16 +2,16 @@
     <article id='main'>
         <section>
             <header>
-                <h2>Create island</h2>
+                <h2>{{(show_builds == -1)? 'Create island':'Add build'}}</h2>
             </header>
-            <NewIsland :ip='ip' @event-add='eventAddTag'></NewIsland>
+            <NewIsland :ip='ip' @event-add='eventAddTag' :show_builds='show_builds'></NewIsland>
         </section>
 
         <section>
             <header>
                 <h2>List islands</h2>
             </header>
-            <SeeIslands :ip='ip' ref='seeTag'></SeeIslands>
+            <SeeIslands :ip='ip' @event-builds='changeShowBuilds' ref='seeTag' :show_builds='show_builds'></SeeIslands>
         </section>
     </article>
 </template>
@@ -23,7 +23,8 @@ export default {
     name: 'Main',
     data() {
         return {
-            ip: 'http://127.0.0.1/api/'
+            ip: 'http://127.0.0.1/api/',
+            show_builds: -1
         }
     },
     components: {
@@ -33,6 +34,10 @@ export default {
     methods: {
         eventAddTag() {
             this.$refs.seeTag.listIslands();
+        },
+
+        changeShowBuilds(islandId){
+            this.show_builds = islandId;
         },
 
         resizeMain(){ 
