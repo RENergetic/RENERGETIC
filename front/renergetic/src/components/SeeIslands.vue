@@ -4,9 +4,9 @@
             <caption style='display: none'>Listado de islas</caption>
             <thead>
                 <tr>
-                    <th scope='col'>Datos del servidor</th>
-                    <th scope='col'>Isla</th>
-                    <th scope='col'>Ubicaci&oacute;n</th>
+                    <th scope='col'>Server data</th>
+                    <th scope='col'>Island</th>
+                    <th scope='col'>Location</th>
                 </tr>
                 <tr>
                     <th colspan="3" scope='row'> <hr/> </th>
@@ -20,7 +20,7 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <button @click="listIslands">Actualizar tabla</button>
+                        <button @click="listIslands">Update table</button>
                     </td>
                 </tr>
             </tbody>

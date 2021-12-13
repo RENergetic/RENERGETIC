@@ -1,7 +1,7 @@
 <template>
     <select name="screen" id='screen' @change="goToScreen($event)">
-        <option value="islands">Administrar islas energ&eacute;ticas</option>
-        <option value="graphs">Ver estad&iacute;siticas</option>
+        <option value="islands">Island Management</option>
+        <option value="graphs">Cosumption Forecasting</option>
     </select>
 </template>
 
