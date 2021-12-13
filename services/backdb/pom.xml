@@ -35,12 +35,6 @@
 			<artifactId>lombok</artifactId>
 		</dependency>
 		<dependency>
-<<<<<<< HEAD
-		    <groupId>org.springdoc</groupId>
-		    <artifactId>springdoc-openapi-ui</artifactId>
-	    <version>1.5.2</version>
-</dependency>
-=======
 		  <groupId>org.springdoc</groupId>
 		  <artifactId>springdoc-openapi-ui</artifactId>
 		  <version>1.5.12</version>
@@ -50,7 +44,6 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
->>>>>>> 4b640838b3f9b8ae843e5c5db831c49ba9b74f7c
 	</dependencies>
 
 	<build>

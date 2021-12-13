@@ -2,6 +2,7 @@ package com.renergetic.buildingsService.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.buildingsService.model.Building;
@@ -25,16 +27,18 @@ public class BuildingController {
 	BuildingRepository buildingRepository;
 	
 	@GetMapping("buildings")
-	public ResponseEntity<List<Building>> getAllBuildings (){
+	public ResponseEntity<List<Building>> getBuildings (@RequestParam("islandId") Optional<Long> idIsland){
 		List<Building> buildings = new ArrayList<Building>();
-		
-		buildings = buildingRepository.findAll();
+		if (idIsland.isEmpty())
+			buildings = buildingRepository.findAll();
+		else
+			buildings = buildingRepository.findByIdIsland(idIsland.get());
 		
 		return new ResponseEntity<List<Building>>(buildings, HttpStatus.OK);
 	}
 	
 	
-	@PostMapping("/building")
+	@PostMapping("/buildings")
 	public ResponseEntity<Building> createBuilding(@RequestBody Building building) {
 		try {
 			Building _building = buildingRepository
@@ -43,14 +47,5 @@ public class BuildingController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	}
-	
-	@GetMapping("buildingsByIdIsland")
-	public ResponseEntity<List<Building>> getBuildingsByIdIsland (@RequestBody long idIsland){
-		List<Building> buildings = new ArrayList<Building>();
-		
-		buildings = buildingRepository.findByIdIsland(idIsland);
-		
-		return new ResponseEntity<List<Building>>(buildings, HttpStatus.OK);
 	}
 }

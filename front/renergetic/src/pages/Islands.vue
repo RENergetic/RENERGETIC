@@ -23,7 +23,7 @@ export default {
     name: 'Main',
     data() {
         return {
-            ip: 'http://127.0.0.1/api/islands'
+            ip: 'http://127.0.0.1/api/'
         }
     },
     components: {

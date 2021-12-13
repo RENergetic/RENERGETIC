@@ -31,7 +31,7 @@ export default {
                 axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
 
                 axios
-                .post(this.ip, 
+                .post(this.ip + 'islands', 
                     {name:this.inputName, location:this.inputLocation})
                 .then(() => {
                     this.inputName = "";

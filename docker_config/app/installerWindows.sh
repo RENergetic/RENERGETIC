@@ -11,6 +11,10 @@ installapi='true'
 installfront='true'
 installkeycloak='true'
 
+java1='services\backbuildings'
+javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
+installapi1='true'
+
 while getopts n: flag
 do
     case "${flag}" in
@@ -18,7 +22,7 @@ do
     esac
 done
 
-minikube start --driver=docker
+#minikube start --driver=docker
 kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]
@@ -61,6 +65,33 @@ then
     # create kubernetes resources
     kubectl apply -f backdb-deployment.yaml --force=true --namespace=$namespace
     kubectl apply -f backdb-service.yaml --namespace=$namespace
+fi
+
+if [[ $installapi1 = 'true' ]]
+then
+    if [[ $java1 != '' ]]
+    then
+        # API COMPILE TO JAR
+        cd "${current}\\..\\..\\services\\buildingsService"
+        mvn clean package -Dmaven.test.skip
+        cp ".\\target\\${javafile1}" "${current}\\buildings"
+    fi
+
+    cd  "${current}\\buildings"
+    # API INSTALLATION
+    # set environment variables
+    eval $(minikube docker-env)
+
+    # delete kubernetes resources if exists
+    kubectl delete deployments/backbuildings --namespace=$namespace
+    kubectl delete services/backbuildings-sv --namespace=$namespace
+
+    # create docker image
+    docker build --no-cache --force-rm --tag=backbuildings:latest .
+    
+    # create kubernetes resources
+    kubectl apply -f backbuildings-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f backbuildings-service.yaml --namespace=$namespace
 fi
 
 if [[ $installfront = 'true' ]]

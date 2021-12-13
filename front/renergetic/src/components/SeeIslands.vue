@@ -14,7 +14,7 @@
             </thead>
             <tbody>
                 <tr v-for="isle of islands" :key="isle.id" :id="'isle'+isle.id">
-                    <td><button class="show_builds" @click="showBuilds(isle.id)">Ver Construcciones</button></td>
+                    <td><button class="show_builds" @click="showBuilds(isle.id)">Show Buildings</button></td>
                     <td>{{isle.name}}</td>
                     <td>{{isle.location}}</td>
                 </tr>
@@ -30,20 +30,22 @@
             <thead>
                 <tr>
                     <th scope='col'>Building</th>
-                    <th scope='col'>Ubicaci&oacute;n</th>
+                    <th scope='col'>Description</th>
+                    <th scope='col'>Location</th>
                 </tr>
                 <tr>
                     <th colspan="3" scope='row'> <hr/> </th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="isle of islands" :key="isle.id" :id="'isle'+isle.id">
-                    <td>Build1</td>
-                    <td>Ubicacion: {{isle.location}}</td>
+                <tr v-for="build of builds" :key="build.id">
+                    <td>{{build.name}}</td>
+                    <td>{{build.description}}</td>
+                    <td>{{build.idIsland}}</td>
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <button @click="hideBuilds()">Volver atras</button>
+                        <button @click="hideBuilds()">Go Back</button>
                     </td>
                 </tr>
             </tbody>
@@ -63,6 +65,7 @@ export default {
     data() {
         return{
             islands:[],
+            builds:[],
             show_builds: false
         }
     },
@@ -71,7 +74,7 @@ export default {
         
         listIslands(){
             axios
-            .get(this.ip, {
+            .get(this.ip + 'islands', {
                 headers: {'Access-Control-Allow-Origin': '*',
                             'Access-Control-Allow-Credentials': 'true',
                             'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -85,8 +88,21 @@ export default {
             });
         },
         showBuilds(island_id) {
+            axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+            axios.defaults.headers.post['Access-Control-Allow-Credentials'] = 'true';
+            axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+            axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+
             this.show_builds = true;
-            console.log(island_id);
+            
+            axios
+            .get(this.ip + 'buildings', {params: {islandId: island_id}})
+            .then(response => (this.builds = response.data))
+            .catch(error => {
+                console.warn(error.message);
+                console.warn(`No se puede conectar a ${this.ip}`);
+                this.builds = [];
+            });
         },
         hideBuilds() {
             this.show_builds = false;
