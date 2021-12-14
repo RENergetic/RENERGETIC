@@ -1,7 +1,7 @@
 import Keycloak from 'keycloak-js'
 
 const appName = 'renergetic-app'
-const initOptions = {url:'http://localhost:8280/auth/', realm:'realm-renergetic', clientId: appName}
+const initOptions = {url:'http://localhost/auth/', realm:'realm-renergetic', clientId: appName}
 const keycloak = new Keycloak(initOptions)
 
 export default {

@@ -1,2 +1,2 @@
-kubectl port-forward service/keycloak-sv 8280:8280 --namespace app
+kubectl port-forward service/keycloak-sv 8080:8080 --namespace app
 PAUSE

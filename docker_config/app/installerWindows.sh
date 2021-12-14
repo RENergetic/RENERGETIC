@@ -22,7 +22,7 @@ do
     esac
 done
 
-#minikube start --driver=docker
+minikube start --driver=docker
 kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]
@@ -94,6 +94,34 @@ then
     kubectl apply -f backbuildings-service.yaml --namespace=$namespace
 fi
 
+if [[ $installkeycloak = 'true' ]]
+then
+    if [[ $vue != '' ]]
+    then
+        # COMPILE KEYCLOAK FILES TO PRODUCTION
+        cd "${current}\\..\\..\\keycloak\\themes"
+        rm -f -r "${current}\\keycloak\\themes\\renergetic"
+        mkdir -p "${current}\\keycloak\\themes"
+        cp -f -r ".\\renergetic" "${current}\\keycloak\\themes\\renergetic"
+    fi
+
+    cd  "${current}\\keycloak"
+    # FRONTEND INSTALLATION
+    # set environment variables
+    eval $(minikube docker-env)
+
+    # delete kubernetes resources if exists
+    kubectl delete deployments/keycloak --namespace=$namespace
+    kubectl delete services/keycloak-sv --namespace=$namespace
+
+    # create docker image
+    docker build --no-cache --force-rm --tag=keycloak:latest .
+
+    # create kubernetes resources
+    kubectl apply -f keycloak-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f keycloak-service.yaml --namespace=$namespace
+fi
+
 if [[ $installfront = 'true' ]]
 then
     if [[ $vue != '' ]]
@@ -121,34 +149,6 @@ then
     # create kubernetes resources
     kubectl apply -f frontvue-deployment.yaml --force=true --namespace=$namespace
     kubectl apply -f frontvue-service.yaml --namespace=$namespace
-fi
-
-if [[ $installkeycloak = 'true' ]]
-then
-    if [[ $vue != '' ]]
-    then
-        # COMPILE KEYCLOAK FILES TO PRODUCTION
-        cd "${current}\\..\\..\\keycloak\\themes"
-        rm -f -r "${current}\\keycloak\\themes\\renergetic"
-        mkdir -p "${current}\\keycloak\\themes\\renergetic"
-        cp -f -r ".\\renergetic" "${current}\\keycloak\\themes\\renergetic"
-    fi
-
-    cd  "${current}\\keycloak"
-    # FRONTEND INSTALLATION
-    # set environment variables
-    eval $(minikube docker-env)
-
-    # delete kubernetes resources if exists
-    kubectl delete deployments/keycloak --namespace=$namespace
-    kubectl delete services/keycloak-sv --namespace=$namespace
-
-    # create docker image
-    docker build --no-cache --force-rm --tag=keycloak:latest .
-
-    # create kubernetes resources
-    kubectl apply -f keycloak-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f keycloak-service.yaml --namespace=$namespace
 fi
 
 echo "Installation has finished :). Remember to execute in a different console:"
