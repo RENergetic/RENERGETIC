@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wso
+spec:
+  selector:
+      matchLabels:
+        app: wso
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wso
+    spec:
+      containers:
+        - name: wso
+          image: wso2/wso2am:latest
+          imagePullPolicy: Always
+          ports:
+          - name: api-https
+            containerPort: 8243
+          - name: api-http
+            containerPort: 8280
+          - name: https
+            containerPort: 9443
+          volumeMounts:
+          - mountPath: /home/wso2carbon/wso2am-3.1.0/repository/deployment/server/
+            name: wso-disk
+      restartPolicy: Always
+      volumes:
+        - name: wso-disk
+          persistentVolumeClaim:
+            claimName: wso-disk
+# /home/wso2carbon/wso2am-3.1.0/repository/deployment/server/

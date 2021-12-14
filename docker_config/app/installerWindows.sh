@@ -10,6 +10,7 @@ installdb='true'
 installapi='true'
 installfront='true'
 installkeycloak='true'
+installwso='true'
 
 java1='services\backbuildings'
 javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
@@ -96,14 +97,11 @@ fi
 
 if [[ $installkeycloak = 'true' ]]
 then
-    if [[ $vue != '' ]]
-    then
-        # COMPILE KEYCLOAK FILES TO PRODUCTION
-        cd "${current}\\..\\..\\keycloak\\themes"
-        rm -f -r "${current}\\keycloak\\themes\\renergetic"
-        mkdir -p "${current}\\keycloak\\themes"
-        cp -f -r ".\\renergetic" "${current}\\keycloak\\themes\\renergetic"
-    fi
+    # COMPILE KEYCLOAK FILES TO PRODUCTION
+    cd "${current}\\..\\..\\keycloak\\themes"
+    rm -f -r "${current}\\keycloak\\themes\\renergetic"
+    mkdir -p "${current}\\keycloak\\themes"
+    cp -f -r ".\\renergetic" "${current}\\keycloak\\themes\\renergetic"
 
     cd  "${current}\\keycloak"
     # FRONTEND INSTALLATION
@@ -120,6 +118,23 @@ then
     # create kubernetes resources
     kubectl apply -f keycloak-deployment.yaml --force=true --namespace=$namespace
     kubectl apply -f keycloak-service.yaml --namespace=$namespace
+fi
+
+if [[ $installwso = 'true' ]]
+then
+    cd  "${current}\\wso2"
+    # WSO2 (API MANAGER) INSTALLATION
+    # set environment variables
+    eval $(minikube docker-env)
+
+    # delete kubernetes resources if exists
+    kubectl delete deployments/wso --namespace=$namespace
+    kubectl delete services/wso-sv --namespace=$namespace
+
+    # create kubernetes resources
+    kubectl apply -f wso-volume.yaml --namespace=$namespace
+    kubectl apply -f wso-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f wso-service.yaml --namespace=$namespace
 fi
 
 if [[ $installfront = 'true' ]]
