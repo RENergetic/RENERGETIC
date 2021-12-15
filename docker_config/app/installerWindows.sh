@@ -132,9 +132,9 @@ then
     kubectl delete services/wso-sv --namespace=$namespace
 
     # create kubernetes resources
-    kubectl apply -f wso-volume.yaml --namespace=$namespace
-    kubectl apply -f wso-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f wso-service.yaml --namespace=$namespace
+    kubectl apply -f wso2-volume.yaml --namespace=$namespace
+    kubectl apply -f wso2-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f wso2-service.yaml --namespace=$namespace
 fi
 
 if [[ $installfront = 'true' ]]

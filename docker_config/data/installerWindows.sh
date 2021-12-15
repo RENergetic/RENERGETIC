@@ -4,7 +4,7 @@ namespace='data'
 
 installdb='true'
 installapi='true'
-installback='true'
+installback='false'
 installkafka='true'
 installgrafana='true'
 javafile='backinflux-0.0.1-SNAPSHOT.jar'

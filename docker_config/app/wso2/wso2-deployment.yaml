@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: wso
-          image: wso2/wso2am:latest
+          image: wso2/wso2am:3.1.0
           imagePullPolicy: Always
           ports:
           - name: api-https
@@ -24,7 +24,7 @@ spec:
           - name: https
             containerPort: 9443
           volumeMounts:
-          - mountPath: /home/wso2carbon/wso2am-3.1.0/repository/deployment/server/
+          - mountPath: /home/wso2carbon/wso2am-3.1.0/repository/server/
             name: wso-disk
       restartPolicy: Always
       volumes:
