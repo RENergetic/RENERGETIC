@@ -19,9 +19,7 @@ export default {
               accountRoles : keycloak.resourceAccess.account.roles,
               realmRoles : keycloak.realmAccess.roles
             }
-            //console.log(data);
             localStorage.setItem('data',JSON.stringify(data))
-            //console.log(localStorage.getItem("data"));
         }).catch((e) => {
             console.log('failed to initialize ',e);
         });

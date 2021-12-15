@@ -21,7 +21,7 @@ const createRoutes = () => [
     path: "/graphs",
     name: "HeatDemand",
     component: HeatDemand,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, roles:['manager'] },
   },
   {
     path: "/forbidden",
@@ -34,6 +34,14 @@ const createRoutes = () => [
     component: NotFound,
   },
 ];
+
+function hasAccess(assignedRoles, allowedRoles){
+  for(var i=0;i<allowedRoles.length;i++){
+    if(assignedRoles.indexOf(allowedRoles[i])!==-1)
+      return true
+  }
+  return false
+}
 
 export const createRouter = (app) => {
     const router = createVueRouter({
@@ -49,11 +57,10 @@ export const createRouter = (app) => {
             if (!$keycloak.authenticated && data && !data.authenticated) {
               // The page is protected and the user is not authenticated. Force a login.
               $keycloak.login({ redirectUri: basePath.slice(0, -1) + to.path })
-            /*} else if (data.appRoles.indexOf('manager')!==-1){ // hasResourceRole('manager')) {
-              next()*/
-            } else { // The user was authenticated, but did not have the correct role (is not authorized) redirect the user to an error page
-              //next({ name: 'Forbidden' })
+            } else if (!to.meta.roles || (to.meta.roles && hasAccess(data.appRoles,to.meta.roles))){// hasResourceRole('manager')) {
               next()
+            } else { // The user was authenticated, but did not have the correct role (is not authorized) redirect the user to an error page
+              next({ name: 'Forbidden' })
             }
         } else {
           if (!$keycloak.authenticated && data && !data.authenticated) {
