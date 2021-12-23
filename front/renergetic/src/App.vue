@@ -7,6 +7,9 @@
             <article id = 'lytmain'><Main :ip = 'ip'/></article>
         </div>
     </div>
+    <!--<div v-if="!this.keycloak.authenticated">
+        <p>Not authenticated</p>
+    </div> -->
     <footer id = 'lytfooter'><Footer/></footer>
 </template>
 
@@ -17,7 +20,7 @@ import TopMenu from '@/layout/TopMenu.vue'
 import LeftMenu from '@/layout/LeftMenu.vue'
 import Main from '@/layout/Main.vue'
 import Footer from '@/layout/Footer.vue'
-
+import Keycloak from '@/plugins/authentication.js'
 // IMPORT EVENT LISTENER
 import layoutBus from '@/events/layout.js';
 
@@ -26,6 +29,7 @@ export default {
 
     data() {
         return {
+            keycloak:Keycloak,
             ip: 'http://127.0.0.1/api/islands'
         };
     },
@@ -45,7 +49,6 @@ export default {
         onchangeip(ip) {
             this.ip = ip;
         },
-
         changeVisibility(event){
                 console.log(`#app .${event.view}`);
                 document.querySelector(`#lyt${event.view.toLowerCase()}`).style = `display: ${event.show?'flex':'none'}`;
