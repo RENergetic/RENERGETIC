@@ -5,6 +5,7 @@ const initOptions = {url:'http://localhost/auth/', realm:'realm-renergetic', cli
 const keycloak = new Keycloak(initOptions)
 
 export default {
+    data: keycloak,
     install(app) {
         keycloak.init({
             onLoad: 'login-required',

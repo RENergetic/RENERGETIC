@@ -1,6 +1,8 @@
 import { createRouter as createVueRouter, createWebHistory } from 'vue-router'
+import Login from "@/pages/Login.vue"
 import Islands from "@/pages/Islands.vue";
 import HeatDemand from "@/pages/HeatDemand.vue";
+import Roles from "@/pages/Roles.vue";
 import Forbidden from "@/pages/Forbidden.vue";
 import NotFound from "@/pages/NotFound.vue";
 
@@ -8,7 +10,7 @@ const createRoutes = () => [
   {
     path: "/",
     name: "Home",
-    component: Islands,
+    component: Login,
     meta: { requiresAuth: true },
   },
   {
@@ -21,13 +23,18 @@ const createRoutes = () => [
     path: "/graphs",
     name: "HeatDemand",
     component: HeatDemand,
-    meta: { requiresAuth: true, roles:['manager'] },
+    meta: { requiresAuth: true, roles:['manager', 'admin'] },
+  },
+  {
+    path: "/roles",
+    name: "Roles",
+    component: Roles,
+    meta: { requiresAuth: true, roles:['manager', 'admin'] },
   },
   {
     path: "/forbidden",
     name: "Forbidden",
     component: Forbidden,
-    meta: { requiresAuth: false },
   },
   {
     path: "/:catchAll(.*)",
