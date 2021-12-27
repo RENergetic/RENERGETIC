@@ -1,13 +1,15 @@
 import Keycloak from 'keycloak-js'
 import axios from 'axios'
 
-const appName = 'renergetic-app'
-const initOptions = {url:'http://localhost/auth/', realm:'realm-renergetic', clientId: appName}
+const appName = process.env.VUE_APP_KEY_CLOAK_CLIENT_ID
+const keycloakUrl = process.env.VUE_APP_KEY_CLOAK_URL
+const realm =  process.env.VUE_APP_KEY_CLOAK_REALM
+const initOptions = {url:keycloakUrl+'/auth/', realm: realm, clientId: appName}
 const keycloak = new Keycloak(initOptions)
 
 export default {
     data: keycloak,
-    install(app) {
+    install(app,router) {
         keycloak.init({
             onLoad: 'login-required',
             //onLoad: 'check-sso',
@@ -15,13 +17,8 @@ export default {
         }).then( async(_authenticated) =>{
             app.config.globalProperties.authenticated = _authenticated;
             keycloak.authenticated = _authenticated ? true : false
-            const data = {
-              authenticated : keycloak.authenticated,
-              appRoles : keycloak.resourceAccess[appName].roles,
-              accountRoles : keycloak.resourceAccess.account.roles,
-              realmRoles : keycloak.realmAccess.roles
-            }
-            localStorage.setItem('data',JSON.stringify(data))
+            app.component("keycloak", keycloak);
+            app.use(router).mount("#app")
         }).catch((e) => {
             console.log('failed to initialize ',e);
         });
@@ -57,10 +54,7 @@ export default {
                 return users;
             }
             return undefined
-        }).catch((error) => {
-            console.warn(error.message);
-            console.warn(`No se puede conectar a ${this.ip}`);
-        });
+        })
     },
     async getUserRoles(user_id){
         axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
@@ -71,11 +65,11 @@ export default {
         let config = {
             headers: { Authorization: "Bearer "+ keycloak.token }
         };
-        let client_id = await this.getClientID();
+        let client_id = await this.getClientId();
         client_id = client_id.data[0].id;
         return axios.get(`http://localhost/auth/admin/realms/realm-renergetic/users/${user_id}/role-mappings/clients/${client_id}`, config);
     },
-    async getClientID(){
+    async getClientId(){
         axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
         axios.defaults.headers.post['Access-Control-Allow-Credentials'] = 'true';
         axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
@@ -86,5 +80,21 @@ export default {
         };
 
         return axios.get(`http://localhost/auth/admin/realms/realm-renergetic/clients?clientId=${appName}`, config);
+    },
+    assignRolesToUser(userId,clientId,body){
+        let config = {
+            headers: { Authorization: "Bearer "+ keycloak.token },
+            Accept: "*/*",
+            'Content-Type':"application/json"
+        };
+        axios.post(`${keycloakUrl}/auth/admin/realms/${realm}/users/${userId}/role-mappings/clients/${clientId}`, body,config)
+        .then((res) => {
+            console.log("user roles")
+            console.log(res)
+            return res
+        }).catch((error) => {
+            console.warn(error.message);
+            console.warn(`No se puede conectar a ${keycloakUrl}`);
+        });
     }
 };

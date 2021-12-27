@@ -22,13 +22,17 @@ export default {
             this.$router.replace({ name: event.target.value });
         },
         getPaths(){
-            for (const route of this.$router.getRoutes())
-                for (let role of Keycloak.data.resourceAccess['renergetic-app'].roles){
-                    if ((route.meta.roles == undefined || route.meta.roles.includes(role)) && route.meta.requiresAuth != undefined){
-                        this.paths.push({name: route.name, url: route.path});
-                        break;
+            for (const route of this.$router.getRoutes()){
+                if (Keycloak.data.resourceAccess['renergetic-app'] != undefined)
+                    for (let role of Keycloak.data.resourceAccess['renergetic-app'].roles){
+                        if (route.meta.roles != undefined && route.meta.roles.includes(role) && route.meta.requiresAuth != undefined){
+                            this.paths.push({name: route.name, url: route.path});
+                            break;
+                        }
                     }
-                }
+                if (route.meta.roles == undefined && route.meta.requiresAuth != undefined)
+                    this.paths.push({name: route.name, url: route.path});
+            }
         }
     },
     mounted(){

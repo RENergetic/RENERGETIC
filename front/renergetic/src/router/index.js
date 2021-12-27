@@ -5,6 +5,7 @@ import HeatDemand from "@/pages/HeatDemand.vue";
 import Roles from "@/pages/Roles.vue";
 import Forbidden from "@/pages/Forbidden.vue";
 import NotFound from "@/pages/NotFound.vue";
+import Administration from "@/pages/Administration.vue";
 
 const createRoutes = () => [
   {
@@ -23,13 +24,19 @@ const createRoutes = () => [
     path: "/graphs",
     name: "HeatDemand",
     component: HeatDemand,
-    meta: { requiresAuth: true, roles:['manager', 'admin'] },
+    meta: { requiresAuth: true, roles:['manager', 'administrator'] },
   },
   {
     path: "/roles",
     name: "Roles",
     component: Roles,
-    meta: { requiresAuth: true, roles:['manager', 'admin'] },
+    meta: { requiresAuth: true, roles:['manager', 'administrator'] },
+  },
+  {
+    path: "/administration",
+    name: "Administration",
+    component: Administration,
+    meta: { requiresAuth: true, roles:['manager', 'administrator'] },
   },
   {
     path: "/forbidden",
@@ -43,6 +50,7 @@ const createRoutes = () => [
 ];
 
 function hasAccess(assignedRoles, allowedRoles){
+  if(!allowedRoles || allowedRoles.length==0) return true
   for(var i=0;i<allowedRoles.length;i++){
     if(assignedRoles.indexOf(allowedRoles[i])!==-1)
       return true
@@ -59,18 +67,18 @@ export const createRouter = (app) => {
     router.beforeEach((to, from, next) => {
         const basePath = window.location.toString()
         const $keycloak = app.component('keycloak')
-        const data = JSON.parse(localStorage.getItem("data"))
         if (to.meta.requiresAuth) {
-            if (!$keycloak.authenticated && data && !data.authenticated) {
+            if (!$keycloak.authenticated){
               // The page is protected and the user is not authenticated. Force a login.
               $keycloak.login({ redirectUri: basePath.slice(0, -1) + to.path })
-            } else if (!to.meta.roles || (to.meta.roles && hasAccess(data.appRoles,to.meta.roles))){// hasResourceRole('manager')) {
+            } else if ((to.meta.roles == undefined) || 
+            $keycloak.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID] != undefined && hasAccess($keycloak.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,to.meta.roles)){
               next()
             } else { // The user was authenticated, but did not have the correct role (is not authorized) redirect the user to an error page
               next({ name: 'Forbidden' })
             }
         } else {
-          if (!$keycloak.authenticated && data && !data.authenticated) {
+          if (!$keycloak.authenticated){
             $keycloak.login({ redirectUri: window.location.origin })
           }else{
             next()

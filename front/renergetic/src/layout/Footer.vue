@@ -21,12 +21,6 @@ export default {
         logout () {
             Keycloak.logout({ redirectUri: window.location.origin })
         }
-    },
-    mounted(){
-        window.addEventListener('DOMContentLoaded',()=>{
-            console.log('borrado | '+this.showMenu);
-            layoutBus.emit('show', {view: 'leftmenu', show: this.showMenu});
-        });
     }
 }
 </script>
