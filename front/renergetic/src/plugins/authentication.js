@@ -69,6 +69,19 @@ export default {
         client_id = client_id.data[0].id;
         return axios.get(`http://localhost/auth/admin/realms/realm-renergetic/users/${user_id}/role-mappings/clients/${client_id}`, config);
     },
+    async getClientRoles(){
+        axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+        axios.defaults.headers.post['Access-Control-Allow-Credentials'] = 'true';
+        axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+        axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+
+        let config = {
+            headers: { Authorization: "Bearer "+ keycloak.token }
+        };
+        let client_id = await this.getClientId();
+        client_id = client_id.data[0].id;
+        return axios.get(`http://localhost/auth/admin/realms/realm-renergetic/clients/${client_id}/roles`, config);
+    },
     async getClientId(){
         axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
         axios.defaults.headers.post['Access-Control-Allow-Credentials'] = 'true';
@@ -81,16 +94,43 @@ export default {
 
         return axios.get(`http://localhost/auth/admin/realms/realm-renergetic/clients?clientId=${appName}`, config);
     },
-    assignRolesToUser(userId,clientId,body){
+    async assignRolesToUser(userId, body){
+        axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+        axios.defaults.headers.post['Access-Control-Allow-Credentials'] = 'true';
+        axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+        axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+
         let config = {
             headers: { Authorization: "Bearer "+ keycloak.token },
             Accept: "*/*",
             'Content-Type':"application/json"
         };
-        axios.post(`${keycloakUrl}/auth/admin/realms/${realm}/users/${userId}/role-mappings/clients/${clientId}`, body,config)
+        let client_id = await this.getClientId();
+        client_id = client_id.data[0].id;
+
+        axios.post(`${keycloakUrl}/auth/admin/realms/${realm}/users/${userId}/role-mappings/clients/${client_id}`, body,config)
         .then((res) => {
             console.log("user roles")
             console.log(res)
+            return res
+        }).catch((error) => {
+            console.warn(error.message);
+            console.warn(`No se puede conectar a ${keycloakUrl}`);
+        });
+    },
+    createUser(body){
+        axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+        axios.defaults.headers.post['Access-Control-Allow-Credentials'] = 'true';
+        axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+        axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+
+        let config = {
+            headers: { Authorization: "Bearer "+ keycloak.token },
+            Accept: "*/*",
+            'Content-Type':"application/json"
+        };
+        axios.post(`${keycloakUrl}/auth/admin/realms/${realm}/users`, body, config)
+        .then((res) => {
             return res
         }).catch((error) => {
             console.warn(error.message);

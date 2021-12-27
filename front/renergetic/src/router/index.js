@@ -30,13 +30,13 @@ const createRoutes = () => [
     path: "/roles",
     name: "Roles",
     component: Roles,
-    meta: { requiresAuth: true, roles:['manager', 'administrator'] },
+    meta: { requiresAuth: true, roles:['administrator'] },
   },
   {
     path: "/administration",
     name: "Administration",
     component: Administration,
-    meta: { requiresAuth: true, roles:['manager', 'administrator'] },
+    meta: { requiresAuth: true, roles:['administrator'] },
   },
   {
     path: "/forbidden",

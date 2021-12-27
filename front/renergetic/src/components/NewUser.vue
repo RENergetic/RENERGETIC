@@ -1,24 +1,49 @@
 <template>
     <div>
-        <input type="text" v-model="inputName" placeholder="Name"/><br>
-        <input type="text" v-model="inputPassword" placeholder="Password" @keyup.enter="addIsland"/><br>
-        <button @click="addIsland">Create</button>
+        <input type="text" v-model="username" placeholder="Username*"/><br>
+        <input type="text" v-model="firstName" placeholder="First Name"/><br>
+        <input type="text" v-model="lastName" placeholder="Last Name"/><br>
+        <input type="text" v-model="email" placeholder="Email"/><br>
+        <input type="text" v-model="password" placeholder="Password*" @keyup.enter="addUser"/><br>
+        <button @click="addUser">Create</button>
     </div>
 </template>
 
 <script>
-
+import Keycloak from '@/plugins/authentication.js'
 export default {
     name: 'NewUser',
     data() {
         return{
-            inputName: '',
-            inputPassword: ''
+            username: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            password: ''
         }
     },    
     methods: {
-        addIsland(){
-            this.$emit("event-add");
+        addUser(){
+            if(this.username != '' && this.password != '') {
+                let body = {
+                    enabled:true,
+                    attributes:{},
+                    groups:[],
+                    username:this.username? this.username : '',
+                    firstName: this.firstName? this.firstName : '',
+                    lastName: this.lastName? this.lastName : '',
+                    email: this.email? this.email : '',
+                    emailVerified:"false",
+                    credentials:[{type:"password", value:this.password, temporary:false}]
+                };
+
+                Keycloak.createUser(body);
+                this.username = '';
+                this.firstName = '';
+                this.lastName = '';
+                this.email = '';
+                this.password = '';
+            }
         }
     },
 }

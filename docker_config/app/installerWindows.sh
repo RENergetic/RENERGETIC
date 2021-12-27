@@ -13,7 +13,7 @@ installkeycloak='false'
 
 java1='services\backbuildings'
 javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
-installapi1='true'
+installapi1='false'
 
 while getopts n: flag
 do
@@ -22,7 +22,7 @@ do
     esac
 done
 
-minikube start --driver=docker
+#minikube start --driver=docker
 kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]
