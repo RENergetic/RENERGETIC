@@ -8,8 +8,8 @@ vue='front\renergetic'
 
 installdb='false'
 installapi='false'
-installfront='true'
-installkeycloak='false'
+installfront='false'
+installkeycloak='true'
 
 java1='services\backbuildings'
 javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
@@ -118,6 +118,7 @@ then
     docker build --no-cache --force-rm --tag=keycloak:latest .
 
     # create kubernetes resources
+    kubectl apply -f keycloak-volume.yaml --namespace=$namespace
     kubectl apply -f keycloak-deployment.yaml --force=true --namespace=$namespace
     kubectl apply -f keycloak-service.yaml --namespace=$namespace
 fi

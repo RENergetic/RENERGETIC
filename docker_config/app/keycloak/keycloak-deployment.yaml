@@ -23,13 +23,34 @@ spec:
           value: "admin"
         - name: PROXY_ADDRESS_FORWARDING
           value: "true"
+        - name: DB_VENDOR
+          value: "POSTGRES"
+        - name: DB_ADDR
+          value: "postgresql-db-sv"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_SCHEMA
+          value: "public"
+        - name: DB_DATABASE
+          value: "renerdb"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "postgres"
         ports:
         - name: http
           containerPort: 8080
         - name: https
           containerPort: 8443
+#        volumeMounts:
+#        - name: keycloak-diskc
+#          mountPath: /opt/jboss/keycloak/standalone/configuration/
         readinessProbe:
           httpGet:
             path: /auth/realms/master
             port: 8080
       restartPolicy: Always
+#      volumes:
+#        - name: keycloak-diskc
+#          persistentVolumeClaim:
+#            claimName: keycloak-disk
