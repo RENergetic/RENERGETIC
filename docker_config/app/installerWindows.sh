@@ -6,15 +6,15 @@ java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
 
-installdb='true'
-installapi='true'
-installfront='true'
-installkeycloak='true'
+installdb=''
+installapi=''
+installfront=''
+installkeycloak=''
 installwso='true'
 
 java1='services\backbuildings'
 javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
-installapi1='true'
+installapi1=''
 
 while getopts n: flag
 do
@@ -23,7 +23,7 @@ do
     esac
 done
 
-minikube start --driver=docker
+#minikube start --driver=docker
 kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]
@@ -126,6 +126,8 @@ then
     # WSO2 (API MANAGER) INSTALLATION
     # set environment variables
     eval $(minikube docker-env)
+
+    docker build --no-cache --force-rm --tag=wso2:latest .
 
     # delete kubernetes resources if exists
     kubectl delete deployments/wso --namespace=$namespace
