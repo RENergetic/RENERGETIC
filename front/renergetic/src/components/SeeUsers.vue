@@ -18,6 +18,7 @@
                     <td>{{user.name}}</td>
                     <td>{{user.roles.join(', ')}}</td>
                     <td><button class="edit_user" @click="editUser(user)">Edit</button></td>
+                    <td><button class="delete_user" @click="delUser(user)">Delete</button></td>
                 </tr>
                 <tr>
                     <td colspan="4">
@@ -32,7 +33,10 @@
             </thead>
             <tbody>
                 <tr v-for="role of user.roles" :key="role" >
-                    <td colspan="2">{{role}}</td>
+                    <td>{{role}}</td>
+                    <td>
+                        <button class="delete_user" @click='quitRole(role)'>Quit</button>
+                    </td>
                 </tr>
                 <tr v-if="available_roles.length > 0">
                     <td>
@@ -41,7 +45,7 @@
                         </select>
                     </td>
                     <td>
-                        <button @click='addRole'>Add</button>
+                        <button class="edit_user" @click='addRole'>Add</button>
                     </td>
                 </tr>
                 <tr>
@@ -71,7 +75,8 @@ export default {
     methods: {
         async getUsers(){
             this.users = [];
-            this.users = await Keycloak.getUsers()
+            this.users = await Keycloak.getUsers();
+
             for(let user of this.users) {
                 let roles = [];
                 for(let role of user.roles)
@@ -95,11 +100,16 @@ export default {
                 if (user.id == id)
                     return user;
         },
+        delUser(user = undefined) {
+            if (user != undefined) {
+                Keycloak.deleteUser(user.id).then(() => this.getUsers());
+            }
+        },
         async getAvailableRoles(){
             this.available_roles = [];
             let roles = await Keycloak.getClientRoles();
-
-            for (let role of roles.data)
+            
+            for (let role of roles)
                 if(!this.user.roles.includes(role.name))
                     this.available_roles.push(role);
 
@@ -109,11 +119,17 @@ export default {
         addRole(){
             for (let role of this.available_roles)
                 if (role.name == this.selected_role) {
-                    console.log(role);
                     Keycloak.assignRolesToUser(this.user.id, Array(role));
                     this.user.roles.push(role.name);
                     this.available_roles.splice(this.available_roles.indexOf(role), 1);
                     break;
+                }
+        },
+        async quitRole(roleName){
+            for(let role of await Keycloak.getClientRoles())
+                if(role.name == roleName){
+                    Keycloak.unAssignRolesToUser(this.user.id, Array(role));
+                    this.user.roles.splice(this.user.roles.indexOf(role.name), 1);
                 }
         },
         selectRole(value) {
@@ -184,6 +200,13 @@ export default {
     .edit_user {
         width: max-content;
         margin-top: 0.3em;
+    }
+
+    .delete_user {
+        width: max-content;
+        margin-top: 0.3em;
+        color: red;
+        border-color: red;
     }
 
     button {

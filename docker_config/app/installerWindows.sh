@@ -6,14 +6,14 @@ java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
 
-installdb='false'
-installapi='false'
-installfront='false'
+installdb='true'
+installapi='true'
+installfront='true'
 installkeycloak='true'
 
 java1='services\backbuildings'
 javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
-installapi1='false'
+installapi1='true'
 
 while getopts n: flag
 do
@@ -22,7 +22,7 @@ do
     esac
 done
 
-#minikube start --driver=docker
+minikube start --driver=docker
 kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]

@@ -2,7 +2,6 @@ import { createRouter as createVueRouter, createWebHistory } from 'vue-router'
 import Login from "@/pages/Login.vue"
 import Islands from "@/pages/Islands.vue";
 import HeatDemand from "@/pages/HeatDemand.vue";
-import Roles from "@/pages/Roles.vue";
 import Forbidden from "@/pages/Forbidden.vue";
 import NotFound from "@/pages/NotFound.vue";
 import Administration from "@/pages/Administration.vue";
@@ -25,12 +24,6 @@ const createRoutes = () => [
     name: "HeatDemand",
     component: HeatDemand,
     meta: { requiresAuth: true, roles:['manager', 'administrator'] },
-  },
-  {
-    path: "/roles",
-    name: "Roles",
-    component: Roles,
-    meta: { requiresAuth: true, roles:['administrator'] },
   },
   {
     path: "/administration",

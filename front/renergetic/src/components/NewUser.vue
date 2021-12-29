@@ -37,12 +37,14 @@ export default {
                     credentials:[{type:"password", value:this.password, temporary:false}]
                 };
 
-                Keycloak.createUser(body);
-                this.username = '';
-                this.firstName = '';
-                this.lastName = '';
-                this.email = '';
-                this.password = '';
+                Keycloak.createUser(body).then(()=> {
+                    this.username = '';
+                    this.firstName = '';
+                    this.lastName = '';
+                    this.email = '';
+                    this.password = '';
+                    this.$emit("event-add");
+                });
             }
         }
     },
