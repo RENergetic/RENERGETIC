@@ -16,10 +16,15 @@ spec:
     spec:
       containers:
         - name: postgresql-db
-          image: postgres:latest
+          image: docker-registry.default.svc:5000/ren-prototype/postgres:latest
+          imagePullPolicy: Always
           volumeMounts:
             - name: postgresql-db-disk
               mountPath: /data
+          resources:
+            limits:
+              cpu: 10m
+              memory: 200Mi
           # Config from ConfigMap
           envFrom:
           - configMapRef:

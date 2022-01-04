@@ -14,8 +14,12 @@ spec:
     spec:
       containers:
         - name: backinflux
-          image: backinflux:latest
-          imagePullPolicy: Never
+          image: docker-registry.default.svc:5000/ren-prototype/backinflux:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8084
+          resources:
+            limits:
+              cpu: 200m
+              memory: 250Mi
       restartPolicy: Always

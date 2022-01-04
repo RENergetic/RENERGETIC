@@ -1,36 +1,35 @@
 current=$(pwd -W tr / \\)
 
-namespace='data'
+user='your_user'
+token='your_key'
 
 installdb='true'
-installapi='true'
-installback='true'
-installkafka='true'
-installgrafana='true'
+installapi=''
+installback=''
+installkafka=''
+installgrafana=''
 javafile='backinflux-0.0.1-SNAPSHOT.jar'
 
-while getopts n: flag
-do
-    case "${flag}" in
-        n) namespace=${OPTARG};
-    esac
-done
-
-minikube start --driver=docker
-kubectl create namespace $namespace
+oc login https://console.paas-dev.psnc.pl --token=$token
 
 if [[ $installdb = 'true' ]]
 then
     cd  "${current}\db"
     # DATABASE INSTALATION
     # delete kubernetes resources if exists
-    kubectl delete deployment/influx-db --namespace=$namespace
-    kubectl delete services/influx-db-sv --namespace=$namespace
+    kubectl delete deployment/influx-db
+    kubectl delete services/influx-db-sv
+    
+    # create docker image
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype/influxdb:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/ren-prototype/influxdb:latest
 
     # create kubernetes resources
-    kubectl apply -f influx-volume.yaml --namespace=$namespace
-    kubectl apply -f influx-deployment.yaml --namespace=$namespace
-    kubectl apply -f influx-service.yaml --namespace=$namespace
+    kubectl apply -f influx-secrets.yaml
+    kubectl apply -f influx-volume.yaml
+    kubectl apply -f influx-deployment.yaml
+    kubectl apply -f influx-service.yaml
 fi
 
 if [[ $installapi = 'true' ]]
@@ -46,15 +45,17 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/backinflux --namespace=$namespace
-    kubectl delete services/backinflux-sv --namespace=$namespace
+    kubectl delete deployments/backinflux
+    kubectl delete services/backinflux-sv
 
     # create docker image
-    docker build --no-cache --force-rm --tag=backinflux:latest .
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype/backinflux:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/ren-prototype/backinflux:latest
     
     # create kubernetes resources
-    kubectl apply -f backinflux-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f backinflux-service.yaml --namespace=$namespace
+    kubectl apply -f backinflux-deployment.yaml --force=true
+    kubectl apply -f backinflux-service.yaml
 fi
 
 if [[ $installback = 'true' ]]
@@ -65,8 +66,8 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/nifi --namespace=$namespace
-    kubectl delete services/nifi-sv --namespace=$namespace
+    kubectl delete deployments/nifi
+    kubectl delete services/nifi-sv
 
     # create docker image
     docker build --no-cache --force-rm --tag=nifi:latest .
@@ -74,7 +75,7 @@ then
     # create kubernetes resources
     #-kubectl apply -f nifi-deployment.yaml --force=true --namespace=$namespace
     #-kubectl apply -f nifi-service.yaml --namespace=$namespace
-    kubectl apply -f nifi.yaml --force=true --namespace=$namespace
+    kubectl apply -f nifi.yaml --force=true
 fi
 
 if [[ $installkafka = 'true' ]]
@@ -82,15 +83,15 @@ then
     cd  "${current}\\kafka"
     # KAFKA INSTALATION
     # delete kubernetes resources if exists
-    kubectl delete deployments/zookeeper --namespace=$namespace
-    kubectl delete services/zookeeper-sv --namespace=$namespace
+    kubectl delete deployments/zookeeper
+    kubectl delete services/zookeeper-sv
 
-    kubectl delete deployments/kafka-broker --namespace=$namespace
-    kubectl delete services/kafka-sv --namespace=$namespace
+    kubectl delete deployments/kafka-broker
+    kubectl delete services/kafka-sv
 
     # create kubernetes resources
-    kubectl apply -f zookeeper.yaml --namespace=$namespace
-    kubectl apply -f kafka.yaml --namespace=$namespace
+    kubectl apply -f zookeeper.yaml
+    kubectl apply -f kafka.yaml
 fi
 
 if [[ $installgrafana = 'true' ]]
@@ -98,17 +99,17 @@ then
     cd  "${current}\\grafana"
     # GRAFANA INSTALATION
     # delete kubernetes resources if exists
-    kubectl delete deployments/grafana --namespace=$namespace
-    kubectl delete services/grafana-sv --namespace=$namespace
+    kubectl delete deployments/grafana
+    kubectl delete services/grafana-sv
 
     # create kubernetes resources
-    kubectl apply -f grafana-config.yaml --namespace=$namespace
-    kubectl apply -f grafana-volume.yaml --namespace=$namespace
-    kubectl apply -f grafana-deployment.yaml --namespace=$namespace
-    kubectl apply -f grafana-service.yaml --namespace=$namespace
+    kubectl apply -f grafana-config.yaml
+    kubectl apply -f grafana-volume.yaml
+    kubectl apply -f grafana-deployment.yaml
+    kubectl apply -f grafana-service.yaml
 fi
 
 echo "Installation has finished :). Remember to execute in a different console:"
-	echo "	minikube service grafana-sv --namespace ${namespace}"
+	echo "	minikube service grafana-sv"
     read -p "Press any key to end ..."
 clear

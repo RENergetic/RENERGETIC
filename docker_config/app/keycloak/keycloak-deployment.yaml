@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: keycloak
-        image: keycloak:latest
-        imagePullPolicy: Never
+        image: docker-registry.default.svc:5000/ren-prototype/keycloak:latest
+        imagePullPolicy: IfNotPresent
         env:
         - name: KEYCLOAK_USER
           value: "admin"
@@ -42,6 +42,10 @@ spec:
           containerPort: 8080
         - name: https
           containerPort: 8443
+        resources:
+          limits:
+            cpu: 800m
+            memory: 700Mi
 #        volumeMounts:
 #        - name: keycloak-diskc
 #          mountPath: /opt/jboss/keycloak/standalone/configuration/
