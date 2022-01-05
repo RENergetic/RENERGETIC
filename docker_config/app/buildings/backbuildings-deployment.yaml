@@ -19,6 +19,9 @@ spec:
           ports:
             - containerPort: 8088
           resources:
+            requests:
+              cpu: 50m
+              memory: 220Mi
             limits:
               cpu: 200m
               memory: 250Mi

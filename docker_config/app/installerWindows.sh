@@ -1,16 +1,16 @@
 current=$(pwd -W tr / \\)
 
 user='your_user'
-token='your_key'
+token='your_token'
+project='ren-prototype'
 
 java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
-vue=''
-#'front\renergetic'
+vue='front\renergetic'
 
 installdb='true'
 installapi='true'
-installfront=''
+installfront='true'
 installkeycloak='true'
 
 java1='services\backbuildings'
@@ -18,6 +18,7 @@ javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
 installapi1='true'
 
 oc login https://console.paas-dev.psnc.pl --token=$token
+oc project $project
 
 if [[ $installdb = 'true' ]]
 then
@@ -29,9 +30,9 @@ then
     kubectl delete services/postgresql-db-sv
 	
     # create docker image
-    #docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype/postgres:latest .
-    #docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    #docker push registry.apps.paas-dev.psnc.pl/ren-prototype/postgres:latest
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/postgres:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/postgres:latest
 
     # create kubernetes resources
     kubectl apply -f postgresql-configmap.yaml
@@ -59,9 +60,9 @@ then
     kubectl delete services/backdb-sv
 
     # create docker image
-    #docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype/backdb:latest .
-    #docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    #docker push registry.apps.paas-dev.psnc.pl/ren-prototype/backdb:latest
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backdb:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/backdb:latest
     
     # create kubernetes resources
     kubectl apply -f backdb-deployment.yaml --force=true
@@ -88,9 +89,9 @@ then
     kubectl delete services/backbuildings-sv
 
     # create docker image
-    #docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype/backbuildings:latest .
-    #docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    #docker push registry.apps.paas-dev.psnc.pl/ren-prototype/backbuildings:latest
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest
     
     # create kubernetes resources
     kubectl apply -f backbuildings-deployment.yaml --force=true
@@ -118,9 +119,9 @@ then
     kubectl delete services/keycloak-sv
 
     # create docker image
-    #docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype/keycloak:latest .
-    #docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    #docker push registry.apps.paas-dev.psnc.pl/ren-prototype/keycloak:latest
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/keycloak:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/keycloak:latest
 
     # create kubernetes resources
     kubectl apply -f keycloak-deployment.yaml --force=true
@@ -151,9 +152,9 @@ then
     kubectl delete configmaps/frontvue-configmap-config
 
     # create docker image
-    #docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype/frontvue:latest .
-    #docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    #docker push registry.apps.paas-dev.psnc.pl/ren-prototype/frontvue:latest
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/frontvue:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/frontvue:latest
 
     # create configuration files
     #kubectl create configmap frontvue-configmap-ui --from-file=./dist/

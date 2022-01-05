@@ -3,7 +3,7 @@ current=$(pwd -W tr / \\)
 # CREATE A NAMESPACE IN KUBERNETE TO TEST JENKINS AND SONARKUBE
 # CREATE A KUBERNETES INSTANCE OF PROGRAMS IF VARIABLES ARE SETTING TO TRUE
 installsonarqube='true'
-installjenkins='true'
+installjenkins=''
 
 minikube start --driver=docker
 

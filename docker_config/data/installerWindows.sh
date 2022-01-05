@@ -1,16 +1,18 @@
 current=$(pwd -W tr / \\)
 
 user='your_user'
-token='your_key'
+token='your_token'
+project='ren-prototype'
 
 installdb='true'
-installapi=''
+installapi='true'
 installback=''
 installkafka=''
-installgrafana=''
+installgrafana='true'
 javafile='backinflux-0.0.1-SNAPSHOT.jar'
 
 oc login https://console.paas-dev.psnc.pl --token=$token
+oc project $project
 
 if [[ $installdb = 'true' ]]
 then
@@ -21,9 +23,9 @@ then
     kubectl delete services/influx-db-sv
     
     # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype/influxdb:latest .
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/influxdb:latest .
     docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/ren-prototype/influxdb:latest
+    docker push registry.apps.paas-dev.psnc.pl/$project/influxdb:latest
 
     # create kubernetes resources
     kubectl apply -f influx-secrets.yaml
@@ -49,9 +51,9 @@ then
     kubectl delete services/backinflux-sv
 
     # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype/backinflux:latest .
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backinflux:latest .
     docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/ren-prototype/backinflux:latest
+    docker push registry.apps.paas-dev.psnc.pl/$project/backinflux:latest
     
     # create kubernetes resources
     kubectl apply -f backinflux-deployment.yaml --force=true
@@ -101,6 +103,11 @@ then
     # delete kubernetes resources if exists
     kubectl delete deployments/grafana
     kubectl delete services/grafana-sv
+
+    # create docker image
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/grafana:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/grafana:latest
 
     # create kubernetes resources
     kubectl apply -f grafana-config.yaml

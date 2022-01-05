@@ -22,8 +22,11 @@ spec:
             - name: postgresql-db-disk
               mountPath: /data
           resources:
+            requests:
+              cpu: 20m
+              memory: 200Mi
             limits:
-              cpu: 10m
+              cpu: 50m
               memory: 200Mi
           # Config from ConfigMap
           envFrom:
