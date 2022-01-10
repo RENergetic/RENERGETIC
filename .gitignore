@@ -25,4 +25,4 @@ keycloak/themes/keycloak.v2/
 keycloak/themes/keycloak/
 keycloak/version.txt
 keycloak/welcome-content/
-
+services/*/target/*.jar
