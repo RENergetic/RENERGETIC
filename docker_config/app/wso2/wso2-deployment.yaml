@@ -15,7 +15,7 @@ spec:
       containers:
         - name: wso
           image: docker-registry.default.svc:5000/ren-prototype/wso2:latest
-          imagePullPolicy: Never
+          imagePullPolicy: Always
           ports:
           - name: api-https
             containerPort: 8243
@@ -23,12 +23,19 @@ spec:
             containerPort: 8280
           - name: https
             containerPort: 9443
-          volumeMounts:
-          - mountPath: /home/wso2carbon/wso2am-4.0.0/repository/server/
-            name: wso-disk
+#          volumeMounts:
+#          - mountPath: /home/wso2carbon/wso2am-4.0.0/repository/server/
+#            name: wso-disk
+          resources:
+            requests:
+              cpu: 200m
+              memory: 1200Mi
+            limits:
+              cpu: 500m
+              memory: 2000Mi
       restartPolicy: Always
-      volumes:
-        - name: wso-disk
-          persistentVolumeClaim:
-            claimName: wso-disk
+#      volumes:
+#        - name: wso-disk
+#          persistentVolumeClaim:
+#            claimName: wso-disk
 # /home/wso2carbon/wso2am-3.1.0/repository/deployment/server/

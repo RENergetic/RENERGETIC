@@ -133,19 +133,19 @@ then
     # set environment variables
     eval $(minikube docker-env)
 
+    # delete kubernetes resources if exists
+    kubectl delete deployments/wso
+    kubectl delete services/wso-sv
+
     # create docker image
     docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/wso2:latest .
     docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
     docker push registry.apps.paas-dev.psnc.pl/$project/wso2:latest
 
-    # delete kubernetes resources if exists
-    kubectl delete deployments/wso --namespace=$namespace
-    kubectl delete services/wso-sv --namespace=$namespace
-
     # create kubernetes resources
-    kubectl apply -f wso2-volume.yaml --namespace=$namespace
-    kubectl apply -f wso2-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f wso2-service.yaml --namespace=$namespace
+#    kubectl apply -f wso2-volume.yaml
+    kubectl apply -f wso2-deployment.yaml --force=true
+    kubectl apply -f wso2-service.yaml
 fi
 
 if [[ $installfront = 'true' ]]

@@ -15,7 +15,7 @@ spec:
       containers:
         - name: backbuildings
           image: docker-registry.default.svc:5000/ren-prototype/backbuildings:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8088
           resources:

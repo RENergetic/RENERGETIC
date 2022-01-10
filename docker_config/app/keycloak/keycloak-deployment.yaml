@@ -15,7 +15,7 @@ spec:
       containers:
       - name: keycloak
         image: docker-registry.default.svc:5000/ren-prototype/keycloak:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: KEYCLOAK_USER
           value: "admin"
