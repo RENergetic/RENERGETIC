@@ -1,0 +1,12 @@
+# Backdb Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backbuildings-sv
+spec:
+  selector:
+    app: backbuildings
+  ports:
+    - protocol: TCP
+      port: 8088
+      targetPort: 8088

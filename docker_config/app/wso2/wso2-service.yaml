@@ -7,10 +7,10 @@ spec:
   selector:
     app: wso
   ports:
-    - name: uno
+    - name: api-https
       port: 8243
       targetPort: 8243
-    - name: dos
+    - name: api-http
       port: 8280
       targetPort: 8280
     - name: https

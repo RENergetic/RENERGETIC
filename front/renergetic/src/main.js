@@ -5,4 +5,4 @@ import Keycloak from './plugins/authentication'
 
 const app = createApp(App)
 const router = createRouter(app)
-app.use(Keycloak).use(router).mount("#app");
+app.use(Keycloak,router);

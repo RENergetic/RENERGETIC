@@ -14,8 +14,28 @@ spec:
     spec:
       containers:
         - name: frontvue
-          image: frontvue:latest
-          imagePullPolicy: Never
+          image: docker-registry.default.svc:5000/ren-prototype/frontvue:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 80
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 50Mi
+            limits:
+              cpu: 150m
+              memory: 100Mi
+#          volumeMounts:
+#            - name: frontvue-config
+#              mountPath: /etc/nginx/conf.d/default.conf
+#              subPath: default.conf
+#            - name: frontvue-interface
+#              mountPath: /usr/share/nginx/html/
       restartPolicy: Always
+#      volumes:
+#        - name: frontvue-config
+#          configMap:
+#            name: frontvue-configmap-config
+#        - name: frontvue-interface
+#          configMap:
+#            name: frontvue-configmap-ui

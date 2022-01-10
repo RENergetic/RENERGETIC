@@ -14,8 +14,15 @@ spec:
     spec:
       containers:
         - name: backdb
-          image: backdb:latest
-          imagePullPolicy: Never
+          image: docker-registry.default.svc:5000/ren-prototype/backdb:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8082
+          resources:
+            requests:
+              cpu: 50m
+              memory: 220Mi
+            limits:
+              cpu: 200m
+              memory: 250Mi
       restartPolicy: Always

@@ -1,11 +1,16 @@
 current=$(pwd -W tr / \\)
 
+user='your_user'
+token='your_token'
+project='ren-prototype-devops'
+
 # CREATE A NAMESPACE IN KUBERNETE TO TEST JENKINS AND SONARKUBE
 # CREATE A KUBERNETES INSTANCE OF PROGRAMS IF VARIABLES ARE SETTING TO TRUE
 installsonarqube='true'
-installjenkins='true'
+installjenkins=''
 
-minikube start --driver=docker
+oc login https://console.paas-dev.psnc.pl --token=$token
+oc project $project
 
 if [[ $installsonarqube = 'true' ]]
 then
@@ -19,7 +24,9 @@ then
     kubectl delete services/sonarqube-sv
 
     # create docker image
-    docker build --no-cache --force-rm --tag=sonarqube:latest .
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/sonarqube:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/sonarqube:latest
 
     # create kubernetes resources
     kubectl apply -f sonar-deployment.yaml --force=true

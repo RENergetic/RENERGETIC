@@ -20,7 +20,7 @@ import NewIsland from '@/components/NewIsland.vue'
 import SeeIslands from '@/components/SeeIslands.vue'
 
 export default {
-    name: 'Main',
+    name: 'Islands',
     data() {
         return {
             ip: 'http://127.0.0.1/api/',

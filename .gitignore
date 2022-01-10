@@ -3,6 +3,11 @@ docker_config/data/api/backinflux-0.0.1-SNAPSHOT.jar
 docker_config/app/buildings/buildingsService-0.0.1-SNAPSHOT.jar
 docker_config/app/front/dist
 docker_config/app/keycloak/themes
+docker_config_local/app/api/backdb-0.0.1-SNAPSHOT.jar
+docker_config_local/data/api/backinflux-0.0.1-SNAPSHOT.jar
+docker_config_local/app/buildings/buildingsService-0.0.1-SNAPSHOT.jar
+docker_config_local/app/front/dist
+docker_config_local/app/keycloak/themes
 keycloak/Dockerfile
 keycloak/LICENSE.txt
 keycloak/bin/

@@ -1,44 +1,44 @@
 current=$(pwd -W tr / \\)
 
-namespace='app'
+user='your_user'
+token='your_token'
+project='ren-prototype'
 
 java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
 
-installdb=''
-installapi=''
-installfront=''
-installkeycloak=''
+installdb='true'
+installapi='true'
+installfront='true'
+installkeycloak='true'
 installwso='true'
 
 java1='services\backbuildings'
 javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
-installapi1=''
+installapi1='true'
 
-while getopts n: flag
-do
-    case "${flag}" in
-        n) namespace=${OPTARG};
-    esac
-done
-
-#minikube start --driver=docker
-kubectl create namespace $namespace
+oc login https://console.paas-dev.psnc.pl --token=$token
+oc project $project
 
 if [[ $installdb = 'true' ]]
 then
     cd  "${current}\\db"
     # DATABASE INSTALATION
 	# delete kubernetes resources if exists
-    kubectl delete configmaps/postgres-db-config --namespace=$namespace
-    kubectl delete statefulsets/postgresql-db --namespace=$namespace
-    kubectl delete services/postgres-db-sv --namespace=$namespace
+    kubectl delete configmaps/postgresql-db-config
+    kubectl delete statefulsets/postgresql-db
+    kubectl delete services/postgresql-db-sv
 	
+    # create docker image
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/postgres:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/postgres:latest
+
     # create kubernetes resources
-    kubectl apply -f postgresql-configmap.yaml --namespace=$namespace
-    kubectl apply -f postgresql.yaml --namespace=$namespace
-    kubectl apply -f postgresql-service.yaml --namespace=$namespace
+    kubectl apply -f postgresql-configmap.yaml
+    kubectl apply -f postgresql.yaml
+    kubectl apply -f postgresql-service.yaml
 fi
 
 if [[ $installapi = 'true' ]]
@@ -57,15 +57,17 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/backdb --namespace=$namespace
-    kubectl delete services/backdb-sv --namespace=$namespace
+    kubectl delete deployments/backdb
+    kubectl delete services/backdb-sv
 
     # create docker image
-    docker build --no-cache --force-rm --tag=backdb:latest .
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backdb:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/backdb:latest
     
     # create kubernetes resources
-    kubectl apply -f backdb-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f backdb-service.yaml --namespace=$namespace
+    kubectl apply -f backdb-deployment.yaml --force=true
+    kubectl apply -f backdb-service.yaml
 fi
 
 if [[ $installapi1 = 'true' ]]
@@ -84,15 +86,17 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/backbuildings --namespace=$namespace
-    kubectl delete services/backbuildings-sv --namespace=$namespace
+    kubectl delete deployments/backbuildings
+    kubectl delete services/backbuildings-sv
 
     # create docker image
-    docker build --no-cache --force-rm --tag=backbuildings:latest .
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest
     
     # create kubernetes resources
-    kubectl apply -f backbuildings-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f backbuildings-service.yaml --namespace=$namespace
+    kubectl apply -f backbuildings-deployment.yaml --force=true
+    kubectl apply -f backbuildings-service.yaml
 fi
 
 if [[ $installkeycloak = 'true' ]]
@@ -109,15 +113,17 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/keycloak --namespace=$namespace
-    kubectl delete services/keycloak-sv --namespace=$namespace
+    kubectl delete deployments/keycloak
+    kubectl delete services/keycloak-sv
 
     # create docker image
-    docker build --no-cache --force-rm --tag=keycloak:latest .
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/keycloak:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/keycloak:latest
 
     # create kubernetes resources
-    kubectl apply -f keycloak-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f keycloak-service.yaml --namespace=$namespace
+    kubectl apply -f keycloak-deployment.yaml --force=true
+    kubectl apply -f keycloak-service.yaml
 fi
 
 if [[ $installwso = 'true' ]]
@@ -127,7 +133,10 @@ then
     # set environment variables
     eval $(minikube docker-env)
 
-    docker build --no-cache --force-rm --tag=wso2:latest .
+    # create docker image
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/wso2:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/wso2:latest
 
     # delete kubernetes resources if exists
     kubectl delete deployments/wso --namespace=$namespace
@@ -157,15 +166,23 @@ then
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/frontvue --namespace=$namespace
-    kubectl delete services/frontvue-sv --namespace=$namespace
+    kubectl delete deployments/frontvue
+    kubectl delete services/frontvue-sv
+    kubectl delete configmaps/frontvue-configmap-ui
+    kubectl delete configmaps/frontvue-configmap-config
 
     # create docker image
-    docker build --no-cache --force-rm --tag=frontvue:latest .
+    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/frontvue:latest .
+    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+    docker push registry.apps.paas-dev.psnc.pl/$project/frontvue:latest
+
+    # create configuration files
+    #kubectl create configmap frontvue-configmap-ui --from-file=./dist/
+    #kubectl create configmap frontvue-configmap-config --from-file=./default.conf
 
     # create kubernetes resources
-    kubectl apply -f frontvue-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f frontvue-service.yaml --namespace=$namespace
+    kubectl apply -f frontvue-deployment.yaml --force=true
+    kubectl apply -f frontvue-service.yaml
 fi
 
 echo "Installation has finished :). Remember to execute in a different console:"

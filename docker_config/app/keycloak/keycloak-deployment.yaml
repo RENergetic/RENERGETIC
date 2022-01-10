@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: keycloak
-        image: keycloak:latest
-        imagePullPolicy: Never
+        image: docker-registry.default.svc:5000/ren-prototype/keycloak:latest
+        imagePullPolicy: IfNotPresent
         env:
         - name: KEYCLOAK_USER
           value: "admin"
@@ -23,13 +23,41 @@ spec:
           value: "admin"
         - name: PROXY_ADDRESS_FORWARDING
           value: "true"
+        - name: DB_VENDOR
+          value: "POSTGRES"
+        - name: DB_ADDR
+          value: "postgresql-db-sv"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_SCHEMA
+          value: "public"
+        - name: DB_DATABASE
+          value: "renerdb"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "postgres"
         ports:
         - name: http
           containerPort: 8080
         - name: https
           containerPort: 8443
+        resources:
+          requests:
+            cpu: 250m
+            memory: 600Mi
+          limits:
+            cpu: 800m
+            memory: 700Mi
+#        volumeMounts:
+#        - name: keycloak-diskc
+#          mountPath: /opt/jboss/keycloak/standalone/configuration/
         readinessProbe:
           httpGet:
             path: /auth/realms/master
             port: 8080
       restartPolicy: Always
+#      volumes:
+#        - name: keycloak-diskc
+#          persistentVolumeClaim:
+#            claimName: keycloak-disk

@@ -14,8 +14,15 @@ spec:
     spec:
       containers:
         - name: sonarqube
-          image: sonarqube:latest
-          imagePullPolicy: Never
+          image: docker-registry.default.svc:5000/ren-prototype-devops/sonarqube:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 9000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1750Mi
+            limits:
+              cpu: 250m
+              memory: 2200Mi
       restartPolicy: Always

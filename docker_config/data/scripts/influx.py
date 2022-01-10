@@ -33,7 +33,7 @@ client.create_database(database)
 
 if (len(argv) > 1):
     if (argv[1] == '-i' and isfile(argv[2])):
-        file = open(argv[1], 'r')
+        file = open(argv[2], 'r')
 
         json = list()
         for line in file:
@@ -53,3 +53,6 @@ if (len(argv) > 1):
         client.write_points(json)
     elif (argv[1] == '-d'):
         client.drop_measurement(argv[2])
+    elif (argv[1] == '-s'):
+        for measure in client.query('SELECT * FROM %s' %argv[2]).get_points():
+            print(measure)

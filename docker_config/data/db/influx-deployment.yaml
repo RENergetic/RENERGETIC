@@ -13,10 +13,18 @@ spec:
         app: influx-db
     spec:
       containers:
-        - image: influxdb:1.8.10
+        - image: docker-registry.default.svc:5000/ren-prototype/influxdb:latest
           name: influx-db
+          imagePullPolicy: Always
           ports:
             - containerPort: 8086
+          resources:
+            requests:
+              cpu: 20m
+              memory: 200Mi
+            limits:
+              cpu: 200m
+              memory: 200Mi
           volumeMounts:
             - mountPath: /var/lib/influxdb
               name: influx-disk

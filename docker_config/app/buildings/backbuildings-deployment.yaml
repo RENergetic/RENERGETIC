@@ -14,8 +14,15 @@ spec:
     spec:
       containers:
         - name: backbuildings
-          image: backbuildings
-          imagePullPolicy: Never
+          image: docker-registry.default.svc:5000/ren-prototype/backbuildings:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8088
+          resources:
+            requests:
+              cpu: 50m
+              memory: 220Mi
+            limits:
+              cpu: 200m
+              memory: 250Mi
       restartPolicy: Always

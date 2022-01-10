@@ -8,7 +8,7 @@
     export default {
         data() {
             return {
-                graphicUrl: 'http://localhost:3000/d/cRQGpjpnk/consumption-forecasting?orgId=2&from=1606816726788&to=1638352726788&theme=light&panelId=2',
+                graphicUrl: 'http://localhost:3000/d-solo/nq5m1s0nk/renergetic-forecast?orgId=1&from=1634427441815&to=1636724258711&panelId=2',
             }
         }
     }
