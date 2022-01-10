@@ -20,9 +20,9 @@ spec:
             - containerPort: 9000
           resources:
             requests:
-              cpu: 100m
-              memory: 1750Mi
+              cpu: 200m
+              memory: 1200Mi
             limits:
-              cpu: 250m
-              memory: 2200Mi
+              cpu: 450m
+              memory: 1700Mi
       restartPolicy: Always

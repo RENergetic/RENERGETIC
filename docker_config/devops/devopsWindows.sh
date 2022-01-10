@@ -1,7 +1,7 @@
 current=$(pwd -W tr / \\)
 
-user='your_user'
-token='your_token'
+user='tomas.garcia-cabanero@inetum.com'
+token='GC86Q22xSqRA1LpXgoG1t9GYxwe1CPqRpEBDv-cZQFU'
 project='ren-prototype-devops'
 
 # CREATE A NAMESPACE IN KUBERNETE TO TEST JENKINS AND SONARKUBE
