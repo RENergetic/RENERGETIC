@@ -1,22 +1,21 @@
 current=$(pwd -W tr / \\)
 
-user='your_user'
-token='your_token'
+user='PaaS_user'
+token='Personal_token'
 project='ren-prototype'
 
-java='services\backdb'
+buildimages='true'
+compileapps='true'
+
 javafile='backdb-0.0.1-SNAPSHOT.jar'
-vue='front\renergetic'
+javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
 
 installdb='true'
-installapi='true'
+installapi='true'   # API ISLANDS
+installapi1='true'  # API BUILDINGS
 installfront='true'
 installkeycloak='true'
 installwso='true'
-
-java1='services\backbuildings'
-javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
-installapi1='true'
 
 oc login https://console.paas-dev.psnc.pl --token=$token
 oc project $project
@@ -30,10 +29,13 @@ then
     kubectl delete statefulsets/postgresql-db
     kubectl delete services/postgresql-db-sv
 	
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/postgres:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/postgres:latest
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/postgres:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/postgres:latest
+    fi
 
     # create kubernetes resources
     kubectl apply -f postgresql-configmap.yaml
@@ -43,7 +45,7 @@ fi
 
 if [[ $installapi = 'true' ]]
 then
-    if [[ $java != '' ]]
+    if [[ $compileapps = 'true' ]]
     then
         # API COMPILE TO JAR
         cd "${current}\\..\\..\\services\\backdb"
@@ -60,10 +62,14 @@ then
     kubectl delete deployments/backdb
     kubectl delete services/backdb-sv
 
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backdb:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/backdb:latest
+
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backdb:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/backdb:latest
+    fi
     
     # create kubernetes resources
     kubectl apply -f backdb-deployment.yaml --force=true
@@ -72,7 +78,7 @@ fi
 
 if [[ $installapi1 = 'true' ]]
 then
-    if [[ $java1 != '' ]]
+    if [[ $compileapps = 'true' ]]
     then
         # API COMPILE TO JAR
         cd "${current}\\..\\..\\services\\buildingsService"
@@ -89,10 +95,14 @@ then
     kubectl delete deployments/backbuildings
     kubectl delete services/backbuildings-sv
 
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest
+
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest
+    fi
     
     # create kubernetes resources
     kubectl apply -f backbuildings-deployment.yaml --force=true
@@ -101,14 +111,16 @@ fi
 
 if [[ $installkeycloak = 'true' ]]
 then
-    # COMPILE KEYCLOAK FILES TO PRODUCTION
-    cd "${current}\\..\\..\\keycloak\\themes"
-    rm -f -r "${current}\\keycloak\\themes\\renergetic"
-    mkdir -p "${current}\\keycloak\\themes"
-    cp -f -r ".\\renergetic" "${current}\\keycloak\\themes\\renergetic"
-
+    if [[ $compileapps = 'true' ]]
+    then
+        # COMPILE KEYCLOAK FILES TO PRODUCTION
+        cd "${current}\\..\\..\\keycloak\\themes"
+        rm -f -r "${current}\\keycloak\\themes\\renergetic"
+        mkdir -p "${current}\\keycloak\\themes"
+        cp -f -r ".\\renergetic" "${current}\\keycloak\\themes\\renergetic"
+    fi
     cd  "${current}\\keycloak"
-    # FRONTEND INSTALLATION
+    # KEYCLOAK INSTALLATION
     # set environment variables
     eval $(minikube docker-env)
 
@@ -116,10 +128,14 @@ then
     kubectl delete deployments/keycloak
     kubectl delete services/keycloak-sv
 
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/keycloak:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/keycloak:latest
+
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/keycloak:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/keycloak:latest
+    fi
 
     # create kubernetes resources
     kubectl apply -f keycloak-deployment.yaml --force=true
@@ -137,10 +153,14 @@ then
     kubectl delete deployments/wso
     kubectl delete services/wso-sv
 
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/wso2:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/wso2:latest
+
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/wso2:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/wso2:latest
+    fi
 
     # create kubernetes resources
 #    kubectl apply -f wso2-volume.yaml
@@ -150,10 +170,11 @@ fi
 
 if [[ $installfront = 'true' ]]
 then
-    if [[ $vue != '' ]]
+    if [[ $compileapps = 'true' ]]
     then
         # COMPILE VUE FILES TO PRODUCTION
         cd "${current}\\..\\..\\front\\renergetic"
+        cp -f "${current}\\front\\.env" ".env"
         npm install
         npm run build --prod
         rm -f -r "${current}\\front\\dist"
@@ -168,17 +189,14 @@ then
     # delete kubernetes resources if exists
     kubectl delete deployments/frontvue
     kubectl delete services/frontvue-sv
-    kubectl delete configmaps/frontvue-configmap-ui
-    kubectl delete configmaps/frontvue-configmap-config
 
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/frontvue:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/frontvue:latest
-
-    # create configuration files
-    #kubectl create configmap frontvue-configmap-ui --from-file=./dist/
-    #kubectl create configmap frontvue-configmap-config --from-file=./default.conf
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/frontvue:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/frontvue:latest
+    fi
 
     # create kubernetes resources
     kubectl apply -f frontvue-deployment.yaml --force=true

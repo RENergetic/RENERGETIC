@@ -1,8 +1,11 @@
 current=$(pwd -W tr / \\)
 
-user='your_user'
-token='your_token'
+user='PaaS_user'
+token='Personal_token'
 project='ren-prototype'
+
+buildimages=''
+compileapps=''
 
 installdb='true'
 installapi='true'
@@ -22,10 +25,13 @@ then
     kubectl delete deployment/influx-db
     kubectl delete services/influx-db-sv
     
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/influxdb:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/influxdb:latest
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/influxdb:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/influxdb:latest
+    fi
 
     # create kubernetes resources
     kubectl apply -f influx-secrets.yaml
@@ -36,10 +42,13 @@ fi
 
 if [[ $installapi = 'true' ]]
 then
-    # API COMPILE TO JAR
-    cd "${current}\\..\\..\\services\\backinflux"
-    mvn clean package -Dmaven.test.skip
-    cp ".\\target\\${javafile}" "${current}\\api"
+    if [[ $compileapps = 'true' ]]
+    then
+        # API COMPILE TO JAR
+        cd "${current}\\..\\..\\services\\backinflux"
+        mvn clean package -Dmaven.test.skip
+        cp ".\\target\\${javafile}" "${current}\\api"
+    fi
 
     cd  "${current}\\api"
     # API INSTALLATION
@@ -50,10 +59,14 @@ then
     kubectl delete deployments/backinflux
     kubectl delete services/backinflux-sv
 
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backinflux:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/backinflux:latest
+    
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backinflux:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/backinflux:latest
+    fi
     
     # create kubernetes resources
     kubectl apply -f backinflux-deployment.yaml --force=true
@@ -104,10 +117,14 @@ then
     kubectl delete deployments/grafana
     kubectl delete services/grafana-sv
 
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/grafana:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/grafana:latest
+
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/grafana:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/grafana:latest
+    fi
 
     # create kubernetes resources
     kubectl apply -f grafana-config.yaml

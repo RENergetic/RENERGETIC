@@ -29,7 +29,8 @@ export default {
                 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
                 axios.defaults.headers.post['Access-Control-Allow-Credentials'] = 'true';
                 axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
-                axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+                axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,apikey';
+                //axios.defaults.headers.post['apikey'] = process.env.VUE_APP_API_KEY;
 
                 let data;
                 if (this.show_builds == -1)
@@ -38,17 +39,17 @@ export default {
                     data = {name:this.inputName, description:this.inputLocation, idIsland:this.show_builds};
 
                 axios
-                .post(this.ip + ((this.show_builds == -1)?'islands' : 'buildings'), 
+                .post(this.ip + ((this.show_builds == -1)? process.env.VUE_APP_API_ISLANDS_PATH : process.env.VUE_APP_API_BUILDINGS_PATH), 
                     data)
                 .then(() => {
                     this.inputName = "";
                     this.inputLocation = "";
                     this.$emit("event-add");
                     })
-                .catch((error) => {
+                /*.catch((error) => {
                     console.warn(error.message);
                     console.warn(`No se puede conectar a ${this.ip}`);
-                });
+                })*/;
             }
         }
     },

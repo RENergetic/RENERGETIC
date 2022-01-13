@@ -45,10 +45,10 @@ spec:
         resources:
           requests:
             cpu: 250m
-            memory: 600Mi
+            memory: 500Mi
           limits:
-            cpu: 800m
-            memory: 700Mi
+            cpu: 650m
+            memory: 650Mi
 #        volumeMounts:
 #        - name: keycloak-diskc
 #          mountPath: /opt/jboss/keycloak/standalone/configuration/

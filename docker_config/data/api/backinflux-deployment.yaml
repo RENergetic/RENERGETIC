@@ -20,9 +20,9 @@ spec:
             - containerPort: 8084
           resources:
             requests:
-              cpu: 50m
-              memory: 220Mi
+              cpu: 100m
+              memory: 170Mi
             limits:
-              cpu: 200m
-              memory: 250Mi
+              cpu: 150m
+              memory: 200Mi
       restartPolicy: Always

@@ -12,8 +12,13 @@ axios.defaults.headers.delete['Access-Control-Allow-Methods'] = 'GET, POST, DELE
 axios.defaults.headers.delete['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Origin';
 axios.defaults.headers.delete['Content-Type'] = 'application/json';
 
+let VUE_APP_KEY_CLOAK_URL = undefined;
+if (process.env.VUE_APP_KEY_CLOAK_URL == undefined || process.env.VUE_APP_KEY_CLOAK_URL == '')
+    VUE_APP_KEY_CLOAK_URL = `${location.origin}/auth`;
+else VUE_APP_KEY_CLOAK_URL = process.env.VUE_APP_KEY_CLOAK_URL;
+
 const initOptions = {
-    url: process.env.VUE_APP_KEY_CLOAK_URL, 
+    url: VUE_APP_KEY_CLOAK_URL, 
     realm: process.env.VUE_APP_KEY_CLOAK_REALM, 
     clientId: process.env.VUE_APP_KEY_CLOAK_CLIENT_ID
 }
@@ -24,7 +29,7 @@ export default {
     info: {
         app: process.env.VUE_APP_KEY_CLOAK_CLIENT_ID,
         realm: process.env.VUE_APP_KEY_CLOAK_REALM,
-        url: process.env.VUE_APP_KEY_CLOAK_URL,
+        url: VUE_APP_KEY_CLOAK_URL,
         clientId: undefined
     },
     async install(app, router) {

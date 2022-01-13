@@ -129,6 +129,7 @@ then
     then
         # COMPILE VUE FILES TO PRODUCTION
         cd "${current}\\..\\..\\front\\renergetic"
+        cp -f "${current}\\front\\.env" ".env"
         npm install
         npm run build --prod
         rm -f -r "${current}\\front\\dist"

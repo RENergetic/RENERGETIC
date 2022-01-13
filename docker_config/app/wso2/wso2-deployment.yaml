@@ -29,10 +29,10 @@ spec:
           resources:
             requests:
               cpu: 200m
-              memory: 1200Mi
+              memory: 1300Mi
             limits:
-              cpu: 500m
-              memory: 2000Mi
+              cpu: 900m
+              memory: 1800Mi
       restartPolicy: Always
 #      volumes:
 #        - name: wso-disk

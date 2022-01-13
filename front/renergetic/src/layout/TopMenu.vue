@@ -18,7 +18,6 @@ export default {
     },
     methods: {
         goToScreen(event){
-            console.log(this.$router)
             this.$router.replace({ name: event.target.value });
         },
         getPaths(){
@@ -36,6 +35,13 @@ export default {
         }
     },
     mounted(){
+        this.$watch(
+            () => this.$route,
+            (to) => {
+                document.getElementById('screen').value = to.name;
+            }
+        );
+
         if (Keycloak.ready)
             this.getPaths();     
         else 

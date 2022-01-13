@@ -8,7 +8,7 @@
     export default {
         data() {
             return {
-                graphicUrl: 'http://localhost:3000/d-solo/nq5m1s0nk/renergetic-forecast?orgId=1&from=1634427441815&to=1636724258711&panelId=2',
+                graphicUrl: process.env.VUE_APP_GRAFANA_URL,
             }
         }
     }

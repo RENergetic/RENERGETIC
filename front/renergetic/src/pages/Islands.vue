@@ -23,7 +23,7 @@ export default {
     name: 'Islands',
     data() {
         return {
-            ip: 'http://127.0.0.1/api/',
+            ip: (process.env.VUE_APP_API_URL == undefined || process.env.VUE_APP_API_URL == '')? location.origin : process.env.VUE_APP_API_URL,
             show_builds: -1
         }
     },

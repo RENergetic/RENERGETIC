@@ -1,16 +1,14 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-unused-vars */
 <template>
     <article id='main'>
         <section>
             <header>
-                <h2>List users</h2>
+                <h2>Create user</h2>
             </header>
             <NewUser @event-add='eventAddTag'></NewUser>
         </section>
         <section>
             <header>
-                <h2>Create user</h2>
+                <h2>List users</h2>
             </header>
             <SeeUsers ref='seeTag'></SeeUsers>
         </section>

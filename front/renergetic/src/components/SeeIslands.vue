@@ -73,40 +73,43 @@ export default {
     methods: {
         
         listIslands(){
-            if (this.show_builds == -1)
+            axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
+            axios.defaults.headers.get['Access-Control-Allow-Credentials'] = 'true';
+            axios.defaults.headers.get['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+            axios.defaults.headers.get['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,apikey';
+            //axios.defaults.headers.get['apikey'] = process.env.VUE_APP_API_KEY;
+
+            if (this.show_builds == -1){
                 axios
-                .get(this.ip + 'islands', {
-                    headers: {'Access-Control-Allow-Origin': '*',
-                                'Access-Control-Allow-Credentials': 'true',
-                                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                                'Access-Control-Allow-Headers': 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type'}
-                })
+                .get(this.ip + process.env.VUE_APP_API_ISLANDS_PATH)
                 .then(response => (this.islands = response.data))
                 .catch(error => {
                     console.warn(error.message);
                     console.warn(`No se puede conectar a ${this.ip}`);
                     this.islands = [];
                 });
-            else
+            } else{
                 axios
-                .get(this.ip + 'buildings', {params: {islandId:this.show_builds}})
+                .get(this.ip + process.env.VUE_APP_API_BUILDINGS_PATH, {params: {islandId:this.show_builds}})
                 .then(response => (this.builds = response.data))
                 .catch(error => {
                     console.warn(error.message);
                     console.warn(`No se puede conectar a ${this.ip}`);
                     this.builds = [];
                 });
+            }
         },
         showBuilds(island_id) {
-            axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-            axios.defaults.headers.post['Access-Control-Allow-Credentials'] = 'true';
-            axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
-            axios.defaults.headers.post['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+            axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
+            axios.defaults.headers.get['Access-Control-Allow-Credentials'] = 'true';
+            axios.defaults.headers.get['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+            axios.defaults.headers.get['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,apikey';
+            //axios.defaults.headers.get['apikey'] = process.env.VUE_APP_API_KEY;
 
             this.$emit('event-builds', island_id);
             
             axios
-            .get(this.ip + 'buildings', {params: {islandId: island_id}})
+            .get(this.ip + process.env.VUE_APP_API_BUILDINGS_PATH, {params: {islandId: island_id}})
             .then(response => (this.builds = response.data))
             .catch(error => {
                 console.warn(error.message);
