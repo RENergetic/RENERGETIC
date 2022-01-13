@@ -15,7 +15,7 @@ installapi='true'   # API ISLANDS
 installapi1='true'  # API BUILDINGS
 installfront='true'
 installkeycloak='true'
-installwso='true'
+installwso=''
 
 oc login https://console.paas-dev.psnc.pl --token=$token
 oc project $project
