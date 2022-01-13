@@ -8,5 +8,5 @@ spec:
     app: backbuildings
   ports:
     - protocol: TCP
-      port: 8088
-      targetPort: 8088
+      port: 8082
+      targetPort: 8082

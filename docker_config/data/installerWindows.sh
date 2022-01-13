@@ -1,17 +1,17 @@
 current=$(pwd -W tr / \\)
 
-user='PaaS_user'
-token='Personal_token'
+user='tomas.garcia-cabanero@inetum.com'
+token='Swb5qxvC1DKleJOCm0CpK1EJG6EYgMVDWwOXARF-PW4'
 project='ren-prototype'
 
-buildimages=''
-compileapps=''
+buildimages='true'
+compileapps='true'
 
-installdb='true'
+installdb=''
 installapi='true'
 installback=''
 installkafka=''
-installgrafana='true'
+installgrafana=''
 javafile='backinflux-0.0.1-SNAPSHOT.jar'
 
 oc login https://console.paas-dev.psnc.pl --token=$token

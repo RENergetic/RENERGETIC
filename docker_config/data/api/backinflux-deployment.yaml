@@ -17,7 +17,7 @@ spec:
           image: docker-registry.default.svc:5000/ren-prototype/backinflux:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8084
+            - containerPort: 8082
           resources:
             requests:
               cpu: 100m

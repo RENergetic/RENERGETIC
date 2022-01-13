@@ -17,7 +17,7 @@ spec:
           image: docker-registry.default.svc:5000/ren-prototype/backbuildings:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8088
+            - containerPort: 8082
           resources:
             requests:
               cpu: 100m
