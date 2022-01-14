@@ -1,16 +1,43 @@
 current=$(pwd -W tr / \\)
 
-user='PaaS_user'
-token='Personal_token'
+user=$(grep -ioP "(?<=user=).+" ../_credentials.properties)
+token=$(grep -ioP "(?<=token=).+" ../_credentials.properties)
 project='ren-prototype-devops'
 
-# CREATE A NAMESPACE IN KUBERNETE TO TEST JENKINS AND SONARKUBE
+buildimages='true';
+
+# CREATE A NAMESPACE IN KUBERNETES TO TEST JENKINS AND SONARKUBE
 # CREATE A KUBERNETES INSTANCE OF PROGRAMS IF VARIABLES ARE SETTING TO TRUE
+installdb=''
 installsonarqube='true'
 installjenkins=''
 
-oc login https://console.paas-dev.psnc.pl --token=$token
+if oc login https://console.paas-dev.psnc.pl --token=$token;
+then
 oc project $project
+
+if [[ $installdb = 'true' ]]
+then
+    cd  "${current}\\db"
+    # DATABASE INSTALATION
+	# delete kubernetes resources if exists
+    kubectl delete configmaps/postgresql-db-config
+    kubectl delete statefulsets/postgresql-db
+    kubectl delete services/postgresql-db-sv
+	
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/postgres:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/postgres:latest
+    fi
+
+    # create kubernetes resources
+    kubectl apply -f postgresql-configmap.yaml
+    kubectl apply -f postgresql.yaml
+    kubectl apply -f postgresql-service.yaml
+fi
 
 if [[ $installsonarqube = 'true' ]]
 then
@@ -23,12 +50,16 @@ then
     kubectl delete deployments/sonarqube
     kubectl delete services/sonarqube-sv
 
-    # create docker image
-    docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/sonarqube:latest .
-    docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-    docker push registry.apps.paas-dev.psnc.pl/$project/sonarqube:latest
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/sonarqube:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/sonarqube:latest
+    fi
 
     # create kubernetes resources
+    kubectl apply -f sonar-disks.yaml
     kubectl apply -f sonar-deployment.yaml --force=true
     kubectl apply -f sonar-service.yaml
 fi
@@ -55,3 +86,6 @@ fi
 
 read -p "La instalacion ha finalizado pulsa una tecla para salir ..."
 clear
+else
+    echo "Can't connect with OpenShift server"
+fi

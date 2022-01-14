@@ -1,7 +1,7 @@
 current=$(pwd -W tr / \\)
 
-user='PaaS_user'
-token='Personal_token'
+user=$(grep -ioP "(?<=user=).+" ../_credentials.properties)
+token=$(grep -ioP "(?<=token=).+" ../_credentials.properties)
 project='ren-prototype'
 
 buildimages='true'
@@ -14,7 +14,8 @@ installkafka=''
 installgrafana='true'
 javafile='backinflux-0.0.1-SNAPSHOT.jar'
 
-oc login https://console.paas-dev.psnc.pl --token=$token
+if oc login https://console.paas-dev.psnc.pl --token=$token;
+then
 oc project $project
 
 if [[ $installdb = 'true' ]]
@@ -137,3 +138,6 @@ echo "Installation has finished :). Remember to execute in a different console:"
 	echo "	minikube service grafana-sv"
     read -p "Press any key to end ..."
 clear
+else
+    echo "Can't connect with OpenShift server"
+fi

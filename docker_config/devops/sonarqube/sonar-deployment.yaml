@@ -18,6 +18,13 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
+          env:
+          - name: SONARQUBE_JDBC_URL
+            value: "jdbc:postgresql://postgresql-db-sv:5432/devops"
+          - name: SONARQUBE_JDBC_USERNAME
+            value: devops
+          - name: SONARQUBE_JDBC_PASSWORD
+            value: renergetic
           resources:
             requests:
               cpu: 200m
@@ -25,4 +32,16 @@ spec:
             limits:
               cpu: 450m
               memory: 1700Mi
+          volumeMounts: 
+            - mountPath: /opt/sonarqube/data/
+              name: sonarqube-data
+            - mountPath: /opt/sonarqube/extensions/
+              name: sonarqube-extensions
+      volumes: 
+        - name: sonarqube-data
+          persistentVolumeClaim: 
+            claimName: sonarqube-data-disk
+        - name: sonarqube-extensions
+          persistentVolumeClaim: 
+            claimName: sonarqube-ext-disk
       restartPolicy: Always
