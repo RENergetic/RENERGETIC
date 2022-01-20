@@ -1,3 +1,4 @@
+docker_config/_credentials.properties
 docker_config/app/api/backdb-0.0.1-SNAPSHOT.jar
 docker_config/data/api/backinflux-0.0.1-SNAPSHOT.jar
 docker_config/app/buildings/buildingsService-0.0.1-SNAPSHOT.jar

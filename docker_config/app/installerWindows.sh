@@ -6,6 +6,7 @@ project='ren-prototype'
 
 buildimages='true'
 compileapps='true'
+automatic=-1
 
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
@@ -16,6 +17,15 @@ installapi1='true'  # API BUILDINGS
 installfront='true'
 installkeycloak='true'
 installwso=''
+
+while getopts "ab:c:" flag
+do
+    case "${flag}" in
+        a) automatic=${OPTARG};;
+        b) buildimages=${OPTARG};;
+        c) compileapps=${OPTARG};;
+    esac
+done
 
 if oc login https://console.paas-dev.psnc.pl --token=$token;
 then
@@ -204,10 +214,16 @@ then
     kubectl apply -f frontvue-service.yaml
 fi
 
-echo "Installation has finished :). Remember to execute in a different console:"
-	echo "	minikube service frontvue-sv --namespace ${namespace}"
-    read -p "Press any key to end ..."
-clear
+    echo "Installation has finished :). Remember to execute in a different console:"
+	    echo "	minikube service frontvue-sv --namespace ${namespace}"
+
+    if [ $automatic != '-1' ]
+    then
+        read -p "Press any key to end ..."
+        clear
+    fi
 else
     echo "Can't connect with OpenShift server"
+    read -p "Press any key to end ..."
+    clear
 fi

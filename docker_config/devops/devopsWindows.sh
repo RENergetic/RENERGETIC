@@ -4,13 +4,22 @@ user=$(grep -ioP "(?<=user=).+" ../_credentials.properties)
 token=$(grep -ioP "(?<=token=).+" ../_credentials.properties)
 project='ren-prototype-devops'
 
-buildimages='true';
+buildimages='true'
+automatic=-1
 
 # CREATE A NAMESPACE IN KUBERNETES TO TEST JENKINS AND SONARKUBE
 # CREATE A KUBERNETES INSTANCE OF PROGRAMS IF VARIABLES ARE SETTING TO TRUE
-installdb=''
+installdb='true'
 installsonarqube='true'
 installjenkins=''
+
+while getopts "ab:" flag
+do
+    case "${flag}" in
+        a) automatic=${OPTARG};;
+        b) buildimages=${OPTARG};;
+    esac
+done
 
 if oc login https://console.paas-dev.psnc.pl --token=$token;
 then
@@ -83,9 +92,13 @@ then
     kubectl apply -f jenkins-deployment.yaml --force=true --namespace=jenkins
     kubectl apply -f jenkins-service.yaml --namespace=jenkins
 fi
-
-read -p "La instalacion ha finalizado pulsa una tecla para salir ..."
-clear
+    if [ $automatic != '-1' ]
+    then
+        read -p "Installation has finished, Press any key to end ..."
+        clear
+    fi
 else
     echo "Can't connect with OpenShift server"
+    read -p "Press any key to end ..."
+    clear
 fi

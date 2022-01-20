@@ -6,6 +6,7 @@ project='ren-prototype'
 
 buildimages='true'
 compileapps='true'
+automatic=-1
 
 installdb='true'
 installapi='true'
@@ -14,6 +15,15 @@ installkafka=''
 installgrafana='true'
 javafile='backinflux-0.0.1-SNAPSHOT.jar'
 
+while getopts "ab:c:" flag
+do
+    case "${flag}" in
+        a) automatic=${OPTARG};;
+        b) buildimages=${OPTARG};;
+        c) compileapps=${OPTARG};;
+    esac
+done
+echo $buildimages
 if oc login https://console.paas-dev.psnc.pl --token=$token;
 then
 oc project $project
@@ -134,10 +144,16 @@ then
     kubectl apply -f grafana-service.yaml
 fi
 
-echo "Installation has finished :). Remember to execute in a different console:"
-	echo "	minikube service grafana-sv"
-    read -p "Press any key to end ..."
-clear
+    echo "Installation has finished :). Remember to execute in a different console:"
+        echo "	minikube service grafana-sv"
+
+    if [ $automatic != '-1' ]
+    then
+        read -p "Press any key to end ..."
+        clear
+    fi
 else
     echo "Can't connect with OpenShift server"
+    read -p "Press any key to end ..."
+    clear
 fi
