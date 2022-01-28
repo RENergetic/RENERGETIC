@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.renergetic.backdb.model.Information;
 import com.renergetic.backdb.model.Infrastructure;
+import com.renergetic.backdb.model.InfrastructureRequest;
 import com.renergetic.backdb.model.information.InfrastructureInformation;
 import com.renergetic.backdb.repository.InfrastructureRepository;
 import com.renergetic.backdb.repository.information.InfrastructureInformationRepository;
@@ -75,8 +77,7 @@ public class InfrastructureController {
 	public ResponseEntity<List<Infrastructure>> getInfrastructuresByType (@PathVariable String type){
 		List<Infrastructure> infrastructures = new ArrayList<Infrastructure>();
 		
-		infrastructures = infrastructureRepository.findByType(type);
-		
+		infrastructures = infrastructureRepository.findByType(type);		
 		infrastructures = infrastructures.isEmpty() ? null : infrastructures;
 		
 		return new ResponseEntity<List<Infrastructure>>(infrastructures, infrastructures != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -130,15 +131,18 @@ public class InfrastructureController {
 	
 	@Operation(summary = "Insert Information for a Infrastructure")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Information saved correctly"),
+		@ApiResponse(responseCode = "201", description = "Information saved correctly"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PostMapping(path = "{infrastructure_id}/info", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<InfrastructureInformation> insertInformation (@RequestBody InfrastructureInformation information, @PathVariable Long infrastructure_id){
 		try {
-			information.setInfrastructureId(infrastructure_id);
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.CREATED);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information.setInfrastructureId(infrastructure_id);
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.CREATED);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -150,13 +154,16 @@ public class InfrastructureController {
 		@ApiResponse(responseCode = "200", description = "Information saved correctly"),
 		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
 		@ApiResponse(responseCode = "404", description = "Information not exist"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PutMapping(path = "{infrastructure_id}/info", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<InfrastructureInformation> updateInformation (@RequestBody InfrastructureInformation information){
+	public ResponseEntity<InfrastructureInformation> updateInformation (@RequestBody InfrastructureInformation information, @PathVariable Long infrastructure_id){
 		try {
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.CREATED);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.OK);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -169,7 +176,7 @@ public class InfrastructureController {
 		@ApiResponse(responseCode = "500", description = "Error deleting information")
 	})
 	@DeleteMapping(path = "{infrastructure_id}/info/{info_id}")
-	public ResponseEntity<InfrastructureInformation> updateInformation (@PathVariable Long info_id){
+	public ResponseEntity<InfrastructureInformation> updateInformation (@PathVariable Long infrastructure_id, @PathVariable Long info_id){
 		try {
 			informationRepository.deleteById(info_id);
 			return ResponseEntity.noContent().build();
@@ -184,14 +191,17 @@ public class InfrastructureController {
 	@Operation(summary = "Create a new Infrastructure")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Infrastructure saved correctly"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 			@ApiResponse(responseCode = "500", description = "Error saving infrastructure")
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Infrastructure> createInfrastructure(@RequestBody Infrastructure infrastructure) {
+	public ResponseEntity<Infrastructure> createInfrastructure(@RequestBody InfrastructureRequest infrastructure) {
 		try {
-			Infrastructure _infrastructure = infrastructureRepository.save(infrastructure);
-			return new ResponseEntity<>(_infrastructure, HttpStatus.CREATED);
+			if (Infrastructure.ALLOWED_TYPES.stream().anyMatch(infrastructure.getType()::equalsIgnoreCase)) {
+				Infrastructure _infrastructure = infrastructureRepository.save(infrastructure.mapToEntity());
+				return new ResponseEntity<>(_infrastructure, HttpStatus.CREATED);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -202,17 +212,20 @@ public class InfrastructureController {
 			@ApiResponse(responseCode = "200", description = "Infrastructure saved correctly"),
 			@ApiResponse(responseCode = "400", description = "Path isn't valid"),
 			@ApiResponse(responseCode = "404", description = "Infrastructure not exist"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 			@ApiResponse(responseCode = "500", description = "Error saving infrastructure")
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Infrastructure> updateInfrastructure(@RequestBody Infrastructure infrastructure, @PathVariable Long id) {
+	public ResponseEntity<Infrastructure> updateInfrastructure(@RequestBody InfrastructureRequest infrastructure, @PathVariable Long id) {
 		try {
-			infrastructure.setId(id);
-			if (infrastructureRepository.update(infrastructure, id) == 0)
-				return ResponseEntity.notFound().build();
-			else
-				return new ResponseEntity<>(infrastructure, HttpStatus.CREATED);
+			if (Infrastructure.ALLOWED_TYPES.stream().anyMatch(infrastructure.getType()::equalsIgnoreCase)) {
+				infrastructure.setId(id);
+				if (infrastructureRepository.update(infrastructure.mapToEntity(), id) == 0)
+					return ResponseEntity.notFound().build();
+				else
+					return new ResponseEntity<>(infrastructure.mapToEntity(), HttpStatus.CREATED);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

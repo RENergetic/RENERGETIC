@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.renergetic.backdb.model.Information;
 import com.renergetic.backdb.model.Supply;
+import com.renergetic.backdb.model.SupplyRequest;
 import com.renergetic.backdb.model.information.SupplyInformation;
 import com.renergetic.backdb.repository.SupplyRepository;
 import com.renergetic.backdb.repository.information.SupplyInformationRepository;
@@ -115,14 +117,17 @@ public class SupplyController {
 	@Operation(summary = "Insert Information for a Supply")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "Information saved correctly"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PostMapping(path = "{supply_id}/info", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<SupplyInformation> insertInformation (@RequestBody SupplyInformation information, @PathVariable Long supply_id){
 		try {
-			information.setSupplyId(supply_id);
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.CREATED);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information.setSupplyId(supply_id);
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.CREATED);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -134,13 +139,16 @@ public class SupplyController {
 		@ApiResponse(responseCode = "200", description = "Information saved correctly"),
 		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
 		@ApiResponse(responseCode = "404", description = "Information not exist"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PutMapping(path = "{supply_id}/info", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<SupplyInformation> updateInformation (@RequestBody SupplyInformation information){
+	public ResponseEntity<SupplyInformation> updateInformation (@RequestBody SupplyInformation information, @PathVariable Long supply_id){
 		try {
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.OK);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.OK);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -153,7 +161,7 @@ public class SupplyController {
 		@ApiResponse(responseCode = "500", description = "Error deleting information")
 	})
 	@DeleteMapping(path = "{supply_id}/info/{info_id}")
-	public ResponseEntity<SupplyInformation> updateInformation (@PathVariable Long info_id){
+	public ResponseEntity<SupplyInformation> updateInformation (@PathVariable Long supply_id, @PathVariable Long info_id){
 		try {
 			informationRepository.deleteById(info_id);
 			return ResponseEntity.noContent().build();
@@ -167,15 +175,15 @@ public class SupplyController {
 			
 	@Operation(summary = "Create a new Supply")
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Supply saved correctly"),
+			@ApiResponse(responseCode = "201", description = "Supply saved correctly"),
 			@ApiResponse(responseCode = "500", description = "Error saving supply")
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Supply> createSupply(@RequestBody Supply supply) {
+	public ResponseEntity<Supply> createSupply(@RequestBody SupplyRequest supply) {
 		try {
 			Supply _supply = supplyRepository
-					.save(supply);
+					.save(supply.mapToEntity());
 			return new ResponseEntity<>(_supply, HttpStatus.CREATED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -193,13 +201,13 @@ public class SupplyController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Supply> updateSupply(@RequestBody Supply supply, @PathVariable Long id) {
+	public ResponseEntity<Supply> updateSupply(@RequestBody SupplyRequest supply, @PathVariable Long id) {
 		try {
 			supply.setId(id);
-			if (supplyRepository.update(supply, id) == 0)
+			if (supplyRepository.update(supply.mapToEntity(), id) == 0)
 				return ResponseEntity.notFound().build();
 			else
-				return new ResponseEntity<>(supply, HttpStatus.CREATED);
+				return new ResponseEntity<>(supply.mapToEntity(), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

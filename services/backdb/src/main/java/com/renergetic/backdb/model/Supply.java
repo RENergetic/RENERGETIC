@@ -5,7 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,30 +19,40 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "supply")
-@Getter
-@Setter
 @RequiredArgsConstructor
 @ToString
 public class Supply {
 	@Id
+	@Getter
+	@Setter
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
-	
-	@Column(name = "name")
+
+	@Getter
+	@Setter
+	@Column(name = "name", nullable = true, insertable = true, updatable = true)
 	private String name;
-	
-	@Column(name = "description")
+
+	@Getter
+	@Setter
+	@Column(name = "description", nullable = true, insertable = true, updatable = true)
 	private String description;
 	
 	// FOREIGN KEY FROM ASSETS TABLE
-	@Column(name = "asset_id")
-	private long assetId;
+	@OneToOne(optional = true)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "asset_id", nullable = false, insertable = true, updatable = true)
+	private Asset asset;
 	
 	// FOREIGN KEY FROM INFRASTRUCTURE TABLE
-	@Column(name = "input_infrastructure_id")
-	private long inputInfrastructureId;
+	@OneToOne(optional = true)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "infrastructure_id", nullable = false, insertable = true, updatable = true)
+	private Infrastructure infrastructure;
 	
 	// REFERENCE TO POWER TIMESERIES
+	@Getter
+	@Setter
 	@Column(name = "power")
 	private long power;
 
@@ -45,8 +60,29 @@ public class Supply {
 		super();
 		this.name = name;
 		this.description = description;
-		this.assetId = asset_id;
-		this.inputInfrastructureId = input_infrastructure_id;
+		this.asset = new Asset();
+		this.asset.setId(asset_id);
+		this.infrastructure = new Infrastructure();
+		this.infrastructure.setId(input_infrastructure_id);
 		this.power = power;
 	}
+
+	public Asset getAsset() {
+		return asset;
+	}
+
+	public void setAsset(Long id) {
+		this.asset = new Asset();
+		this.asset.setId(id);
+	}
+
+	public Infrastructure getInfrastructure() {
+		return infrastructure;
+	}
+
+	public void setInfrastructure(Long id) {
+		this.infrastructure = new Infrastructure();
+		this.infrastructure.setId(id);
+	}
+	
 }

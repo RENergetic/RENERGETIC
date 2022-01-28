@@ -18,7 +18,7 @@ public interface DemandRepository extends JpaRepository<Demand, Long> {
 
 	@Transactional
 	@Modifying
-	@Query("update Demand d set d.name = :#{#demand.name}, d.description = :#{#demand.description}, d.assetId = :#{#demand.assetId}, d.outputInfrastructureId = :#{#demand.outputInfrastructureId}, d.power = :#{#demand.power} where d.id = :id")
+	@Query("update Demand d set d.name = :#{#demand.name}, d.description = :#{#demand.description}, d.asset.id = :#{#demand.asset.id}, d.infrastructure.id = :#{#demand.infrastructure.id}, d.power = :#{#demand.power} where d.id = :id")
 	int update(@Param("demand") Demand demand, Long id);
 
 	List<Demand> findByAssetId(String asset_id);

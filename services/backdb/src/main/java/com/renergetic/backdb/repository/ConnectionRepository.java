@@ -18,7 +18,7 @@ public interface ConnectionRepository extends JpaRepository<Connection, Long> {
 
 	@Transactional
 	@Modifying
-	@Query("update Connection c set c.name = :#{#connex.name}, c.description = :#{#connex.description}, c.assetId = :#{#connex.assetId}, c.inputInfrastructureId = :#{#connex.inputInfrastructureId}, c.outputInfrastructureId = :#{#connex.outputInfrastructureId}, c.inputPower = :#{#connex.inputPower}, c.outputPower = :#{#connex.outputPower} where c.id = :id")
+	@Query("update Connection c set c.name = :#{#connex.name}, c.description = :#{#connex.description}, c.asset.id = :#{#connex.asset.id}, c.inputInfrastructure.id = :#{#connex.inputInfrastructure.id}, c.outputInfrastructure.id = :#{#connex.outputInfrastructure.id}, c.inputPower = :#{#connex.inputPower}, c.outputPower = :#{#connex.outputPower} where c.id = :id")
 	int update(@Param("connex") Connection connection, Long id);
 
 	List<Connection> findByAssetId(String asset_id);

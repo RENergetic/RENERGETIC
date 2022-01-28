@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import com.renergetic.backdb.model.Information;
+import com.renergetic.backdb.model.UnitSI;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class ConnectionInformation extends Information{
 	@Column(name = "connection_id")
 	private long connectionId;
 
-	public ConnectionInformation(String name, String type, String unit, long connection_id, long signal) {
+	public ConnectionInformation(String name, String type, UnitSI unit, long connection_id, long signal) {
 		super(name, type, unit, signal);
 		this.connectionId = connection_id;
 	}

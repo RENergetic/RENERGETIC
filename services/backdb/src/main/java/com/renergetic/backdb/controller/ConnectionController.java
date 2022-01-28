@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.backdb.model.Connection;
+import com.renergetic.backdb.model.ConnectionRequest;
+import com.renergetic.backdb.model.Information;
 import com.renergetic.backdb.model.Infrastructure;
 import com.renergetic.backdb.model.information.ConnectionInformation;
 import com.renergetic.backdb.repository.ConnectionRepository;
@@ -113,7 +115,7 @@ public class ConnectionController {
 		connection = connectionRepository.findById(id).orElse(null);
 		
 		if (connection != null)
-			 infrastructure = infrastructureRepository.findById(connection.getInputInfrastructureId()).orElse(null);
+			 infrastructure = infrastructureRepository.findById(connection.getInputInfrastructure().getId()).orElse(null);
 		
 		return new ResponseEntity<Infrastructure>(infrastructure, infrastructure != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
@@ -131,7 +133,7 @@ public class ConnectionController {
 		connection = connectionRepository.findById(id).orElse(null);
 		
 		if (connection != null)
-			 infrastructure = infrastructureRepository.findById(connection.getOutputInfrastructureId()).orElse(null);
+			 infrastructure = infrastructureRepository.findById(connection.getOutputInfrastructure().getId()).orElse(null);
 		
 		return new ResponseEntity<Infrastructure>(infrastructure, infrastructure != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
@@ -171,14 +173,17 @@ public class ConnectionController {
 	@Operation(summary = "Insert Information for a Connection")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "Information saved correctly"),
+		@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PostMapping(path = "{connection_id}/info", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<ConnectionInformation> insertInformation (@RequestBody ConnectionInformation information, @PathVariable Long connection_id){
 		try {
-			information.setConnectionId(connection_id);
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.CREATED);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information.setConnectionId(connection_id);
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.CREATED);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -187,16 +192,18 @@ public class ConnectionController {
 	
 	@Operation(summary = "Update Information from its id")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Information saved correctly"),
-		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
+		@ApiResponse(responseCode = "201", description = "Information saved correctly"),
 		@ApiResponse(responseCode = "404", description = "Information not exist"),
+		@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PutMapping(path = "{connection_id}/info", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<ConnectionInformation> updateInformation (@RequestBody ConnectionInformation information){
+	public ResponseEntity<ConnectionInformation> updateInformation (@RequestBody ConnectionInformation information, @PathVariable Long connection_id){
 		try {
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.OK);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.OK);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -209,7 +216,7 @@ public class ConnectionController {
 		@ApiResponse(responseCode = "500", description = "Error deleting information")
 	})
 	@DeleteMapping(path = "{connection_id}/info/{info_id}")
-	public ResponseEntity<ConnectionInformation> updateInformation (@PathVariable Long info_id){
+	public ResponseEntity<ConnectionInformation> updateInformation (@PathVariable Long connection_id, @PathVariable Long info_id){
 		try {
 			informationRepository.deleteById(info_id);
 			return ResponseEntity.noContent().build();
@@ -223,14 +230,14 @@ public class ConnectionController {
 			
 	@Operation(summary = "Create a new Connection")
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Connection saved correctly"),
+			@ApiResponse(responseCode = "201", description = "Connection saved correctly"),
 			@ApiResponse(responseCode = "500", description = "Error saving connection")
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Connection> createConnection(@RequestBody Connection connection) {
+	public ResponseEntity<Connection> createConnection(@RequestBody ConnectionRequest connection) {
 		try {
-			Connection _connection = connectionRepository.save(connection);
+			Connection _connection = connectionRepository.save(connection.mapToEntity());
 			return new ResponseEntity<>(_connection, HttpStatus.CREATED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -247,13 +254,13 @@ public class ConnectionController {
 		@ApiResponse(responseCode = "500", description = "Error saving connection")
 	})
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Connection> updateConnection(@RequestBody Connection connection, @PathVariable Long id) {
+	public ResponseEntity<Connection> updateConnection(@RequestBody ConnectionRequest connection, @PathVariable Long id) {
 		try {
 			connection.setId(id);
-			if (connectionRepository.update(connection, id) == 0)
+			if (connectionRepository.update(connection.mapToEntity(), id) == 0)
 				return ResponseEntity.notFound().build();
 			else
-				return new ResponseEntity<>(connection, HttpStatus.CREATED);
+				return new ResponseEntity<>(connection.mapToEntity(), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

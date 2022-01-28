@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.backdb.model.Asset;
+import com.renergetic.backdb.model.AssetRequest;
+import com.renergetic.backdb.model.Information;
 import com.renergetic.backdb.model.information.AssetInformation;
 import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.information.AssetInformationRepository;
@@ -132,13 +134,16 @@ public class AssetController {
 	@Operation(summary = "Insert Information for a Asset")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Information saved correctly"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PostMapping(path = "{asset_id}/info", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AssetInformation> insertInformation (@RequestBody AssetInformation information, @PathVariable Long asset_id){
 		try {
-			information.setAssetId(asset_id);
-			information = informationRepository.save(information);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information.setAssetId(asset_id);
+				information = informationRepository.save(information);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 			return new ResponseEntity<>(information, HttpStatus.CREATED);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -151,13 +156,17 @@ public class AssetController {
 		@ApiResponse(responseCode = "200", description = "Information saved correctly"),
 		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
 		@ApiResponse(responseCode = "404", description = "Information not exist"),
+		@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PutMapping(path = "{asset_id}/info", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<AssetInformation> updateInformation (@RequestBody AssetInformation information){
+	public ResponseEntity<AssetInformation> updateInformation (@RequestBody AssetInformation information, @PathVariable Long asset_id){
 		try {
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.CREATED);
+			
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.CREATED);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -170,7 +179,7 @@ public class AssetController {
 		@ApiResponse(responseCode = "500", description = "Error deleting information")
 	})
 	@DeleteMapping(path = "{asset_id}/info/{info_id}")
-	public ResponseEntity<AssetInformation> updateInformation (@PathVariable Long info_id){
+	public ResponseEntity<AssetInformation> updateInformation (@PathVariable Long asset_id, @PathVariable Long info_id){
 		try {
 			informationRepository.deleteById(info_id);
 			return ResponseEntity.noContent().build();
@@ -184,15 +193,18 @@ public class AssetController {
 	
 	@Operation(summary = "Create a new Asset")
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Asset saved correctly"),
+			@ApiResponse(responseCode = "201", description = "Asset saved correctly"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 			@ApiResponse(responseCode = "500", description = "Error saving asset")
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Asset> createAsset(@RequestBody Asset asset) {
+	public ResponseEntity<Asset> createAsset(@RequestBody AssetRequest asset) {
 		try {
-			Asset _asset = assetRepository.save(asset);
-			return new ResponseEntity<>(_asset, HttpStatus.CREATED);
+			if (Asset.ALLOWED_TYPES.stream().anyMatch(asset.getType()::equalsIgnoreCase)) {	
+				Asset _asset = assetRepository.save(asset.mapToEntity());
+				return new ResponseEntity<>(_asset, HttpStatus.CREATED);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -203,19 +215,21 @@ public class AssetController {
 	@Operation(summary = "Update a existing Asset")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Asset saved correctly"),
-			@ApiResponse(responseCode = "400", description = "Path isn't valid"),
 			@ApiResponse(responseCode = "404", description = "Asset not exist"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 			@ApiResponse(responseCode = "500", description = "Error saving asset")
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Asset> updateAsset(@RequestBody Asset asset, @PathVariable Long id) {
+	public ResponseEntity<Asset> updateAsset(@RequestBody AssetRequest asset, @PathVariable Long id) {
 		try {
 			asset.setId(id);
-			if (assetRepository.update(asset, id) == 0)
-				return ResponseEntity.notFound().build();
-			else
-				return new ResponseEntity<>(asset, HttpStatus.CREATED);
+			if (Asset.ALLOWED_TYPES.stream().anyMatch(asset.getType()::equalsIgnoreCase)) {	
+				if (assetRepository.update(asset.mapToEntity(), id) == 0)
+					return ResponseEntity.notFound().build();
+				else
+					return new ResponseEntity<>(asset.mapToEntity(), HttpStatus.OK);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

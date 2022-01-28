@@ -96,7 +96,7 @@ public class IslandController {
 			
 	@Operation(summary = "Create a new Island")
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Island saved correctly"),
+			@ApiResponse(responseCode = "201", description = "Island saved correctly"),
 			@ApiResponse(responseCode = "500", description = "Error saving island")
 		}
 	)
@@ -129,7 +129,7 @@ public class IslandController {
 			if (islandRepository.update(island, id) == 0)
 				return ResponseEntity.notFound().build();
 			else
-				return new ResponseEntity<>(island, HttpStatus.CREATED);
+				return new ResponseEntity<>(island, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

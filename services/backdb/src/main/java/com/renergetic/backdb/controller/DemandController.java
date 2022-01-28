@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.backdb.model.Demand;
+import com.renergetic.backdb.model.DemandRequest;
+import com.renergetic.backdb.model.Information;
 import com.renergetic.backdb.model.information.DemandInformation;
 import com.renergetic.backdb.repository.DemandRepository;
 import com.renergetic.backdb.repository.information.DemandInformationRepository;
@@ -115,14 +117,17 @@ public class DemandController {
 	@Operation(summary = "Insert Information for a Demand")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "Information saved correctly"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PostMapping(path = "{demand_id}/info", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<DemandInformation> insertInformation (@RequestBody DemandInformation information, @PathVariable Long demand_id){
 		try {
-			information.setDemandId(demand_id);
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.CREATED);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information.setDemandId(demand_id);
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.CREATED);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -134,13 +139,16 @@ public class DemandController {
 		@ApiResponse(responseCode = "200", description = "Information saved correctly"),
 		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
 		@ApiResponse(responseCode = "404", description = "Information not exist"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PutMapping(path = "{demand_id}/info", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<DemandInformation> updateInformation (@RequestBody DemandInformation information){
+	public ResponseEntity<DemandInformation> updateInformation (@RequestBody DemandInformation information, @PathVariable Long demand_id){
 		try {
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.OK);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.OK);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -153,7 +161,7 @@ public class DemandController {
 		@ApiResponse(responseCode = "500", description = "Error deleting information")
 	})
 	@DeleteMapping(path = "{demand_id}/info/{info_id}")
-	public ResponseEntity<DemandInformation> updateInformation (@PathVariable Long info_id){
+	public ResponseEntity<DemandInformation> updateInformation (@PathVariable Long demand_id, @PathVariable Long info_id){
 		try {
 			informationRepository.deleteById(info_id);
 			return ResponseEntity.noContent().build();
@@ -166,15 +174,15 @@ public class DemandController {
 			
 	@Operation(summary = "Create a new Demand")
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Demand saved correctly"),
+			@ApiResponse(responseCode = "201", description = "Demand saved correctly"),
 			@ApiResponse(responseCode = "500", description = "Error saving demand")
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Demand> createDemand(@RequestBody Demand demand) {
+	public ResponseEntity<Demand> createDemand(@RequestBody DemandRequest demand) {
 		try {
 			Demand _demand = demandRepository
-					.save(demand);
+					.save(demand.mapToEntity());
 			return new ResponseEntity<>(_demand, HttpStatus.CREATED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -192,13 +200,13 @@ public class DemandController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Demand> updateDemand(@RequestBody Demand demand, @PathVariable Long id) {
+	public ResponseEntity<Demand> updateDemand(@RequestBody DemandRequest demand, @PathVariable Long id) {
 		try {
 			demand.setId(id);
-			if (demandRepository.update(demand, id) == 0)
+			if (demandRepository.update(demand.mapToEntity(), id) == 0)
 				return ResponseEntity.notFound().build();
 			else
-				return new ResponseEntity<>(demand, HttpStatus.CREATED);
+				return new ResponseEntity<>(demand.mapToEntity(), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

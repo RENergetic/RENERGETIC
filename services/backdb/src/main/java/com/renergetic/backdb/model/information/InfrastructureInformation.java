@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import com.renergetic.backdb.model.Information;
+import com.renergetic.backdb.model.UnitSI;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class InfrastructureInformation extends Information{
 	@Column(name = "infrastructure_id")
 	private long infrastructureId;
 
-	public InfrastructureInformation(String name, String type, String unit, long infrastructure_id, long signal) {
+	public InfrastructureInformation(String name, String type, UnitSI unit, long infrastructure_id, long signal) {
 		super(name, type, unit, signal);
 		this.infrastructureId = infrastructure_id;
 	}

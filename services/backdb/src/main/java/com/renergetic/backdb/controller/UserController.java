@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.Connection;
+import com.renergetic.backdb.model.Information;
 import com.renergetic.backdb.model.User;
+import com.renergetic.backdb.model.UserRequest;
 import com.renergetic.backdb.model.information.UserInformation;
 import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.UserRepository;
@@ -120,14 +122,17 @@ public class UserController {
 	@Operation(summary = "Insert Information for a User")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", description = "Information saved correctly"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PostMapping(path = "{user_id}/info", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserInformation> insertInformation (@RequestBody UserInformation information, @PathVariable Long user_id){
 		try {
-			information.setUserId(user_id);
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.CREATED);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information.setUserId(user_id);
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.CREATED);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -139,13 +144,16 @@ public class UserController {
 		@ApiResponse(responseCode = "200", description = "Information saved correctly"),
 		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
 		@ApiResponse(responseCode = "404", description = "Information not exist"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
 		@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
 	@PutMapping(path = "{user_id}/info", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<UserInformation> updateInformation (@RequestBody UserInformation information){
+	public ResponseEntity<UserInformation> updateInformation (@RequestBody UserInformation information, @PathVariable Long user_id){
 		try {
-			information = informationRepository.save(information);
-			return new ResponseEntity<>(information, HttpStatus.OK);
+			if (Information.ALLOWED_TYPES.stream().anyMatch(information.getType()::equalsIgnoreCase)) {
+				information = informationRepository.save(information);
+				return new ResponseEntity<>(information, HttpStatus.OK);
+			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -158,7 +166,7 @@ public class UserController {
 		@ApiResponse(responseCode = "500", description = "Error deleting information")
 	})
 	@DeleteMapping(path = "{user_id}/info/{info_id}")
-	public ResponseEntity<UserInformation> updateInformation (@PathVariable Long info_id){
+	public ResponseEntity<UserInformation> updateInformation (@PathVariable Long user_id, @PathVariable Long info_id){
 		try {
 			informationRepository.deleteById(info_id);
 			return ResponseEntity.noContent().build();
@@ -177,10 +185,9 @@ public class UserController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<User> createUser(@RequestBody User user) {
+	public ResponseEntity<User> createUser(@RequestBody UserRequest user) {
 		try {
-			User _user = userRepository
-					.save(user);
+			User _user = userRepository.save(user.mapToEntity());
 			return new ResponseEntity<>(_user, HttpStatus.CREATED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -198,13 +205,13 @@ public class UserController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable Long id) {
+	public ResponseEntity<User> updateUser(@RequestBody UserRequest user, @PathVariable Long id) {
 		try {
 			user.setId(id);
-			if (userRepository.update(user, id) == 0)
+			if (userRepository.update(user.mapToEntity(), id) == 0)
 				return ResponseEntity.notFound().build();
 			else
-				return new ResponseEntity<>(user, HttpStatus.OK);
+				return new ResponseEntity<>(user.mapToEntity(), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -256,7 +263,7 @@ public class UserController {
 	@GetMapping(path = "/{id}/home/connections", produces = "application/json")
 	public ResponseEntity<List<Connection>> getHomeConnections(@PathVariable Long id) {
 		try {
-			List<Connection> connections = assetRepository.findConnections(userRepository.findById(id).get().getResideAssetId());
+			List<Connection> connections = assetRepository.findConnections(userRepository.findById(id).get().getResideAsset().getId());
 			
 			if (connections.size() == 0)
 				connections = null;

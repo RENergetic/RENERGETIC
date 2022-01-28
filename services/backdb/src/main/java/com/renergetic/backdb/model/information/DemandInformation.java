@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import com.renergetic.backdb.model.Information;
+import com.renergetic.backdb.model.UnitSI;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class DemandInformation extends Information{
 	@Column(name = "demand_id")
 	private long demandId;
 
-	public DemandInformation(String name, String type, String unit, long demand_id, long signal) {
+	public DemandInformation(String name, String type, UnitSI unit, long demand_id, long signal) {
 		super(name, type, unit, signal);
 		this.demandId = demand_id;
 	}

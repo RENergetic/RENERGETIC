@@ -18,7 +18,7 @@ public interface InfrastructureRepository extends JpaRepository<Infrastructure, 
 
 	@Transactional
 	@Modifying
-	@Query("update Infrastructure i set i.name = :#{#iparam.name}, i.description = :#{#iparam.description}, i.type = :#{#iparam.type}, i.operatorUserId = :#{#iparam.operatorUserId}, i.energyStored = :#{#iparam.energyStored} where i.id = :id")
+	@Query("update Infrastructure i set i.name = :#{#iparam.name}, i.description = :#{#iparam.description}, i.type = :#{#iparam.type}, i.operatorUser.id = :#{#iparam.operatorUser.id}, i.energyStored = :#{#iparam.energyStored} where i.id = :id")
 	int update(@Param("iparam") Infrastructure infrastructure, Long id);
 
 	List<Infrastructure> findByType(String type);

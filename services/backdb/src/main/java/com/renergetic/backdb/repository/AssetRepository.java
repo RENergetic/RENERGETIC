@@ -19,11 +19,11 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 
 	@Transactional
 	@Modifying
-	@Query("update Asset a set a.name = :#{#asset.name}, a.description = :#{#asset.description}, a.location = :#{#asset.location}, a.partOfAssetId = :#{#asset.partOfAssetId}, a.ownerUserId = :#{#asset.ownerUserId} where a.id = :id")
+	@Query("update Asset a set a.name = :#{#asset.name}, a.description = :#{#asset.description}, a.location = :#{#asset.location}, a.partOfAsset.id = :#{#asset.partOfAsset.id}, a.ownerUser.id = :#{#asset.ownerUser.id} where a.id = :id")
 	int update(@Param("asset") Asset asset, Long id);
 
 	List<Asset> findByLocation(String location);
 	
-	@Query("select c from Connection c where c.assetId = (select a.id from Asset a where a.id = :id)")
+	@Query("select c from Connection c where c.asset.id = (select a.id from Asset a where a.id = :id)")
 	List<Connection> findConnections(Long id);
 }

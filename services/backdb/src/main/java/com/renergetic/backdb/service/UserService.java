@@ -3,13 +3,10 @@ package com.renergetic.backdb.service;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
@@ -38,7 +35,7 @@ public class UserService {
 	
 	public Asset getUserResidence(long userId) {
 		User user = userRepository.getById(userId);
-		return assetRepository.getById(user.getResideAssetId());
+		return assetRepository.getById(user.getResideAsset().getId());
 	}
 	
 	@Transactional
@@ -49,7 +46,7 @@ public class UserService {
 		if (!user.getName().isEmpty())
 			setClause.add("name=:name");
 
-		if (user.getResideAssetId() != 0)
+		if (user.getResideAsset().getId() != 0)
 			setClause.add("reside_asset_id=:asset");
 		
 		if (setClause.size() > 0) {
@@ -62,8 +59,8 @@ public class UserService {
 			if (!user.getName().isEmpty())
 				query.setParameter("name", user.getName());
 	
-			if (user.getResideAssetId() != 0)
-				query.setParameter("asset", user.getResideAssetId());
+			if (user.getResideAsset().getId() != 0)
+				query.setParameter("asset", user.getResideAsset().getId());
 			
 			query.executeUpdate();
 			session.close();

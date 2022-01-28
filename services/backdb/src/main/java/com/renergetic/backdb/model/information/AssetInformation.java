@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import com.renergetic.backdb.model.Information;
+import com.renergetic.backdb.model.UnitSI;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class AssetInformation extends Information{
 	@Column(name = "asset_id")
 	private long assetId;
 
-	public AssetInformation(String name, String type, String unit, long asset_id, long signal) {
+	public AssetInformation(String name, String type, UnitSI unit, long asset_id, long signal) {
 		super(name, type, unit, signal);
 		this.assetId = asset_id;
 	}

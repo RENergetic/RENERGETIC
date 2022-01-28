@@ -33,7 +33,7 @@ EOM
         read option
         case $option in
         1)
-            kubectl port-forward service/frontvue-sv 80:8080
+            start kubectl port-forward service/frontvue-sv 80:8080
         ;;
         2)
             start kubectl port-forward service/grafana-sv 3000:3000

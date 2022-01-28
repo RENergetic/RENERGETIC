@@ -18,7 +18,7 @@ public interface SupplyRepository extends JpaRepository<Supply, Long> {
 
 	@Transactional
 	@Modifying
-	@Query("update Supply s set s.name = :#{#supply.name}, s.description = :#{#supply.description}, s.assetId = :#{#supply.assetId}, s.inputInfrastructureId = :#{#supply.inputInfrastructureId}, s.power = :#{#supply.power} where s.id = :id")
+	@Query("update Supply s set s.name = :#{#supply.name}, s.description = :#{#supply.description}, s.asset.id = :#{#supply.asset.id}, s.infrastructure.id = :#{#supply.infrastructure.id}, s.power = :#{#supply.power} where s.id = :id")
 	int update(@Param("supply") Supply supply, Long id);
 
 	List<Supply> findByAssetId(String asset_id);
