@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.renergetic</groupId>
-	<artifactId>backdb</artifactId>
+	<artifactId>hdrapi</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>backdb</name>
 	<description>Project to access the relational database</description>

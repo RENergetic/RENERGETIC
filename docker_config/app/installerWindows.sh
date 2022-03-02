@@ -9,11 +9,11 @@ compileapps='true'
 automatic=-1
 
 javafile='backdb-0.0.1-SNAPSHOT.jar'
-javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
+javafilehdr='hdrapi-0.0.1-SNAPSHOT.jar'
 
 installdb='true'
 installapi='true'   # API ISLANDS
-installapi1='true'  # API BUILDINGS
+installapihdr='true'  # API HDR
 installfront='true'
 installkeycloak='true'
 installwso=''
@@ -87,37 +87,37 @@ then
     kubectl apply -f backdb-service.yaml
 fi
 
-if [[ $installapi1 = 'true' ]]
+if [[ $installapihdr = 'true' ]]
 then
     if [[ $compileapps = 'true' ]]
     then
         # API COMPILE TO JAR
-        cd "${current}\\..\\..\\services\\buildingsService"
+        cd "${current}\\..\\..\\services\\hdrapi"
         mvn clean package -Dmaven.test.skip
-        cp ".\\target\\${javafile1}" "${current}\\buildings"
+        cp ".\\target\\${javafilehdr}" "${current}\\hdr-api"
     fi
 
-    cd  "${current}\\buildings"
+    cd  "${current}\\hdr-api"
     # API INSTALLATION
     # set environment variables
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/backbuildings
-    kubectl delete services/backbuildings-sv
+    kubectl delete deployments/hdr-api
+    kubectl delete services/hdr-api-sv
 
 
     if [[ $buildimages = 'true' ]]
     then
         # create docker image
-        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest .
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/hdr:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-        docker push registry.apps.paas-dev.psnc.pl/$project/backbuildings:latest
+        docker push registry.apps.paas-dev.psnc.pl/$project/hdr:latest
     fi
     
     # create kubernetes resources
-    kubectl apply -f backbuildings-deployment.yaml --force=true
-    kubectl apply -f backbuildings-service.yaml
+    kubectl apply -f hdr-deployment.yaml --force=true
+    kubectl apply -f hdr-service.yaml
 fi
 
 if [[ $installkeycloak = 'true' ]]

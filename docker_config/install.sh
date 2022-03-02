@@ -2,8 +2,8 @@ current=$(pwd -W tr / \\)
 
 token=$(grep -ioP "(?<=token=).+" _credentials.properties)
 
-buildimages=''
-compileapps=''
+buildimages='true'
+compileapps='true'
 
 option=-1
 automatic=-1
