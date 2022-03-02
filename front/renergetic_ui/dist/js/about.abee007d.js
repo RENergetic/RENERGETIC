@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkrenergetic_ui"]=self["webpackChunkrenergetic_ui"]||[]).push([[443],{2634:function(e,n,r){r.r(n),r.d(n,{default:function(){return l}});var u=r(6252);const t={class:"about"},i=(0,u._)("h1",null,"This is an about page",-1),a=[i];function c(e,n){return(0,u.wg)(),(0,u.iD)("div",t,a)}var s=r(3744);const o={},f=(0,s.Z)(o,[["render",c]]);var l=f}}]);
+//# sourceMappingURL=about.abee007d.js.map

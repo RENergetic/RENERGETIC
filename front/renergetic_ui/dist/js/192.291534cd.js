@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkrenergetic_ui"]=self["webpackChunkrenergetic_ui"]||[]).push([[192],{9192:function(e,n,r){r.r(n),r.d(n,{default:function(){return i}});var t=r(6252);function a(e,n,r,a,u,o){return(0,t.wg)(),(0,t.iD)("div",null," todo create new panel ")}var u={name:"InformationPanelCreator",components:{},data(){return{panel:null,locked:!1,editMode:!1}},methods:{}},o=r(3744);const c=(0,o.Z)(u,[["render",a]]);var i=c}}]);
+//# sourceMappingURL=192.291534cd.js.map

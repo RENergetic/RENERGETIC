@@ -1,0 +1,1 @@
+{"version":3,"file":"js/877-legacy.d92efb54.js","mappings":"8IAEA,iBAAkB,MAElB,aAAe,EAAK","sources":["webpack://renergetic_ui/./node_modules/chart.js/auto/auto.esm.js"],"sourcesContent":["import {Chart, registerables} from '../dist/chart.esm';\n\nChart.register(...registerables);\n\nexport default Chart;\n"],"names":[],"sourceRoot":""}
