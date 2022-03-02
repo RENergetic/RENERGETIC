@@ -11,4 +11,5 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 	Asset save(Asset asset);
 	
 	List<Asset> findByParentAsset(Asset parentAsset);
+	List<Asset> findByAssets(Asset asset);
 }

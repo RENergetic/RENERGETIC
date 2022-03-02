@@ -55,6 +55,14 @@ public class AssetService {
 		} else return null;
 	}
 
+	public AssetDAOResponse connect(Long id, Long connectId) {
+		if ( assetRepository.existsById(id) && assetRepository.existsById(connectId)) {
+			Asset asset = assetRepository.findById(id).get();
+			asset.getAssets().add(assetRepository.findById(connectId).get());
+			return AssetDAOResponse.create(assetRepository.save(asset), null, null);
+		} else return null;
+	}
+
 	public List<AssetDAOResponse> get(Map<String, String> filters) {
 		List<Asset> assets = assetRepository.findAll();
 		Stream<Asset> stream = assets.stream();
@@ -81,8 +89,19 @@ public class AssetService {
 				.collect(Collectors.toList());
 	}
 
-	public Asset getById(Long id) {
-		return assetRepository.findById(id).orElse(null);
+	public AssetDAOResponse getById(Long id) {
+		Asset asset = assetRepository.findById(id).orElse(null);
+		
+		return AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAssets(asset));
+	}
+
+	public List<AssetDAOResponse> getConnectedTo(Long id) {
+		Asset asset = assetRepository.findById(id).orElse(null);
+		return asset != null
+				? asset.getAssets().stream()
+						.map(obj -> AssetDAOResponse.create(obj, assetRepository.findByParentAsset(obj), measurementRepository.findByAssets(obj)))
+						.collect(Collectors.toList())
+				: null;
 	}
 	
 	// ASSETDETAILS CRUD OPERATIONS

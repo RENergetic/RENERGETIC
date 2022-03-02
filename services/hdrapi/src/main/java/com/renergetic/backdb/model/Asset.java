@@ -1,6 +1,7 @@
 package com.renergetic.backdb.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
@@ -10,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -78,6 +81,16 @@ public class Asset {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "owner_id", nullable = true, insertable = true, updatable = true)
 	private Asset owner;
+	
+	@Getter
+	@Setter
+	@ManyToMany(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinTable(
+			name = "asset_connection",
+			joinColumns = @JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true),
+			inverseJoinColumns = @JoinColumn(name = "connected_asset_id"))
+	private List<Asset> assets;
 
 	public Asset(String name, String type, String label, String description, String location, long part_of_asset_id, long owner_user_id) {
 		super();

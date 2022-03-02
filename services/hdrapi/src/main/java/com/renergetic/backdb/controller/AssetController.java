@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.backdb.dao.AssetDAORequest;
@@ -59,12 +60,26 @@ public class AssetController {
 		@ApiResponse(responseCode = "404", description = "No assets found with this id")
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
-	public ResponseEntity<Asset> getAssetsByLocation (@PathVariable Long id){
-		Asset asset = null;
+	public ResponseEntity<AssetDAOResponse> getAssetsById (@PathVariable Long id){
+		AssetDAOResponse asset = null;
 		
 		asset = assetSv.getById(id);
 		
-		return new ResponseEntity<Asset>(asset, asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(asset, asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+	
+	@Operation(summary = "Get Connected Asset to a Asset with specified id")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+		@ApiResponse(responseCode = "404", description = "No assets found connected to this id")
+	})
+	@GetMapping(path = "/connect/{id}", produces = "application/json")
+	public ResponseEntity<List<AssetDAOResponse>> getAssetsConnectedTo (@PathVariable Long id){
+		List<AssetDAOResponse> asset = null;
+		
+		asset = assetSv.getConnectedTo(id);
+		
+		return new ResponseEntity<>(asset, asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //=== INFO REQUESTS ===================================================================================
@@ -174,6 +189,24 @@ public class AssetController {
 				AssetDAOResponse _asset = assetSv.update(asset, id);
 				return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@Operation(summary = "Connect two existing Asset")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Asset connected correctly"),
+			@ApiResponse(responseCode = "404", description = "Asset cann't be connected"),
+			@ApiResponse(responseCode = "500", description = "Error connecting asset")
+		}
+	)
+	@PutMapping(path = "/connect", produces = "application/json")
+	public ResponseEntity<AssetDAOResponse> connectAssets(@RequestParam("asset_id") Long id, @RequestParam("connected_asset_id") Long connectId) {
+		try {
+			AssetDAOResponse _asset = assetSv.connect(id, connectId);
+			return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

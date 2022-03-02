@@ -48,32 +48,36 @@ public class AssetDAOResponse {
 	private Long owner;
 	
 	public static AssetDAOResponse create(Asset asset, List<Asset> childs, List<Measurement> measurements) {
-		AssetDAOResponse dao = new AssetDAOResponse();
+		AssetDAOResponse dao = null;
 		
-		dao.setId(asset.getId());
-		dao.setName(asset.getName());
-		dao.setType(asset.getType());
-		dao.setLabel(asset.getLabel());
-		dao.setDescription(asset.getDescription());
-		dao.setGeo_location(asset.getLocation());
-		
-		if (asset.getParentAsset() != null) 
-			dao.setParent(SimpleAssetDAO.create(asset.getParentAsset()));
-		
-		if (childs != null) {
-			List<SimpleAssetDAO> mapChilds = new ArrayList<>();
-			for (Asset child : childs)
-				mapChilds.add(SimpleAssetDAO.create(child));
-			dao.setChild(mapChilds);
+		if (asset != null) {
+			dao = new AssetDAOResponse();
+			
+			dao.setId(asset.getId());
+			dao.setName(asset.getName());
+			dao.setType(asset.getType());
+			dao.setLabel(asset.getLabel());
+			dao.setDescription(asset.getDescription());
+			dao.setGeo_location(asset.getLocation());
+			
+			if (asset.getParentAsset() != null) 
+				dao.setParent(SimpleAssetDAO.create(asset.getParentAsset()));
+			
+			if (childs != null) {
+				List<SimpleAssetDAO> mapChilds = new ArrayList<>();
+				for (Asset child : childs)
+					mapChilds.add(SimpleAssetDAO.create(child));
+				dao.setChild(mapChilds);
+			}
+			if (measurements != null) {
+				List<SimpleMeasurementDAO> mapMeasurements = new ArrayList<>();
+				for (Measurement measurement : measurements)
+					mapMeasurements.add(SimpleMeasurementDAO.create(measurement));
+				dao.setMeasurements(mapMeasurements);
+			}
+			if (asset.getOwner() != null) 
+				dao.setOwner(asset.getOwner().getId());
 		}
-		if (measurements != null) {
-			List<SimpleMeasurementDAO> mapMeasurements = new ArrayList<>();
-			for (Measurement measurement : measurements)
-				mapMeasurements.add(SimpleMeasurementDAO.create(measurement));
-			dao.setMeasurements(mapMeasurements);
-		}
-		if (asset.getOwner() != null) 
-			dao.setOwner(asset.getOwner().getId());
 		return dao;
 	}
 	

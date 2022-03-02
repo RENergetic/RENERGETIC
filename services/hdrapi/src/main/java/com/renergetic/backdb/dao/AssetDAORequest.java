@@ -39,20 +39,24 @@ public class AssetDAORequest {
 	private Long owner;
 	
 	public static AssetDAORequest create(Asset asset) {
-		AssetDAORequest dao = new AssetDAORequest();
+		AssetDAORequest dao = null;
 		
-		dao.setId(asset.getId());
-		dao.setName(asset.getName());
-		dao.setType(asset.getType());
-		dao.setLabel(asset.getLabel());
-		dao.setDescription(asset.getDescription());
-		dao.setGeo_location(asset.getLocation());
+		if (asset != null) {
+			dao = new AssetDAORequest();
 		
-		if (asset.getParentAsset() != null) 
-			dao.setParent(asset.getParentAsset().getId());
-		
-		if (asset.getOwner() != null) 
-			dao.setOwner(asset.getOwner().getId());
+			dao.setId(asset.getId());
+			dao.setName(asset.getName());
+			dao.setType(asset.getType());
+			dao.setLabel(asset.getLabel());
+			dao.setDescription(asset.getDescription());
+			dao.setGeo_location(asset.getLocation());
+			
+			if (asset.getParentAsset() != null) 
+				dao.setParent(asset.getParentAsset().getId());
+			
+			if (asset.getOwner() != null) 
+				dao.setOwner(asset.getOwner().getId());
+		}
 		return dao;
 	}
 	

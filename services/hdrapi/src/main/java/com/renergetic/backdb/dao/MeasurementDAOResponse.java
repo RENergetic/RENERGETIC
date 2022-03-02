@@ -48,19 +48,22 @@ public class MeasurementDAOResponse {
 	}
 	
 	public static MeasurementDAOResponse create(Measurement measurement, List<MeasurementDetails> details) {
-		MeasurementDAOResponse dao = new MeasurementDAOResponse();
+		MeasurementDAOResponse dao = null;
 		
-		dao.setId(measurement.getId());
-		dao.setName(measurement.getName());
-		if (measurement.getType() != null)
-			dao.setType(measurement.getType());
-		dao.setLabel(measurement.getLabel());
-		dao.setDescription(measurement.getDescription());
-		dao.setIcon(measurement.getIcon());
-		
-		if (details != null)
-			dao.setMeasurement_details(details);
-		
+		if (measurement != null) {
+			dao = new MeasurementDAOResponse();
+			
+			dao.setId(measurement.getId());
+			dao.setName(measurement.getName());
+			if (measurement.getType() != null)
+				dao.setType(measurement.getType());
+			dao.setLabel(measurement.getLabel());
+			dao.setDescription(measurement.getDescription());
+			dao.setIcon(measurement.getIcon());
+			
+			if (details != null)
+				dao.setMeasurement_details(details);
+		}
 		return dao;
 	}
 	

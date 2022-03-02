@@ -39,16 +39,19 @@ public class MeasurementDAORequest {
 	private Direction direction;
 	
 	public static MeasurementDAORequest create(Measurement measurement) {
-		MeasurementDAORequest dao = new MeasurementDAORequest();
+		MeasurementDAORequest dao = null;
 		
-		dao.setId(measurement.getId());
-		dao.setName(measurement.getName());
-		if (measurement.getType() != null)
-			dao.setType(measurement.getType().getId());
-		dao.setLabel(measurement.getLabel());
-		dao.setDescription(measurement.getDescription());
-		dao.setIcon(measurement.getIcon());
+		if (measurement != null) {
+			dao = new MeasurementDAORequest();
 		
+			dao.setId(measurement.getId());
+			dao.setName(measurement.getName());
+			if (measurement.getType() != null)
+				dao.setType(measurement.getType().getId());
+			dao.setLabel(measurement.getLabel());
+			dao.setDescription(measurement.getDescription());
+			dao.setIcon(measurement.getIcon());
+		}
 		return dao;
 	}
 	
