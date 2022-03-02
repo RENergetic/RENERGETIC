@@ -11,7 +11,8 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.backdb.dao.MeasurementDAO;
+import com.renergetic.backdb.dao.MeasurementDAORequest;
+import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.Direction;
 import com.renergetic.backdb.model.Measurement;
@@ -37,11 +38,11 @@ public class MeasurementService {
 	MeasurementDetailsRepository measurementDetailsRepository;
 
 	// ASSET CRUD OPERATIONS
-	public MeasurementDAO save(MeasurementDAO measurement) {
+	public MeasurementDAOResponse save(MeasurementDAORequest measurement) {
 		measurement.setId(null);
 		System.err.println(measurement);
 		System.err.println(measurement.mapToEntity());
-		return MeasurementDAO.create(measurementRepository.save(measurement.mapToEntity()), null);
+		return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null);
 	}
 	
 	public boolean deleteById(Long id) {
@@ -51,14 +52,14 @@ public class MeasurementService {
 		} else return false;
 	}
 
-	public MeasurementDAO update(MeasurementDAO measurement, Long id) {
+	public MeasurementDAOResponse update(MeasurementDAORequest measurement, Long id) {
 		if ( measurementRepository.existsById(id) ) {
 			measurement.setId(id);
-			return MeasurementDAO.create(measurementRepository.save(measurement.mapToEntity()), null);
+			return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null);
 		} else return null;
 	}
 
-	public List<MeasurementDAO> get(Map<String, String> filters) {
+	public List<MeasurementDAOResponse> get(Map<String, String> filters) {
 		List<Measurement> measurements = measurementRepository.findAll();
 		Stream<Measurement> stream = measurements.stream();
 		
@@ -83,7 +84,7 @@ public class MeasurementService {
 				return equals;
 			});
 		return stream
-				.map(measurement -> MeasurementDAO.create(measurement, measurementDetailsRepository.findByMeasurementId(measurement.getId())))
+				.map(measurement -> MeasurementDAOResponse.create(measurement, measurementDetailsRepository.findByMeasurementId(measurement.getId())))
 				.collect(Collectors.toList());
 	}
 

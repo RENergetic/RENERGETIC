@@ -54,7 +54,8 @@ public class Dashboard {
 	@Column(name = "label")
 	@JsonProperty(required = false)
 	private String label;
-	
+
+	@Getter
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "user_id", nullable = false, insertable = true, updatable = true)
@@ -73,10 +74,6 @@ public class Dashboard {
 		this.name = name;
 		this.url = url;
 		this.label = label;
-	}
-
-	public Asset getUser() {
-		return user;
 	}
 
 	public void setUser(Long id) {

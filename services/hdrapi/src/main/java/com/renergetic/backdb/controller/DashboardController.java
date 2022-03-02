@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.renergetic.backdb.dao.DashboardDAORequest;
 import com.renergetic.backdb.model.Dashboard;
 import com.renergetic.backdb.repository.DashboardRepository;
 
@@ -134,10 +135,10 @@ public class DashboardController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Dashboard> createDashboard(@RequestBody Dashboard dashboard) {
+	public ResponseEntity<Dashboard> createDashboard(@RequestBody DashboardDAORequest dashboard) {
 		try {
 			dashboard.setId(null);
-			Dashboard _dashboard = dashboardRepository.save(dashboard);
+			Dashboard _dashboard = dashboardRepository.save(dashboard.mapToEntity());
 			
 			return new ResponseEntity<>(_dashboard, HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -154,12 +155,12 @@ public class DashboardController {
 			@ApiResponse(responseCode = "500", description = "Error saving dashboard")
 		}
 	)
-	@PutMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Dashboard> updateDashboard(@RequestBody Dashboard dashboard) {
+	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
+	public ResponseEntity<Dashboard> updateDashboard(@RequestBody DashboardDAORequest dashboard, @PathVariable Long id) {
 		try {
-				if (dashboard.getId() != null && dashboardRepository.existsById(dashboard.getId())) {
-					dashboardRepository.save(dashboard);
-					return new ResponseEntity<>(dashboard, HttpStatus.OK);
+				if (dashboardRepository.existsById(id)) {
+					dashboard.setId(id);
+					return new ResponseEntity<>(dashboardRepository.save(dashboard.mapToEntity()), HttpStatus.OK);
 				}else return ResponseEntity.notFound().build();
 				
 		} catch (Exception e) {

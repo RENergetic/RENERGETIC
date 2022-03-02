@@ -10,6 +10,8 @@ public enum UnitSI {
 	cd ("candela", "base", "Luminous Intensity"),
 	
 	W ("watt", "derived", "Power"),
+	kW ("kilowatt", "derived", "Power"),
+	kWh ("kilowatt/hour", "derived", "Power"),
 	V ("volt", "derived", "Voltage"),
 	Ohm ("ohm", "derived", "Electrical Resistance"),
 	lx ("lux", "derived", "Illuminance");

@@ -11,7 +11,8 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.backdb.dao.AssetDAO;
+import com.renergetic.backdb.dao.AssetDAORequest;
+import com.renergetic.backdb.dao.AssetDAOResponse;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.AssetRepository;
@@ -31,10 +32,10 @@ public class AssetService {
 	AssetDetailsRepository assetDetailsRepository;
 
 	// ASSET CRUD OPERATIONS
-	public AssetDAO save(AssetDAO asset) {
+	public AssetDAOResponse save(AssetDAORequest asset) {
 		asset.setId(null);
 		if (Asset.ALLOWED_TYPES.keySet().stream().anyMatch(asset.getType()::equalsIgnoreCase)) {
-			return AssetDAO.create(assetRepository.save(asset.mapToEntity()), null, null);
+			return AssetDAOResponse.create(assetRepository.save(asset.mapToEntity()), null, null);
 		}
 		else return null;
 	}
@@ -46,15 +47,15 @@ public class AssetService {
 		} else return false;
 	}
 
-	public AssetDAO update(AssetDAO asset, Long id) {
+	public AssetDAOResponse update(AssetDAORequest asset, Long id) {
 		if ( assetRepository.existsById(id) && 
 				Asset.ALLOWED_TYPES.keySet().stream().anyMatch(asset.getType()::equalsIgnoreCase)) {
 			asset.setId(id);
-			return AssetDAO.create(assetRepository.save(asset.mapToEntity()), null, null);
+			return AssetDAOResponse.create(assetRepository.save(asset.mapToEntity()), null, null);
 		} else return null;
 	}
 
-	public List<AssetDAO> get(Map<String, String> filters) {
+	public List<AssetDAOResponse> get(Map<String, String> filters) {
 		List<Asset> assets = assetRepository.findAll();
 		Stream<Asset> stream = assets.stream();
 		
@@ -76,7 +77,7 @@ public class AssetService {
 				return equals;
 			});
 		return stream
-				.map(asset -> AssetDAO.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAssets(asset)))
+				.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAssets(asset)))
 				.collect(Collectors.toList());
 	}
 

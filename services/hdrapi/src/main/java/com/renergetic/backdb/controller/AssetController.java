@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.backdb.dao.AssetDAO;
+import com.renergetic.backdb.dao.AssetDAORequest;
+import com.renergetic.backdb.dao.AssetDAOResponse;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
@@ -44,8 +45,8 @@ public class AssetController {
 	@Operation(summary = "Get All Assets")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<AssetDAO>> getAllAssets (){
-		List<AssetDAO> assets = new ArrayList<AssetDAO>();
+	public ResponseEntity<List<AssetDAOResponse>> getAllAssets (){
+		List<AssetDAOResponse> assets = new ArrayList<AssetDAOResponse>();
 		
 		assets = assetSv.get(null);
 		
@@ -143,10 +144,10 @@ public class AssetController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<AssetDAO> createAsset(@RequestBody AssetDAO asset) {
+	public ResponseEntity<AssetDAOResponse> createAsset(@RequestBody AssetDAORequest asset) {
 		try {
 			if (Asset.ALLOWED_TYPES.keySet().stream().anyMatch(asset.getType()::equalsIgnoreCase)) {	
-				AssetDAO _asset = assetSv.save(asset);
+				AssetDAOResponse _asset = assetSv.save(asset);
 				return new ResponseEntity<>(_asset, HttpStatus.CREATED);
 			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
@@ -166,11 +167,11 @@ public class AssetController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<AssetDAO> updateAsset(@RequestBody AssetDAO asset, @PathVariable Long id) {
+	public ResponseEntity<AssetDAOResponse> updateAsset(@RequestBody AssetDAORequest asset, @PathVariable Long id) {
 		try {
 			asset.setId(id);
 			if (Asset.ALLOWED_TYPES.keySet().stream().anyMatch(asset.getType()::equalsIgnoreCase)) {	
-				AssetDAO _asset = assetSv.update(asset, id);
+				AssetDAOResponse _asset = assetSv.update(asset, id);
 				return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {

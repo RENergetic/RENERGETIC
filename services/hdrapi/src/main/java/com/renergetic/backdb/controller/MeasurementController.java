@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.backdb.dao.MeasurementDAO;
+import com.renergetic.backdb.dao.MeasurementDAORequest;
+import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.MeasurementType;
 import com.renergetic.backdb.model.details.MeasurementDetails;
@@ -45,8 +46,8 @@ public class MeasurementController {
 	@Operation(summary = "Get All Measurements")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<MeasurementDAO>> getAllMeasurements (){
-		List<MeasurementDAO> measurements = new ArrayList<>();
+	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (){
+		List<MeasurementDAOResponse> measurements = new ArrayList<>();
 		
 		measurements = measurementSv.get(null);
 		
@@ -169,9 +170,9 @@ public class MeasurementController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<MeasurementDAO> createMeasurement(@RequestBody MeasurementDAO measurement) {
+	public ResponseEntity<MeasurementDAOResponse> createMeasurement(@RequestBody MeasurementDAORequest measurement) {
 		try {
-			MeasurementDAO _measurement = measurementSv.save(measurement);
+			MeasurementDAOResponse _measurement = measurementSv.save(measurement);
 			return new ResponseEntity<>(_measurement, HttpStatus.CREATED);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -208,10 +209,10 @@ public class MeasurementController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<MeasurementDAO> updateMeasurement(@RequestBody MeasurementDAO measurement, @PathVariable Long id) {
+	public ResponseEntity<MeasurementDAOResponse> updateMeasurement(@RequestBody MeasurementDAORequest measurement, @PathVariable Long id) {
 		try {
 			measurement.setId(id);	
-			MeasurementDAO _measurement = measurementSv.update(measurement, id);
+			MeasurementDAOResponse _measurement = measurementSv.update(measurement, id);
 			return new ResponseEntity<>(_measurement, _measurement != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			e.printStackTrace();
