@@ -1,0 +1,18 @@
+{
+    "id": "2",
+    "measurement_type": {
+        "name": "type_name",
+        "label": "type's label ",
+        "unit": "kWh",
+        "id": ""
+    },
+    "name": "m_2",
+    "label": "M 2",
+    "direction": 1,
+    "description": "avg",
+    "icon": "electricity",
+    "measurement_details": {
+        "color": "#5C6BC0"
+    },
+    
+}

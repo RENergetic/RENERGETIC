@@ -1,0 +1,39 @@
+{
+    "id": 1,
+    "asset_type": "type_1",
+    "name": "asset_1",
+    "label": "Asset 1",
+    "geo_location": null,
+    "parent": {
+        "id": 4,
+        "name": "parent_4",
+        "label": "Parent 4"
+    },
+    "child": [],
+    "measurents": [
+        {
+            "id": "7",
+            "name": "e7",
+            "label": "e7",
+            "unit": "kWh",
+            "description": "total",
+            "icon": "electricity"
+        },
+        {
+            "id": "6",
+            "name": "e7",
+            "label": "e7",
+            "unit": "kWh",
+            "description": "total",
+            "icon": "electricity"
+        },
+        {
+            "id": "5",
+            "name": "e5",
+            "label": "e5",
+            "unit": "kWh",
+            "description": "total",
+            "icon": "electricity"
+        }
+    ]
+}

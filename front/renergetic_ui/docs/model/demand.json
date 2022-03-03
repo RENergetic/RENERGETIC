@@ -1,0 +1,17 @@
+{
+    "id": 1,
+    "type": "heat",
+    "msg": "Increase Something",
+    "icon": "battery",
+    "asset": {
+        "id": 1
+    },
+    "measurement_type": null,
+    "measurement": {
+        "id": 1
+    },
+    "up": true,
+    "description": "Increase something by flah ulah because of clah klah",
+    "demand_request_start": 1646082303,
+    "demand_request_stop": 1646182303
+}

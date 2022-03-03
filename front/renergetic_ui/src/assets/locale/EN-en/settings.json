@@ -1,0 +1,14 @@
+{
+  "on": "On",
+  "off": "Off",
+  "hidden": "Hidden",
+  "visible": "Visible",
+  "feedback": "Feedback",
+  "notification": "Notification",
+  "measurements": "Measurements",
+  "recommendations": "Recommendations",
+  "selected_panel": "Selected Panel" ,
+  "heatmap":"Heatmap",
+  "chart":"Chart",
+  "request_demand":"Request demand"
+}

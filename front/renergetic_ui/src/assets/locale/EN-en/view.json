@@ -1,0 +1,36 @@
+{
+  "asset_list": "Asset list",
+  "dashboards": "Dashboards",
+  "dashboard_delete": "Delete dashboard",
+  "dashboard_delete_confirm": "Are you sure you want to remove dashboard: {label}",
+  "delete_area": "Delete area",
+  "heatmap_area_delete": "Delete heatmap",
+  "heatmap_area_delete_confirm": "Are you sure you want to remove heatmap: {label}",
+  "go_to_dashboard": "Go to dashboard",
+  "go_to_heatmap":"Go inside",
+  "manage_sensors": "Manage sensors",
+  "measurements": "Measurements",
+  "no_asset":"No asset",
+  "no_dashboard":"No dashboard",
+  "no_heatmap": "No heatmap",
+  "no_parent":"No parent",
+  "profile": "Profile",
+  "add_dashboard": "Add dashboard",
+  "heatmap_list": "Heatmap List",
+  "selected_area": "Selected area",
+  "select_dashboard": "Select dashboard",
+  "select_heatmap":"Select heatmap",
+  "select_asset":"Select asset",
+  "edit_area": "Edit area",
+  "button": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "add":"Add"
+  },
+  "settings": {
+    "true": {},
+    "false": {}
+  }
+
+  
+}

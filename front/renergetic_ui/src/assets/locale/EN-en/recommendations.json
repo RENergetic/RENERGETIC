@@ -1,0 +1,10 @@
+{
+    "heat": {
+        "increase": {},
+        "decrease": {}
+    },
+    "hot_water": {},
+    "dirty_water": {
+        "drink": "Don't drink it {parameter_1} : and {param_2} "
+    }
+}

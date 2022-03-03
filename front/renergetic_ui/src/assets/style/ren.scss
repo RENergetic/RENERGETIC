@@ -1,0 +1,192 @@
+// @import url('primevue/resources/themes/nova-vue/theme.css');
+@import './variables.scss';
+// $inputwidth: 100%;
+// $primary-color: #94ba39; //#F1F2F2;//#0D89EC
+// $secondary-color: #f1f2f2; //#F1F2F2;//#0D89EC
+// $sidemenu-button-width: 2rem;
+
+body {
+    background-color: lightgrey;
+}
+.disabled{    
+    color: rgba(144, 144, 144,0.75);
+    font-style: italic;
+}
+.ren {
+    .tile {
+        margin: 0.15rem;
+    }
+    .p-inputtext {
+        width: $inputwidth;
+    }
+    .p-inputwrapper {
+        width: $inputwidth !important;
+    }
+    td {
+        margin: 0;
+        padding: 0 !important;
+    }
+    .cell-state {
+        padding: 0.3rem;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        text-align: center;
+    }
+
+    p.cell,
+    div.cell {
+        padding: 0.5rem;
+        height: 100%;
+        width: 100%;
+    }
+    .cell-state > div {
+        margin: auto;
+    }
+
+    .state.ok,
+    .cell.ok,
+    .cell-state.ok {
+        background-color: #50b482;
+    }
+    .state.error,
+    .cell.error,
+    .cell-state.error {
+        background-color: crimson;
+    }
+    .state.warning,
+    .cell.warning,
+    .cell-state.warning {
+        background-color: sandybrown;
+    }
+    .state.unknown,
+    .cell.unknown,
+    .cell-state.unknown {
+        background-color: #82fab4aa;
+    }
+    .row.unknown {
+        opacity: 0.65;
+        background: lightgray;
+        // .cell.ok,
+        // .cell-state.ok {
+        //     background-color: lightgray;
+        // }
+        // .cell.error,
+        // .cell-state.error {
+        //     background-color: lightgray;
+        // }
+        // .cell.warning,
+        // .cell-state.warning {
+        //     background-color: lightgray;
+        // }
+        // .cell.unknown,
+        // .cell-state.unknown {
+        //     background-color: lightgray;
+        // }
+    }
+}
+
+.fullscr {
+    width: 100vw;
+    height: 100vh;
+    padding: 0.5rem;
+    // position: fixed;
+    position: absolute;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    margin: 0;
+   
+      .ren-toolbar {
+        margin-left: ($sidemenu-button-width + 0.5rem);
+    }
+} 
+.ren-sidebar.p-sidebar {
+    padding: 0;
+    background-color: $secondary-color//seagreen;
+}
+.ren-sidebar {
+    .p-sidebar {
+        padding: 0;
+    }
+    .p-sidebar-content {
+        height: 100%;
+        padding: 0;
+    }
+    .p-sidebar-close {
+        margin-right: 0.5rem;
+        // bottom: 0;
+        // top: initial;
+    }
+}
+.ren-chart.p-dialog {
+    .p-dialog-content {
+        display: flex;
+        flex-flow: column;
+    }
+    canvas.chartjs-render-monitor {
+        height: 100% !important;
+        position: relative;
+        display: block;
+    }
+    .p-chart {
+        flex: 1;
+        position: relative;
+        display: block;
+        height: 90%;
+        width: 90%;
+        margin: auto;
+    }
+
+    .card {
+        margin-top: 1rem;
+    }
+    .field {
+        margin-bottom: 0;
+    }
+    .col {
+        flex-basis: unset;
+        flex-grow: unset;
+    }
+}
+.ren-tab-content {
+    .p-dialog-content {
+        display: flex;
+        flex-flow: column;
+    }
+    canvas.chartjs-render-monitor {
+        height: 100% !important;
+        position: relative;
+        display: block;
+    }
+    .p-chart {
+        flex: 1;
+        position: relative;
+        display: block;
+        height: 80vh;
+        width: 90vw;
+        margin: auto;
+    }
+
+    .card {
+        margin-top: 1rem;
+    }
+    .field {
+        margin-bottom: 0;
+    }
+    .col {
+        flex-basis: unset;
+        flex-grow: unset;
+    }
+}
+
+.p-tabmenu {
+    position: sticky;
+    top: 0.25rem;
+    left: 1rem;
+    margin-left: 3rem;
+    z-index: 1001;
+}
+.ren.p-menu-overlay {
+    min-width: 15rem !important;
+}
