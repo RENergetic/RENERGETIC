@@ -1,7 +1,7 @@
 package com.renergetic.backdb.dao;
 
 import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.model.UnitSI;
+import com.renergetic.backdb.model.Unit;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class SimpleMeasurementDAO {
 	
 	private String icon;
 	
-	private UnitSI unit;
+	private Unit unit;
 	
 	public static SimpleMeasurementDAO create(Measurement measurement) {
 		SimpleMeasurementDAO dao = new SimpleMeasurementDAO();

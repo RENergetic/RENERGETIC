@@ -33,9 +33,9 @@ public class MeasurementType {
 	
 	@Column(name = "unit", nullable = true, insertable = true, updatable = true)
 	@Enumerated(EnumType.STRING)
-	private UnitSI unit;
+	private Unit unit;
 
-	public MeasurementType(long id, String name, String label, UnitSI unit) {
+	public MeasurementType(long id, String name, String label, Unit unit) {
 		super();
 		this.id = id;
 		this.name = name;

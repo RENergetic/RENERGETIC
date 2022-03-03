@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.backdb.dao.AssetDAORequest;
 import com.renergetic.backdb.dao.AssetDAOResponse;
+import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
@@ -75,11 +76,25 @@ public class AssetController {
 	})
 	@GetMapping(path = "/connect/{id}", produces = "application/json")
 	public ResponseEntity<List<AssetDAOResponse>> getAssetsConnectedTo (@PathVariable Long id){
-		List<AssetDAOResponse> asset = null;
+		List<AssetDAOResponse> assets = null;
 		
-		asset = assetSv.getConnectedTo(id);
+		assets = assetSv.getConnectedTo(id);
 		
-		return new ResponseEntity<>(asset, asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+	
+	@Operation(summary = "Get Measurements from Asset with specified id")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+		@ApiResponse(responseCode = "404", description = "No measurements found to this asset id")
+	})
+	@GetMapping(path = "/measurement/{id}", produces = "application/json")
+	public ResponseEntity<List<MeasurementDAOResponse>> getMeasurements (@PathVariable Long id){
+		List<MeasurementDAOResponse> measurements = null;
+		
+		measurements = assetSv.getMeasurements(id);
+		
+		return new ResponseEntity<>(measurements, measurements != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //=== INFO REQUESTS ===================================================================================
@@ -198,7 +213,7 @@ public class AssetController {
 	@Operation(summary = "Connect two existing Asset")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Asset connected correctly"),
-			@ApiResponse(responseCode = "404", description = "Asset cann't be connected"),
+			@ApiResponse(responseCode = "404", description = "Asset can't be connected"),
 			@ApiResponse(responseCode = "500", description = "Error connecting asset")
 		}
 	)
@@ -207,6 +222,24 @@ public class AssetController {
 		try {
 			AssetDAOResponse _asset = assetSv.connect(id, connectId);
 			return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@Operation(summary = "Add existing measurement to existing Asset")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Measurement added correctly"),
+			@ApiResponse(responseCode = "404", description = "Asset not exists or one of more infrastructure asset connected to measurement"),
+			@ApiResponse(responseCode = "500", description = "Error adding measurement")
+		}
+	)
+	@PutMapping(path = "/measurement", produces = "application/json")
+	public ResponseEntity<MeasurementDAOResponse> addMeasurement(@RequestParam("asset_id") Long assetId, @RequestParam("measurement_id") Long measurementId) {
+		try {
+			MeasurementDAOResponse _measurement = assetSv.addMeasurement(assetId, measurementId);
+			return new ResponseEntity<>(_measurement, _measurement != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

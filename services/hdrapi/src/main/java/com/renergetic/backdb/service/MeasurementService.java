@@ -17,7 +17,7 @@ import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.Direction;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.MeasurementType;
-import com.renergetic.backdb.model.UnitSI;
+import com.renergetic.backdb.model.Unit;
 import com.renergetic.backdb.model.details.MeasurementDetails;
 import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.repository.MeasurementTypeRepository;
@@ -119,7 +119,7 @@ public class MeasurementService {
 			if (filters.containsKey("name"))
 				types = types.stream().filter(type -> type.getName().equalsIgnoreCase(filters.get("name"))).collect(Collectors.toList());
 			if (filters.containsKey("unit"))
-				types = types.stream().filter(type -> type.getUnit().equals(UnitSI.valueOf(filters.get("unit")))).collect(Collectors.toList());
+				types = types.stream().filter(type -> type.getUnit().equals(Unit.valueOf(filters.get("unit")))).collect(Collectors.toList());
 		}
 		return types;
 	}

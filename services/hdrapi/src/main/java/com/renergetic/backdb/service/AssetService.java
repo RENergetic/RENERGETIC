@@ -13,11 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.renergetic.backdb.dao.AssetDAORequest;
 import com.renergetic.backdb.dao.AssetDAOResponse;
+import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.model.Asset;
+import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
+import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
 
 @Service
 public class AssetService {
@@ -30,6 +33,8 @@ public class AssetService {
 	MeasurementRepository measurementRepository;
 	@Autowired
 	AssetDetailsRepository assetDetailsRepository;
+	@Autowired
+	MeasurementDetailsRepository measurementDetailsRepository;
 
 	// ASSET CRUD OPERATIONS
 	public AssetDAOResponse save(AssetDAORequest asset) {
@@ -61,6 +66,26 @@ public class AssetService {
 			asset.getAssets().add(assetRepository.findById(connectId).get());
 			return AssetDAOResponse.create(assetRepository.save(asset), null, null);
 		} else return null;
+	}
+
+	public MeasurementDAOResponse addMeasurement(Long assetid, Long measurementId) {
+		if ( assetRepository.existsById(assetid) && measurementRepository.existsById(measurementId)) {
+			Measurement measurement = measurementRepository.findById(measurementId).get();
+			Asset asset = assetRepository.findById(assetid).get();
+			
+			boolean haveInfrastructure = false;
+			for (Asset obj : measurement.getAssets()) {
+				if (Asset.ALLOWED_TYPES.get(obj.getType()).equalsIgnoreCase("Infrastructure")) {
+					haveInfrastructure = true;
+					break;
+				}
+			}
+			if (!(Asset.ALLOWED_TYPES.get(asset.getType()).equalsIgnoreCase("Infrastructure") && haveInfrastructure)) {
+				measurement.getAssets().add(asset);
+				return MeasurementDAOResponse.create(measurementRepository.save(measurement), null);
+			}
+		}
+		return null;
 	}
 
 	public List<AssetDAOResponse> get(Map<String, String> filters) {
@@ -100,6 +125,15 @@ public class AssetService {
 		return asset != null
 				? asset.getAssets().stream()
 						.map(obj -> AssetDAOResponse.create(obj, assetRepository.findByParentAsset(obj), measurementRepository.findByAssets(obj)))
+						.collect(Collectors.toList())
+				: null;
+	}
+
+	public List<MeasurementDAOResponse> getMeasurements(Long id) {
+		Asset asset = assetRepository.findById(id).orElse(null);
+		return asset != null
+				? measurementRepository.findByAssets(asset).stream()
+						.map(obj -> MeasurementDAOResponse.create(obj, measurementDetailsRepository.findByMeasurementId(obj.getId())))
 						.collect(Collectors.toList())
 				: null;
 	}
