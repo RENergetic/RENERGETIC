@@ -39,7 +39,7 @@ public class User {
 
 	@Getter
 	@Setter
-	@Column(name = "name", nullable = true, insertable = true, updatable = true, unique = true)
+	@Column(name = "name", nullable = true, insertable = true, updatable = true, unique = false)
 	@JsonProperty(required = false)
 	private String name;
 

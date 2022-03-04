@@ -33,7 +33,7 @@ public class UserSettings {
 
 	@Getter
 	@Setter
-	@Column(name = "settings_json", nullable = false, insertable = true, updatable = true, unique = true)
+	@Column(name = "settings_json", nullable = false, insertable = true, updatable = true, unique = false)
 	@JsonProperty(required = true)
 	private String settings_json;
 

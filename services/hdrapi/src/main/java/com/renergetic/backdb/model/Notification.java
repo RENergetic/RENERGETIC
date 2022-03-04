@@ -25,10 +25,10 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "user_roles")
+@Table(name = "notification")
 @RequiredArgsConstructor
 @ToString
-public class UserRoles {	
+public class Notification {	
 	@Id
 	@Getter
 	@Setter
@@ -38,39 +38,53 @@ public class UserRoles {
 	@Getter
 	@Setter
 	@Column(name = "uuid", nullable = true, insertable = true, updatable = true, unique = true)
-	@JsonProperty(required = true)
+	@JsonProperty(required = false)
 	private String uuid;
 
 	@Getter
 	@Setter
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false, insertable = true, updatable = true, unique = false)
-	@JsonProperty(required = false)
-	private RoleType type;
+	@JsonProperty(required = true)
+	private NotificationType type;
 
 	@Getter
 	@Setter
-	@Column(name = "update_date", nullable = false, insertable = true, updatable = true, unique = false)
+	@Column(name = "content", nullable = false, insertable = true, updatable = true, unique = false)
+	@JsonProperty(required = true)
+	private String content;
+
+	@Getter
+	@Setter
+	@Column(name = "value", nullable = true, insertable = true, updatable = true, unique = false)
 	@JsonProperty(required = false)
-	private LocalDateTime update_date;
+	private String value;
+
+	@Getter
+	@Setter
+	@Column(name = "timestamp", nullable = false, insertable = true, updatable = true, unique = false)
+	@JsonProperty(required = true)
+	private LocalDateTime timestamp;
 
 	@Getter
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "user_id", nullable = false, insertable = true, updatable = true)
+	@JoinColumn(name = "asset_id", nullable = false, insertable = true, updatable = true)
 	@JsonProperty(required = false)
-	private User user;
+	private Asset asset;
 
-	public UserRoles(String uuid, RoleType type, LocalDateTime date) {
+	public Notification(String uuid, NotificationType type, String content, String value, LocalDateTime timestamp) {
 		super();
 		this.uuid = uuid;
-		this.type = type;;
-		this.update_date = date;
+		this.type = type;
+		this.content = content;
+		this.value = value;
+		this.timestamp = timestamp;
 	}
 
-	public void setUser(Long id) {
-		this.user = new User();
-		this.user.setId(id);
+	public void setAsset(Long id) {
+		this.asset = new Asset();
+		this.asset.setId(id);
 	}	
 	
 }
