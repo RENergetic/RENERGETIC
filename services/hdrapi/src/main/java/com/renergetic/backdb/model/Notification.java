@@ -17,8 +17,6 @@ import javax.persistence.Table;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -38,39 +36,33 @@ public class Notification {
 	@Getter
 	@Setter
 	@Column(name = "uuid", nullable = true, insertable = true, updatable = true, unique = true)
-	@JsonProperty(required = false)
 	private String uuid;
 
 	@Getter
 	@Setter
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false, insertable = true, updatable = true, unique = false)
-	@JsonProperty(required = true)
 	private NotificationType type;
 
 	@Getter
 	@Setter
 	@Column(name = "content", nullable = false, insertable = true, updatable = true, unique = false)
-	@JsonProperty(required = true)
 	private String content;
 
 	@Getter
 	@Setter
 	@Column(name = "value", nullable = true, insertable = true, updatable = true, unique = false)
-	@JsonProperty(required = false)
 	private String value;
 
 	@Getter
 	@Setter
 	@Column(name = "timestamp", nullable = false, insertable = true, updatable = true, unique = false)
-	@JsonProperty(required = true)
 	private LocalDateTime timestamp;
 
 	@Getter
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "asset_id", nullable = false, insertable = true, updatable = true)
-	@JsonProperty(required = false)
 	private Asset asset;
 
 	public Notification(String uuid, NotificationType type, String content, String value, LocalDateTime timestamp) {
