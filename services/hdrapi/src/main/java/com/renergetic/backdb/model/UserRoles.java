@@ -1,24 +1,23 @@
 package com.renergetic.backdb.model;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +25,10 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "dashboard")
+@Table(name = "user_roles")
 @RequiredArgsConstructor
 @ToString
-public class Dashboard {	
+public class UserRoles {	
 	@Id
 	@Getter
 	@Setter
@@ -38,22 +37,22 @@ public class Dashboard {
 
 	@Getter
 	@Setter
-	@Column(name = "name")
-	@JsonProperty(required = false)
-	private String name;
-
-	@Getter
-	@Setter
-	@Pattern(regexp = "https?://\\S+([/?].+)?", message = "URL isn't valid format")
-	@Column(name = "url")
+	@Column(name = "uuid", nullable = true, insertable = true, updatable = true, unique = true)
 	@JsonProperty(required = true)
-	private String url;
+	private String uuid;
 
 	@Getter
 	@Setter
-	@Column(name = "label")
+	@Enumerated(EnumType.STRING)
+	@Column(name = "type", nullable = false, insertable = true, updatable = true, unique = true)
 	@JsonProperty(required = false)
-	private String label;
+	private RoleType type;
+
+	@Getter
+	@Setter
+	@Column(name = "update_date", nullable = false, insertable = true, updatable = true, unique = true)
+	@JsonProperty(required = false)
+	private LocalDateTime update_date;
 
 	@Getter
 	@ManyToOne(cascade = CascadeType.REFRESH)
@@ -62,18 +61,11 @@ public class Dashboard {
 	@JsonProperty(required = false)
 	private User user;
 
-	@Getter
-	@Setter
-	@Transient
-	@JsonInclude(value = Include.NON_NULL)
-	@JsonProperty(access = Access.READ_ONLY)
-	private Integer status;
-
-	public Dashboard(String name, String url, String label) {
+	public UserRoles(String uuid, RoleType type, LocalDateTime date) {
 		super();
-		this.name = name;
-		this.url = url;
-		this.label = label;
+		this.uuid = uuid;
+		this.type = type;;
+		this.update_date = date;
 	}
 
 	public void setUser(Long id) {

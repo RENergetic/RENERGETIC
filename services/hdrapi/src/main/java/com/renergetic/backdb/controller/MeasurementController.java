@@ -242,7 +242,7 @@ public class MeasurementController {
 
 //=== DELETE REQUESTS ================================================================================
 			
-	@Operation(summary = "Delete a existing Measurement", hidden = true)
+	@Operation(summary = "Delete a existing Measurement", hidden = false)
 	@ApiResponses({
 			@ApiResponse(responseCode = "204", description = "Measurement deleted correctly"),
 			@ApiResponse(responseCode = "500", description = "Error saving measurement")
@@ -259,7 +259,7 @@ public class MeasurementController {
 		}
 	}
 	
-	@Operation(summary = "Delete a existing Measurement", hidden = true)
+	@Operation(summary = "Delete a existing Measurement", hidden = false)
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", description = "Measurement deleted correctly"),
 		@ApiResponse(responseCode = "500", description = "Error saving measurement")

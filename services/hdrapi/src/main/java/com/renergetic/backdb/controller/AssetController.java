@@ -248,7 +248,7 @@ public class AssetController {
 
 //=== DELETE REQUESTS ================================================================================
 			
-	@Operation(summary = "Delete a existing Asset", hidden = true)
+	@Operation(summary = "Delete a existing Asset", hidden = false)
 	@ApiResponses({
 			@ApiResponse(responseCode = "204", description = "Asset deleted correctly"),
 			@ApiResponse(responseCode = "500", description = "Error saving asset")
