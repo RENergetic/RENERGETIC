@@ -118,23 +118,27 @@ public class UserService {
 				.collect(Collectors.toList());
 	}
 
-	public List<UserRolesDAO> getRoles(Map<String, String> filters, long offset, int limit) {
+	public Stream<UserRoles> getRolesStream(Map<String, String> filters, long offset, int limit) {
 		Page<UserRoles> roles = userRolesRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<UserRoles> stream = roles.stream();
-		
+
 		if (filters != null)
-			stream.filter(role -> {
+			stream = stream.filter(role -> {
 				boolean equals = true;
-				
+
 				if (filters.containsKey("type"))
 					equals = role.getType().toString().equalsIgnoreCase(filters.get("type"));
 				if (equals && filters.containsKey("user_id"))
 					equals = String.valueOf(role.getUser().getId()).equalsIgnoreCase(filters.get("user_id"));
-				
+
 				return equals;
 			});
-		return stream
-				.map(role -> UserRolesDAO.create(role))
+		return stream;
+	}
+
+	public List<UserRolesDAO> getRoles(Map<String, String> filters, long offset, int limit) {
+		return getRolesStream(filters, offset, limit)
+				.map(UserRolesDAO::create)
 				.collect(Collectors.toList());
 	}
 
