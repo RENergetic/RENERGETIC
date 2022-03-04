@@ -2,7 +2,7 @@ package com.renergetic.backdb.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.backdb.dao.UserDAORequest;
@@ -42,10 +43,10 @@ public class UserController {
 	@Operation(summary = "Get All Users")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<UserDAOResponse>> getAllUsers (){
+	public ResponseEntity<List<UserDAOResponse>> getAllUsers (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
 		List<UserDAOResponse> users = new ArrayList<UserDAOResponse>();
 		
-		users = userSv.get(null);
+		users = userSv.get(null, offset.orElse(0L), limit.orElse(20));
 		
 		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
@@ -67,10 +68,10 @@ public class UserController {
 	@Operation(summary = "Get All Users Roles")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "/roles", produces = "application/json")
-	public ResponseEntity<List<UserRolesDAO>> getAllUsersRoles (){
+	public ResponseEntity<List<UserRolesDAO>> getAllUsersRoles (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
 		List<UserRolesDAO> roles = new ArrayList<>();
 		
-		roles = userSv.getRoles(null);
+		roles = userSv.getRoles(null, offset.orElse(0L), limit.orElse(20));
 		
 		return new ResponseEntity<>(roles, HttpStatus.OK);
 	}
@@ -78,10 +79,10 @@ public class UserController {
 	@Operation(summary = "Get All Users Settings")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "/settings", produces = "application/json")
-	public ResponseEntity<List<UserSettingsDAO>> getAllUsersSettings (){
+	public ResponseEntity<List<UserSettingsDAO>> getAllUsersSettings (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
 		List<UserSettingsDAO> settings = new ArrayList<>();
 		
-		settings = userSv.getSettings(null);
+		settings = userSv.getSettings(null, offset.orElse(0L), limit.orElse(20));
 		
 		return new ResponseEntity<>(settings, HttpStatus.OK);
 	}

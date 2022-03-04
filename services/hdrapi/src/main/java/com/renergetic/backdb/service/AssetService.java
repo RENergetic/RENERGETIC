@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.renergetic.backdb.dao.AssetDAORequest;
@@ -21,6 +22,7 @@ import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
 import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
+import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
 public class AssetService {
@@ -88,8 +90,8 @@ public class AssetService {
 		return null;
 	}
 
-	public List<AssetDAOResponse> get(Map<String, String> filters) {
-		List<Asset> assets = assetRepository.findAll();
+	public List<AssetDAOResponse> get(Map<String, String> filters, long offset, int limit) {
+		Page<Asset> assets = assetRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<Asset> stream = assets.stream();
 		
 		if (filters != null)
@@ -158,14 +160,20 @@ public class AssetService {
 		} else return false;
 	}
 	
-	public List<AssetDetails> getDetails(Long asset_id, Map<String, String> filters) {
-		List<AssetDetails> details = assetDetailsRepository.findAll();
+	public List<AssetDetails> getDetails(Map<String, String> filters, long offset, int limit) {
+		Page<AssetDetails> details = assetDetailsRepository.findAll(new OffSetPaging(offset, limit));
+		Stream<AssetDetails> stream = details.stream();
 		
-		if  (filters != null) {
-			if (filters.containsKey("name"))
-				details = details.stream().filter(detail -> detail.getKey().equalsIgnoreCase(filters.get("key"))).collect(Collectors.toList());
-		}
-		return details;
+		if (filters != null)
+			stream.filter(Detail -> {
+				boolean equals = true;
+				
+				if (filters.containsKey("key"))
+					equals = Detail.getKey().equalsIgnoreCase(filters.get("key"));
+				
+				return equals;
+			});
+		return stream.collect(Collectors.toList());
 	}
 
 	public AssetDetails getDetailById(Long id) {

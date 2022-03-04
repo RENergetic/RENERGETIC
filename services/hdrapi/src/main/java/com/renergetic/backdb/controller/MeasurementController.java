@@ -2,7 +2,7 @@ package com.renergetic.backdb.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.backdb.dao.MeasurementDAORequest;
@@ -46,10 +47,10 @@ public class MeasurementController {
 	@Operation(summary = "Get All Measurements")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (){
+	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
 		List<MeasurementDAOResponse> measurements = new ArrayList<>();
 		
-		measurements = measurementSv.get(null);
+		measurements = measurementSv.get(null, offset.orElse(0L), limit.orElse(20));
 		
 		return new ResponseEntity<>(measurements, HttpStatus.OK);
 	}
@@ -71,10 +72,10 @@ public class MeasurementController {
 	@Operation(summary = "Get All Measurements Types")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "/type", produces = "application/json")
-	public ResponseEntity<List<MeasurementType>> getAllMeasurementsTypes(){
+	public ResponseEntity<List<MeasurementType>> getAllMeasurementsTypes(@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
 		List<MeasurementType> type = new ArrayList<>();
 		
-		type = measurementSv.getTypes(null);
+		type = measurementSv.getTypes(null, offset.orElse(0L), limit.orElse(20));
 		
 		return new ResponseEntity<>(type, HttpStatus.OK);
 	}

@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.renergetic.backdb.dao.UserDAORequest;
@@ -21,6 +22,7 @@ import com.renergetic.backdb.model.UserSettings;
 import com.renergetic.backdb.repository.UserRepository;
 import com.renergetic.backdb.repository.UserRolesRepository;
 import com.renergetic.backdb.repository.UserSettingsRepository;
+import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
 public class UserService {
@@ -96,8 +98,8 @@ public class UserService {
 		} else return null;
 	}
 
-	public List<UserDAOResponse> get(Map<String, String> filters) {
-		List<User> users = userRepository.findAll();
+	public List<UserDAOResponse> get(Map<String, String> filters, long offset, int limit) {
+	Page<User> users = userRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<User> stream = users.stream();
 		
 		if (filters != null)
@@ -116,8 +118,8 @@ public class UserService {
 				.collect(Collectors.toList());
 	}
 
-	public List<UserRolesDAO> getRoles(Map<String, String> filters) {
-		List<UserRoles> roles = userRolesRepository.findAll();
+	public List<UserRolesDAO> getRoles(Map<String, String> filters, long offset, int limit) {
+		Page<UserRoles> roles = userRolesRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<UserRoles> stream = roles.stream();
 		
 		if (filters != null)
@@ -136,8 +138,8 @@ public class UserService {
 				.collect(Collectors.toList());
 	}
 
-	public List<UserSettingsDAO> getSettings(Map<String, String> filters) {
-		List<UserSettings> settings = userSettingsRepository.findAll();
+	public List<UserSettingsDAO> getSettings(Map<String, String> filters, long offset, int limit) {
+		Page<UserSettings> settings = userSettingsRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<UserSettings> stream = settings.stream();
 		
 		if (filters != null)

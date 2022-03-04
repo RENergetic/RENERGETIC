@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.renergetic.backdb.dao.MeasurementDAORequest;
@@ -22,6 +23,7 @@ import com.renergetic.backdb.model.details.MeasurementDetails;
 import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.repository.MeasurementTypeRepository;
 import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
+import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
 public class MeasurementService {
@@ -59,8 +61,8 @@ public class MeasurementService {
 		} else return null;
 	}
 
-	public List<MeasurementDAOResponse> get(Map<String, String> filters) {
-		List<Measurement> measurements = measurementRepository.findAll();
+	public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {
+		Page<Measurement> measurements = measurementRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<Measurement> stream = measurements.stream();
 		
 		if (filters != null)
@@ -112,16 +114,22 @@ public class MeasurementService {
 		} else return false;
 	}
 	
-	public List<MeasurementType> getTypes(Map<String, String> filters) {
-		List<MeasurementType> types = measurementTypeRepository.findAll();
+	public List<MeasurementType> getTypes(Map<String, String> filters, long offset, int limit) {
+		Page<MeasurementType> types = measurementTypeRepository.findAll(new OffSetPaging(offset, limit));
+		Stream<MeasurementType> stream = types.stream();
 		
-		if  (filters != null) {
-			if (filters.containsKey("name"))
-				types = types.stream().filter(type -> type.getName().equalsIgnoreCase(filters.get("name"))).collect(Collectors.toList());
-			if (filters.containsKey("unit"))
-				types = types.stream().filter(type -> type.getUnit().equals(Unit.valueOf(filters.get("unit")))).collect(Collectors.toList());
-		}
-		return types;
+		if (filters != null)
+			stream.filter(type -> {
+				boolean equals = true;
+				
+				if (filters.containsKey("name"))
+					equals = type.getName().equalsIgnoreCase(filters.get("name"));
+				if (equals && filters.containsKey("unit"))
+					equals = type.getUnit().equals(Unit.valueOf(filters.get("unit")));
+				
+				return equals;
+			});
+		return stream.collect(Collectors.toList());
 	}
 
 	public MeasurementType getTypeById(Long id) {
@@ -148,14 +156,20 @@ public class MeasurementService {
 		} else return false;
 	}
 	
-	public List<MeasurementDetails> getDetails(Long measurement_id, Map<String, String> filters) {
-		List<MeasurementDetails> details = measurementDetailsRepository.findAll();
+	public List<MeasurementDetails> getDetails(Map<String, String> filters, long offset, int limit) {
+		Page<MeasurementDetails> details = measurementDetailsRepository.findAll(new OffSetPaging(offset, limit));
+		Stream<MeasurementDetails> stream = details.stream();
 		
-		if  (filters != null) {
-			if (filters.containsKey("key"))
-				details = details.stream().filter(detail -> detail.getKey().equalsIgnoreCase(filters.get("key"))).collect(Collectors.toList());
-		}
-		return details;
+		if (filters != null)
+			stream.filter(Detail -> {
+				boolean equals = true;
+				
+				if (filters.containsKey("key"))
+					equals = Detail.getKey().equalsIgnoreCase(filters.get("key"));
+				
+				return equals;
+			});
+		return stream.collect(Collectors.toList());
 	}
 
 	public MeasurementDetails getDetailById(Long id) {

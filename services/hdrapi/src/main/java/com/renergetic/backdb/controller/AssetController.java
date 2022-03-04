@@ -2,7 +2,7 @@ package com.renergetic.backdb.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,10 +47,10 @@ public class AssetController {
 	@Operation(summary = "Get All Assets")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<AssetDAOResponse>> getAllAssets (){
+	public ResponseEntity<List<AssetDAOResponse>> getAllAssets (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
 		List<AssetDAOResponse> assets = new ArrayList<AssetDAOResponse>();
 		
-		assets = assetSv.get(null);
+		assets = assetSv.get(null, offset.orElse(0L), limit.orElse(20));
 		
 		return new ResponseEntity<>(assets, HttpStatus.OK);
 	}
