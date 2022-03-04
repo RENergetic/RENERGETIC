@@ -118,12 +118,12 @@ public class UserService {
 				.collect(Collectors.toList());
 	}
 
-	public Stream<UserRoles> getRolesStream(Map<String, String> filters, long offset, int limit) {
+	public List<UserRolesDAO> getRoles(Map<String, String> filters, long offset, int limit) {
 		Page<UserRoles> roles = userRolesRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<UserRoles> stream = roles.stream();
 
 		if (filters != null)
-			stream = stream.filter(role -> {
+			stream.filter(role -> {
 				boolean equals = true;
 
 				if (filters.containsKey("type"))
@@ -133,12 +133,8 @@ public class UserService {
 
 				return equals;
 			});
-		return stream;
-	}
-
-	public List<UserRolesDAO> getRoles(Map<String, String> filters, long offset, int limit) {
-		return getRolesStream(filters, offset, limit)
-				.map(UserRolesDAO::create)
+		return stream
+				.map(role -> UserRolesDAO.create(role))
 				.collect(Collectors.toList());
 	}
 
