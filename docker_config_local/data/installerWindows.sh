@@ -4,8 +4,8 @@ namespace='data'
 
 installdb='true'
 installapi='true'
-installback='true'
-installkafka='true'
+installback='false'
+installkafka='false'
 installgrafana='true'
 javafile='backinflux-0.0.1-SNAPSHOT.jar'
 
@@ -110,5 +110,5 @@ fi
 
 echo "Installation has finished :). Remember to execute in a different console:"
 	echo "	minikube service grafana-sv --namespace ${namespace}"
-    read -p "Press any key to end ..."
+#    read -p "Press any key to end ..."
 clear
