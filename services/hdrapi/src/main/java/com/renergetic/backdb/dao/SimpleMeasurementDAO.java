@@ -1,5 +1,6 @@
 package com.renergetic.backdb.dao;
 
+import com.renergetic.backdb.model.Direction;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.Unit;
 
@@ -25,6 +26,8 @@ public class SimpleMeasurementDAO {
 	
 	private Unit unit;
 	
+	private Direction direction;
+	
 	public static SimpleMeasurementDAO create(Measurement measurement) {
 		SimpleMeasurementDAO dao = new SimpleMeasurementDAO();
 		
@@ -35,6 +38,7 @@ public class SimpleMeasurementDAO {
 		dao.setLabel(measurement.getLabel());
 		dao.setDescription(measurement.getDescription());
 		dao.setIcon(measurement.getIcon());
+		dao.setDirection(measurement.getDirection());
 		
 		return dao;
 	}
@@ -47,6 +51,7 @@ public class SimpleMeasurementDAO {
 		measurement.setLabel(label);
 		measurement.setDescription(description);
 		measurement.setIcon(icon);
+		measurement.setDirection(direction);
 
 		return measurement;
 	}
