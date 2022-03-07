@@ -4,10 +4,13 @@ namespace='app'
 
 java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
+javahdr='services\hdrapi'
+javafilehdr='hdrapi-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic'
 
 installdb='true'
 installapi='true'
+installapihdr='true'  # API HDR
 installfront='true'
 installkeycloak='true'
 
@@ -67,31 +70,31 @@ then
     kubectl apply -f backdb-service.yaml --namespace=$namespace
 fi
 
-if [[ $installapi1 = 'true' ]]
+if [[ $installapihdr = 'true' ]]
 then
-    if [[ $java1 != '' ]]
+    if [[ $javahdr != '' ]]
     then
         # API COMPILE TO JAR
-        cd "${current}\\..\\..\\services\\buildingsService"
+        cd "${current}\\..\\..\\services\\hdrapi"
         mvn clean package -Dmaven.test.skip
-        cp ".\\target\\${javafile1}" "${current}\\buildings"
+        cp ".\\target\\${javafilehdr}" "${current}\\hdr-api"
     fi
 
-    cd  "${current}\\buildings"
+    cd  "${current}\\hdr-api"
     # API INSTALLATION
     # set environment variables
     eval $(minikube docker-env)
 
     # delete kubernetes resources if exists
-    kubectl delete deployments/backbuildings --namespace=$namespace
-    kubectl delete services/backbuildings-sv --namespace=$namespace
+    kubectl delete deployments/hdr-api --namespace=$namespace
+    kubectl delete services/hdr-api-sv --namespace=$namespace
 
     # create docker image
-    docker build --no-cache --force-rm --tag=backbuildings:latest .
+    docker build --no-cache --force-rm --tag=hdr:latest .
     
     # create kubernetes resources
-    kubectl apply -f backbuildings-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f backbuildings-service.yaml --namespace=$namespace
+    kubectl apply -f hdr-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f hdr-service.yaml --namespace=$namespace
 fi
 
 if [[ $installkeycloak = 'true' ]]
@@ -128,7 +131,7 @@ then
     if [[ $vue != '' ]]
     then
         # COMPILE VUE FILES TO PRODUCTION
-        cd "${current}\\..\\..\\front\\renergetic"
+        cd "${current}\\..\\..\\front\\renergetic_ui"
         cp -f "${current}\\front\\.env" ".env"
         npm install
         npm run build --prod
@@ -155,5 +158,5 @@ fi
 
 echo "Installation has finished :). Remember to execute in a different console:"
 	echo "	minikube service frontvue-sv --namespace ${namespace}"
-    read -p "Press any key to end ..."
+#    read -p "Press any key to end ..."
 clear
