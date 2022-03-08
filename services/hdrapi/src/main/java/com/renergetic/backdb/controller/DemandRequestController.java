@@ -3,11 +3,6 @@ package com.renergetic.backdb.controller;
 import com.renergetic.backdb.dao.DemandRequestDAO;
 import com.renergetic.backdb.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.model.*;
-import com.renergetic.backdb.repository.AssetRepository;
-import com.renergetic.backdb.repository.DemandRequestRepository;
-import com.renergetic.backdb.repository.UserRepository;
-import com.renergetic.backdb.repository.UserRolesRepository;
 import com.renergetic.backdb.service.DemandRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

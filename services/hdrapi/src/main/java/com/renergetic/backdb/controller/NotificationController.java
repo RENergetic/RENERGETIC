@@ -3,6 +3,7 @@ package com.renergetic.backdb.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,8 +43,9 @@ public class NotificationController {
 	@Operation(summary = "Get All Notifications")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<Notification>> getAllNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){		
-		 List<Notification> notifications = notificationRepository.findAll(new OffSetPaging(offset.orElse(0L), limit.orElse(60))).toList();
+	public ResponseEntity<List<NotificationDAO>> getAllNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){		
+		 List<NotificationDAO> notifications = notificationRepository.findAll(new OffSetPaging(offset.orElse(0L), limit.orElse(60)))
+				 .stream().map(NotificationDAO::create).collect(Collectors.toList());
 		
 		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
@@ -54,14 +56,14 @@ public class NotificationController {
 		@ApiResponse(responseCode = "404", description = "No notifications found with this name")
 	})
 	@GetMapping(path = "asset/{asset_id}", produces = "application/json")
-	public ResponseEntity<List<Notification>> getNotificationsByName (@PathVariable Long asset_id){
-		List<Notification> notifications = new ArrayList<Notification>();
+	public ResponseEntity<List<NotificationDAO>> getNotificationsByName (@PathVariable Long asset_id){
+		List<NotificationDAO> notifications = new ArrayList<>();
 		
-		notifications = notificationRepository.findByAssetId(asset_id);
+		notifications = notificationRepository.findByAssetId(asset_id).stream().map(NotificationDAO::create).collect(Collectors.toList());
 		
 		notifications = notifications.isEmpty() ? null : notifications;
 		
-		return new ResponseEntity<List<Notification>>(notifications, notifications != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(notifications, notifications != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Get Notification by id")
@@ -71,12 +73,12 @@ public class NotificationController {
 		@ApiResponse(responseCode = "404", description = "No notifications found with this id")
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
-	public ResponseEntity<Notification> getNotificationsById (@PathVariable Long id){
-		Notification notification = null;
+	public ResponseEntity<NotificationDAO> getNotificationsById (@PathVariable Long id){
+		NotificationDAO notification = null;
 		
-		notification = notificationRepository.findById(id).orElse(null);
+		notification = NotificationDAO.create(notificationRepository.findById(id).orElse(null));
 		
-		return new ResponseEntity<Notification>(notification, notification != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(notification, notification != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //=== POST REQUESTS ===================================================================================
@@ -88,10 +90,10 @@ public class NotificationController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Notification> createNotification(@RequestBody NotificationDAO notification) {
+	public ResponseEntity<NotificationDAO> createNotification(@RequestBody NotificationDAO notification) {
 		try {
 			notification.setId(null);
-			Notification _notification = notificationRepository.save(notification.mapToEntity());
+			NotificationDAO _notification = NotificationDAO.create(notificationRepository.save(notification.mapToEntity()));
 			
 			return new ResponseEntity<>(_notification, HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -109,11 +111,11 @@ public class NotificationController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Notification> updateNotification(@RequestBody NotificationDAO notification, @PathVariable Long id) {
+	public ResponseEntity<NotificationDAO> updateNotification(@RequestBody NotificationDAO notification, @PathVariable Long id) {
 		try {
 				if (notificationRepository.existsById(id)) {
 					notification.setId(id);
-					return new ResponseEntity<>(notificationRepository.save(notification.mapToEntity()), HttpStatus.OK);
+					return new ResponseEntity<>(NotificationDAO.create(notificationRepository.save(notification.mapToEntity())), HttpStatus.OK);
 				}else return ResponseEntity.notFound().build();
 				
 		} catch (Exception e) {

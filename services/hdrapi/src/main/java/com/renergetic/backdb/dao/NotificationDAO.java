@@ -36,14 +36,18 @@ public class NotificationDAO {
 	private Long asset_id;
 	
 	public static NotificationDAO create(Notification notification) {
-		NotificationDAO dao = new NotificationDAO();
+		NotificationDAO dao = null;
 		
-		dao.setId(notification.getId());
-		dao.setType(notification.getType());
-		dao.setContent(notification.getContent());
-		dao.setValue(notification.getValue());
-		dao.setTimestamp(notification.getTimestamp());
-		dao.setAsset_id(notification.getAsset().getId());
+		if (notification != null) {
+			dao = new NotificationDAO();
+			
+			dao.setId(notification.getId());
+			dao.setType(notification.getType());
+			dao.setContent(notification.getContent());
+			dao.setValue(notification.getValue());
+			dao.setTimestamp(notification.getTimestamp());
+			dao.setAsset_id(notification.getAsset().getId());
+		}
 		
 		return dao;
 	}
