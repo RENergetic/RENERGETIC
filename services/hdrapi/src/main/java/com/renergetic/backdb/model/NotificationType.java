@@ -4,5 +4,5 @@ public enum NotificationType {
 	information,
 	warning,
 	anomaly,
-	demand_response_cction;
+	demand_response_action;
 }

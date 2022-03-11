@@ -9,7 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.renergetic.backdb.dao.AssetDAORequest;
@@ -26,8 +25,6 @@ import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
 import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
-
-import net.bytebuddy.implementation.bytecode.Throw;
 
 @Service
 public class AssetService {

@@ -46,37 +46,48 @@ public class Notification {
 
 	@Getter
 	@Setter
-	@Column(name = "content", nullable = false, insertable = true, updatable = true, unique = false)
-	private String content;
+	@Column(name = "message", nullable = true, insertable = true, updatable = true, unique = false)
+	private String message;
 
 	@Getter
 	@Setter
-	@Column(name = "value", nullable = true, insertable = true, updatable = true, unique = false)
-	private String value;
-
+	@Column(name = "date_from", nullable = false, insertable = true, updatable = true, unique = false)
+	private LocalDateTime dateFrom;
+	
 	@Getter
 	@Setter
-	@Column(name = "timestamp", nullable = false, insertable = true, updatable = true, unique = false)
-	private LocalDateTime timestamp;
+	@Column(name = "date_to", nullable = true, insertable = true, updatable = true, unique = false)
+	private LocalDateTime dateTo;
 
 	@Getter
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "asset_id", nullable = false, insertable = true, updatable = true)
+	@JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true)
 	private Asset asset;
 
-	public Notification(String uuid, NotificationType type, String content, String value, LocalDateTime timestamp) {
+	@Getter
+	@ManyToOne(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "dashboard_id", nullable = true, insertable = true, updatable = true)
+	private Dashboard dashboard;
+
+	public Notification(String uuid, NotificationType type, String message, LocalDateTime date_from, LocalDateTime date_to) {
 		super();
 		this.uuid = uuid;
 		this.type = type;
-		this.content = content;
-		this.value = value;
-		this.timestamp = timestamp;
+		this.message = message;
+		this.dateFrom = date_from;
+		this.dateTo = date_to;
 	}
 
 	public void setAsset(Long id) {
 		this.asset = new Asset();
 		this.asset.setId(id);
+	}	
+
+	public void setDashboard(Long id) {
+		this.dashboard = new Dashboard();
+		this.dashboard.setId(id);
 	}	
 	
 }
