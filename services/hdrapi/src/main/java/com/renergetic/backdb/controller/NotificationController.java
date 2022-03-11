@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.backdb.dao.NotificationDAO;
-import com.renergetic.backdb.model.Notification;
 import com.renergetic.backdb.repository.NotificationRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 
