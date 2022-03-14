@@ -10,9 +10,7 @@ public enum Unit {
 	cd ("cd", "candela", "base", "Luminous Intensity"),
 	
 	W ("W", "watt", "derived", "Power"),
-	kW ("kW", "kilowatt", "derived", "Power"),
 	Wh ("Wh", "watt/hour", "derived", "Power"),
-	kWh ("kWh", "kilowatt/hour", "derived", "Power"),
 	V ("V", "volt", "derived", "Voltage"),
 	Ohm ("Ohm", "ohm", "derived", "Electrical Resistance"),
 	lx ("Lx", "lux", "derived", "Illuminance"),

@@ -37,16 +37,26 @@ public class MeasurementType {
 	@JsonProperty(required = false)
 	private String label;
 	
-	@Column(name = "unit", nullable = true, insertable = true, updatable = true)
+	@Column(name = "base_unit", nullable = true, insertable = true, updatable = true)
 	@Enumerated(EnumType.STRING)
 	@JsonProperty(required = false)
-	private Unit unit;
+	private Unit baseUnit;
+	
+	@Column(name = "unit", nullable = true, insertable = true, updatable = true)
+	@JsonProperty(required = false)
+	private String unit;
+	
+	@Column(name = "factor", nullable = true, insertable = true, updatable = true)
+	@JsonProperty(required = false)
+	private Double factor;
 
-	public MeasurementType(long id, String name, String label, Unit unit) {
+	public MeasurementType(long id, String name, String label, Unit baseUnit, String unit, Double factor) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.label = label;
+		this.baseUnit = baseUnit;
 		this.unit = unit;
+		this.factor = factor;
 	}
 }
