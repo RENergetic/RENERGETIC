@@ -10,13 +10,15 @@ public enum Unit {
 	cd ("cd", "candela", "base", "Luminous Intensity"),
 	
 	W ("W", "watt", "derived", "Power"),
-	Wh ("Wh", "watt/hour", "derived", "Power"),
+	Wh ("Wh", "watt/hour", "derived", "Energy"),
+	J ("J", "joule", "derived", "Energy"),
 	V ("V", "volt", "derived", "Voltage"),
 	Ohm ("Ohm", "ohm", "derived", "Electrical Resistance"),
 	lx ("Lx", "lux", "derived", "Illuminance"),
+	gperkWh ("g/kWh", "CO2 equivalent", "derived", "Contribution to the greenhouse effect in CO2"),
+	m3perh ("m3/h", "Flow", "derived", "Liquid flow"),
 	
 	percent ("%", "Percentage", "other", "Percentage"),
-	CO2e ("CO2e", "CO2 equivalent", "other", "Contribution to the greenhouse effect in CO2"),
 	C ("ºC", "Celsius", "other", "Temperature");
 
 	public String SYMBOL;

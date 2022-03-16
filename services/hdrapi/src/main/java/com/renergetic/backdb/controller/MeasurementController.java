@@ -2,7 +2,9 @@ package com.renergetic.backdb.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.renergetic.backdb.dao.MeasurementDAORequest;
 import com.renergetic.backdb.dao.MeasurementDAOResponse;
@@ -92,6 +95,32 @@ public class MeasurementController {
 		type = measurementSv.getTypeById(id);
 		
 		return new ResponseEntity<>(type, type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+	
+	@Operation(summary = "Get Measurement Timeseries from InfluxDB")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+		@ApiResponse(responseCode = "404", description = "No measurement values found with this id")
+	})
+	@GetMapping(path = "/{measurement_id}/values", produces = "application/json")
+	public ResponseEntity<String> getMeasurementsValues(@PathVariable Long measurement_id, @RequestParam Map<String, String> tags){
+		try {
+			String url = "http://backinflux-sv:8082/api/";
+			url += measurementSv.getById(measurement_id).getName();
+			
+			if (tags != null && tags.size() > 0)
+				url += "?" + String.join("&", 
+						tags.keySet().stream()
+						.map(key -> key+"="+tags.get(key))
+						.collect(Collectors.toList()));
+			
+			RestTemplate apiInflux = new RestTemplate();		
+			String data = apiInflux.getForObject(url, String.class);
+			
+			return new ResponseEntity<>(data, data != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		} catch(Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 //=== INFO REQUESTS ===================================================================================

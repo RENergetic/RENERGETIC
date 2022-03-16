@@ -18,6 +18,7 @@ import com.renergetic.backdb.exception.InvalidArgumentException;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.exception.NotFoundException;
 import com.renergetic.backdb.model.Asset;
+import com.renergetic.backdb.model.AssetCategory;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.AssetRepository;
@@ -79,12 +80,12 @@ public class AssetService {
 			
 			boolean haveInfrastructure = false;
 			for (Asset obj : measurement.getAssets()) {
-				if (Asset.ALLOWED_TYPES.get(obj.getType()).equalsIgnoreCase("Infrastructure")) {
+				if (Asset.ALLOWED_TYPES.get(obj.getType()).equals(AssetCategory.infrastructure)) {
 					haveInfrastructure = true;
 					break;
 				}
 			}
-			if (!(Asset.ALLOWED_TYPES.get(asset.getType()).equalsIgnoreCase("Infrastructure") && haveInfrastructure)) {
+			if (!(Asset.ALLOWED_TYPES.get(asset.getType()).equals(AssetCategory.infrastructure) && haveInfrastructure)) {
 				measurement.getAssets().add(asset);
 				return MeasurementDAOResponse.create(measurementRepository.save(measurement), null);
 			}else throw new InvalidArgumentException("Measurement already have a Infrastructure connected");
@@ -94,25 +95,32 @@ public class AssetService {
 
 	public List<AssetDAOResponse> get(Map<String, String> filters, long offset, int limit) {
 		Stream<Asset> stream = assetRepository.findAll(new OffSetPaging(offset, limit)).stream();
+		List<AssetDAOResponse> assets;
 		
 		if (filters != null)
-			stream.filter(asset -> {
+			assets = stream.filter(asset -> {
 				boolean equals = true;
 				
 				if (filters.containsKey("name"))
 					equals = asset.getName().equalsIgnoreCase(filters.get("name"));
 				if (equals && filters.containsKey("type"))
 					equals = asset.getType().equalsIgnoreCase(filters.get("type"));
+				if (equals && filters.containsKey("category")) {
+					System.out.println(asset.getType());
+					equals = Asset.ALLOWED_TYPES.get(asset.getType()).equals(AssetCategory.valueOf(filters.get("category")));
+				}
 				if (equals && filters.containsKey("location"))
 					equals = asset.getLocation().equalsIgnoreCase(filters.get("location"));
 				if (equals && filters.containsKey("owner"))
-					equals = String.valueOf(asset.getOwner().getId()).equalsIgnoreCase(filters.get("owner"));
+					equals = asset.getOwner() != null? String.valueOf(asset.getOwner().getId()).equalsIgnoreCase(filters.get("owner")) : false;
 				if (equals && filters.containsKey("parent"))
-					equals = String.valueOf(asset.getParentAsset().getId()).equalsIgnoreCase(filters.get("parent_id"));
+					equals = asset.getParentAsset() != null? String.valueOf(asset.getParentAsset().getId()).equalsIgnoreCase(filters.get("parent")) : false;
 				
 				return equals;
-			});
-		List<AssetDAOResponse> assets = stream
+			}).map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAssets(asset)))
+					.collect(Collectors.toList());
+		else
+			assets = stream
 				.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAssets(asset)))
 				.collect(Collectors.toList());
 		

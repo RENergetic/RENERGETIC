@@ -32,7 +32,7 @@ import lombok.ToString;
 @ToString
 public class Asset {
 	@JsonIgnore
-	public static Map<String, String> ALLOWED_TYPES;
+	public static Map<String, AssetCategory> ALLOWED_TYPES;
 	
 	@Id
 	@Getter
@@ -108,26 +108,27 @@ public class Asset {
 	static {
 		ALLOWED_TYPES =  new HashMap<>();
 
-		ALLOWED_TYPES.put("user", "User");
+		ALLOWED_TYPES.put("user", AssetCategory.user);
 
-		ALLOWED_TYPES.put("room", "Structural");
-		ALLOWED_TYPES.put("flat", "Structural");
-		ALLOWED_TYPES.put("building", "Structural");
-		ALLOWED_TYPES.put("energy island", "Structural");
+		ALLOWED_TYPES.put("room", AssetCategory.structural);
+		ALLOWED_TYPES.put("flat", AssetCategory.structural);
+		ALLOWED_TYPES.put("building", AssetCategory.structural);
+		ALLOWED_TYPES.put("energy island", AssetCategory.structural);
 		
-		ALLOWED_TYPES.put("ev charging station", "Energy");
-		ALLOWED_TYPES.put("generation plant", "Energy");
-		ALLOWED_TYPES.put("heatpump", "Energy");
-		ALLOWED_TYPES.put("co-generation unit", "Energy");
-		ALLOWED_TYPES.put("coal plant", "Energy");
-		ALLOWED_TYPES.put("pv plant", "Energy");
-		ALLOWED_TYPES.put("external heat grid", "Energy");
-		ALLOWED_TYPES.put("external electricity grid", "Energy");
+		ALLOWED_TYPES.put("ev charging station", AssetCategory.energy);
+		ALLOWED_TYPES.put("generation plant", AssetCategory.energy);
+		ALLOWED_TYPES.put("heatpump", AssetCategory.energy);
+		ALLOWED_TYPES.put("gas boiler", AssetCategory.energy);
+		ALLOWED_TYPES.put("co-generation unit", AssetCategory.energy);
+		ALLOWED_TYPES.put("coal plant", AssetCategory.energy);
+		ALLOWED_TYPES.put("pv plant", AssetCategory.energy);
+		ALLOWED_TYPES.put("external heat grid", AssetCategory.energy);
+		ALLOWED_TYPES.put("external electricity grid", AssetCategory.energy);
 		
-		ALLOWED_TYPES.put("steam", "Infrastructure");
-		ALLOWED_TYPES.put("distric heating", "Infrastructure");
-		ALLOWED_TYPES.put("distric cooling", "Infrastructure");
-		ALLOWED_TYPES.put("electricity", "Infrastructure");
+		ALLOWED_TYPES.put("steam", AssetCategory.infrastructure);
+		ALLOWED_TYPES.put("district heating", AssetCategory.infrastructure);
+		ALLOWED_TYPES.put("district cooling", AssetCategory.infrastructure);
+		ALLOWED_TYPES.put("electricity", AssetCategory.infrastructure);
 	}
 
 	public Asset getParentAsset() {

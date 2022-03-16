@@ -1,6 +1,7 @@
 package com.renergetic.backdb.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ import com.renergetic.backdb.dao.AssetDAORequest;
 import com.renergetic.backdb.dao.AssetDAOResponse;
 import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.model.Asset;
+import com.renergetic.backdb.model.AssetCategory;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
 import com.renergetic.backdb.service.AssetService;
@@ -47,10 +49,22 @@ public class AssetController {
 	@Operation(summary = "Get All Assets")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<AssetDAOResponse>> getAllAssets (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+	public ResponseEntity<List<AssetDAOResponse>> getAllAssets (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit, 
+			@RequestParam(required=false) Optional<AssetCategory> category,
+			@RequestParam(required=false) Optional<String> type,
+			@RequestParam(required=false) Optional<String> name,
+			@RequestParam(required=false) Optional<Long> owner_id,
+			@RequestParam(required=false) Optional<Long> parent_id){
 		List<AssetDAOResponse> assets = new ArrayList<AssetDAOResponse>();
+		HashMap<String, String> filters = new HashMap<>();
 		
-		assets = assetSv.get(null, offset.orElse(0L), limit.orElse(20));
+		if(category.isPresent()) filters.put("category", category.get().toString());
+		if(type.isPresent())	 filters.put("type", type.get());
+		if(name.isPresent()) 	 filters.put("name", name.get());
+		if(owner_id.isPresent()) 	 filters.put("owner", owner_id.get().toString());
+		if(parent_id.isPresent()) 	 filters.put("parent", parent_id.get().toString());
+		
+		assets = assetSv.get(filters.size() > 0? filters : null, offset.orElse(0L), limit.orElse(20));
 		
 		return new ResponseEntity<>(assets, HttpStatus.OK);
 	}
