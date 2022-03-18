@@ -21,7 +21,7 @@ public class AssetDAORequest {
 	private String name;
 
 	@JsonProperty(required = true)
-	private String type;
+	private Long type;
 
 	@JsonProperty(required = false)
 	private String label;
@@ -46,7 +46,10 @@ public class AssetDAORequest {
 		
 			dao.setId(asset.getId());
 			dao.setName(asset.getName());
-			dao.setType(asset.getType());
+			
+			if (asset.getType() != null)
+				dao.setType(asset.getType().getId());
+			
 			dao.setLabel(asset.getLabel());
 			dao.setDescription(asset.getDescription());
 			dao.setGeo_location(asset.getLocation());

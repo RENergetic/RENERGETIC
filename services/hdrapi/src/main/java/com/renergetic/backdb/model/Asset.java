@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -51,9 +52,10 @@ public class Asset {
 	private String name;
 
 	@Getter
-	@Setter
-	@Column(name = "type", nullable = false, insertable = true, updatable = true)
-	private String type;
+	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "asset_type_id", nullable = false, insertable = true, updatable = true)
+	private AssetType type;
 
 	@Getter
 	@Setter
@@ -71,12 +73,14 @@ public class Asset {
 	private String location;
 	
 	// REFERENCES THIS TABLE TO GROUP ASSETS
+	@Getter
 	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "parent_asset_id", nullable = true, insertable = true, updatable = true)
 	private Asset parentAsset;
 	
 	// FOREIGN KEY FROM USERS TABLE
+	@Getter
 	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "owner_id", nullable = true, insertable = true, updatable = true)
@@ -92,10 +96,10 @@ public class Asset {
 			inverseJoinColumns = @JoinColumn(name = "connected_asset_id"))
 	private List<Asset> assets;
 
-	public Asset(String name, String type, String label, String description, String location, long part_of_asset_id, long owner_user_id) {
+	public Asset(String name, Long type, String label, String description, String location, Long part_of_asset_id, Long owner_user_id) {
 		super();
 		this.name = name;
-		this.type = type;
+		this.setType(type);
 		this.label = label;
 		this.description = description;
 		this.location = location;
@@ -124,6 +128,7 @@ public class Asset {
 		ALLOWED_TYPES.put("pv plant", AssetCategory.energy);
 		ALLOWED_TYPES.put("external heat grid", AssetCategory.energy);
 		ALLOWED_TYPES.put("external electricity grid", AssetCategory.energy);
+		ALLOWED_TYPES.put("solar thermal collector", AssetCategory.energy);
 		
 		ALLOWED_TYPES.put("steam", AssetCategory.infrastructure);
 		ALLOWED_TYPES.put("district heating", AssetCategory.infrastructure);
@@ -131,8 +136,11 @@ public class Asset {
 		ALLOWED_TYPES.put("electricity", AssetCategory.infrastructure);
 	}
 
-	public Asset getParentAsset() {
-		return parentAsset;
+	public void setType(Long id) {
+		if (id != null) {
+			this.type = new AssetType();
+			this.type.setId(id);
+		}
 	}
 
 	public void setParentAsset(Long id) {
@@ -140,10 +148,6 @@ public class Asset {
 			this.parentAsset = new Asset();
 			this.parentAsset.setId(id);
 		}
-	}
-
-	public Asset getOwner() {
-		return owner;
 	}
 
 	public void setOwner(Long id) {

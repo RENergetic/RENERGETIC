@@ -60,6 +60,7 @@ public class MeasurementDAOResponse {
 			dao.setLabel(measurement.getLabel());
 			dao.setDescription(measurement.getDescription());
 			dao.setIcon(measurement.getIcon());
+			dao.setDirection(measurement.getDirection());
 			
 			if (details != null)
 				dao.setMeasurement_details(details);

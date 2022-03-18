@@ -19,9 +19,11 @@ import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.exception.NotFoundException;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.AssetCategory;
+import com.renergetic.backdb.model.AssetType;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.AssetRepository;
+import com.renergetic.backdb.repository.AssetTypeRepository;
 import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
 import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
@@ -37,6 +39,8 @@ public class AssetService {
 	@Autowired
 	MeasurementRepository measurementRepository;
 	@Autowired
+	AssetTypeRepository assetTypeRepository;
+	@Autowired
 	AssetDetailsRepository assetDetailsRepository;
 	@Autowired
 	MeasurementDetailsRepository measurementDetailsRepository;
@@ -44,10 +48,10 @@ public class AssetService {
 	// ASSET CRUD OPERATIONS
 	public AssetDAOResponse save(AssetDAORequest asset) {
 		asset.setId(null);
-		if (Asset.ALLOWED_TYPES.keySet().stream().anyMatch(asset.getType()::equalsIgnoreCase)) {
+		if (assetTypeRepository.existsById(asset.getType())) {
 			return AssetDAOResponse.create(assetRepository.save(asset.mapToEntity()), null, null);
 		}
-		else throw new InvalidArgumentException("The asset type isn't allowed");
+		else throw new InvalidArgumentException("The asset type doesn't exists");
 	}
 	
 	public boolean deleteById(Long id) {
@@ -58,15 +62,21 @@ public class AssetService {
 	}
 
 	public AssetDAOResponse update(AssetDAORequest asset, Long id) {
-		if ( assetRepository.existsById(id) && 
-				Asset.ALLOWED_TYPES.keySet().stream().anyMatch(asset.getType()::equalsIgnoreCase)) {
+		boolean assetExists = assetRepository.existsById(id);
+		
+		if ( assetExists && 
+				assetTypeRepository.existsById(asset.getType())) {
 			asset.setId(id);
 			return AssetDAOResponse.create(assetRepository.save(asset.mapToEntity()), null, null);
-		} else throw new InvalidNonExistingIdException("The asset to update doesn't exists");
+		} else throw new InvalidNonExistingIdException(assetExists
+				? "The asset type doesn't exists"
+				: "The asset to update doesn't exists");
 	}
 
 	public AssetDAOResponse connect(Long id, Long connectId) {
-		if ( assetRepository.existsById(id) && assetRepository.existsById(connectId)) {
+		boolean assetExists = assetRepository.existsById(id);
+
+		if ( assetExists && assetRepository.existsById(connectId)) {
 			Asset asset = assetRepository.findById(id).get();
 			asset.getAssets().add(assetRepository.findById(connectId).get());
 			return AssetDAOResponse.create(assetRepository.save(asset), null, null);
@@ -80,12 +90,12 @@ public class AssetService {
 			
 			boolean haveInfrastructure = false;
 			for (Asset obj : measurement.getAssets()) {
-				if (Asset.ALLOWED_TYPES.get(obj.getType()).equals(AssetCategory.infrastructure)) {
+				if (obj.getType().getCategory().equals(AssetCategory.infrastructure)) {
 					haveInfrastructure = true;
 					break;
 				}
 			}
-			if (!(Asset.ALLOWED_TYPES.get(asset.getType()).equals(AssetCategory.infrastructure) && haveInfrastructure)) {
+			if (!(asset.getType().getCategory().equals(AssetCategory.infrastructure) && haveInfrastructure)) {
 				measurement.getAssets().add(asset);
 				return MeasurementDAOResponse.create(measurementRepository.save(measurement), null);
 			}else throw new InvalidArgumentException("Measurement already have a Infrastructure connected");
@@ -103,11 +113,11 @@ public class AssetService {
 				
 				if (filters.containsKey("name"))
 					equals = asset.getName().equalsIgnoreCase(filters.get("name"));
-				if (equals && filters.containsKey("type"))
-					equals = asset.getType().equalsIgnoreCase(filters.get("type"));
-				if (equals && filters.containsKey("category")) {
-					System.out.println(asset.getType());
-					equals = Asset.ALLOWED_TYPES.get(asset.getType()).equals(AssetCategory.valueOf(filters.get("category")));
+				if (equals && filters.containsKey("type") && asset.getType() != null)
+					equals = asset.getType().getName().equalsIgnoreCase(filters.get("type")) ||
+							asset.getType().getLabel().equalsIgnoreCase(filters.get("type"));
+				if (equals && filters.containsKey("category") && asset.getType() != null) {
+					equals = asset.getType().getCategory().equals(AssetCategory.valueOf(filters.get("category")));
 				}
 				if (equals && filters.containsKey("location"))
 					equals = asset.getLocation().equalsIgnoreCase(filters.get("location"));
@@ -163,6 +173,48 @@ public class AssetService {
 							.collect(Collectors.toList());
 			else throw new NotFoundException("Asset " + id + " hasn't related measurements");
 		}
+	}
+	
+	// ASSETTYPE CRUD OPERATIONS
+	public AssetType saveType(AssetType type) {
+		type.setId(null);
+		return assetTypeRepository.save(type);
+	}
+	
+	public AssetType updateType(AssetType detail, Long id) {
+		if ( assetTypeRepository.existsById(id)) {
+			detail.setId(id);
+			return assetTypeRepository.save(detail);
+		} else return null;
+	}
+
+	public boolean deleteTypeById(Long id) {
+		if (id != null && assetTypeRepository.existsById(id)) {
+			assetTypeRepository.deleteById(id);
+			return true;
+		} else return false;
+	}
+	
+	public List<AssetType> getTypes(Map<String, String> filters, long offset, int limit) {
+		Stream<AssetType> stream = assetTypeRepository.findAll(new OffSetPaging(offset, limit)).stream();
+		
+		if (filters != null)
+			return stream.filter(type -> {
+				boolean equals = true;
+				
+				if (filters.containsKey("name"))
+					equals = type.getName().equalsIgnoreCase(filters.get("name")) ||
+							type.getLabel().equalsIgnoreCase(filters.get("name"));
+				if (equals && filters.containsKey("category"))
+					equals = type.getCategory().equals(AssetCategory.valueOf(filters.get("category")));
+				
+				return equals;
+			}).collect(Collectors.toList());
+		else return stream.collect(Collectors.toList());
+	}
+
+	public AssetType getTypeById(Long id) {
+		return assetTypeRepository.findById(id).orElse(null);
 	}
 	
 	// ASSETDETAILS CRUD OPERATIONS

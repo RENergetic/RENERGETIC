@@ -51,6 +51,7 @@ public class MeasurementDAORequest {
 			dao.setLabel(measurement.getLabel());
 			dao.setDescription(measurement.getDescription());
 			dao.setIcon(measurement.getIcon());
+			dao.setDirection(measurement.getDirection());
 		}
 		return dao;
 	}

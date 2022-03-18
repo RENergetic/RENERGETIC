@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.backdb.model.Asset;
+import com.renergetic.backdb.model.AssetType;
 import com.renergetic.backdb.model.Measurement;
 
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class AssetDAOResponse {
 	private String name;
 
 	@JsonProperty(required = true)
-	private String type;
+	private AssetType type;
 
 	@JsonProperty(required = false)
 	private String label;
@@ -86,7 +87,7 @@ public class AssetDAOResponse {
 		
 		asset.setId(id);
 		asset.setName(name);
-		asset.setType(type);
+		if (type != null)asset.setType(type.getId());
 		asset.setLabel(label);
 		asset.setDescription(description);
 		asset.setLocation(geo_location);

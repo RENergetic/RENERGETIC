@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.renergetic.backdb.dao.AssetDAORequest;
 import com.renergetic.backdb.dao.AssetDAOResponse;
 import com.renergetic.backdb.dao.MeasurementDAOResponse;
-import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.AssetCategory;
+import com.renergetic.backdb.model.AssetType;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
 import com.renergetic.backdb.service.AssetService;
@@ -110,6 +110,31 @@ public class AssetController {
 		
 		return new ResponseEntity<>(measurements, measurements != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
+	
+	@Operation(summary = "Get All Assets Types")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "/type", produces = "application/json")
+	public ResponseEntity<List<AssetType>> getAllMeasurementsTypes(@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<AssetType> type = new ArrayList<>();
+		
+		type = assetSv.getTypes(null, offset.orElse(0L), limit.orElse(20));
+		
+		return new ResponseEntity<>(type, HttpStatus.OK);
+	}
+	
+	@Operation(summary = "Get Asset Type by id")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+		@ApiResponse(responseCode = "404", description = "No asset type found with this id")
+	})
+	@GetMapping(path = "/type/{id}", produces = "application/json")
+	public ResponseEntity<AssetType> getAssetsTypeById(@PathVariable Long id){
+		AssetType type = null;
+		
+		type = assetSv.getTypeById(id);
+		
+		return new ResponseEntity<>(type, type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
 
 //=== INFO REQUESTS ===================================================================================
 		
@@ -190,10 +215,27 @@ public class AssetController {
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AssetDAOResponse> createAsset(@RequestBody AssetDAORequest asset) {
 		try {
-			if (Asset.ALLOWED_TYPES.keySet().stream().anyMatch(asset.getType()::equalsIgnoreCase)) {	
-				AssetDAOResponse _asset = assetSv.save(asset);
-				return new ResponseEntity<>(_asset, HttpStatus.CREATED);
-			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
+			AssetDAOResponse _asset = assetSv.save(asset);
+			return new ResponseEntity<>(_asset, HttpStatus.CREATED);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@Operation(summary = "Create a new Asset Type")
+	@ApiResponses({
+			@ApiResponse(responseCode = "201", description = "Measurement Type saved correctly"),
+			@ApiResponse(responseCode = "422", description = "Type isn't valid"),
+			@ApiResponse(responseCode = "500", description = "Error saving measurement")
+		}
+	)
+	@PostMapping(path = "/type", produces = "application/json", consumes = "application/json")
+	public ResponseEntity<AssetType> createAssetType(@RequestBody AssetType type) {
+		try {
+			System.err.println(type);
+			AssetType _type = assetSv.saveType(type);
+			return new ResponseEntity<>(_type, HttpStatus.CREATED);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -214,10 +256,8 @@ public class AssetController {
 	public ResponseEntity<AssetDAOResponse> updateAsset(@RequestBody AssetDAORequest asset, @PathVariable Long id) {
 		try {
 			asset.setId(id);
-			if (Asset.ALLOWED_TYPES.keySet().stream().anyMatch(asset.getType()::equalsIgnoreCase)) {	
-				AssetDAOResponse _asset = assetSv.update(asset, id);
-				return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-			} else return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY);
+			AssetDAOResponse _asset = assetSv.update(asset, id);
+			return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -259,6 +299,26 @@ public class AssetController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@Operation(summary = "Update a existing Measurement Type")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Measurement Type saved correctly"),
+			@ApiResponse(responseCode = "404", description = "Measurement Type not exist"),
+			@ApiResponse(responseCode = "422", description = "Type isn's valid"),
+			@ApiResponse(responseCode = "500", description = "Error saving measurement type")
+		}
+	)
+	@PutMapping(path = "/type/{id}", produces = "application/json", consumes = "application/json")
+	public ResponseEntity<AssetType> updateAssetType(@RequestBody AssetType type, @PathVariable Long id) {
+		try {
+			type.setId(id);	
+			AssetType _type = assetSv.updateType(type, id);
+			return new ResponseEntity<>(_type, _type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 //=== DELETE REQUESTS ================================================================================
 			
@@ -272,6 +332,23 @@ public class AssetController {
 	public ResponseEntity<?> deleteAsset(@PathVariable Long id) {
 		try {
 			assetSv.deleteById(id);
+			
+			return ResponseEntity.noContent().build();
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@Operation(summary = "Delete a existing Measurement", hidden = false)
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", description = "Measurement deleted correctly"),
+		@ApiResponse(responseCode = "500", description = "Error saving measurement")
+	}
+	)
+	@DeleteMapping(path = "/type/{id}")
+	public ResponseEntity<?> deleteAssetType(@PathVariable Long id) {
+		try {
+			assetSv.deleteTypeById(id);
 			
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
