@@ -18,22 +18,21 @@ import org.springframework.stereotype.Repository;
 
 import com.inetum.app.model.InfluxFunction;
 import com.inetum.app.model.InfluxTimeUnit;
-import com.inetum.app.model.HeatSupply;
+import com.inetum.app.model.HeatConsumed;
 
 @Repository
-public class HeatSupplyRepository {
+public class HeatConsumedRepository {
 	@Autowired
     private InfluxDB influxDB;
 
 	public final String DATABASE = "renergetic";
-	public final String MEASUREMENT_NAME = "heat_supply";
 
 	/**
 	 * Insert a power data to myMeasurement table
 	 * @param power Power to set
 	 */
-    public void insert(HeatSupply power, Map<String, String> tags) {
-        Point registry = Point.measurement(HeatSupply.measurement())
+    public void insert(HeatConsumed power, Map<String, String> tags) {
+        Point registry = Point.measurement(HeatConsumed.measurement())
         		.addFieldsFromPOJO(power)
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .build();
@@ -45,19 +44,19 @@ public class HeatSupplyRepository {
      * Get all power data from database
      * @return All power data from database as List
      */
-    public List<HeatSupply> select(Map<String, String> tags) {
-		List<HeatSupply> results = new ArrayList<HeatSupply>();
+    public List<HeatConsumed> select(Map<String, String> tags) {
+		List<HeatConsumed> results = new ArrayList<HeatConsumed>();
 		String pTags = String.join(" AND ", tags.keySet().stream().map(key -> String.format("\"%s\"='%s'", key, tags.get(key))).collect(Collectors.toList()));
 		pTags = '(' + pTags + ')';
 		
-		Query query = new Query("SELECT * FROM " + MEASUREMENT_NAME +
+		Query query = new Query("SELECT * FROM " + HeatConsumed.measurement() +
 				((tags != null && tags.size() > 0)? " WHERE " + pTags : ""), DATABASE);
 		
-		System.err.println("SELECT * FROM " + MEASUREMENT_NAME +
+		System.err.println("SELECT * FROM " + HeatConsumed.measurement() +
 				((tags != null && tags.size() > 0)? " WHERE " + pTags : ""));
 		
         QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
-        results = (new InfluxDBResultMapper()).toPOJO(queryResult, HeatSupply.class);
+        results = (new InfluxDBResultMapper()).toPOJO(queryResult, HeatConsumed.class);
 
  
         return results;
@@ -70,8 +69,8 @@ public class HeatSupplyRepository {
      * @param to Date of last power data to get | Format: yyyy-MM-dd hh:mm:ss
      * @return The power data between the from and to parameters
      */
-    public List<HeatSupply> select(String from, String to, Map<String, String> tags) {
-		List<HeatSupply> results = new ArrayList<HeatSupply>();
+    public List<HeatConsumed> select(String from, String to, Map<String, String> tags) {
+		List<HeatConsumed> results = new ArrayList<HeatConsumed>();
 
 		// IF from VARIABLE IS A DATE TRADUCE IT TO INFLUX FORMAT ELSE IF IS A TIMESTAMP CONVERT THE TIME TO MILLISECONDS
 		if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
@@ -89,7 +88,7 @@ public class HeatSupplyRepository {
 			Query query = new Query(
 					String.format("SELECT * FROM %s "
 							+ "WHERE time >= %s%s%s",
-							MEASUREMENT_NAME,
+							HeatConsumed.measurement(),
 							from, 
 							!to.equals("0ms")? " AND time <= " + to : "", 
 							(tags != null && tags.size() > 0)? " AND " + pTags : "")
@@ -97,7 +96,7 @@ public class HeatSupplyRepository {
 			
 			System.err.printf("SELECT * FROM %s "
 					+ "WHERE time >= %s%s%s\n",
-					MEASUREMENT_NAME,
+					HeatConsumed.measurement(),
 					from, 
 					!to.equals("0ms")? " AND time <= " + to : "", 
 					(tags != null && tags.size() > 0)? " AND " + pTags : "");
@@ -105,7 +104,7 @@ public class HeatSupplyRepository {
 	        QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
 	        
 	        // GET RESULTS AND TRANSLATE THEM TO THE Power MODEL
-	        results = (new InfluxDBResultMapper()).toPOJO(queryResult, HeatSupply.class);
+	        results = (new InfluxDBResultMapper()).toPOJO(queryResult, HeatConsumed.class);
 	        
 		} catch(InfluxDBException | InfluxDBMapperException e) {
 			e.printStackTrace();
@@ -124,8 +123,8 @@ public class HeatSupplyRepository {
      * @param group Time to group the data (example: 1596039s)
      * @return The sum of power data group by time
      */
-    public List<HeatSupply> operate(InfluxFunction function, String from, String to, String group, Map<String, String> tags) {
-		List<HeatSupply> results = new ArrayList<HeatSupply>();
+    public List<HeatConsumed> operate(InfluxFunction function, String from, String to, String group, Map<String, String> tags) {
+		List<HeatConsumed> results = new ArrayList<HeatConsumed>();
 		String pTags = String.join(" AND ", tags.keySet().stream().map(key -> key + "=" + tags.get(key)).collect(Collectors.toList()));
 		
 		if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(\\.\\d)*"))
@@ -144,7 +143,7 @@ public class HeatSupplyRepository {
 						String.format("SELECT %s(power) as power FROM %s "
 								+ "WHERE time >= %s%s%s%s",
 								function.name(),
-								MEASUREMENT_NAME,
+								HeatConsumed.measurement(),
 								from, 
 								!to.equals("0ms")? " AND time <= " + to : "", 
 								(tags != null && tags.size() > 0)? " AND " + pTags : "", 
@@ -152,7 +151,7 @@ public class HeatSupplyRepository {
 						, DATABASE);
 				
 		        QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
-		        results = (new InfluxDBResultMapper()).toPOJO(queryResult, HeatSupply.class);
+		        results = (new InfluxDBResultMapper()).toPOJO(queryResult, HeatConsumed.class);
 		        
 			} catch(InfluxDBException | InfluxDBMapperException e) {
 				e.printStackTrace();

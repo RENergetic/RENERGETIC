@@ -16,8 +16,8 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @Entity
-@Measurement(name = "heat_supply")
-public class HeatSupply {
+@Measurement(name = "heat_consumed")
+public class HeatConsumed {
 	@Column(name = "time")
 	Long time;
 	
@@ -28,5 +28,5 @@ public class HeatSupply {
 	@JsonProperty(access = Access.READ_ONLY, required = false, value = "asset_name")
 	String assetName;
 	
-	public static String measurement() { return "heat_supply"; }
+	public static String measurement() { return "heat_consumed"; }
 }
