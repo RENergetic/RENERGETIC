@@ -96,7 +96,7 @@ public class MeasurementService {
 	
 	// MEASUREMENTTYPE CRUD OPERATIONS
 	public MeasurementType saveType(MeasurementType type) {
-		type.setId(null);
+		//type.setId(null);
 		return measurementTypeRepository.save(type);
 	}
 	

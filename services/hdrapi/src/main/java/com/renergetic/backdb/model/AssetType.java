@@ -4,13 +4,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +22,8 @@ import lombok.ToString;
 @ToString
 public class AssetType {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@JsonProperty(access = Access.READ_ONLY)
+	@JsonProperty(required = true)
+	@Column(name = "id", nullable = false, insertable = true, updatable = true, unique = true)
 	private Long id;
 	
 	@Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)

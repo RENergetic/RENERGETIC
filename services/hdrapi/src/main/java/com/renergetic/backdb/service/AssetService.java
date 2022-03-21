@@ -177,7 +177,7 @@ public class AssetService {
 	
 	// ASSETTYPE CRUD OPERATIONS
 	public AssetType saveType(AssetType type) {
-		type.setId(null);
+		//type.setId(null);
 		return assetTypeRepository.save(type);
 	}
 	
