@@ -56,7 +56,7 @@ export default {
       return state.dashboards;
     },
     informationPanels: (state /* getters*/) => {
-      return state.dashboards;
+      return state.informationPanels;
     },
   },
 };

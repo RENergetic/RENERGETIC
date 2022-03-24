@@ -11,9 +11,14 @@ TODO: restApiName - describe
 *   
 *   TODO: describe this.$emit("UpdateMenu", null);
 
+###  global events
+```$emit("UpdateMenu", args)``` - emit event to menu
+
 ### colors
 https://materialui.co/colors
 
 ### vue.config.js
 Project imports
 * scss variables import
+
+

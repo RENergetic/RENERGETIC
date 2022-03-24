@@ -9,5 +9,20 @@ const AssetTypes = Object.freeze({
   BUILDING: "bulding",
   FLAT: "flat",
   HEAT_SOURCE: "heat_source",
+  ISLAND: "island",
+  PV: "pv",
 });
-export { Colors, AssetTypes };
+
+const TileTypes = Object.freeze({
+  knob: "knob",
+  doughnut: "doughnut",
+  list: "list",
+});
+
+const NotificationContext = Object.freeze({
+  ASSET: "asset",
+  USER: "user",
+  AREA: "area",
+  TILE: "area",
+});
+export { Colors, AssetTypes, TileTypes, NotificationContext };

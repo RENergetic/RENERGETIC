@@ -7,8 +7,12 @@
   "notification": "Notification",
   "measurements": "Measurements",
   "recommendations": "Recommendations",
-  "selected_panel": "Selected Panel" ,
-  "heatmap":"Heatmap",
-  "chart":"Chart",
-  "request_demand":"Request demand"
+  "selected_panel": "Selected Panel",
+  "heatmap": "Heatmap",
+  "chart": "Chart",
+  "panel_font_size":"Panel font size",
+  "request_demand": "Request demand",
+  "measurement_details": {
+    "color": "Color"
+  }
 }

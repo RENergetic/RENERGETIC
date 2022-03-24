@@ -1,11 +1,11 @@
 <template>
-  <Knob v-model="value" :min="0" :max="100.0" />
+  <Knob v-model="value" :style="{ textAlign: 'center' }" :min="0" :max="100.0" />
   <div style="text-align: center">
     <!-- <div key="" class="flex flex-grow-1">
       {{ $t("model.heatmap.heatmap") }}
     </div> -->
 
-    <div>{{ measurement.label }}</div>
+    <div v-if="measurement">{{ measurement.label }}</div>
   </div>
 </template>
 <script>

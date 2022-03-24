@@ -1,5 +1,11 @@
 <template>
-  <InformationTileItem v-for="m in tile.measurements" :key="m.id" :tile-item="m" :pdata="pdata"></InformationTileItem>
+  <InformationTileItem
+    v-for="m in tile.measurements"
+    :key="m.id"
+    :style="{ fontSize: fontSize }"
+    :tile-item="m"
+    :pdata="pdata"
+  ></InformationTileItem>
 </template>
 <script>
 import InformationTileItem from "./InformationTileItem.vue";
@@ -15,6 +21,10 @@ export default {
     pdata: {
       type: Object,
       default: () => ({}),
+    },
+    fontSize: {
+      type: String,
+      default: "2rem",
     },
   },
   // emits: ["edit", "notification"],

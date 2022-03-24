@@ -1,9 +1,9 @@
 <template>
   <div id="panel-grid-stack" style="width: 100%; position: absolute; top: 0" class="grid-stack">
     <InformationTile
-      v-for="tile in tiles"
+      v-for="(tile, index) in tiles"
       :key="tile.id"
-      :tile="tile"
+      :slot-props="{ tile: tile, index: index }"
       :edit="editMode"
       :pdata="pdata"
       :settings="settings"
@@ -11,6 +11,7 @@
       @notification="viewNotification"
     />
   </div>
+
   <Dialog
     v-model:visible="notificationDialog"
     :style="{ width: '50vw' }"
@@ -18,8 +19,7 @@
     :modal="true"
     :dismissable-mask="true"
   >
-    <notification-view :notifications="[]" />
-    <p>todo:</p>
+    <notification-list v-if="selectedItem" :context="notificationContext" :object-id="selectedItem.tile.id" />
   </Dialog>
   <Dialog
     v-model:visible="editDialog"
@@ -28,15 +28,32 @@
     :modal="true"
     :dismissable-mask="true"
   >
-    {{ editTile }}
-    <p>todo edit options, list of metricss</p>
-    <Button
-      :class="' p-button-text '"
-      aria-haspopup="true"
-      icon="pi pi-bell"
-      @click="() => (manageSensorsDialog = !manageSensorsDialog)"
-      >add sensor todo:</Button
-    >
+    <!-- {{ selectedTile }} -->
+    <div class="field grid">
+      <label for="assetType" class="col-fixed" style="width: 5rem">
+        {{ $t("model.information_tile.type") }}
+      </label>
+      <div class="col">
+        <Dropdown
+          id="assetType"
+          v-model="selectedItem.tile.type"
+          :options="tileTypes"
+          option-label="label"
+          option-value="value"
+          :placeholder="$t('view.select_tile_type')"
+        />
+      </div>
+    </div>
+    <div class="field grid">
+      <Button
+        :label="$t('view.button.manage_measurement')"
+        icon="pi pi-plus"
+        @click="() => (manageSensorsDialog = !manageSensorsDialog)"
+      />
+    </div>
+    <div class="field grid">
+      <Button :label="$t('view.button.submit')" icon="pi pi-plus" @click="saveGrid" />
+    </div>
     <Dialog
       v-model:visible="manageSensorsDialog"
       :style="{ width: '75vw' }"
@@ -44,30 +61,20 @@
       :modal="true"
       :dismissable-mask="true"
     >
-      <ManageSensors></ManageSensors>
+      <!-- {{ selectedTile.tile.measurements }} -->
+      <ManageSensors v-model="selectedItem.tile.measurements"></ManageSensors>
     </Dialog>
   </Dialog>
-  <!-- <div class="grid-stack">
-      <div
-        v-for="tile in tiles"
-        :key="tile.id"
-        :class="'grid-stack-item'"
-        :gs-w="gridWidth(tile)"
-      >
-        <div class="grid-stack-item-content">Item 2 wider</div>
-      </div>
-    </div> -->
-  <!-- {{ tiles }} -->
-  <!-- </div> -->
 </template>
 <script>
 import InformationTile from "./informationtile/InformationTile.vue";
 import ManageSensors from "./measurements/ManageSensors.vue";
 
-import NotificationView from "../dashboard/area/NotificationList.vue";
+import NotificationList from "../management/notification/NotificationList.vue";
 
 import Dialog from "primevue/dialog";
 import { GridStack } from "gridstack";
+import { TileTypes, NotificationContext } from "@/plugins/model/Enums.js";
 // THEN to get HTML5 drag&drop
 import "gridstack/dist/h5/gridstack-dd-native";
 import "gridstack/dist/gridstack.min.css";
@@ -75,9 +82,10 @@ export default {
   name: "InformationPanel",
   components: {
     InformationTile,
+
     ManageSensors,
     Dialog,
-    NotificationView,
+    NotificationList,
   },
   props: {
     locked: {
@@ -99,14 +107,20 @@ export default {
       default: false,
     },
   },
+  emits: ["update"],
   data() {
     return {
       grid: null,
       notificationDialog: false,
       editDialog: false,
-      editTile: null,
+      selectedItem: null,
       mPanel: this.panel,
+      manageSensorsDialog: false,
       pdata: {},
+      tileTypes: Object.entries(TileTypes).map((k) => {
+        return { value: k[1], label: this.$t("enums.tile_type." + k[1]) };
+      }),
+      notificationContext: NotificationContext.TILE,
     };
   },
   computed: {
@@ -119,6 +133,11 @@ export default {
     },
   },
   watch: {
+    manageSensorsDialog: function (newValue) {
+      if (!newValue) {
+        this.mPanel.tiles[this.selectedItem.index] = this.selectedItem.tile;
+      }
+    },
     panel: {
       handler: function (newValue) {
         this.mPanel = newValue;
@@ -137,7 +156,7 @@ export default {
     },
   },
   async mounted() {
-    this.pdata = await this.$ren.dataApi.getPanelData(this.panel.id);
+    await this.loadData();
     console.info(JSON.stringify(this.pdata));
     if (this.grid != null) this.grid.destroy(false);
     let grid = GridStack.init({ float: true }, "#panel-grid-stack");
@@ -148,7 +167,6 @@ export default {
     }
     this.grid = grid;
     //TODO: remove this reference?
-
     window.panelGrid = this.grid;
   },
   updated() {
@@ -164,12 +182,15 @@ export default {
     window.panelGrid = this.grid;
   },
   methods: {
+    async loadData() {
+      if (this.panel.id != null) this.pdata = await this.$ren.dataApi.getPanelData(this.panel.id);
+    },
     gridWidth(tile) {
       return tile.col == null ? 2 : tile.col;
     },
-    onEdit(tile) {
+    onEdit(evt) {
       //todo
-      this.editTile = tile;
+      this.selectedItem = evt;
       this.editDialog = true;
       // console.info(tile);
     },
@@ -190,10 +211,13 @@ export default {
           };
         }
       });
-      this.tiles = tiles;
+      this.mPanel.tiles = tiles;
+      this.$emit("update", this.mPanel);
     },
-    viewNotification() {
+
+    viewNotification(evt) {
       //TODO: load here notifications for tile
+      this.selectedItem = evt;
       this.notificationDialog = true;
     },
   },

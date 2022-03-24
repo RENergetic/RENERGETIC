@@ -1,13 +1,14 @@
 <template>
   <div class="p-fluid">
-    TODO: measurements view
-    {{ objects }} {{ measurements.length }}dddddd
-    {{ measurements }}
-    <div v-for="s in measurements" :key="s" :class="'field grid'">
-      <label :for="s.key" class="col-12">{{ $t("model.measurements" + s.key) }}</label>
+    <div v-for="k in objectsId" :key="k" :class="'flex-row'">
+      label: {{ objects[k] }}
+      <div v-for="p in pData[k]" :key="p.key" :class="'flex'">
+        <label :for="p.key" class="flex flex-grow-1">{{ $t("model.measurements" + p.key) }}</label>
+        <div class="flex flex-none">
+          <span :id="p.key">{{ p.value }}</span>
+        </div>
 
-      <div class="col-12">
-        <span :id="s.key">{{ s.value }}</span>
+        <!-- <span :id="p.key">{{ p.value }}</span> -->
       </div>
     </div>
   </div>
@@ -25,7 +26,7 @@ export default {
   },
 
   data() {
-    return { measurements: [], objectsId: [] };
+    return { pData: {}, objectsId: [] };
   },
   watch: {
     objects: {
@@ -42,9 +43,19 @@ export default {
   },
   methods: {
     async refresh() {
-      await this.$ren.measurementApi.getCurrentMeasurements(Object.keys(this.objectsId)).then((measurements) => {
-        this.measurements = measurements;
-      });
+      // todo:
+
+      let pData = {};
+      for (let k of this.objectsId) {
+        pData[k] = [
+          { key: "m1", value: 0.0 },
+          { key: "m2", value: 10.0 },
+        ];
+      }
+      this.pData = pData;
+      // await this.$ren.measurementApi.getCurrentMeasurements(Object.keys(this.objectsId)).then((measurements) => {
+      //   this.measurements = measurements;
+      // });
     },
   },
 };

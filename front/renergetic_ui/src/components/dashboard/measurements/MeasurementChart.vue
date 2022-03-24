@@ -31,7 +31,7 @@
 import Chart from "primevue/chart";
 // import chartjsPluginAnnotation from "chartjs-plugin-annotation";
 import chartjsMoment from "chartjs-adapter-moment";
-import InfoIcon from "../../miscellaneous/InfoIcon.vue";
+import InfoIcon from "@/components/miscellaneous/InfoIcon.vue";
 
 export default {
   name: "MasurementChart",
@@ -137,5 +137,4 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss"></style>

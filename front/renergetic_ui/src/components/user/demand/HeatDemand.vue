@@ -1,11 +1,28 @@
 <template>
   <div class="flex heatdemand">
-    <div class="flex-none flex align-items-center justify-content-center">
+    <div class="flex align-items-center justify-content-center">
       <span
         v-if="demand.icon != null"
         id="demandicon"
-        :style="'background-image: url(' + icons[demand.icon] + ')'"
+        :style="'background-image: url(' + icons[demand.icon] + ');width:7.5rem;'"
       ></span>
+      <span v-if="demand.tile != null" id="demandtile" @click="$router.push(`/panel/view/${demand.tile.panelId}`)">
+        <!-- TODO: load :pdata="pdata" -->
+        <DoughnutTile
+          :style="'height:7.5rem;width:7.5rem;margin-right: 1rem;'"
+          :legend="false"
+          class="block"
+          :tile="demand.tile"
+          :pdata="{ '2': 2, '3': 3, '4': 4 }"
+        ></DoughnutTile>
+        <InformationTile
+          v-if="false"
+          :key="demand.tile.id"
+          :slot-props="{ tile: demand.tile, index: 0 }"
+          :settings="{}"
+        />
+        {{ demand.area }}</span
+      >
     </div>
 
     <div class="flex-none flex flex-column justify-content-center flex-wrap">
@@ -24,9 +41,12 @@
   </div>
 </template>
 <script>
+import InformationTile from "@/components/dashboard/informationtile/InformationTile.vue";
+import DoughnutTile from "@/components/dashboard/informationtile/DoughnutTile.vue";
+
 export default {
   name: "HeatDemand",
-  components: {},
+  components: { InformationTile, DoughnutTile },
   props: {
     demand: {
       type: Object,
@@ -68,7 +88,7 @@ export default {
   width: 5rem;
   height: 5rem;
   // display: inherit;
-  background-size: 100%;
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   margin-right: 1rem;

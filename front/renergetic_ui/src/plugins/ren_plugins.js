@@ -6,7 +6,7 @@ const plugin = {};
 plugin.install = function (Vue /*, options*/) {
   Vue.config.globalProperties.$keycloak = createKeyCloak(Vue);
   Vue.config.globalProperties.$ren = {
-    utils: RenUtils,
+    utils: new RenUtils(Vue),
     ...new RestClient(Vue),
   };
 };

@@ -101,7 +101,7 @@ vue/attribute-hyphenation */
 </template>
 
 <script>
-import UserAdd from "../../components/admin/UserAdd.vue";
+import UserAdd from "@/components/admin/UserAdd.vue";
 
 export default {
   name: "Users",

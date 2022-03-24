@@ -1,11 +1,15 @@
 import RestComponent from "./restcomponent";
+import storage from "../../../assets/dummy/storage.js";
+const USER_API_KEY = "user_api";
+const SETTINGS_KEY = "settings";
 export default class UserApi extends RestComponent {
   constructor(axiosInstance, vueInstance) {
     super(axiosInstance, vueInstance);
   }
   // TODO: implement
   // async getDemad(userId) {}
-
+  // async setSettings(settings) {   }
+  // async getSettings() {   }
   static loggedUser = undefined;
   register(user) {
     //validate
@@ -36,5 +40,11 @@ export default class UserApi extends RestComponent {
       .catch(function (error) {
         console.error(error.response);
       });
+  }
+  async setSettings(settings) {
+    storage.update(`${USER_API_KEY}.${SETTINGS_KEY}`, settings);
+  }
+  async getSettings() {
+    return storage.get(`${USER_API_KEY}.${SETTINGS_KEY}`, null);
   }
 }

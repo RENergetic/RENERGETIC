@@ -5,6 +5,7 @@
           "label": "Label"
      },
      "heatmap": {
+          "name":"Name",
           "label": "Label",
           "areas": "Areas",
           "attributes": "Attributes",
@@ -12,27 +13,52 @@
           "notifications": "Notifications",
           "dashboard": "Dashboard",
           "heatmap": "Heatmap",
-          "imgUrl":"Image URL",
-          "description":"Description",
-          "id":"Id" 
+          "imgUrl": "Image URL",
+          "description": "Description",
+          "id": "Id"
      },
      "asset": {
           "name": "Name",
           "id": "Id",
-          "child":"Sub assets",
-          "asset_type": "Asset",
+          "child": "Sub assets",
+          "asset_type": "Asset type",
           "label": "Label",
-          "geo_location":"Geo location",
+          "measurements": "Measurements",
+          "geo_location": "Geo location",
           "owner": "Owner",
           "parent": "Parent",
-          
-          "asset_types":
-          {
-               "room":"Room",
-               "pv":"PV"
+          "asset_types": {
+               "room": "Room",
+               "pv": "PV"
           }
      },
-     "measurement":{
-          
+     "information_tile": {
+          "type": "type"
+     },
+     "information_panel": {
+          "id": "Id",
+          "label": "Label",
+          "name": "Name"
+     },
+     "measurement": {
+          "name": "Name",
+          "label": "Label",
+          "measurement_type": "Measurement type",
+          "location_name": "Location",
+          "type": "Measurement type",
+          "id": "Id",
+          "details": "details",
+          "direction": "Direction",
+          "direction_out": "Out",
+          "direction_in": "In",
+          "direction_null": "N/A"
+     },
+     "panel": {
+          "name": "Name",
+          "label": "Label"
+     },
+     "user": {
+          "login": "Login",
+          "password": "Password"
      }
 }

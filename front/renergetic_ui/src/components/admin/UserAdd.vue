@@ -1,42 +1,69 @@
-/* eslint-disable vue/v-on-event-hyphenation */ /* eslint-disable vue/first-attribute-linebreak */ /* eslint-disable
-vue/attribute-hyphenation */
 <template>
+  <!-- TODO add locale keys -->
   <Dialog
     :visible="visible"
-    :style="{ width: '450px' }"
-    header="Add new user"
+    :style="{ width: '30rem' }"
+    :header="$t('view.add_new_user')"
     :modal="true"
     @update:visible="cancelAdd"
   >
-    <div class="p-fluid grid">
-      <span class="p-float-label p-my-4">
+    <div class="field grid">
+      <label for="username" class="col-fixed" style="width: 10rem">
+        {{ $t("model.user.username") }}
+      </label>
+      <div class="col">
         <InputText id="username" v-model="user.username" type="text" :class="error.username ? 'p-invalid' : ''" />
-        <label for="username">Username</label>
-      </span>
-      <span class="p-float-label p-my-4">
-        <InputText id="firstname" v-model="user.firstName" type="text" />
-        <label for="firstname">User First Name</label>
-      </span>
-      <span class="p-float-label p-my-4">
-        <InputText id="lastname" v-model="user.lastName" type="text" />
-        <label for="lastname">User Surname</label>
-      </span>
-      <span class="p-float-label p-my-4">
-        <InputText id="email" v-model="user.email" type="text" :class="error.email ? 'p-invalid' : ''" />
-        <label for="email">User E-mail</label>
-      </span>
-      <span class="p-float-label p-my-4">
-        <Password id="password" v-model="user.credentials[0].value" :class="error.password ? 'p-invalid' : ''" />
-        <label for="email">User Password</label>
-      </span>
-      <ToggleButton
-        v-model="user.credentials[0].temporary"
-        on-label="Temporal Password"
-        off-label="Permanent Password"
-        on-icon="pi pi-check"
-        off-icon="pi pi-times"
-      />
+      </div>
     </div>
+    <div class="field grid">
+      <label for="firstName" class="col-fixed" style="width: 10rem">
+        {{ $t("model.user.firstName") }}
+      </label>
+      <div class="col">
+        <InputText id="firstName" v-model="user.firstName" type="text" />
+      </div>
+    </div>
+    <div class="field grid">
+      <label for="lastName" class="col-fixed" style="width: 10rem">
+        {{ $t("model.user.lastName") }}
+      </label>
+      <div class="col">
+        <InputText id="lastName" v-model="user.lastName" type="text" />
+      </div>
+    </div>
+    <div class="field grid">
+      <label for="email" class="col-fixed" style="width: 10rem">
+        {{ $t("model.user.email") }}
+      </label>
+      <div class="col">
+        <InputText id="email" v-model="user.email" type="email" :class="error.email ? 'p-invalid' : ''" />
+      </div>
+    </div>
+
+    <div class="field grid">
+      <label for="password" class="col-fixed" style="width: 10rem">
+        {{ $t("model.user.password") }}
+      </label>
+      <div class="col">
+        <Password id="password" v-model="user.password" :class="error.password ? 'p-invalid' : ''" />
+      </div>
+    </div>
+    <div class="field grid">
+      <label for="temp_password" class="col-fixed" style="width: 10rem">
+        {{ $t("model.user.temp_password") }}
+      </label>
+      <div class="col">
+        <ToggleButton
+          id="temp_password"
+          v-model="user.credentials[0].temporary"
+          on-label="Temporal Password"
+          off-label="Permanent Password"
+          on-icon="pi pi-check"
+          off-icon="pi pi-times"
+        />
+      </div>
+    </div>
+
     <template #footer>
       <Button
         label="No"

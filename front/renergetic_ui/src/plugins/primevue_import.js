@@ -18,6 +18,14 @@ import Message from "primevue/message";
 import Toolbar from "primevue/toolbar";
 import TabView from "primevue/tabview";
 import TabPanel from "primevue/tabpanel";
+import Card from "primevue/card";
+import FileUpload from "primevue/fileupload";
+import Listbox from "primevue/listbox";
+import Tree from "primevue/tree";
+
+import Accordion from "primevue/accordion";
+
+import AccordionTab from "primevue/accordiontab";
 const plugin = {};
 
 plugin.install = function (Vue /*, options*/) {
@@ -42,6 +50,11 @@ plugin.install = function (Vue /*, options*/) {
   Vue.component("Toolbar", Toolbar);
   Vue.component("TabView", TabView);
   Vue.component("TabPanel", TabPanel);
+  Vue.component("Card", Card);
+  Vue.component("FileUpload", FileUpload);
+  Vue.component("Listbox", Listbox);
+  Vue.component("Tree", Tree);
+  Vue.component("Accordion", Accordion);
+  Vue.component("AccordionTab", AccordionTab);
 }; // install
-
 export default plugin;

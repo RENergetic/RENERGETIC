@@ -23,7 +23,7 @@ export default {
   async mounted() {
     //TODO: userId
     let userID = 0;
-    this.demands = await this.$ren.userApi.getDemad(userID);
+    this.demands = await this.$ren.dashboardApi.getDemand(userID);
   },
 
   methods: {},
@@ -32,7 +32,7 @@ export default {
 
 <style lang="scss">
 .heatdemand {
-  padding: 0.75rem;
+  padding: 0.5rem;
   i {
     font-size: 2rem;
     margin-left: 0.75rem;
@@ -50,7 +50,7 @@ export default {
   width: 5rem;
   height: 5rem;
   // display: inherit;
-  background-size: 100%;
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   margin-right: 1rem;

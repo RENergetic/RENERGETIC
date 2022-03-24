@@ -7,6 +7,7 @@ export default {
   name: "DoughnutTile",
   components: { Chart },
   props: {
+    legend: { type: Boolean, default: true },
     pdata: { type: Object, default: () => ({}) },
     tile: {
       type: Object,
@@ -16,8 +17,10 @@ export default {
   data() {
     return {
       options: {
+        responsive: true,
         plugins: {
           legend: {
+            display: this.legend,
             labels: {
               color: "#495057",
             },
@@ -31,7 +34,7 @@ export default {
       let labels = this.tile.measurements.map((m) => m.label);
 
       let data = this.tile.measurements.map((m) => this.pdata[m.id]);
-      console.info(this.tile.measurements);
+      // console.info(this.tile.measurements);
       let backgroundColor = this.tile.measurements.map((m) =>
         m.measurement_details.color ? m.measurement_details.color : "#90A4AE",
       );

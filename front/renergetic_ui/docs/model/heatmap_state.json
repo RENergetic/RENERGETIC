@@ -1,5 +1,6 @@
 {
     "area_1": "OK",
     "area_2": "WARNING",
+    "area_4": "ERROR",
     "area_3": "OK"
 }

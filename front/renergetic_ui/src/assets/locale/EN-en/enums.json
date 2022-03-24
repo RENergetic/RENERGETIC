@@ -2,6 +2,19 @@
   "asset_type": {
     "bulding": "Bulding",
     "flat": "Flat",
-    "heat_source": "Heat Source"
-  }
+    "heat_source": "Heat Source",
+    "island":"Island",
+    "pv":"pv"
+  },
+  "metric_type":{
+   "electricity":"electricity",
+   "heat":"heat",
+   "temperature":"temperature",
+   "renewability":"renewability"
+  },
+  "tile_type":{
+    "knob":"knob",
+    "doughnut":"doughnut",
+    "list":"list"
+  } 
 }

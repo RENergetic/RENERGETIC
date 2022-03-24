@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-import ProfileComponent from "../../components/user/Profile.vue";
+import ProfileComponent from "@/components/user/Profile.vue";
 export default {
   name: "ProfileView",
   components: {

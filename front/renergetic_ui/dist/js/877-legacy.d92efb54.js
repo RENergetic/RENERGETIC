@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkrenergetic_ui"]=self["webpackChunkrenergetic_ui"]||[]).push([[877],{1877:function(e,r,u){u.r(r);var i=u(2728);i.kL.register(...i.zX),r["default"]=i.kL}}]);
-//# sourceMappingURL=877-legacy.d92efb54.js.map

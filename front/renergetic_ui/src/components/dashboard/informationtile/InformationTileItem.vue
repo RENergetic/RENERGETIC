@@ -1,14 +1,12 @@
 <template>
   <div>
     <div>
-      <span> value: {{ value }} {{ tileItem.unit }}</span>
-      <span
-        v-if="tileItem.icon != null"
-        id="tileicon"
-        :style="'background-image: url(' + icons[tileItem.icon] + ')'"
-      ></span>
+      <!-- {{ tileItem.type }} -->
+      <!-- {{ icon }} -->
+      <span> {{ label }}: {{ value }} {{ tileItem.type.unit }}</span>
+      <span v-if="icon != null" id="tileicon" :style="'background-image: url(' + icon + ')'"></span>
     </div>
-    <div>description {{ tileItem.description }}</div>
+    <div v-if="tileItem.description">description: {{ tileItem.description }}</div>
   </div>
 </template>
 <script>
@@ -37,8 +35,23 @@ export default {
     };
   },
   computed: {
+    icon: function () {
+      //todo: default
+      let icon = this.tileItem.type.metric_type;
+      if (this.tileItem.measurement_details.icon != null) icon = this.tileItem.measurement_details.icon;
+      else if (this.tileItem.type.icon != null) icon = this.tileItem.type.icon;
+      return this.icons[icon] != null ? this.icons[icon] : this.icons.default;
+    },
     value: function () {
       return this.pdata ? this.pdata[this.tileItem.id] : null;
+    },
+    label: function () {
+      if (this.tileItem.label != null) {
+        return this.tileItem.label;
+      } else {
+        //TODO: translate it
+        return this.tileItem.name;
+      }
     },
   },
   mounted() {},

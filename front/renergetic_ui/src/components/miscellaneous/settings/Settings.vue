@@ -1,5 +1,6 @@
 <template>
   <div class="p-fluid">
+    <!-- {{ settings }} -->
     <div v-for="s in schema" :key="s" :class="'field grid'">
       <label :for="s.key" class="col-12">{{ s.label }}</label>
 
@@ -33,7 +34,16 @@
           :use-grouping="false"
         />
         <div v-else-if="s.type == Array">
-          <ListBox :id="s.key" v-model="mModel[s.key]" :options="s.ext.options" :option-label="s.ext.optionLabel" />
+          <ListBox
+            :id="s.key"
+            v-model="mModel[s.key]"
+            :options="s.ext.options"
+            :option-value="s.ext.optionValue"
+            :option-label="s.ext.optionLabel"
+          />
+        </div>
+        <div v-else-if="s.type == 'Color'">
+          <ColorPicker v-model="mModel[s.key]" />
         </div>
         <InputText v-else :id="s.key" v-model="mModel[s.key]" />
       </div>
@@ -45,16 +55,18 @@
 import SelectButton from "primevue/selectbutton";
 import InputNumber from "primevue/inputnumber";
 import ListBox from "primevue/listbox";
+import ColorPicker from "primevue/colorpicker";
 export default {
   name: "Settings",
   components: {
     SelectButton,
     InputNumber,
     ListBox,
+    ColorPicker,
     // ToggleButton
   },
   props: {
-    model: {
+    settings: {
       type: Object,
       default: () => ({}),
     },
@@ -63,14 +75,15 @@ export default {
       default: () => ({}),
     },
   },
-  emits: ["update:modelValue"],
+  emits: ["update:settings"],
   data() {
-    return { mModel: this.model };
+    return { mModel: this.settings };
   },
   watch: {
     mModel: {
       handler: function (newVal) {
-        this.$emit("update:modelValue", newVal);
+        console.info(newVal);
+        this.$emit("update:settings", newVal);
       },
       deep: true,
     },

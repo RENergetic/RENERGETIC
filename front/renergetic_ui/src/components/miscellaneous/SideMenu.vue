@@ -54,21 +54,16 @@ export default {
   },
   methods: {
     async reload() {
-      this.$ren.dashboardApi.list().then((dashboards) => {
-        this.dashboards = dashboards;
-        this.$store.commit("view/dashboards", dashboards);
-        let menu = this.initMenu();
-        this.menuModel = menu;
-      });
-      //this.$route.params.id
-      //TODO: set user id ?
-      this.$ren.dashboardApi.listInformationPanel().then((informationPanels) => {
-        this.informationPanels = informationPanels;
-        this.$store.commit("view/informationPanels", informationPanels);
-        let menu = this.initMenu();
-        this.menuModel = menu;
-      });
-      //todo: catch
+      this.$ren.utils
+        .reloadStore()
+        .then(async () => {
+          //this.dashboards = this.$store.getters["view/dashboards"];
+          this.dashboards = await this.$ren.dashboardApi.list();
+          this.informationPanels = this.$store.getters["view/informationPanels"];
+          let menu = this.initMenu();
+          this.menuModel = menu;
+        })
+        .catch((error) => console.error(error));
     },
     panelItems() {
       if (this.informationPanels.length == 0) {
@@ -85,6 +80,14 @@ export default {
             this.$router.push(to);
           },
         };
+      });
+      items.push({
+        label: this.$t("menu.information_panel_list"),
+        icon: "pi pi-fw  pi-align-left",
+        to: "/panel",
+        command: () => {
+          this.$router.push({ name: "InformationPanelList" });
+        },
       });
       items.push({
         //tODO:

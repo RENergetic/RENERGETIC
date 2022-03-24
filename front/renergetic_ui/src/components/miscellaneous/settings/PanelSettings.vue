@@ -1,6 +1,6 @@
 <template>
-  {{ model }}
-  <Settings :schema="schema" :model="model"></Settings>
+  <!-- {{ model }} -->
+  <Settings :schema="schema" :settings="settings"></Settings>
 </template>
 
 <script>
@@ -14,14 +14,14 @@ export default {
   emits: ["update"],
   data() {
     return {
-      model: this.$store.getters["settings/panel"],
+      settings: this.$store.getters["settings/panel"],
       panels: [],
       schema: {},
     };
   },
   computed: {},
   watch: {
-    model: {
+    settings: {
       handler: function (newVal) {
         this.$store.commit("settings/panel", newVal);
         this.$emit("update");
@@ -54,6 +54,12 @@ export default {
           },
           type: Boolean,
           key: "notificationVisibility",
+        },
+        {
+          label: this.$t("settings.panel_font_size"),
+          type: Number,
+          key: "fontSize",
+          ext: { mode: "decimal" },
         },
       ];
 

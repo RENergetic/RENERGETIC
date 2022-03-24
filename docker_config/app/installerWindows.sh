@@ -184,7 +184,7 @@ then
     if [[ $compileapps = 'true' ]]
     then
         # COMPILE VUE FILES TO PRODUCTION
-        cd "${current}\\..\\..\\front\\renergetic"
+        cd "${current}\\..\\..\\front\\renergetic_ui"
         cp -f "${current}\\front\\.env" ".env"
         npm install
         npm run build --prod

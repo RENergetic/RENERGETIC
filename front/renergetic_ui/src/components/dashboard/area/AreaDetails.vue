@@ -2,22 +2,13 @@
   <Card>
     <template v-if="mArea != null" #title>
       <div class="flex">
-        <div class="flex flex-grow-1">{{ mArea.label }}</div>
         <div class="flex flex-none">
           <i v-tooltip="$t('view.measurements')" class="pi pi-chart-line" @click="viewMeasurements()" />
         </div>
-        <!-- TODO: new icon for manage_sensors -->
         <div class="flex flex-none">
-          <i
-            v-if="edit"
-            v-tooltip="$t('view.manage_sensors')"
-            class="pi pi-plus"
-            @click="() => (manageSensorsDialog = !manageSensorsDialog)"
-          />
+          <i v-if="edit" v-tooltip="$t('view.delete_area')" class="pi pi-times" @click="deleteArea" />
         </div>
-        <div class="flex flex-none">
-          <i v-if="edit" v-tooltip="$t('view.delete_area')" class="pi pi-times" />
-        </div>
+        <div class="flex flex-grow-1">{{ mArea.label }}</div>
       </div>
     </template>
     <template v-else #title>
@@ -36,12 +27,9 @@
       <div id="asset-select" class="flex">
         <div v-if="mArea.asset" class="flex flex-grow-1">
           {{ mArea.asset.label }}
-          <i
-            v-if="mArea.asset"
-            v-tooltip="$t('view.asset')"
-            class="pi pi-arrow-circle-right"
-            @click="assetDialog = true"
-          />
+          <span v-if="mArea.asset != null">
+            <i v-tooltip="$t('view.show')" class="pi pi-arrow-circle-right" @click="showAsset" />
+          </span>
         </div>
         <div v-else class="flex flex-grow-1">
           <span v-if="edit">
@@ -50,7 +38,7 @@
           <span v-else class="disabled"> {{ $t("view.no_asset") }} </span>
         </div>
         <div class="flex flex-none">
-          <i v-if="edit" v-tooltip="$t('view.select_asset')" class="pi pi-pencil" @click="selectAsset" />
+          <i v-if="edit" v-tooltip="$t('view.select_asset')" class="pi pi-pencil" @click="selectAsset()" />
         </div>
       </div>
       <!-- DASHBOARD  -->
@@ -70,7 +58,12 @@
           </span>
           <span v-else class="disabled"> {{ $t("view.no_dashboard") }} </span>
         </div>
+
+        <div class="flex flex-none">
+          <i v-if="edit" v-tooltip="$t('view.select_dashboard')" class="pi pi-pencil" @click="selectDashboard" />
+        </div>
       </div>
+
       <!-- HEATMAP  -->
       <div id="heatmap-select" class="flex">
         <div v-if="mArea.heatmap" class="flex flex-grow-1">
@@ -105,40 +98,27 @@
     >
       <MeasurementChart v-if="mArea != null" :objects="[mArea.id]"></MeasurementChart>
     </Dialog>
-    <Dialog
-      v-model:visible="manageSensorsDialog"
-      :style="{ width: '75vw' }"
-      :maximizable="true"
-      :modal="true"
-      :dismissable-mask="true"
-    >
-      <ManageSensors></ManageSensors>
-    </Dialog>
 
     <HeatMapSelect ref="heatmapSelectDialog" :current="mArea.dashboard" @change="updateHeatMap"></HeatMapSelect>
-    <DashboardSelect ref="dashboardDialog"></DashboardSelect>
-    <AssetSelect ref="dashboardDialog"></AssetSelect>
+    <DashboardSelect ref="dashboardDialog" @change="onDashboardUpdate"></DashboardSelect>
+    <AssetSelect ref="assetSelectDialog" @change="onAssetUpdate"></AssetSelect>
+    <AssetView ref="assetViewDialog"></AssetView>
   </div>
 </template>
 <script>
-import Card from "primevue/card";
 import MeasurementChart from "../measurements/MeasurementChart.vue";
-import ManageSensors from "../measurements/ManageSensors.vue";
 import AssetSelect from "../../management/infrastructure/AssetSelect.vue";
 import HeatMapSelect from "./HeatMapSelect.vue";
 import DashboardSelect from "../DashboardSelect.vue";
-
-import Dialog from "primevue/dialog";
+import AssetView from "@/components/management/infrastructure/AssetView.vue";
 export default {
   name: "AreaDetails",
   components: {
-    Card,
-    Dialog,
     MeasurementChart,
-    ManageSensors,
     HeatMapSelect,
     DashboardSelect,
     AssetSelect,
+    AssetView,
   },
   props: {
     edit: {
@@ -183,21 +163,34 @@ export default {
     selectDashboard() {
       this.$refs.dashboardDialog.open();
     },
-    selectAsset() {
-      this.$refs.assetSelect.open();
+    async selectAsset() {
+      if (this.mArea.asset != null) {
+        await this.$ren.managementApi
+          .getAsset(this.mArea.asset.id)
+          .then((asset) => this.$refs.assetSelectDialog.open(asset));
+      } else this.$refs.assetSelectDialog.open();
+    },
+    async showAsset() {
+      if (this.mArea.asset != null) {
+        await this.$ren.managementApi
+          .getAsset(this.mArea.asset.id)
+          .then((asset) => this.$refs.assetViewDialog.open(asset));
+      }
     },
 
+    onAssetUpdate(asset) {
+      this.mArea.assetId = asset.id;
+      this.mArea.asset = asset;
+    },
     viewMeasurements() {
       this.measurementDialog = true;
     },
 
-    updateDashboard(dashboard) {
+    onDashboardUpdate(dashboard) {
       this.mArea.dashboard = dashboard;
-      // todo: save to api
     },
     updateHeatMap(heatmap) {
       this.mArea.heatmap = heatmap;
-      // todo: save to api
     },
     deleteArea() {
       this.$confirm.require({

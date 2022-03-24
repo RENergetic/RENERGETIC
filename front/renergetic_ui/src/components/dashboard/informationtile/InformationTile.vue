@@ -1,9 +1,10 @@
 <template>
   <div :class="'grid-stack-item ren'" v-bind="gridStackAttributes">
-    <div :class="'grid-stack-item-content' + state" style="padding: 0">
+    <div :class="'grid-stack-item-content ' + state" style="padding: 0">
       <!-- <template v-if="tile != null && tile.title != null" #title> {{ tile.title }} </template> -->
       <!-- <template v-if="tile != null" #content> -->
       <!-- state: {{ state }}  -->
+
       <div style="position: absolute; left: 0.3rem; top: 0.3rem">
         <Button
           v-if="edit"
@@ -11,7 +12,7 @@
           :class="'p-button-rounded p-button-text edit-button'"
           aria-haspopup="true"
           icon="pi pi-pencil"
-          @click="$emit('edit', tile)"
+          @click="$emit('edit', slotProps)"
         />
         <Button
           v-if="notificationVisible"
@@ -19,7 +20,7 @@
           :class="'p-button-rounded p-button-text bell-button '"
           aria-haspopup="true"
           icon="pi pi-bell"
-          @click="$emit('notification', tile)"
+          @click="$emit('notification', slotProps)"
         />
       </div>
       <div class="card-container">
@@ -27,10 +28,22 @@
 
         <KnobTile v-if="tile.type == 'knob'" class="block" :tile="tile" :pdata="pdata.data"></KnobTile>
 
-        <DoughnutTile v-else-if="tile.type == 'doughnut'" class="block" :tile="tile" :pdata="pdata.data"></DoughnutTile>
+        <DoughnutTile
+          v-else-if="tile.type == 'doughnut'"
+          class="block"
+          :tile="tile"
+          :pdata="pdata.data"
+          :legend="true"
+        ></DoughnutTile>
 
         <!-- tile list-->
-        <InformationListTile v-else class="block" :tile="tile" :pdata="pdata.data"></InformationListTile>
+        <InformationListTile
+          v-else
+          class="block"
+          :tile="tile"
+          :pdata="pdata.data"
+          :font-size="fontSize"
+        ></InformationListTile>
         <!-- </template> -->
       </div>
     </div>
@@ -46,10 +59,14 @@ export default {
   components: { InformationListTile, KnobTile, DoughnutTile },
   props: {
     edit: { type: Boolean, default: false },
-    tile: {
+    slotProps: {
       type: Object,
       default: () => ({}),
     },
+    // index: {
+    //   type: Number,
+    //   default: null,
+    // },
     pdata: {
       type: Object,
       default: () => ({}),
@@ -64,20 +81,30 @@ export default {
   //   return {};
   // },
   computed: {
+    fontSize: function () {
+      let size = this.settings != null && this.settings.fontSize != null ? this.settings.fontSize : 2.0;
+      return `${size}rem`;
+    },
+    tile: function () {
+      return this.slotProps.tile;
+    },
     notificationVisible: function () {
       //default visible
       return !(this.settings != null && !this.settings.notificationVisibility);
     },
     state: function () {
+      // return state class
       // let state = this.tile == null || this.tile.state == null ? "unknown" : this.tile.state;
       let state = this.pdata && this.pdata.state ? this.pdata.state[this.tile.id] : "unknown";
-      return ` state ${state.toLowerCase()}`;
+      if (state) return ` state ${state.toLowerCase()}`;
+      //state not provided to the exists tile (e.g. tile not saved yet in the backend)
+      return ` state unknown`;
     },
     col: function () {
       return this.tile == null || this.tile.col == null ? 2 : this.tile.col;
     },
     layout: function () {
-      console.info(this.tile.layout);
+      // console.info(this.tile.layout);
       return this.tile != null && this.tile.layout != null ? this.tile.layout : (() => ({}))();
     },
     gridStackAttributes() {

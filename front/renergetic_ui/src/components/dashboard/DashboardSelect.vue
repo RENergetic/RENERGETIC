@@ -52,7 +52,7 @@ export default {
       }
     },
     async open() {
-      await this.$ren.dashboardApi.list().then((dashboardList) => {
+      await this.$ren.utils.reloadDashboard().then((dashboardList) => {
         this.dashboardDialog = true;
         if (this.current) {
           if (dashboardList.find((it) => it.id == this.current.id) == null) {

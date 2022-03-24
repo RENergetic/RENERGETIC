@@ -3,7 +3,7 @@
     <!--description -->
     <div class="field grid">
       <label for="usernameInput" class="col-fixed">
-        {{ $t("form.username") }}
+        {{ $t("model.user.username") }}
       </label>
       <div class="col">
         <InputText id="usernameInput" v-model="username" />
@@ -12,7 +12,7 @@
 
     <div class="field grid">
       <label for="passwordInput" class="col-fixed">
-        {{ $t("form.password") }}
+        {{ $t("model.user.password") }}
       </label>
       <div class="col">
         <Password id="passwordInput" v-model="password" :feedback="false" toggle-mask />

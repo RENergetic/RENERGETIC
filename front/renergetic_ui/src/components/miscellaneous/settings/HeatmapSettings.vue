@@ -1,6 +1,5 @@
 <template>
-  <!-- {{ model }} -->
-  <Settings :schema="schema" :model="model"></Settings>
+  <Settings :schema="schema" :settings="settings"></Settings>
 </template>
 
 <script>
@@ -14,14 +13,14 @@ export default {
   emits: ["update"],
   data() {
     return {
-      model: this.$store.getters["settings/heatmap"],
+      settings: this.$store.getters["settings/heatmap"],
       panels: [],
       schema: {},
     };
   },
   computed: {},
   watch: {
-    model: {
+    settings: {
       handler: function (newVal) {
         this.$store.commit("settings/heatmap", newVal);
         this.$emit("update");

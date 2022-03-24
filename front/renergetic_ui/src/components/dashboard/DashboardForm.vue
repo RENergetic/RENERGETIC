@@ -81,7 +81,6 @@ export default {
     cancel() {
       this.$emit("cancel");
     },
-
     async submit() {
       this.$emit("save", this.mDashboard);
     },

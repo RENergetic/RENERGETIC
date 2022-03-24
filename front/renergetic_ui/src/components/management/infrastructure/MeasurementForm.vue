@@ -33,14 +33,14 @@ export default {
   name: "MeasurementForm",
   components: { InfoIcon },
   props: {
-    model: {
+    modelValue: {
       type: Object,
       default: () => ({}),
     },
   },
   emits: ["update:modelValue", "cancel"],
   data() {
-    return { mModel: this.model };
+    return { mModel: this.modelValue };
   },
   computed: {},
   watch: {},
@@ -49,7 +49,7 @@ export default {
       this.$emit("update:modelValue", this.mModel);
     },
     cancel() {
-      this.$emit("cancel", this.model);
+      this.$emit("cancel", this.mModel);
     },
   },
 };

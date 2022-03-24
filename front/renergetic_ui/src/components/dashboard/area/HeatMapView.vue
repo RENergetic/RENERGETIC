@@ -67,7 +67,7 @@
       <Accordion v-if="settings.notificationVisibility && selectedAreas" class="tile" :active-index="0">
         <AccordionTab>
           <template #header> {{ $t("model.heatmap.notifications") }}</template>
-          <notification-view :objects="selectedAreas"></notification-view>
+          <notification-list :object-id="heatmap.id" :context="context"></notification-list>
         </AccordionTab>
       </Accordion>
       <Accordion v-if="settings.measurementsVisibility && selectedAreas" class="tile" :active-index="0">
@@ -89,37 +89,27 @@
   </Dialog>
 </template>
 <script>
-import Tree from "primevue/tree";
-import DotMenu from "../../miscellaneous/DotMenu.vue";
+import DotMenu from "@/components/miscellaneous/DotMenu.vue";
 import AreaDetails from "./AreaDetails.vue";
-import RecommendationView from "../../management/RecommendationView.vue";
-import Listbox from "primevue/listbox";
-import Accordion from "primevue/accordion";
-import AccordionTab from "primevue/accordiontab";
-import Card from "primevue/card";
+import RecommendationView from "@/components/management/RecommendationView.vue";
 import Konva from "konva";
-import NotificationView from "./NotificationList.vue";
-import { Colors } from "../../../plugins/model/Enums";
+import NotificationList from "../../management/notification/NotificationList.vue";
+import { Colors, NotificationContext } from "../../../plugins/model/Enums";
 import HeatMapSettings from "../../miscellaneous/settings/HeatmapSettings.vue";
 import MeasurementChart from "../measurements/MeasurementChart.vue";
 import MeasurementsView from "../measurements/MeasurementsView.vue";
 //todo: config
 const TRANSPARENCY = "77";
-const sceneWidth = 1200;
-const sceneHeight = 600;
+const sceneWidth = 0.7 * window.innerWidth;
+const sceneHeight = (sceneWidth * 9) / 16;
 export default {
   name: "HeatMapView",
   components: {
-    Card,
-    Listbox,
     AreaDetails,
-    Accordion,
-    AccordionTab,
-    Tree,
     HeatMapSettings,
     RecommendationView,
     DotMenu,
-    NotificationView,
+    NotificationList,
     MeasurementChart,
     MeasurementsView,
   },
@@ -151,6 +141,7 @@ export default {
       measurmenentState: true,
       settingsDialog: false,
       settings: this.$store.getters["settings/heatmap"],
+      context: NotificationContext.AREA,
     };
   },
   watch: {
@@ -212,7 +203,7 @@ export default {
           this.toggleArea(id, false);
         });
         let selectedAreas = {};
-        selectedAreas[area.id] = 1;
+        selectedAreas[area.id] = area.label;
         this.selectedAreas = selectedAreas;
         let newId = area.id;
         this.toggleArea(newId, true);
@@ -271,13 +262,13 @@ export default {
       let areaId = area.id;
       item.on("click", () => {
         this.selectedArea = this.heatmap.areas[idx];
-        if (this.selectedAreas[areaId] == 1) {
+        if (this.selectedAreas[areaId]) {
           if (this.selectedAreas.length == 1) {
             this.selectedAreas = {};
           } else delete this.selectedAreas[areaId];
           this.toggleArea(area.id, false);
         } else {
-          this.selectedAreas[areaId] = 1;
+          this.selectedAreas[areaId] = area.label;
           this.toggleArea(area.id, true);
         }
 
@@ -300,7 +291,7 @@ export default {
       return {
         sceneFunc: function (context, shape) {
           context.beginPath();
-          console.info(area);
+          // console.info(area);
           area.roi.forEach((pnt) => {
             context.lineTo(pnt[0], pnt[1]);
           });
@@ -326,8 +317,9 @@ export default {
       if (bgImage != null) {
         var scale = sceneWidth / bgImage.width;
         this.scale = scale;
-        stage.width(bgImage.width);
-        stage.height(bgImage.height);
+        console.info(scale);
+        stage.width(bgImage.width * scale);
+        stage.height(bgImage.height * scale);
         stage.scale({ x: scale, y: scale });
       }
     },
@@ -338,6 +330,15 @@ export default {
           icon: "pi pi-fw pi-eye",
           command: () => {
             this.settingsDialog = !this.settingsDialog;
+          },
+        },
+
+        {
+          label: this.$t("menu.edit"),
+          icon: "pi pi-fw pi-pencil",
+          command: () => {
+            let to = `/dashboard/heatmap/edit/${this.heatmap.id}`;
+            this.$router.push(to);
           },
         },
       ];

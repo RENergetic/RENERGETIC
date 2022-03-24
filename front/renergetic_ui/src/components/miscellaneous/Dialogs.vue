@@ -21,7 +21,7 @@
 
 <script>
 import Dialog from "primevue/dialog";
-import NotificationList from "../dashboard/area/NotificationList.vue";
+import NotificationList from "../management/notification/NotificationList.vue";
 import DashboardForm from "../../components/dashboard/DashboardForm.vue";
 export default {
   name: "Dialogs",
@@ -82,7 +82,7 @@ export default {
     },
   },
   methods: {
-    async onDashboardCreate(dashboard) {
+    async onSave(dashboard) {
       await this.$ren.dashboardApi.add(dashboard).then((dashboardReq) => {
         this.$store.commit("view/dashboardsAdd", dashboardReq);
         this.$emit("UpdateMenu", null);

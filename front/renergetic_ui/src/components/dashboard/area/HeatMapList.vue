@@ -13,24 +13,12 @@
               </template>
             </Column>
           </DataTable>
-          <!-- 
-          <Listbox v-model="selectedArea" :options="heatMapList" option-label="label">
-            <template #option="slotProps">
-              <div class="flex">
-                <div>{{ slotProps.option.label }}</div>
-                <i class="pi pi-chevron-circle-right" style="fontsize: 2rem" @click="view(slotProps.option)" />
-              </div>
-            </template>
-          </Listbox> -->
         </template>
       </Card>
     </div>
   </div>
 </template>
 <script>
-// import Listbox from "primevue/listbox";
-// import { MapArea } from "../../plugins/model/Area";
-
 import Card from "primevue/card";
 export default {
   name: "HeatMapList",

@@ -7,32 +7,37 @@
       :maximizable="true"
       :modal="true"
       :dismissable-mask="true"
+      @hide="reload"
     >
-      <HomeSettings @update="reloadSettings()"></HomeSettings>
+      <!--  @update="onSettingsUpdate()" -->
+      <HomeSettings></HomeSettings>
     </Dialog>
 
     <div class="home-grid-stack grid-stack">
-      <div v-if="settings.demandVisibility" :class="'grid-stack-item ren'" v-bind="panelTile">
+      <div v-if="settings.demandVisibility" :class="'grid-stack-item ren'" v-bind="getLayout('demandTile')">
         <DemandList :class="'grid-stack-item-content'" />
       </div>
-      <div v-if="settings.feedbackVisibility" :class="'grid-stack-item ren'" v-bind="feedbackTile">
+      <div v-if="settings.feedbackVisibility" :class="'grid-stack-item ren'" v-bind="getLayout('feedbackTile')">
         <Card :class="'grid-stack-item-content'">
           <Feedback></Feedback>
         </Card>
       </div>
-
-      <div v-if="settings.notificationVisibility" :class="'grid-stack-item ren'" v-bind="notificationTile">
-        <Card :class="'grid-stack-item-content'">
-          <NotificationList></NotificationList>
-        </Card>
+      <div v-if="settings.notificationVisibility" :class="'grid-stack-item ren'" v-bind="getLayout('notificationTile')">
+        <NotificationList :class="'grid-stack-item-content'"></NotificationList>
       </div>
-      <div v-if="settings.selectedPanel" :class="'grid-stack-item ren'" v-bind="informationTile">
-        <div :class="'grid-stack-item-content'">
+      <div
+        v-if="settings.selectedPanel"
+        :class="'grid-stack-item ren'"
+        style="background: transparent"
+        v-bind="getLayout('panelTile')"
+      >
+        <div class="grid-stack-item-content" sty>
           <InformationPanel
-            v-if="loaded"
+            v-if="loaded && panel != null"
             ref="panel"
-            :panel="settings.selectedPanel"
+            :panel="panel"
             :edit-mode="false"
+            style="background: transparent"
           ></InformationPanel>
         </div>
       </div>
@@ -43,12 +48,11 @@
 import DotMenu from "../components/miscellaneous/DotMenu.vue";
 import HomeSettings from "../components/miscellaneous/settings/HomeSettings.vue";
 import Feedback from "../components/user/Feedback.vue";
-import NotificationList from "../components/dashboard/area/NotificationList.vue";
+import NotificationList from "../components/management/notification/NotificationList.vue";
 import InformationPanel from "../components/dashboard/InformationPanel.vue";
 import DemandList from "../components/user/demand/DemandList.vue";
 
 import { GridStack } from "gridstack";
-// THEN to get HTML5 drag&drop
 import "gridstack/dist/h5/gridstack-dd-native";
 import "gridstack/dist/gridstack.min.css";
 
@@ -66,45 +70,14 @@ export default {
     return {
       demand: { msg: "increase bla blah blah", icon: "battery", up: true, description: "description" },
       loaded: false,
-      panelTile: {
-        id: "panelTile",
-        "gs-id": "panelTile",
-        // "gs-x": 0,
-        // "gs-y": 0,
-        "gs-w": 4,
-        "gs-h": 4,
-      },
-      notificationTile: {
-        id: "notificationTile",
-        "gs-id": "notificationTile",
-        // "gs-x": this.layout.x,
-        // "gs-y": this.layout.y,
-        "gs-w": 4,
-        "gs-h": 4,
-      },
-      feedbackTile: {
-        id: "feedbackTile",
-        "gs-id": "feedbackTile",
-        // "gs-x": this.layout.x,
-        // "gs-y": this.layout.y,
-        "gs-w": 4,
-        "gs-h": 4,
-      },
-      informationTile: {
-        id: "informationTile",
-        "gs-id": "informationTile",
-        "gs-w": 12,
-        "gs-h": 3,
-      },
       grid: null,
       panel: null,
       locked: true,
-      editTile: null,
-      editDialog: false,
       notifiationDialog: false,
-      manageSensorsDialog: false,
       settingsDialog: false,
+      settingsChange: false,
       settings: this.$store.getters["settings/home"],
+      layout: this.$store.getters["settings/homeLayout"],
     };
   },
   computed: {
@@ -124,7 +97,6 @@ export default {
         command: () => this.saveGrid(),
       };
     },
-
     settingsButton: function () {
       //TODO: set icon
       return {
@@ -133,7 +105,6 @@ export default {
         command: () => (this.settingsDialog = !this.settingsDialog),
       };
     },
-
     menuModel() {
       let model = [];
       if (!this.locked) model.push(this.saveButton);
@@ -142,27 +113,41 @@ export default {
       return model;
     },
   },
-
   watch: {},
   async created() {
-    // todo: get id from session storage
     this.loaded = false;
-    let id = "1";
-    console.info(this.$ren.dashboardApi);
-    this.$ren.dashboardApi.getInformationPanel(id).then((panel) => {
-      this.panel = panel;
-    });
-    //todo: catch
+    this.getPanel();
   },
   async mounted() {
     this.setGrid();
+    this.getPanel();
   },
-  updated() {
-    this.setGrid();
-  },
+  updated() {},
   methods: {
-    reloadSettings() {
-      this.settings = this.$store.getters["settings/home"];
+    getLayout(tileId) {
+      // console.info(this.tile.layout);
+      var layout = this.layout != null ? this.layout[tileId] : null;
+      return layout != null
+        ? {
+            id: tileId,
+            "gs-id": tileId,
+            "gs-x": layout.x,
+            "gs-y": layout.y,
+            "gs-w": layout.w,
+            "gs-h": layout.h,
+          }
+        : {
+            id: tileId,
+            "gs-id": tileId,
+          };
+    },
+    async getPanel() {
+      if (this.settings.selectedPanel != null) {
+        this.panel = await this.$ren.dashboardApi.getInformationPanel(this.settings.selectedPanel);
+      } else this.panel = null;
+    },
+    reload() {
+      this.setGrid();
     },
     setGrid() {
       this.loaded = false;
@@ -177,45 +162,23 @@ export default {
       window.homeGrid = this.grid;
       this.loaded = true;
     },
-    gridWidth(tile) {
-      return tile.col == null ? 2 : tile.col;
-    },
     async toggleLock() {
       this.locked = !this.locked;
+      this.setGrid();
     },
-    addTile() {
-      //TODO: get unique id?
-      this.panel.tiles.push({
-        // layout: { x: 0, y: 0, h: 3, w: 3 },
-        id: this.$ren.utils.uuid(),
-        title: null,
-        items: [],
-      });
-    },
-    startEdit(tile) {
-      //todo
-      this.editTile = tile;
-      this.editDialog = true;
-      // console.info(tile);
-    },
-
     saveGrid() {
-      //TODO: save
-      let nodes = this.gridItems;
-      let tiles = this.tiles;
+      let nodes = this.grid.getGridItems();
       nodes.forEach((node) => {
         let gridstackNode = node.gridstackNode;
-        const tile = tiles.find((t) => t.id === gridstackNode.id);
-        if (tile) {
-          tile.layout = {
-            x: gridstackNode.x,
-            y: gridstackNode.y,
-            w: gridstackNode.w,
-            h: gridstackNode.h,
-          };
-        }
+        this.layout[gridstackNode.id] = {
+          x: gridstackNode.x,
+          y: gridstackNode.y,
+          w: gridstackNode.w,
+          h: gridstackNode.h,
+        };
       });
-      this.tiles = tiles;
+      this.$ren.utils.saveSettings("settings/homeLayout", this.layout);
+      this.toggleLock();
     },
     viewNotification() {
       //TODO: load here notifications for tile
@@ -227,7 +190,7 @@ export default {
 
 <style lang="scss">
 .grid-stack-item {
-  margin: 10px;
+  margin: 0;
 }
 .grid-stack-item-content {
   display: flex;
