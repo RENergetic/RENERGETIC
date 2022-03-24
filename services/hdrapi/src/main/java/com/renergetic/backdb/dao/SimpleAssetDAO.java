@@ -30,8 +30,10 @@ public class SimpleAssetDAO {
 		dao.setId(asset.getId());
 		dao.setName(asset.getName());
 
-		if (asset.getType() != null)
-			dao.setType(asset.getType().getName());
+		if (asset.getType() != null) {
+			if(asset.getType().getLabel() != null) dao.setType(asset.getType().getLabel());
+			else  dao.setType(asset.getType().getName());
+		}
 		
 		dao.setLabel(asset.getLabel());
 		dao.setDescription(asset.getDescription());

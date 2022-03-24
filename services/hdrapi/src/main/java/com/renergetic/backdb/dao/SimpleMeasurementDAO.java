@@ -2,6 +2,7 @@ package com.renergetic.backdb.dao;
 
 import com.renergetic.backdb.model.Direction;
 import com.renergetic.backdb.model.Measurement;
+import com.renergetic.backdb.model.MeasurementType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class SimpleMeasurementDAO {
 	
 	private String icon;
 	
-	private String type;
+	private MeasurementType type;
 	
 	private Direction direction;
 	
@@ -32,8 +33,7 @@ public class SimpleMeasurementDAO {
 		
 		dao.setId(measurement.getId());
 		dao.setName(measurement.getName());
-		if (measurement.getType() != null)
-			dao.setType(measurement.getType().getName());
+		if(measurement.getType() != null) dao.setType(measurement.getType());
 		dao.setLabel(measurement.getLabel());
 		dao.setDescription(measurement.getDescription());
 		dao.setIcon(measurement.getIcon());
@@ -48,6 +48,7 @@ public class SimpleMeasurementDAO {
 		measurement.setId(id);
 		measurement.setName(name);
 		measurement.setLabel(label);
+		measurement.setType(type.getId());
 		measurement.setDescription(description);
 		measurement.setIcon(icon);
 		measurement.setDirection(direction);
