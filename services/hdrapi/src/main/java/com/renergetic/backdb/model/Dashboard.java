@@ -58,7 +58,7 @@ public class Dashboard {
 	@Getter
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "user_id", nullable = false, insertable = true, updatable = true)
+	@JoinColumn(name = "user_id", nullable = true, insertable = true, updatable = true)
 	@JsonProperty(required = false)
 	private User user;
 

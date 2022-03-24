@@ -125,7 +125,8 @@ public class CurrentTemperatureRepository {
      */
     public List<CurrentTemperature> operate(InfluxFunction function, String from, String to, String group, Map<String, String> tags) {
 		List<CurrentTemperature> results = new ArrayList<CurrentTemperature>();
-		String pTags = String.join(" AND ", tags.keySet().stream().map(key -> key + "=" + tags.get(key)).collect(Collectors.toList()));
+		String pTags = String.join(" AND ", tags.keySet().stream().map(key -> String.format("\"%s\"='%s'", key, tags.get(key))).collect(Collectors.toList()));
+		pTags = '(' + pTags + ')';
 		
 		if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(\\.\\d)*"))
 			from = '\''+from.replace(" ", "T")+'Z'+'\'';
@@ -147,7 +148,7 @@ public class CurrentTemperatureRepository {
 								from, 
 								!to.equals("0ms")? " AND time <= " + to : "", 
 								(tags != null && tags.size() > 0)? " AND " + pTags : "", 
-								!group.equals("0ms")? " GROUP BY time(" + group + ")" : "")
+								!group.equals("0ms")? " GROUP BY time(" + group + ") fill(linear)" : "")
 						, DATABASE);
 				
 		        QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);

@@ -16,7 +16,7 @@ public class SimpleAssetDAO {
 
 	private String name;
 
-	private Long type;
+	private String type;
 
 	private String label;
 
@@ -31,7 +31,7 @@ public class SimpleAssetDAO {
 		dao.setName(asset.getName());
 
 		if (asset.getType() != null)
-			dao.setType(asset.getType().getId());
+			dao.setType(asset.getType().getName());
 		
 		dao.setLabel(asset.getLabel());
 		dao.setDescription(asset.getDescription());
@@ -45,7 +45,6 @@ public class SimpleAssetDAO {
 		
 		asset.setId(id);
 		asset.setName(name);
-		asset.setType(type);
 		asset.setLabel(label);
 		asset.setDescription(description);
 		asset.setLocation(geo_location);

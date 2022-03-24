@@ -49,7 +49,7 @@ public class DashboardDAORequest {
 	
 	public Dashboard mapToEntity() {
 		Dashboard dashboard = new Dashboard(name, url, label);
-		dashboard.setUser(user);
+		if(user != null) dashboard.setUser(user);
 		dashboard.setId(id);
 		
 		return dashboard;

@@ -23,7 +23,7 @@ public class SimpleMeasurementDAO {
 	
 	private String icon;
 	
-	private String unit;
+	private String type;
 	
 	private Direction direction;
 	
@@ -33,7 +33,7 @@ public class SimpleMeasurementDAO {
 		dao.setId(measurement.getId());
 		dao.setName(measurement.getName());
 		if (measurement.getType() != null)
-			dao.setUnit(measurement.getType().getUnit());
+			dao.setType(measurement.getType().getName());
 		dao.setLabel(measurement.getLabel());
 		dao.setDescription(measurement.getDescription());
 		dao.setIcon(measurement.getIcon());
