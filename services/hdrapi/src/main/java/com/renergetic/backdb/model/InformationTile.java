@@ -33,6 +33,11 @@ public class InformationTile {
 
     @Getter
     @Setter
+    @Column(name = "featured", nullable = true)
+    private Boolean featured;
+
+    @Getter
+    @Setter
     @Column(name = "layout")
     private String layout;
 
@@ -41,10 +46,9 @@ public class InformationTile {
     @Column(name = "props")
     private String props;
 
-    /*@Getter
-    @Setter
+    @Getter
     @Column(name = "information_panel_id")
-    private Long informationPanelId;*/
+    private InformationPanel informationPanel;
 
     @Getter
     @Setter
@@ -66,6 +70,13 @@ public class InformationTile {
         if (id != null) {
             this.type = new InformationTileType();
             this.type.setId(id);
+        }
+    }
+
+    public void setInformationPanel(Long id) {
+        if (id != null) {
+            this.informationPanel = new InformationPanel();
+            this.informationPanel.setId(id);
         }
     }
 }

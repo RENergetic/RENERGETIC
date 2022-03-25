@@ -15,12 +15,21 @@ import java.util.List;
 public class InformationTileDAOResponse {
     @JsonProperty()
     private Long id;
+    
+    @JsonProperty(value = "panel_id")
+    private Long panelId;
 
     @JsonProperty(required = true)
-    private String title;
+    private String name;
+
+    @JsonProperty()
+    private String label;
 
     @JsonProperty
     private String type;
+
+    @JsonProperty(required = false)
+    private Boolean featured;
 
     @JsonProperty()
     private List<MeasurementDAOResponse> measurements;

@@ -24,9 +24,12 @@ public class InformationTileDAORequest {
 
     @JsonProperty()
     private Long type;
+    
+    @JsonProperty()
+    private Boolean featured;
 
-    @JsonProperty(required = true)
-    private Long information_panel_id;
+    @JsonProperty(required = true, value = "panel_id")
+    private Long panelId;
 
     @JsonProperty()
     private String layout;

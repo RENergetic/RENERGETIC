@@ -26,9 +26,10 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
         entity.setName(dto.getName());
         entity.setLabel(dto.getLabel());
         entity.setType(dto.getType());
+        entity.setFeatured(dto.getFeatured());
         entity.setLayout(dto.getLayout());
         entity.setProps(dto.getProps());
-        //entity.setInformationPanelId(dto.getInformation_panel_id());
+        entity.setInformationPanel(dto.getPanelId());
         if(dto.getMeasurements() != null)
             entity.setMeasurements(dto.getMeasurements().stream().map(MeasurementDAORequest::mapToEntity).collect(Collectors.toList()));
         return entity;
@@ -40,9 +41,12 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
             return null;
         InformationTileDAOResponse dao = new InformationTileDAOResponse();
         dao.setId(entity.getId());
-        dao.setTitle(entity.getName());
+        dao.setPanelId(entity.getInformationPanel().getId());
+        dao.setName(entity.getName());
+        dao.setLabel(entity.getLabel());
         if(entity.getType() != null)
             dao.setType(entity.getType().getName());
+        dao.setFeatured(entity.getFeatured());
         dao.setLayout(entity.getLayout());
         dao.setProps(entity.getProps());
         if(entity.getMeasurements() != null)

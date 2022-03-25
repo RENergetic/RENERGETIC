@@ -1,14 +1,10 @@
 package com.renergetic.backdb.service;
 
 import com.renergetic.backdb.dao.DemandRequestDAO;
-import com.renergetic.backdb.dao.UserDAOResponse;
-import com.renergetic.backdb.dao.UserRolesDAO;
 import com.renergetic.backdb.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.mapper.DemandRequestMapper;
 import com.renergetic.backdb.model.DemandRequest;
-import com.renergetic.backdb.model.User;
-import com.renergetic.backdb.model.UserRoles;
 import com.renergetic.backdb.repository.DemandRequestRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class DemandRequestService {
