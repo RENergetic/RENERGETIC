@@ -47,7 +47,8 @@ public class InformationTile {
     private String props;
 
     @Getter
-    @Column(name = "information_panel_id")
+    @ManyToOne
+    @JoinColumn(name = "information_panel_id")
     private InformationPanel informationPanel;
 
     @Getter
