@@ -69,7 +69,7 @@ public class InformationTileController {
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationTileDAOResponse> createInformationTile(@RequestBody InformationTileDAORequest informationTileDAORequest) {
         try {
-            return new ResponseEntity<>(informationTileService.save(informationTileDAORequest.getInformation_panel_id(), informationTileDAORequest),
+            return new ResponseEntity<>(informationTileService.save(informationTileDAORequest.getPanelId(), informationTileDAORequest),
                     HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
