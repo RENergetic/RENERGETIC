@@ -16,7 +16,7 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @Entity
-@Measurement(name = "renowability")
+@Measurement(name = "renewability")
 public class Renewability {
 	@Column(name = "time")
 	Long time;
