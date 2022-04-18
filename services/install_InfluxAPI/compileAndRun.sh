@@ -1,7 +1,7 @@
 # This script compile and run HDR-API
 current=$(pwd -W tr / \\)
-javafilehdr='backinflux-0.0.1-SNAPSHOT.jar'
-cd "${current}\\..\\backinflux"
+javafilehdr='measurementapi-0.0.1-SNAPSHOT.jar'
+cd "${current}\\..\\measurementapi"
 
 # COPY PROPERTIES
 cp "${current}\\application.properties" ".\\src\\main\\resources\\application.properties"
