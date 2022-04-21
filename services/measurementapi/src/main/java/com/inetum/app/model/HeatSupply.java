@@ -26,7 +26,7 @@ import lombok.ToString;
 public class HeatSupply {
 	@TimeColumn
 	@Column(name = "time")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
 	@JsonProperty(access = Access.READ_ONLY, required = false)
 	Instant time;
 	

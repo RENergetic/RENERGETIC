@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.inetum.app.model.InfluxFunction;
 import com.inetum.app.model.InfluxTimeUnit;
+import com.inetum.app.model.ForecastHeatConsumed;
 import com.inetum.app.model.ForecastHeatSupply;
 
 @Service
@@ -27,7 +28,6 @@ public class ForecastHeatSupplyRepository {
     private InfluxDB influxDB;
 
 	public final String DATABASE = "renergetic";
-	public final String MEASUREMENT_NAME = "heat_supply";
 
 	/**
 	 * Insert a power data to myMeasurement table
@@ -53,10 +53,10 @@ public class ForecastHeatSupplyRepository {
 		String pTags = String.join(" AND ", tags.keySet().stream().map(key -> String.format("\"%s\"='%s'", key, tags.get(key))).collect(Collectors.toList()));
 		pTags = '(' + pTags + ')';
 		
-		Query query = new Query("SELECT * FROM " + MEASUREMENT_NAME +
+		Query query = new Query("SELECT * FROM " + ForecastHeatSupply.measurement() +
 				((tags != null && tags.size() > 0)? " WHERE " + pTags : ""), DATABASE);
 		
-		System.err.println("SELECT * FROM " + MEASUREMENT_NAME +
+		System.err.println("SELECT * FROM " + ForecastHeatSupply.measurement() +
 				((tags != null && tags.size() > 0)? " WHERE " + pTags : ""));
 		
         QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
@@ -92,7 +92,7 @@ public class ForecastHeatSupplyRepository {
 			Query query = new Query(
 					String.format("SELECT * FROM %s "
 							+ "WHERE time >= %s%s%s",
-							MEASUREMENT_NAME,
+							ForecastHeatSupply.measurement(),
 							from, 
 							!to.equals("0ms")? " AND time <= " + to : "", 
 							(tags != null && tags.size() > 0)? " AND " + pTags : "")
@@ -100,7 +100,7 @@ public class ForecastHeatSupplyRepository {
 			
 			System.err.printf("SELECT * FROM %s "
 					+ "WHERE time >= %s%s%s\n",
-					MEASUREMENT_NAME,
+					ForecastHeatSupply.measurement(),
 					from, 
 					!to.equals("0ms")? " AND time <= " + to : "", 
 					(tags != null && tags.size() > 0)? " AND " + pTags : "");
@@ -148,7 +148,7 @@ public class ForecastHeatSupplyRepository {
 						String.format("SELECT %s(power) as power FROM %s "
 								+ "WHERE time >= %s%s%s%s",
 								function.name(),
-								MEASUREMENT_NAME,
+								ForecastHeatSupply.measurement(),
 								from, 
 								!to.equals("0ms")? " AND time <= " + to : "", 
 								(tags != null && tags.size() > 0)? " AND " + pTags : "", 

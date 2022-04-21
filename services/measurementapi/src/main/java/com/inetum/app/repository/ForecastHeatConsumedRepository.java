@@ -27,7 +27,6 @@ public class ForecastHeatConsumedRepository {
     private InfluxDB influxDB;
 
 	public final String DATABASE = "renergetic";
-	public final String MEASUREMENT_NAME = "heat_Consumed";
 
 	/**
 	 * Insert a power data to myMeasurement table
@@ -53,10 +52,10 @@ public class ForecastHeatConsumedRepository {
 		String pTags = String.join(" AND ", tags.keySet().stream().map(key -> String.format("\"%s\"='%s'", key, tags.get(key))).collect(Collectors.toList()));
 		pTags = '(' + pTags + ')';
 		
-		Query query = new Query("SELECT * FROM " + MEASUREMENT_NAME +
+		Query query = new Query("SELECT * FROM " + ForecastHeatConsumed.measurement() +
 				((tags != null && tags.size() > 0)? " WHERE " + pTags : ""), DATABASE);
 		
-		System.err.println("SELECT * FROM " + MEASUREMENT_NAME +
+		System.err.println("SELECT * FROM " + ForecastHeatConsumed.measurement() +
 				((tags != null && tags.size() > 0)? " WHERE " + pTags : ""));
 		
         QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
@@ -92,7 +91,7 @@ public class ForecastHeatConsumedRepository {
 			Query query = new Query(
 					String.format("SELECT * FROM %s "
 							+ "WHERE time >= %s%s%s",
-							MEASUREMENT_NAME,
+							ForecastHeatConsumed.measurement(),
 							from, 
 							!to.equals("0ms")? " AND time <= " + to : "", 
 							(tags != null && tags.size() > 0)? " AND " + pTags : "")
@@ -100,7 +99,7 @@ public class ForecastHeatConsumedRepository {
 			
 			System.err.printf("SELECT * FROM %s "
 					+ "WHERE time >= %s%s%s\n",
-					MEASUREMENT_NAME,
+					ForecastHeatConsumed.measurement(),
 					from, 
 					!to.equals("0ms")? " AND time <= " + to : "", 
 					(tags != null && tags.size() > 0)? " AND " + pTags : "");
@@ -148,7 +147,7 @@ public class ForecastHeatConsumedRepository {
 						String.format("SELECT %s(power) as power FROM %s "
 								+ "WHERE time >= %s%s%s%s",
 								function.name(),
-								MEASUREMENT_NAME,
+								ForecastHeatConsumed.measurement(),
 								from, 
 								!to.equals("0ms")? " AND time <= " + to : "", 
 								(tags != null && tags.size() > 0)? " AND " + pTags : "", 

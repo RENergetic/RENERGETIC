@@ -41,5 +41,5 @@ public class ForecastHeatConsumed {
 	@JsonProperty(access = Access.READ_ONLY, required = false, value = "asset_name")
 	String assetName;
 	
-	public static String measurement() { return "heat_consumed"; }
+	public static String measurement() { return "forecast_consumed"; }
 }
