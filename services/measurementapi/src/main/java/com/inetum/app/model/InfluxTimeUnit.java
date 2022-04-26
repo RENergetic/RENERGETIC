@@ -55,6 +55,22 @@ public enum InfluxTimeUnit {
 		return "0" + to.name();
 	}
 	
+	public static Long convertNumber(String time, InfluxTimeUnit to) {
+		double value;
+		
+		if (time.matches("\\d+(\\.*\\d+)?\\D"))
+			value = Double.parseDouble(time.substring(0, time.length() - 1));
+		else if (time.matches("\\d+(\\.*\\d+)?\\D{2}"))
+			value = Double.parseDouble(time.substring(0, time.length() - 2));
+		else return 0L;
+
+		for (InfluxTimeUnit elem : InfluxTimeUnit.values())
+			if (time.contains(elem.name()))
+				return Math.round(value * to.VALUE / elem.VALUE);
+		
+		return 0L;
+	}
+	
 	@Override
 	public String toString() {
 		return this.name();
