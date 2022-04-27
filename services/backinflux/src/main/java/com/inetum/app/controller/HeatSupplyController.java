@@ -65,7 +65,7 @@ public class HeatSupplyController {
 		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
-	@PostMapping("/")
+	@PostMapping()
 	public ResponseEntity<?> addMeasurement(@RequestBody HeatSupply power, @RequestParam Optional<Map<String, String>> tags){
 		repository.insert(power, tags.orElse(null));
 		

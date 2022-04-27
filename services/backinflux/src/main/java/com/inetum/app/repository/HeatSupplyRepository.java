@@ -10,6 +10,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBException;
 import org.influxdb.InfluxDBMapperException;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Point.Builder;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 import org.influxdb.impl.InfluxDBResultMapper;
@@ -33,12 +34,13 @@ public class HeatSupplyRepository {
 	 * @param power Power to set
 	 */
     public void insert(HeatSupply power, Map<String, String> tags) {
-        Point registry = Point.measurement(HeatSupply.measurement())
+        Builder registry = Point.measurement(HeatSupply.measurement())
         		.addFieldsFromPOJO(power)
-                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .build();
-
-        influxDB.write(DATABASE, "autogen", registry);
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        if (tags != null && !tags.isEmpty())
+        	registry.tag(tags);
+        
+        influxDB.write(DATABASE, "autogen", registry.build());
     }
     
     /**

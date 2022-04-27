@@ -65,7 +65,7 @@ public class RenewabilityController {
 		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
-	@PostMapping("/")
+	@PostMapping()
 	public ResponseEntity<?> addMeasurement(@RequestBody Renewability renewability, @RequestParam Optional<Map<String, String>> tags){
 		repository.insert(renewability, tags.orElse(null));
 		

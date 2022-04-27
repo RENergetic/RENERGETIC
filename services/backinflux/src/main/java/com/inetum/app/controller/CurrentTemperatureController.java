@@ -65,7 +65,7 @@ public class CurrentTemperatureController {
 		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
-	@PostMapping("/")
+	@PostMapping()
 	public ResponseEntity<?> addMeasurement(@RequestBody CurrentTemperature power, @RequestParam Optional<Map<String, String>> tags){
 		repository.insert(power, tags.orElse(null));
 		

@@ -13,14 +13,10 @@ import org.influxdb.dto.Point;
 import org.influxdb.dto.Point.Builder;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
-import org.influxdb.impl.InfluxDBResultMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.inetum.app.model.InfluxFunction;
-import com.inetum.app.model.InfluxTimeUnit;
 import com.inetum.app.model.GeneralMeasurement;
-import com.inetum.app.model.HeatSupply;
 
 @Repository
 public class GeneralRepository {

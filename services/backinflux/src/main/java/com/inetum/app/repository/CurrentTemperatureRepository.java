@@ -10,6 +10,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBException;
 import org.influxdb.InfluxDBMapperException;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Point.Builder;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 import org.influxdb.impl.InfluxDBResultMapper;
@@ -32,12 +33,13 @@ public class CurrentTemperatureRepository {
 	 * @param power Power to set
 	 */
     public void insert(CurrentTemperature power, Map<String, String> tags) {
-        Point registry = Point.measurement(CurrentTemperature.measurement())
+    	Builder registry = Point.measurement(CurrentTemperature.measurement())
         		.addFieldsFromPOJO(power)
-                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .build();
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        if (tags != null && !tags.isEmpty())
+        	registry.tag(tags);    	
 
-        influxDB.write(DATABASE, "autogen", registry);
+        influxDB.write(DATABASE, "autogen", registry.build());
     }
     
     /**
