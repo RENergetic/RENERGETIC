@@ -6,7 +6,7 @@ java='services\backdb'
 javafile='backdb-0.0.1-SNAPSHOT.jar'
 javahdr='services\hdrapi'
 javafilehdr='hdrapi-0.0.1-SNAPSHOT.jar'
-vue='front\renergetic'
+vue='front\renergetic_ui'
 
 installdb='true'
 installapi='true'
