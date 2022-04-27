@@ -8,10 +8,10 @@ javahdr='services\hdrapi'
 javafilehdr='hdrapi-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic_ui'
 
-installdb='true'
+installdb='false'
 installapi='true'
 installapihdr='true'  # API HDR
-installfront='true'
+installfront='false'
 installkeycloak='true'
 
 java1='services\backbuildings'
