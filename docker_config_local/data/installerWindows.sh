@@ -7,7 +7,7 @@ installapi='true'
 installback='false'
 installkafka='false'
 installgrafana='true'
-javafile='backinflux-0.0.1-SNAPSHOT.jar'
+javafile='measurementapi-0.0.1-SNAPSHOT.jar'
 
 while getopts n: flag
 do

@@ -17,5 +17,5 @@ spec:
           image: backinflux:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 8084
+            - containerPort: 8082
       restartPolicy: Always
