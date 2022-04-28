@@ -17,6 +17,7 @@ import com.renergetic.backdb.exception.NotFoundException;
 import com.renergetic.backdb.model.Heatmap;
 import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.repository.HeatmapRepository;
+import com.renergetic.backdb.repository.UuidRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
@@ -28,12 +29,14 @@ public class HeatmapService {
 	HeatmapRepository heatmapRepository;
 	@Autowired
 	AreaService areaService;
+	@Autowired
+	UuidRepository uuidRepository;
 
 	// ASSET CRUD OPERATIONS
 	public HeatmapDAO save(HeatmapDAO heatmap) {
 		heatmap.setId(null);
 		Heatmap heatmapEntity = heatmap.mapToEntity();
-		heatmapEntity.setUuid(new UUID());
+		heatmapEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
 		return HeatmapDAO.create(heatmapRepository.save(heatmapEntity), null);
 	}
 	

@@ -23,6 +23,7 @@ import com.renergetic.backdb.model.Unit;
 import com.renergetic.backdb.model.details.MeasurementDetails;
 import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.repository.MeasurementTypeRepository;
+import com.renergetic.backdb.repository.UuidRepository;
 import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 
@@ -33,18 +34,18 @@ public class MeasurementService {
 	
 	@Autowired
 	MeasurementRepository measurementRepository;
-	
 	@Autowired
 	MeasurementTypeRepository measurementTypeRepository;
-	
 	@Autowired
 	MeasurementDetailsRepository measurementDetailsRepository;
+	@Autowired
+	UuidRepository uuidRepository;
 
 	// ASSET CRUD OPERATIONS
 	public MeasurementDAOResponse save(MeasurementDAORequest measurement) {
 		measurement.setId(null);
 		Measurement measurementEntity = measurement.mapToEntity();
-		measurementEntity.setUuid(new UUID());
+		measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
 		return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null);
 	}
 	

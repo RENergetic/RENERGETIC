@@ -23,6 +23,7 @@ import com.renergetic.backdb.model.UserSettings;
 import com.renergetic.backdb.repository.UserRepository;
 import com.renergetic.backdb.repository.UserRolesRepository;
 import com.renergetic.backdb.repository.UserSettingsRepository;
+import com.renergetic.backdb.repository.UuidRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
@@ -36,12 +37,14 @@ public class UserService {
 	UserRolesRepository userRolesRepository;
 	@Autowired
 	UserSettingsRepository userSettingsRepository;
+	@Autowired
+	UuidRepository uuidRepository;
 
 	// USER CRUD OPERATIONS
 	public UserDAOResponse save(UserDAORequest user) {
 		user.setId(null);
 		User userEntity = user.mapToEntity();
-		userEntity.setUuid(new UUID());
+		userEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
 		return UserDAOResponse.create(userRepository.save(userEntity), null, null);
 	}
 

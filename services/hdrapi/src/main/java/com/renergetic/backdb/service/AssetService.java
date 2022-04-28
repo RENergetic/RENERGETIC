@@ -26,6 +26,7 @@ import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.AssetTypeRepository;
 import com.renergetic.backdb.repository.MeasurementRepository;
+import com.renergetic.backdb.repository.UuidRepository;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
 import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
@@ -45,13 +46,16 @@ public class AssetService {
 	AssetDetailsRepository assetDetailsRepository;
 	@Autowired
 	MeasurementDetailsRepository measurementDetailsRepository;
+	@Autowired
+	UuidRepository uuidRepository;
 
 	// ASSET CRUD OPERATIONS
 	public AssetDAOResponse save(AssetDAORequest asset) {
 		asset.setId(null);
 		if (assetTypeRepository.existsById(asset.getType())) {
 			Asset assetEntity = asset.mapToEntity();
-			assetEntity.setUuid(new UUID());
+			assetEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+			System.err.println(assetEntity);
 			return AssetDAOResponse.create(assetRepository.save(assetEntity), null, null);
 		}
 		else throw new InvalidArgumentException("The asset type doesn't exists");

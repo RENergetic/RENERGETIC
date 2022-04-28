@@ -19,6 +19,7 @@ import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.model.User;
 import com.renergetic.backdb.repository.DashboardRepository;
 import com.renergetic.backdb.repository.UserRepository;
+import com.renergetic.backdb.repository.UuidRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
@@ -28,15 +29,16 @@ public class DashboardService {
 	
 	@Autowired
 	DashboardRepository dashboardRepository;
-	
 	@Autowired
 	UserRepository userRepository;
+	@Autowired
+	UuidRepository uuidRepository;
 
 	// AREA CRUD OPERATIONS
 	public DashboardDAO save(DashboardDAO dashboard) {
 		dashboard.setId(null);
 		Dashboard dashboardEntity = dashboard.mapToEntity();
-		dashboardEntity.setUuid(new UUID());
+		dashboardEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
 		return DashboardDAO.create(dashboardRepository.save(dashboardEntity));
 	}
 	

@@ -19,6 +19,7 @@ import com.renergetic.backdb.model.Heatmap;
 import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.repository.AreaRepository;
 import com.renergetic.backdb.repository.HeatmapRepository;
+import com.renergetic.backdb.repository.UuidRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
@@ -28,15 +29,16 @@ public class AreaService {
 	
 	@Autowired
 	AreaRepository areaRepository;
-	
 	@Autowired
 	HeatmapRepository heatmapRepository;
+	@Autowired
+	UuidRepository uuidRepository;
 
 	// AREA CRUD OPERATIONS
 	public AreaDAO save(AreaDAO area) {
 		area.setId(null);
 		Area areaEntity = area.mapToEntity();
-		areaEntity.setUuid(new UUID());
+		areaEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
 		return AreaDAO.create(areaRepository.save(areaEntity));
 	}
 	

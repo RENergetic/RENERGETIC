@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.AssetType;
 import com.renergetic.backdb.model.Measurement;
+import com.renergetic.backdb.model.User;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -97,7 +98,7 @@ public class AssetDAOResponse {
 			asset.setParentAsset(parent.mapToEntity());
 		
 		if (owner != null) {
-			Asset entityOwner = new Asset();
+			User entityOwner = new User();
 			entityOwner.setId(owner);
 			asset.setOwner(entityOwner);
 		}

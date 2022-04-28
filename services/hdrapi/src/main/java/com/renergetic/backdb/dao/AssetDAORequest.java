@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.AssetType;
+import com.renergetic.backdb.model.User;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -70,22 +71,25 @@ public class AssetDAORequest {
 		asset.setId(id);
 		asset.setName(name);
 		
-		AssetType entityType = new AssetType();
-		entityType.setId(type);
-		asset.setType(entityType);
-		
+		if (type != null) {
+			AssetType entityType = new AssetType();
+			entityType.setId(type);
+			asset.setType(entityType);
+		}
 		asset.setLabel(label);
 		asset.setDescription(description);
 		asset.setLocation(geo_location);
 		
-		Asset entityParent = new Asset();
-		entityParent.setId(parent);
-		asset.setParentAsset(entityParent);
-		
-		Asset entityOwner = new Asset();
-		entityOwner.setId(owner);
-		asset.setOwner(entityOwner);
-		
+		if (parent != null) {
+			Asset entityParent = new Asset();
+			entityParent.setId(parent);
+			asset.setParentAsset(entityParent);
+		}
+		if (owner != null) {
+			User entityOwner = new User();
+			entityOwner.setId(owner);
+			asset.setOwner(entityOwner);
+		}
 		return asset;
 	}
 }

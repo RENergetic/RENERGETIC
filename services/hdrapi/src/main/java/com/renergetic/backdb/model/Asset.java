@@ -68,7 +68,7 @@ public class Asset {
 	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "owner_id", nullable = true, insertable = true, updatable = true)
-	private Asset owner;
+	private User owner;
 	
 	@ManyToMany(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -83,7 +83,7 @@ public class Asset {
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
 	private UUID uuid;
 
-	public Asset(String name, AssetType type, String label, String description, String location, Asset part_of_asset, Asset owner) {
+	public Asset(String name, AssetType type, String label, String description, String location, Asset part_of_asset, User owner) {
 		super();
 		this.name = name;
 		this.type = type;
