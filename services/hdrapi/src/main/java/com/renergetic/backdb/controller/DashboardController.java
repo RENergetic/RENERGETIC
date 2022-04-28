@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.validation.constraints.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.backdb.dao.DashboardDAORequest;
-import com.renergetic.backdb.model.Dashboard;
-import com.renergetic.backdb.repository.DashboardRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
+import com.renergetic.backdb.dao.DashboardDAO;
+import com.renergetic.backdb.service.DashboardService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -40,51 +36,35 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class DashboardController {
 	
 	@Autowired
-	DashboardRepository dashboardRepository;
+	DashboardService dashboardSv;
 
 //=== GET REQUESTS ====================================================================================
 			
 	@Operation(summary = "Get All Dashboards")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<Dashboard>> getAllDashboards (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-		List<Dashboard> dashboards = new ArrayList<Dashboard>();
+	public ResponseEntity<List<DashboardDAO>> getAllDashboards (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<DashboardDAO> dashboards = new ArrayList<>();
 		
-		dashboards = dashboardRepository.findAll(new OffSetPaging(offset.orElse(0L), limit.orElse(20))).toList();
+		dashboards = dashboardSv.get(null, offset.orElse(0L), limit.orElse(20));
 		
-		return new ResponseEntity<List<Dashboard>>(dashboards, HttpStatus.OK);
+		return new ResponseEntity<>(dashboards, HttpStatus.OK);
 	}
 	
-	@Operation(summary = "Get Dashboards by name")
+	@Operation(summary = "Get Dashboards related with a User id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
-		@ApiResponse(responseCode = "404", description = "No dashboards found with this name")
+		@ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
 	})
-	@GetMapping(path = "name/{name}", produces = "application/json")
-	public ResponseEntity<List<Dashboard>> getDashboardsByName (@PathVariable String name){
-		List<Dashboard> dashboards = new ArrayList<Dashboard>();
+	@GetMapping(path = "user/{user_id}", produces = "application/json")
+	public ResponseEntity<List<DashboardDAO>> getDashboardsByUser (@PathVariable Long user_id){
+		List<DashboardDAO> dashboards = new ArrayList<>();
 		
-		dashboards = dashboardRepository.findByName(name);
+		dashboards = dashboardSv.getByUser(user_id);
 		
 		dashboards = dashboards.isEmpty() ? null : dashboards;
 		
-		return new ResponseEntity<List<Dashboard>>(dashboards, dashboards != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-	}
-	
-	@Operation(summary = "Get Dashboards by URL")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
-		@ApiResponse(responseCode = "404", description = "No dashboards found in this URL")
-	})
-	@GetMapping(path = "url/{url}", produces = "application/json")
-	public ResponseEntity<List<Dashboard>> getDashboardsByURL (@PathVariable @Pattern(regexp = "https?://\\\\S+([/?].+)?", message = "URL isn't valid format") String url){
-		List<Dashboard> dashboards = new ArrayList<Dashboard>();
-		
-		dashboards = dashboardRepository.findByUrl(url);
-		
-		dashboards = dashboards.isEmpty() ? null : dashboards;
-		
-		return new ResponseEntity<List<Dashboard>>(dashboards, dashboards != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(dashboards, dashboards != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Get Dashboard by id")
@@ -94,12 +74,12 @@ public class DashboardController {
 		@ApiResponse(responseCode = "404", description = "No dashboards found with this id")
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
-	public ResponseEntity<Dashboard> getDashboardsById (@PathVariable Long id){
-		Dashboard dashboard = null;
+	public ResponseEntity<DashboardDAO> getDashboardsById (@PathVariable Long id){
+		DashboardDAO dashboard = null;
 		
-		dashboard = dashboardRepository.findById(id).orElse(null);
+		dashboard = dashboardSv.getById(id);
 		
-		return new ResponseEntity<Dashboard>(dashboard, dashboard != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(dashboard, dashboard != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Get Dashboard by id and test it", description = "Return requested dashboard and add a field (status) with the ping dashboard response")
@@ -109,10 +89,10 @@ public class DashboardController {
 		@ApiResponse(responseCode = "500", description = "Error to try ping dashboard")
 	})
 	@GetMapping(path = "test/{id}", produces = "application/json")
-	public ResponseEntity<Dashboard> getTestedDashboardsById (@PathVariable Long id){
-		Dashboard dashboard = null;
+	public ResponseEntity<DashboardDAO> getTestedDashboardsById (@PathVariable Long id){
+		DashboardDAO dashboard = null;
 		
-		dashboard = dashboardRepository.findById(id).orElse(null);
+		dashboard = dashboardSv.getById(id);
 		
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(dashboard.getUrl()).openConnection();
@@ -126,7 +106,7 @@ public class DashboardController {
 			e.printStackTrace();
 			return ResponseEntity.status(500).build();
 		}
-		return new ResponseEntity<Dashboard>(dashboard, dashboard != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(dashboard, dashboard != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //=== POST REQUESTS ===================================================================================
@@ -138,10 +118,10 @@ public class DashboardController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Dashboard> createDashboard(@RequestBody DashboardDAORequest dashboard) {
+	public ResponseEntity<DashboardDAO> createDashboard(@RequestBody DashboardDAO dashboard) {
 		try {
 			dashboard.setId(null);
-			Dashboard _dashboard = dashboardRepository.save(dashboard.mapToEntity());
+			DashboardDAO _dashboard = dashboardSv.save(dashboard);
 			
 			return new ResponseEntity<>(_dashboard, HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -159,13 +139,9 @@ public class DashboardController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Dashboard> updateDashboard(@RequestBody DashboardDAORequest dashboard, @PathVariable Long id) {
+	public ResponseEntity<DashboardDAO> updateDashboard(@RequestBody DashboardDAO dashboard, @PathVariable Long id) {
 		try {
-				if (dashboardRepository.existsById(id)) {
-					dashboard.setId(id);
-					return new ResponseEntity<>(dashboardRepository.save(dashboard.mapToEntity()), HttpStatus.OK);
-				}else return ResponseEntity.notFound().build();
-				
+			return new ResponseEntity<>(dashboardSv.save(dashboard), HttpStatus.OK);				
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -183,7 +159,7 @@ public class DashboardController {
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteDashboard(@PathVariable Long id) {
 		try {
-			dashboardRepository.deleteById(id);
+			dashboardSv.deleteById(id);
 			
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {

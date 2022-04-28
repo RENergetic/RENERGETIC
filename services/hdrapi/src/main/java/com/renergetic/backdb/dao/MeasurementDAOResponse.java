@@ -73,7 +73,8 @@ public class MeasurementDAOResponse {
 		
 		measurement.setId(id);
 		measurement.setName(name);
-		if (type != null) measurement.setType(type.getId());
+		if (type != null) 
+			measurement.setType(type);
 		measurement.setLabel(label);
 		measurement.setDescription(description);
 		measurement.setIcon(icon);

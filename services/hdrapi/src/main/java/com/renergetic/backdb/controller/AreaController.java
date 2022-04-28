@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.renergetic.backdb.dao.AreaDAO;
 import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.model.Area;
 import com.renergetic.backdb.service.AreaService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,8 +41,8 @@ public class AreaController {
 	@Operation(summary = "Get All Area")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<Area>> getAllArea (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-		List<Area> area = new ArrayList<>();
+	public ResponseEntity<List<AreaDAO>> getAllArea (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<AreaDAO> area = new ArrayList<>();
 		
 		area = areaSv.get(null, offset.orElse(0L), limit.orElse(20));
 		
@@ -56,8 +56,8 @@ public class AreaController {
 		@ApiResponse(responseCode = "404", description = "No area found with this id")
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
-	public ResponseEntity<Area> getAreaById (@PathVariable Long id){
-		Area area = null;
+	public ResponseEntity<AreaDAO> getAreaById (@PathVariable Long id){
+		AreaDAO area = null;
 		
 		area = areaSv.getById(id);
 		
@@ -73,10 +73,9 @@ public class AreaController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Area> createArea(@RequestBody Area area) {
+	public ResponseEntity<AreaDAO> createArea(@RequestBody AreaDAO area) {
 		try {
-			area.setId(null);
-			Area _area = areaSv.save(area);
+			AreaDAO _area = areaSv.save(area);
 			
 			return new ResponseEntity<>(_area, HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -94,10 +93,10 @@ public class AreaController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Area> updateArea(@RequestBody Area area, @PathVariable Long id) {
+	public ResponseEntity<AreaDAO> updateArea(@RequestBody AreaDAO area, @PathVariable Long id) {
 		try {
 			area.setId(id);
-			return new ResponseEntity<>(areaSv.save(area), HttpStatus.OK);
+			return new ResponseEntity<>(areaSv.update(area, id), HttpStatus.OK);
 		} catch (NotFoundException e) { 
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {

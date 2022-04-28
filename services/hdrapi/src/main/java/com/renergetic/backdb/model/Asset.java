@@ -30,64 +30,46 @@ import lombok.ToString;
 @Entity
 @Table(name = "asset")
 @RequiredArgsConstructor
+@Getter
+@Setter
 @ToString
 public class Asset {
 	@JsonIgnore
 	public static Map<String, AssetCategory> ALLOWED_TYPES;
 	
 	@Id
-	@Getter
-	@Setter
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Getter
-	@Setter
-	@Column(name = "uuid", nullable = true, insertable = true, updatable = true, unique = true)
-	private String uuid;
-
-	@Getter
-	@Setter
 	@Column(name = "name", nullable = false, insertable = true, updatable = true)
 	private String name;
 
-	@Getter
 	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "asset_type_id", nullable = false, insertable = true, updatable = true)
 	private AssetType type;
 
-	@Getter
-	@Setter
 	@Column(name = "label", nullable = true, insertable = true, updatable = true)
 	private String label;
 
-	@Getter
-	@Setter
 	@Column(name = "description", nullable = true, insertable = true, updatable = true)
 	private String description;
 
-	@Getter
-	@Setter
 	@Column(name = "geo_location", nullable = true, insertable = true, updatable = true)
 	private String location;
 	
 	// REFERENCES THIS TABLE TO GROUP ASSETS
-	@Getter
 	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "parent_asset_id", nullable = true, insertable = true, updatable = true)
 	private Asset parentAsset;
 	
 	// FOREIGN KEY FROM USERS TABLE
-	@Getter
 	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "owner_id", nullable = true, insertable = true, updatable = true)
 	private Asset owner;
 	
-	@Getter
-	@Setter
 	@ManyToMany(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinTable(
@@ -96,17 +78,20 @@ public class Asset {
 			inverseJoinColumns = @JoinColumn(name = "connected_asset_id"))
 	private List<Asset> assets;
 
-	public Asset(String name, Long type, String label, String description, String location, Long part_of_asset_id, Long owner_user_id) {
+	@OneToOne(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
+	private UUID uuid;
+
+	public Asset(String name, AssetType type, String label, String description, String location, Asset part_of_asset, Asset owner) {
 		super();
 		this.name = name;
-		this.setType(type);
+		this.type = type;
 		this.label = label;
 		this.description = description;
 		this.location = location;
-		this.parentAsset = new Asset();
-		this.parentAsset.setId(part_of_asset_id);
-		this.owner = new Asset();
-		this.owner.setId(owner_user_id);
+		this.parentAsset = part_of_asset;
+		this.owner = owner;
 	}
 	
 	static {
@@ -135,26 +120,4 @@ public class Asset {
 		ALLOWED_TYPES.put("district cooling", AssetCategory.infrastructure);
 		ALLOWED_TYPES.put("electricity", AssetCategory.infrastructure);
 	}
-
-	public void setType(Long id) {
-		if (id != null) {
-			this.type = new AssetType();
-			this.type.setId(id);
-		}
-	}
-
-	public void setParentAsset(Long id) {
-		if (id != null) {
-			this.parentAsset = new Asset();
-			this.parentAsset.setId(id);
-		}
-	}
-
-	public void setOwner(Long id) {
-		if (id != null) {
-			this.owner = new Asset();
-			this.owner.setId(id);
-		}
-	}
-	
 }

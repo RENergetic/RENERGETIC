@@ -4,7 +4,9 @@ import com.renergetic.backdb.dao.InformationTileDAORequest;
 import com.renergetic.backdb.dao.InformationTileDAOResponse;
 import com.renergetic.backdb.dao.MeasurementDAORequest;
 import com.renergetic.backdb.dao.MeasurementDAOResponse;
+import com.renergetic.backdb.model.InformationPanel;
 import com.renergetic.backdb.model.InformationTile;
+import com.renergetic.backdb.model.InformationTileType;
 import com.renergetic.backdb.service.MeasurementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,11 +27,19 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
         entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setLabel(dto.getLabel());
-        entity.setType(dto.getType());
+        
+        InformationTileType tileType = new InformationTileType();
+        tileType.setId(dto.getType());
+        entity.setType(tileType);
+        
         entity.setFeatured(dto.getFeatured());
         entity.setLayout(dto.getLayout());
         entity.setProps(dto.getProps());
-        entity.setInformationPanel(dto.getPanelId());
+        
+        InformationPanel infoPanel = new InformationPanel();
+        infoPanel.setId(dto.getPanelId());
+        entity.setInformationPanel(infoPanel);
+        
         if(dto.getMeasurements() != null)
             entity.setMeasurements(dto.getMeasurements().stream().map(MeasurementDAORequest::mapToEntity).collect(Collectors.toList()));
         return entity;

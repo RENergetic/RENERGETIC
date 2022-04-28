@@ -11,10 +11,12 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.renergetic.backdb.dao.AreaDAO;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.exception.NotFoundException;
 import com.renergetic.backdb.model.Area;
 import com.renergetic.backdb.model.Heatmap;
+import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.repository.AreaRepository;
 import com.renergetic.backdb.repository.HeatmapRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
@@ -31,9 +33,11 @@ public class AreaService {
 	HeatmapRepository heatmapRepository;
 
 	// AREA CRUD OPERATIONS
-	public Area save(Area area) {
+	public AreaDAO save(AreaDAO area) {
 		area.setId(null);
-		return areaRepository.save(area);
+		Area areaEntity = area.mapToEntity();
+		areaEntity.setUuid(new UUID());
+		return AreaDAO.create(areaRepository.save(areaEntity));
 	}
 	
 	public boolean deleteById(Long id) {
@@ -43,16 +47,18 @@ public class AreaService {
 		} else throw new InvalidNonExistingIdException("The area to delete doesn't exists");
 	}
 
-	public Area update(Area area, Long id) {
+	public AreaDAO update(AreaDAO area, Long id) {
 		if (areaRepository.existsById(id)) {
 			area.setId(id);
-			return areaRepository.save(area);
+			Area areaEntity = area.mapToEntity();
+			areaEntity.setUuid(new UUID());
+			return AreaDAO.create(areaRepository.save(areaEntity));
 		} else throw new InvalidNonExistingIdException("The area to update doesn't exists");
 	}
 
-	public List<Area> get(Map<String, String> filters, long offset, int limit) {
+	public List<AreaDAO> get(Map<String, String> filters, long offset, int limit) {
 		Stream<Area> stream = areaRepository.findAll(new OffSetPaging(offset, limit)).stream();
-		List<Area> areas;
+		List<AreaDAO> areas;
 		
 		if (filters != null)
 			areas = stream.filter(area -> {
@@ -65,11 +71,11 @@ public class AreaService {
 					equals = String.valueOf(area.getAsset().getId()).equals(filters.get("asset"));
 				
 				return equals;
-			}).map(area -> area)
+			}).map(area -> AreaDAO.create(area))
 					.collect(Collectors.toList());
 		else
 			areas = stream
-				.map(area -> area)
+				.map(area -> AreaDAO.create(area))
 				.collect(Collectors.toList());
 		
 		if (areas.size() > 0)
@@ -77,23 +83,23 @@ public class AreaService {
 		else throw new NotFoundException("No areas are found");
 	}
 
-	public Area getById(Long id) {
+	public AreaDAO getById(Long id) {
 		Area area = areaRepository.findById(id).orElse(null);
 		
 		if (area != null)
-			return area;
+			return AreaDAO.create(area);
 		else throw new NotFoundException("No area found related with id " + id);
 	}
 
-	public List<Area> getByHeatmap(Long id) {
+	public List<AreaDAO> getByHeatmap(Long id) {
 		Heatmap heatmap = heatmapRepository.findById(id).orElse(null);
-		List<Area> area = null;
+		List<AreaDAO> areas = null;
 		if (heatmap != null) {
-			area = Stream.concat(areaRepository.findByParent(heatmap).stream(), areaRepository.findByChild(heatmap).stream())
-					.collect(Collectors.toList());
+			areas = Stream.concat(areaRepository.findByParent(heatmap).stream(), areaRepository.findByChild(heatmap).stream())
+					.map(area -> AreaDAO.create(area)).collect(Collectors.toList());
 		}		
-		if (area != null)
-			return area;
+		if (areas != null)
+			return areas;
 		else throw new NotFoundException("No areas found related with id " + id);
 	}
 }

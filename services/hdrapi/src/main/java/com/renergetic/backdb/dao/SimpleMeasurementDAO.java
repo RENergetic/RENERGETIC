@@ -48,7 +48,7 @@ public class SimpleMeasurementDAO {
 		measurement.setId(id);
 		measurement.setName(name);
 		measurement.setLabel(label);
-		measurement.setType(type.getId());
+		measurement.setType(type);
 		measurement.setDescription(description);
 		measurement.setIcon(icon);
 		measurement.setDirection(direction);

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.backdb.model.Direction;
 import com.renergetic.backdb.model.Measurement;
+import com.renergetic.backdb.model.MeasurementType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +62,11 @@ public class MeasurementDAORequest {
 		
 		measurement.setId(id);
 		measurement.setName(name);
-		if (type != null) measurement.setType(type);
+		if (type != null) {
+			MeasurementType entityType = new MeasurementType();
+			entityType.setId(type);
+			measurement.setType(entityType);
+		}
 		measurement.setLabel(label);
 		measurement.setDescription(description);
 		measurement.setIcon(icon);

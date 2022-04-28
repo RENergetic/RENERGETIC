@@ -16,6 +16,7 @@ import com.renergetic.backdb.dao.UserDAORequest;
 import com.renergetic.backdb.dao.UserDAOResponse;
 import com.renergetic.backdb.dao.UserRolesDAO;
 import com.renergetic.backdb.dao.UserSettingsDAO;
+import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.model.User;
 import com.renergetic.backdb.model.UserRoles;
 import com.renergetic.backdb.model.UserSettings;
@@ -39,18 +40,20 @@ public class UserService {
 	// USER CRUD OPERATIONS
 	public UserDAOResponse save(UserDAORequest user) {
 		user.setId(null);
-		return UserDAOResponse.create(userRepository.save(user.mapToEntity()), null, null);
+		User userEntity = user.mapToEntity();
+		userEntity.setUuid(new UUID());
+		return UserDAOResponse.create(userRepository.save(userEntity), null, null);
 	}
 
 	public UserRolesDAO saveRole(UserRolesDAO role) {
-		if ( userRepository.existsById(role.getUser_id()) ) {
+		if ( userRepository.existsById(role.getUserId()) ) {
 			role.setId(null);
 			return UserRolesDAO.create(userRolesRepository.save(role.mapToEntity()));
 		} else return null;
 	}
 
 	public UserSettingsDAO saveSetting(UserSettingsDAO settings) {
-		if ( userRepository.existsById(settings.getUser_id()) ) {
+		if ( userRepository.existsById(settings.getUserId()) ) {
 			settings.setId(null);
 			return UserSettingsDAO.create(userSettingsRepository.save(settings.mapToEntity()));
 		} else return null;
@@ -85,14 +88,14 @@ public class UserService {
 	}
 
 	public UserRolesDAO updateRole(UserRolesDAO role, Long id) {
-		if ( userRolesRepository.existsById(id) && userRepository.existsById(role.getUser_id()) ) {
+		if ( userRolesRepository.existsById(id) && userRepository.existsById(role.getUserId()) ) {
 			role.setId(id);
 			return UserRolesDAO.create(userRolesRepository.save(role.mapToEntity()));
 		} else return null;
 	}
 
 	public UserSettingsDAO updateSetting(UserSettingsDAO setting, Long id) {
-		if ( userSettingsRepository.existsById(id) && userRepository.existsById(setting.getUser_id()) ) {
+		if ( userSettingsRepository.existsById(id) && userRepository.existsById(setting.getUserId()) ) {
 			setting.setId(id);
 			return UserSettingsDAO.create(userSettingsRepository.save(setting.mapToEntity()));
 		} else return null;
@@ -108,9 +111,6 @@ public class UserService {
 				
 				if (filters.containsKey("name"))
 					equals = user.getName().equalsIgnoreCase(filters.get("name"));
-				if (equals && filters.containsKey("island_id"))
-					equals = String.valueOf(user.getIsland().getId()).equalsIgnoreCase(filters.get("island_id"));
-				
 				return equals;
 			});
 		return stream

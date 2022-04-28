@@ -18,9 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.backdb.dao.HeatmapDAOResponse;
+import com.renergetic.backdb.dao.HeatmapDAO;
 import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.model.Heatmap;
 import com.renergetic.backdb.service.HeatmapService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,8 +41,8 @@ public class HeatmapController {
 	@Operation(summary = "Get All Heatmap")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<HeatmapDAOResponse>> getAllHeatmap (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-		List<HeatmapDAOResponse> heatmap = new ArrayList<>();
+	public ResponseEntity<List<HeatmapDAO>> getAllHeatmap (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<HeatmapDAO> heatmap = new ArrayList<>();
 		
 		heatmap = heatmapSv.get(null, offset.orElse(0L), limit.orElse(20));
 		
@@ -57,8 +56,8 @@ public class HeatmapController {
 		@ApiResponse(responseCode = "404", description = "No heatmap found with this id")
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
-	public ResponseEntity<HeatmapDAOResponse> getHeatmapById (@PathVariable Long id){
-		HeatmapDAOResponse heatmap = null;
+	public ResponseEntity<HeatmapDAO> getHeatmapById (@PathVariable Long id){
+		HeatmapDAO heatmap = null;
 		
 		heatmap = heatmapSv.getById(id);
 		
@@ -74,10 +73,10 @@ public class HeatmapController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<HeatmapDAOResponse> createHeatmap(@RequestBody Heatmap heatmap) {
+	public ResponseEntity<HeatmapDAO> createHeatmap(@RequestBody HeatmapDAO heatmap) {
 		try {
 			heatmap.setId(null);
-			HeatmapDAOResponse _heatmap = heatmapSv.save(heatmap);
+			HeatmapDAO _heatmap = heatmapSv.save(heatmap);
 			
 			return new ResponseEntity<>(_heatmap, HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -95,7 +94,7 @@ public class HeatmapController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<HeatmapDAOResponse> updateHeatmap(@RequestBody Heatmap heatmap, @PathVariable Long id) {
+	public ResponseEntity<HeatmapDAO> updateHeatmap(@RequestBody HeatmapDAO heatmap, @PathVariable Long id) {
 		try {
 			heatmap.setId(id);
 			return new ResponseEntity<>(heatmapSv.save(heatmap), HttpStatus.OK);

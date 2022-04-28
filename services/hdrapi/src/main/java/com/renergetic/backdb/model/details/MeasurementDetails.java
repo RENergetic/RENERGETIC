@@ -12,12 +12,16 @@ import org.hibernate.annotations.NotFoundAction;
 import com.renergetic.backdb.model.Details;
 import com.renergetic.backdb.model.Measurement;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "measurement_details")
 @RequiredArgsConstructor
+@Getter
+@Setter
 @ToString
 public class MeasurementDetails extends Details{
 	// FOREIGN KEY FROM CONNECTION TABLE
@@ -30,14 +34,5 @@ public class MeasurementDetails extends Details{
 		super(key, value);
 		this.measurement = new Measurement();
 		this.measurement.setId(measurementId);
-	}
-
-	public Long getMeasurement() {
-		return measurement.getId();
-	}
-
-	public void setAsset(Long id) {
-		this.measurement = new Measurement();
-		this.measurement.setId(id);
 	}
 }

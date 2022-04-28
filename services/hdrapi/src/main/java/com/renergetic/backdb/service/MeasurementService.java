@@ -18,6 +18,7 @@ import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.Direction;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.MeasurementType;
+import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.model.Unit;
 import com.renergetic.backdb.model.details.MeasurementDetails;
 import com.renergetic.backdb.repository.MeasurementRepository;
@@ -42,9 +43,9 @@ public class MeasurementService {
 	// ASSET CRUD OPERATIONS
 	public MeasurementDAOResponse save(MeasurementDAORequest measurement) {
 		measurement.setId(null);
-		System.err.println(measurement);
-		System.err.println(measurement.mapToEntity());
-		return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null);
+		Measurement measurementEntity = measurement.mapToEntity();
+		measurementEntity.setUuid(new UUID());
+		return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null);
 	}
 	
 	public boolean deleteById(Long id) {

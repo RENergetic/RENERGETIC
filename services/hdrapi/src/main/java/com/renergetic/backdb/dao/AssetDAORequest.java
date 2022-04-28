@@ -3,6 +3,7 @@ package com.renergetic.backdb.dao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.backdb.model.Asset;
+import com.renergetic.backdb.model.AssetType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -68,12 +69,22 @@ public class AssetDAORequest {
 		
 		asset.setId(id);
 		asset.setName(name);
-		asset.setType(type);
+		
+		AssetType entityType = new AssetType();
+		entityType.setId(type);
+		asset.setType(entityType);
+		
 		asset.setLabel(label);
 		asset.setDescription(description);
 		asset.setLocation(geo_location);
-		asset.setParentAsset(parent);
-		asset.setOwner(owner);
+		
+		Asset entityParent = new Asset();
+		entityParent.setId(parent);
+		asset.setParentAsset(entityParent);
+		
+		Asset entityOwner = new Asset();
+		entityOwner.setId(owner);
+		asset.setOwner(entityOwner);
 		
 		return asset;
 	}

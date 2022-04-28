@@ -2,10 +2,11 @@ package com.renergetic.backdb.dao;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.renergetic.backdb.model.Asset;
+import com.renergetic.backdb.model.Dashboard;
+import com.renergetic.backdb.model.InformationTile;
 import com.renergetic.backdb.model.Notification;
 import com.renergetic.backdb.model.NotificationType;
 
@@ -28,20 +29,23 @@ public class NotificationDAO {
 	@JsonProperty(required = false)
 	private String message;
 
+	@JsonProperty(required = false)
+	private String icon;
+
 	@JsonProperty(required = true)
 	private LocalDateTime date_from;
 
 	@JsonProperty(required = false)
-	@JsonInclude(Include.NON_NULL)
 	private LocalDateTime date_to;
 
-	@JsonProperty(required = false)
-	@JsonInclude(Include.NON_NULL)
-	private Long asset_id;
+	@JsonProperty(value = "asset_id", required = false)
+	private Long assetId;
 
-	@JsonProperty(required = false)
-	@JsonInclude(Include.NON_NULL)
-	private Long dashboard_id;
+	@JsonProperty(value = "dashboard_id", required = false)
+	private Long dashboardId;
+
+	@JsonProperty(value = "information_tile_id", required = false)
+	private Long informationTileId;
 	
 	public static NotificationDAO create(Notification notification) {
 		NotificationDAO dao = null;
@@ -52,10 +56,15 @@ public class NotificationDAO {
 			dao.setId(notification.getId());
 			dao.setType(notification.getType());
 			dao.setMessage(notification.getMessage());
+			dao.setIcon(notification.getIcon());
 			dao.setDate_from(notification.getDateFrom());
 			dao.setDate_to(notification.getDateTo());
-			dao.setAsset_id(notification.getAsset().getId());
-			dao.setDashboard_id(notification.getDashboard().getId());
+			if (notification.getAsset() != null)
+				dao.setAssetId(notification.getAsset().getId());
+			if (notification.getDashboard() != null)
+				dao.setDashboardId(notification.getDashboard().getId());
+			if (notification.getInformationTile() != null)
+				dao.setInformationTileId(notification.getInformationTile().getId());
 		}
 		
 		return dao;
@@ -67,11 +76,24 @@ public class NotificationDAO {
 		notification.setId(id);
 		notification.setType(type);
 		notification.setMessage(message);
+		notification.setIcon(icon);
 		notification.setDateFrom(date_from);
 		notification.setDateTo(date_to);
-		notification.setAsset(asset_id);
-		notification.setDashboard(dashboard_id);
-
+		if (assetId != null) {
+			Asset asset = new Asset();
+			asset.setId(assetId);
+			notification.setAsset(asset);
+		}
+		if (dashboardId != null) {
+			Dashboard dashboard = new Dashboard();
+			dashboard.setId(dashboardId);
+			notification.setDashboard(dashboard);
+		}
+		if (informationTileId != null) {
+			InformationTile informationTile = new InformationTile();
+			informationTile.setId(informationTileId);
+			notification.setInformationTile(informationTile);
+		}
 		return notification;
 	}
 }

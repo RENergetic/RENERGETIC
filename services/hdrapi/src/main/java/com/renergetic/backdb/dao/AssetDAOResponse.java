@@ -87,14 +87,20 @@ public class AssetDAOResponse {
 		
 		asset.setId(id);
 		asset.setName(name);
-		if (type != null)asset.setType(type.getId());
+		if (type != null) 
+			asset.setType(type);
+		
 		asset.setLabel(label);
 		asset.setDescription(description);
 		asset.setLocation(geo_location);
-		if (parent == null) asset.setParentAsset(null);
-		else asset.setParentAsset(parent.getId());
-		asset.setOwner(owner);
+		if (parent != null) 
+			asset.setParentAsset(parent.mapToEntity());
 		
+		if (owner != null) {
+			Asset entityOwner = new Asset();
+			entityOwner.setId(owner);
+			asset.setOwner(entityOwner);
+		}
 		return asset;
 	}
 }

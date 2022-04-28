@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.backdb.model.RoleType;
+import com.renergetic.backdb.model.User;
 import com.renergetic.backdb.model.UserRoles;
 
 import lombok.Getter;
@@ -24,11 +25,11 @@ public class UserRolesDAO {
 	@JsonProperty(required = true)
 	private RoleType type;
 
-	@JsonProperty(required = false)
-	private LocalDateTime update_date;
+	@JsonProperty(value = "update_date", required = false)
+	private LocalDateTime updateDate;
 
-	@JsonProperty(required = true)
-	private Long user_id;
+	@JsonProperty(value = "user_id", required = true)
+	private Long userId;
 	
 	public static UserRolesDAO create(UserRoles role) {
 		UserRolesDAO dao = null;
@@ -38,8 +39,8 @@ public class UserRolesDAO {
 
 			dao.setId(role.getId());
 			dao.setType(role.getType());
-			dao.setUser_id(role.getUser().getId());
-			dao.setUpdate_date(role.getUpdate_date());
+			dao.setUserId(role.getUser().getId());
+			dao.setUpdateDate(role.getUpdateDate());
 		}
 		return dao;
 	}
@@ -49,10 +50,14 @@ public class UserRolesDAO {
 		
 		role.setId(id);
 		role.setType(type);
-		role.setUser(user_id);
-		if (update_date == null)
-			update_date = LocalDateTime.now();
-		role.setUpdate_date(update_date);
+		if (userId != null) {
+			User user = new User();
+			user.setId(userId);
+			role.setUser(user);
+		}
+		if (updateDate == null)
+			updateDate = LocalDateTime.now();
+		role.setUpdateDate(updateDate);
 
 		return role;
 	}

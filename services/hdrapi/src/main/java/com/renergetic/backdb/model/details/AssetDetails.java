@@ -12,12 +12,16 @@ import org.hibernate.annotations.NotFoundAction;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.Details;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "asset_details")
 @RequiredArgsConstructor
+@Getter
+@Setter
 @ToString
 public class AssetDetails extends Details{
 	// FOREIGN KEY FROM CONNECTION TABLE
@@ -26,17 +30,8 @@ public class AssetDetails extends Details{
 	@JoinColumn(name = "asset_id", nullable = false, insertable = true, updatable = true)
 	private Asset asset;
 
-	public AssetDetails(String key, String value, long asset_id) {
+	public AssetDetails(String key, String value, Asset asset) {
 		super(key, value);
-		this.asset.setId(asset_id);
-	}
-
-	public Long getAsset() {
-		return asset.getId();
-	}
-
-	public void setAsset(Long id) {
-		this.asset = new Asset();
-		this.asset.setId(id);
+		this.asset = asset;
 	}
 }

@@ -21,6 +21,7 @@ import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.AssetCategory;
 import com.renergetic.backdb.model.AssetType;
 import com.renergetic.backdb.model.Measurement;
+import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.AssetTypeRepository;
@@ -49,7 +50,9 @@ public class AssetService {
 	public AssetDAOResponse save(AssetDAORequest asset) {
 		asset.setId(null);
 		if (assetTypeRepository.existsById(asset.getType())) {
-			return AssetDAOResponse.create(assetRepository.save(asset.mapToEntity()), null, null);
+			Asset assetEntity = asset.mapToEntity();
+			assetEntity.setUuid(new UUID());
+			return AssetDAOResponse.create(assetRepository.save(assetEntity), null, null);
 		}
 		else throw new InvalidArgumentException("The asset type doesn't exists");
 	}

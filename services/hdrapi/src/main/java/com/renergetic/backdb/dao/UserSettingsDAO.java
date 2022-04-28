@@ -2,6 +2,7 @@ package com.renergetic.backdb.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.renergetic.backdb.model.User;
 import com.renergetic.backdb.model.UserSettings;
 
 import lombok.Getter;
@@ -17,11 +18,11 @@ public class UserSettingsDAO {
 	@JsonProperty(required = false, access = Access.READ_ONLY)
 	private Long id;
 	
-	@JsonProperty(required = true)
-	private String settings_json;
+	@JsonProperty(value = "settings_json", required = true)
+	private String settingsJson;
 
-	@JsonProperty(required = true)
-	private Long user_id;
+	@JsonProperty(value = "user_id", required = true)
+	private Long userId;
 	
 	public static UserSettingsDAO create(UserSettings settings) {
 		UserSettingsDAO dao = null;
@@ -30,8 +31,8 @@ public class UserSettingsDAO {
 			dao = new UserSettingsDAO();
 
 			dao.setId(settings.getId());
-			dao.setSettings_json(settings.getSettings_json());
-			dao.setUser_id(settings.getUser().getId());
+			dao.setSettingsJson(settings.getSettingsJson());
+			dao.setUserId(settings.getUser().getId());
 		}
 		return dao;
 	}
@@ -40,9 +41,12 @@ public class UserSettingsDAO {
 		UserSettings role = new UserSettings();
 		
 		role.setId(id);
-		role.setSettings_json(settings_json);
-		role.setUser(user_id);
-
+		role.setSettingsJson(settingsJson);
+		if (userId != null) {
+			User user = new User();
+			user.setId(userId);
+			role.setUser(user);
+		}
 		return role;
 	}
 }

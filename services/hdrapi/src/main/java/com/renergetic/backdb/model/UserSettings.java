@@ -23,21 +23,18 @@ import lombok.ToString;
 @Entity
 @Table(name = "user_settings")
 @RequiredArgsConstructor
+@Getter
+@Setter
 @ToString
 public class UserSettings {	
 	@Id
-	@Getter
-	@Setter
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Getter
-	@Setter
 	@Column(name = "settings_json", nullable = false, insertable = true, updatable = true, unique = false)
 	@JsonProperty(required = true)
-	private String settings_json;
+	private String settingsJson;
 
-	@Getter
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "user_id", nullable = false, insertable = true, updatable = true)
@@ -46,12 +43,7 @@ public class UserSettings {
 
 	public UserSettings(String settings_json) {
 		super();
-		this.settings_json = settings_json;
+		this.settingsJson = settings_json;
 	}
-
-	public void setUser(Long id) {
-		this.user = new User();
-		this.user.setId(id);
-	}	
 	
 }

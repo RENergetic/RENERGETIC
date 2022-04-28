@@ -27,9 +27,6 @@ public class UserDAOResponse {
 	private String name;
 
 	@JsonProperty(required = true)
-	private Long island_id;
-
-	@JsonProperty(required = true)
 	private List<UserRolesDAO> roles;
 
 	@JsonProperty(required = true)
@@ -43,7 +40,6 @@ public class UserDAOResponse {
 
 			dao.setId(user.getId());
 			dao.setName(user.getName());
-			dao.setIsland_id(user.getIsland().getId());
 			
 			if (roles != null)
 				dao.setRoles(roles.stream().map(role -> UserRolesDAO.create(role)).collect(Collectors.toList()));
@@ -59,7 +55,6 @@ public class UserDAOResponse {
 		
 		user.setId(id);
 		user.setName(name);
-		user.setIsland(island_id);
 
 		return user;
 	}

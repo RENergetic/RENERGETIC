@@ -20,9 +20,6 @@ public class UserDAORequest {
 	
 	@JsonProperty(required = true)
 	private String name;
-
-	@JsonProperty(required = true)
-	private Long island_id;
 	
 	public static UserDAORequest create(User user) {
 		UserDAORequest dao = null;
@@ -32,7 +29,6 @@ public class UserDAORequest {
 
 			dao.setId(user.getId());
 			dao.setName(user.getName());
-			dao.setIsland_id(user.getIsland().getId());
 		}
 		return dao;
 	}
@@ -42,7 +38,6 @@ public class UserDAORequest {
 		
 		user.setId(id);
 		user.setName(name);
-		user.setIsland(island_id);
 
 		return user;
 	}

@@ -27,34 +27,27 @@ import lombok.ToString;
 @Entity
 @Table(name = "user_roles")
 @RequiredArgsConstructor
+@Getter
+@Setter
 @ToString
 public class UserRoles {	
 	@Id
-	@Getter
-	@Setter
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Getter
-	@Setter
 	@Column(name = "uuid", nullable = true, insertable = true, updatable = true, unique = true)
 	@JsonProperty(required = true)
 	private String uuid;
 
-	@Getter
-	@Setter
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false, insertable = true, updatable = true, unique = false)
 	@JsonProperty(required = false)
 	private RoleType type;
 
-	@Getter
-	@Setter
 	@Column(name = "update_date", nullable = false, insertable = true, updatable = true, unique = false)
 	@JsonProperty(required = false)
-	private LocalDateTime update_date;
+	private LocalDateTime updateDate;
 
-	@Getter
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "user_id", nullable = false, insertable = true, updatable = true)
@@ -65,12 +58,7 @@ public class UserRoles {
 		super();
 		this.uuid = uuid;
 		this.type = type;;
-		this.update_date = date;
+		this.updateDate = date;
 	}
-
-	public void setUser(Long id) {
-		this.user = new User();
-		this.user.setId(id);
-	}	
 	
 }
