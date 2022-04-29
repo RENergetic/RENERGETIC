@@ -1,9 +1,11 @@
 current=$(pwd -W tr / \\)
 
 namespace='data'
-
+#inflixdb
 installdb='true'
+#influxdb java api
 installapi='true'
+#nifi
 installback='false'
 installkafka='false'
 installgrafana='true'

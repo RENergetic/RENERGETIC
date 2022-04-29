@@ -5,7 +5,7 @@ namespace='app'
 javahdr='services\hdrapi'
 javafilehdr='hdrapi-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic_ui'
-
+#postgre
 installdb='true'
 installapihdr='true'  # API HDR
 installfront='true'
