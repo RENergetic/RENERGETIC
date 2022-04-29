@@ -38,7 +38,7 @@ fi
 if [[ $installapi = 'true' ]]
 then
     # API COMPILE TO JAR
-    cd "${current}\\..\\..\\services\\backinflux"
+    cd "${current}\\..\\..\\services\\measurementapi"
     mvn clean package -Dmaven.test.skip
     cp ".\\target\\${javafile}" "${current}\\api"
 
