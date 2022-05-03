@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,8 +34,9 @@ public class AlertThreshold {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "threshold_type", nullable = false, insertable = true, updatable = true)
-	private String thresholdType;
+	private ThresholdType thresholdType;
 
 	@Column(name = "threshold_constraint", nullable = false, insertable = true, updatable = true)
 	private String thresholdConstraint;
@@ -41,8 +44,9 @@ public class AlertThreshold {
 	@Column(name = "threshold_update", nullable = false, insertable = true, updatable = true)
 	private LocalDateTime thresholdUpdate;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "aggregation_type", nullable = true, insertable = true, updatable = true)
-	private String aggregationType;
+	private AggregationType aggregationType;
 
 	@Column(name = "aggregation_interval", nullable = true, insertable = true, updatable = true)
 	private Long aggregationInterval;
