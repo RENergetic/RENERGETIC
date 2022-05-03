@@ -36,7 +36,7 @@ public class Measurement {
 	private String name;
 
 	@Column(name = "sensor_name", nullable = false, insertable = true, updatable = true)
-	private String sensor_name;
+	private String sensorName;
 
 	@Column(name = "label", nullable = true, insertable = true, updatable = true)
 	private String label;

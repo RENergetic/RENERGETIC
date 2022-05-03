@@ -12,5 +12,5 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
 	List<Measurement> findByName (String name);
 	
 	Measurement save(Measurement asset);
-	List<Measurement> findByAssets(Asset assetId);
+	List<Measurement> findByAsset(Asset assetId);
 }

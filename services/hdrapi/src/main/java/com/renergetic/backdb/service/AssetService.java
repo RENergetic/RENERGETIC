@@ -122,11 +122,11 @@ public class AssetService {
 					equals = asset.getParentAsset() != null? String.valueOf(asset.getParentAsset().getId()).equalsIgnoreCase(filters.get("parent")) : false;
 				
 				return equals;
-			}).map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAssets(asset)))
+			}).map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAsset(asset)))
 					.collect(Collectors.toList());
 		else
 			assets = stream
-				.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAssets(asset)))
+				.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAsset(asset)))
 				.collect(Collectors.toList());
 		
 		if (assets.size() > 0)
@@ -138,7 +138,7 @@ public class AssetService {
 		Asset asset = assetRepository.findById(id).orElse(null);
 		
 		if (asset != null)
-			return AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAssets(asset));
+			return AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAsset(asset));
 		else throw new NotFoundException("No asset found related with id " + id);
 	}
 
@@ -149,7 +149,7 @@ public class AssetService {
 			throw new InvalidNonExistingIdException("No asset found related with id" + id);
 		else if (asset.getAssets() != null && asset.getAssets().size() > 0)
 			return asset.getAssets().stream()
-				.map(obj -> AssetDAOResponse.create(obj, assetRepository.findByParentAsset(obj), measurementRepository.findByAssets(obj)))
+				.map(obj -> AssetDAOResponse.create(obj, assetRepository.findByParentAsset(obj), measurementRepository.findByAsset(obj)))
 				.collect(Collectors.toList());
 		else throw new NotFoundException("No asset found connected with asset " + id);
 	}
@@ -160,7 +160,7 @@ public class AssetService {
 		if (asset == null)
 			throw new InvalidNonExistingIdException("No asset found related with id" + id);
 		else {
-			List<Measurement> measurements = measurementRepository.findByAssets(asset);
+			List<Measurement> measurements = measurementRepository.findByAsset(asset);
 			
 			if (measurements != null && measurements.size() > 0)
 				return measurements.stream()

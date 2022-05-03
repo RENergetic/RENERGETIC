@@ -24,6 +24,9 @@ public class MeasurementDAORequest {
 	@JsonProperty(required = true)
 	private String name;
 
+	@JsonProperty(value = "sensor_name", required = true)
+	private String sensorName;
+
 	@JsonProperty(required = false)
 	private String label;
 
@@ -60,6 +63,7 @@ public class MeasurementDAORequest {
 			dao.setIcon(measurement.getIcon());
 			dao.setDomain(measurement.getDomain());
 			dao.setDirection(measurement.getDirection());
+			dao.setSensorName(measurement.getSensorName());
 			if (measurement.getAsset() != null)
 				dao.setAssetId(measurement.getAsset().getId());
 		}
@@ -81,6 +85,7 @@ public class MeasurementDAORequest {
 		measurement.setIcon(icon);
 		measurement.setDomain(domain);
 		measurement.setDirection(direction);
+		measurement.setSensorName(sensorName);
 		if (assetId != null) {
 			Asset asset = new Asset();
 			asset.setId(assetId);
