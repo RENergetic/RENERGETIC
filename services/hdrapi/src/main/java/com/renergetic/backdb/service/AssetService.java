@@ -93,19 +93,7 @@ public class AssetService {
 	public MeasurementDAOResponse addMeasurement(Long assetid, Long measurementId) {
 		if ( assetRepository.existsById(assetid) && measurementRepository.existsById(measurementId)) {
 			Measurement measurement = measurementRepository.findById(measurementId).get();
-			Asset asset = assetRepository.findById(assetid).get();
-			
-			boolean haveInfrastructure = false;
-			for (Asset obj : measurement.getAssets()) {
-				if (obj.getType().getCategory().equals(AssetCategory.infrastructure)) {
-					haveInfrastructure = true;
-					break;
-				}
-			}
-			if (!(asset.getType().getCategory().equals(AssetCategory.infrastructure) && haveInfrastructure)) {
-				measurement.getAssets().add(asset);
-				return MeasurementDAOResponse.create(measurementRepository.save(measurement), null);
-			}else throw new InvalidArgumentException("Measurement already have a Infrastructure connected");
+			return MeasurementDAOResponse.create(measurementRepository.save(measurement), null);
 			
 		} else throw new InvalidNonExistingIdException(assetRepository.existsById(assetid) ? "The measurement doesn't exists" : "The asset doesn't exists");
 	}

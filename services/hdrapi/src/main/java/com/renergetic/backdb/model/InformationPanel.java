@@ -28,6 +28,9 @@ public class InformationPanel {
     @Column(name = "label")
     private String label;
 
+    @Column(name = "is_template")
+    private Boolean isTemplate;
+
     @ManyToOne(cascade = CascadeType.REFRESH)
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "owner_id")
@@ -43,6 +46,14 @@ public class InformationPanel {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
 	private UUID uuid;
+	
+	@ManyToMany(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinTable(
+			name = "asset_panel",
+			joinColumns = @JoinColumn(name = "panel_id", nullable = true, insertable = true, updatable = true),
+			inverseJoinColumns = @JoinColumn(name = "asset_id"))
+	private List<Asset> assets;
 
     public InformationPanel(Long id, String name, String label) {
         super();

@@ -38,6 +38,9 @@ public class DemandRequest {
     @Column
     private String value;
 
+    @Column
+    private String properties;
+
     @Column(name = "demand_request_start", nullable = false)
     private LocalDateTime start;
 

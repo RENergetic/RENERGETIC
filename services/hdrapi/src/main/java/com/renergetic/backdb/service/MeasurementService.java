@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.renergetic.backdb.dao.MeasurementDAORequest;
 import com.renergetic.backdb.dao.MeasurementDAOResponse;
-import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.Direction;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.MeasurementType;
@@ -74,15 +73,13 @@ public class MeasurementService {
 				if (filters.containsKey("name"))
 					equals = measurement.getName().equalsIgnoreCase(filters.get("name"));
 				if (equals && filters.containsKey("type"))
-					equals = measurement.getType().equals(filters.get("type"));
+					equals = measurement.getType().getName().equalsIgnoreCase(filters.get("type"));
 				if (equals && filters.containsKey("icon"))
 					equals = measurement.getIcon().equalsIgnoreCase(filters.get("icon"));
 				if (equals && filters.containsKey("direction"))
 					equals = measurement.getDirection().equals(Direction.valueOf(filters.get("direction")));
-				if (equals && filters.containsKey("asset_id")) {
-					equals = false;
-					for(Asset asset : measurement.getAssets())
-						if (equals = String.valueOf(asset.getId()).equalsIgnoreCase(filters.get("asset_id"))) break;
+				if (equals && filters.containsKey("asset_id") && measurement.getAsset() != null) {
+					equals = String.valueOf(measurement.getAsset().getId()).equalsIgnoreCase(filters.get("asset_id"));
 				}
 				
 				return equals;
