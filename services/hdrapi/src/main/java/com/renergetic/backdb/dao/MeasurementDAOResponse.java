@@ -1,6 +1,5 @@
 package com.renergetic.backdb.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -79,7 +78,6 @@ public class MeasurementDAOResponse {
 		measurement.setDescription(description);
 		measurement.setIcon(icon);
 		measurement.setDirection(direction);
-		measurement.setAssets(new ArrayList<>());
 
 		return measurement;
 	}

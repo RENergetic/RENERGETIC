@@ -1,8 +1,5 @@
 package com.renergetic.backdb.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,8 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -40,6 +35,9 @@ public class Measurement {
 	@Column(name = "name", nullable = false, insertable = true, updatable = true)
 	private String name;
 
+	@Column(name = "sensor_name", nullable = false, insertable = true, updatable = true)
+	private String sensor_name;
+
 	@Column(name = "label", nullable = true, insertable = true, updatable = true)
 	private String label;
 
@@ -57,15 +55,16 @@ public class Measurement {
 	@Column(name = "direction", nullable = true, insertable = true, updatable = true)
 	@Enumerated(EnumType.STRING)
 	private Direction direction;
+
+	@Column(name = "domain", nullable = true, insertable = true, updatable = true)
+	@Enumerated(EnumType.STRING)
+	private Domain domain;
 	
 	// FOREIGN KEY FROM ASSETS TABLE
-	@ManyToMany(cascade = CascadeType.REFRESH)
+	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinTable(
-			name = "asset_measurement",
-			joinColumns = @JoinColumn(name = "measurement_id", nullable = true, insertable = true, updatable = true),
-			inverseJoinColumns = @JoinColumn(name = "asset_id"))
-	private List<Asset> assets;
+	@JoinColumn(name = "energy_island_asset_id", nullable = true, insertable = true, updatable = true)
+	private Asset asset;
 
 	@OneToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -81,6 +80,5 @@ public class Measurement {
 		this.icon = icon;
 		this.direction = direction;
 		this.type = new MeasurementType();
-		this.assets = new ArrayList<>();
 	}
 }

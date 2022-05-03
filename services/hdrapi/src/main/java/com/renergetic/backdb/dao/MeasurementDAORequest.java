@@ -1,10 +1,10 @@
 package com.renergetic.backdb.dao;
 
-import java.util.ArrayList;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.Direction;
+import com.renergetic.backdb.model.Domain;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.MeasurementType;
 
@@ -36,6 +36,12 @@ public class MeasurementDAORequest {
 	@JsonProperty(required = false)
 	private Long type;
 
+	@JsonProperty(value = "asset_id", required = false)
+	private Long assetId;
+
+	@JsonProperty(required = false)
+	private Domain domain;
+
 	@JsonProperty(required = false)
 	private Direction direction;
 	
@@ -52,7 +58,10 @@ public class MeasurementDAORequest {
 			dao.setLabel(measurement.getLabel());
 			dao.setDescription(measurement.getDescription());
 			dao.setIcon(measurement.getIcon());
+			dao.setDomain(measurement.getDomain());
 			dao.setDirection(measurement.getDirection());
+			if (measurement.getAsset() != null)
+				dao.setAssetId(measurement.getAsset().getId());
 		}
 		return dao;
 	}
@@ -70,8 +79,13 @@ public class MeasurementDAORequest {
 		measurement.setLabel(label);
 		measurement.setDescription(description);
 		measurement.setIcon(icon);
+		measurement.setDomain(domain);
 		measurement.setDirection(direction);
-		measurement.setAssets(new ArrayList<>());
+		if (assetId != null) {
+			Asset asset = new Asset();
+			asset.setId(assetId);
+			measurement.setAsset(asset);
+		}
 
 		return measurement;
 	}
