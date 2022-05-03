@@ -56,6 +56,7 @@ public class MeasurementDAORequest {
 		
 			dao.setId(measurement.getId());
 			dao.setName(measurement.getName());
+			dao.setSensorName(measurement.getSensorName());
 			if (measurement.getType() != null)
 				dao.setType(measurement.getType().getId());
 			dao.setLabel(measurement.getLabel());
@@ -63,7 +64,6 @@ public class MeasurementDAORequest {
 			dao.setIcon(measurement.getIcon());
 			dao.setDomain(measurement.getDomain());
 			dao.setDirection(measurement.getDirection());
-			dao.setSensorName(measurement.getSensorName());
 			if (measurement.getAsset() != null)
 				dao.setAssetId(measurement.getAsset().getId());
 		}

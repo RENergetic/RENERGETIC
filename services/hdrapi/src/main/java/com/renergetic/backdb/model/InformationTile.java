@@ -8,7 +8,6 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "information_tile")
@@ -39,14 +38,6 @@ public class InformationTile {
     @ManyToOne
     @JoinColumn(name = "information_panel_id")
     private InformationPanel informationPanel;
-
-    @ManyToMany(cascade = CascadeType.REFRESH)
-    @NotFound(action = NotFoundAction.IGNORE)
-    @JoinTable(
-            name = "information_tile_measurement",
-            joinColumns = @JoinColumn(name = "information_tile_id"),
-            inverseJoinColumns = @JoinColumn(name = "measurement_id"))
-    private List<Measurement> measurements;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
     @NotFound(action = NotFoundAction.IGNORE)

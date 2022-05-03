@@ -2,17 +2,14 @@ package com.renergetic.backdb.service;
 
 import com.renergetic.backdb.dao.InformationTileDAORequest;
 import com.renergetic.backdb.dao.InformationTileDAOResponse;
-import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.exception.NotFoundException;
 import com.renergetic.backdb.mapper.InformationTileMapper;
 import com.renergetic.backdb.model.InformationPanel;
 import com.renergetic.backdb.model.InformationTile;
-import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.repository.InformationPanelRepository;
 import com.renergetic.backdb.repository.InformationTileRepository;
 import com.renergetic.backdb.repository.InformationTileTypeRepository;
-import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,9 +27,7 @@ public class InformationTileService {
     private InformationPanelRepository informationPanelRepository;
     @Autowired
     private InformationTileTypeRepository informationTileTypeRepository;
-    @Autowired
-    private MeasurementRepository measurementRepository;
-
+    
     public List<InformationTileDAOResponse> getAllByPanelId(Long panelId, long offset, int limit){
         return informationTileRepository.findAllByInformationPanelId(new OffSetPaging(offset, limit), panelId).stream().map(x -> informationTileMapper.toDTO(x)).collect(Collectors.toList());
     }
@@ -72,15 +67,5 @@ public class InformationTileService {
             throw new InvalidNonExistingIdException();
         informationTileRepository.deleteById(id);
         return true;
-    }
-
-    public MeasurementDAOResponse addMeasurement(Long informationTileId, Long measurementId) {
-        Measurement measurement = measurementRepository.findById(measurementId).orElseThrow(InvalidNonExistingIdException::new);
-        InformationTile informationTile = informationTileRepository.findById(informationTileId).orElseThrow(InvalidNonExistingIdException::new);
-
-        informationTile.getMeasurements().add(measurement);
-        informationTileRepository.save(informationTile);
-
-        return MeasurementDAOResponse.create(measurement, null);
     }
 }
