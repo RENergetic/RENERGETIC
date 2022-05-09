@@ -35,7 +35,7 @@ public class InformationTileMeasurementDAORequest {
 		dao.setProps(tile.getProps());
 
 		if(tile.getMeasurement() != null) dao.setMeasurementId(tile.getMeasurement().getId());
-		if(tile.getMeasurement() != null) dao.setAssetId(tile.getAsset().getId());
+		if(tile.getAsset() != null) dao.setAssetId(tile.getAsset().getId());
 		
 		return dao;
 	}
@@ -51,7 +51,7 @@ public class InformationTileMeasurementDAORequest {
 			asset.setId(assetId);
 			tile.setAsset(asset);
 		}
-		if (assetId != null) {
+		if (measurementId != null) {
 			Measurement measurement = new Measurement();
 			measurement.setId(measurementId);
 			tile.setMeasurement(measurement);

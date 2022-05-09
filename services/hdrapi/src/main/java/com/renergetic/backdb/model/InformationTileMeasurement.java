@@ -36,12 +36,12 @@ public class InformationTileMeasurement {
 	// FOREIGN KEY FROM ASSET TABLE
 	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "asset_id", nullable = false, insertable = true, updatable = true)
+	@JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true)
 	private Asset asset;
 
 	// FOREIGN KEY FROM MEASUREMENT TABLE
 	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "measurement_id", nullable = false, insertable = true, updatable = true)
+	@JoinColumn(name = "measurement_id", nullable = true, insertable = true, updatable = true)
 	private Measurement measurement;
 }

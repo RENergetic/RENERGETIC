@@ -39,7 +39,7 @@ public class InformationTileMeasurementController {
 
 //=== GET REQUESTS ====================================================================================
 			
-	@Operation(summary = "Get All InformationTileMeasurement")
+	@Operation(summary = "Get All Information Tile Measurement")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
 	public ResponseEntity<List<InformationTileMeasurementDAOResponse>> getAllInformationTileMeasurement (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
@@ -50,11 +50,11 @@ public class InformationTileMeasurementController {
 		return new ResponseEntity<>(informationTileMeasurement, HttpStatus.OK);
 	}
 	
-	@Operation(summary = "Get InformationTileMeasurement by id")
+	@Operation(summary = "Get Information Tile Measurement by id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
 		@ApiResponse(responseCode = "400", description = "Malformed URL"),
-		@ApiResponse(responseCode = "404", description = "No informationTileMeasurement found with this id")
+		@ApiResponse(responseCode = "404", description = "No information tile measurement found with this id")
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
 	public ResponseEntity<InformationTileMeasurementDAOResponse> getInformationTileMeasurementById (@PathVariable Long id){
@@ -67,9 +67,9 @@ public class InformationTileMeasurementController {
 
 //=== POST REQUESTS ===================================================================================
 			
-	@Operation(summary = "Create a new InformationTileMeasurement")
+	@Operation(summary = "Create a new Information Tile Measurement")
 	@ApiResponses({
-			@ApiResponse(responseCode = "201", description = "InformationTileMeasurement saved correctly"),
+			@ApiResponse(responseCode = "201", description = "Information tile measurement saved correctly"),
 			@ApiResponse(responseCode = "500", description = "Error saving informationTileMeasurement")
 		}
 	)
@@ -86,11 +86,11 @@ public class InformationTileMeasurementController {
 
 //=== PUT REQUESTS ====================================================================================
 
-	@Operation(summary = "Update a existing InformationTileMeasurement")
+	@Operation(summary = "Update a existing Information Tile Measurement")
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "InformationTileMeasurement saved correctly"),
-			@ApiResponse(responseCode = "404", description = "InformationTileMeasurement not exist"),
-			@ApiResponse(responseCode = "500", description = "Error saving informationTileMeasurement")
+			@ApiResponse(responseCode = "200", description = "Information Tile Measurement saved correctly"),
+			@ApiResponse(responseCode = "404", description = "Information Tile Measurement not exist"),
+			@ApiResponse(responseCode = "500", description = "Error saving information tile measurement")
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
@@ -110,8 +110,8 @@ public class InformationTileMeasurementController {
 			
 	@Operation(summary = "Delete a existing InformationTileMeasurement")
 	@ApiResponses({
-			@ApiResponse(responseCode = "204", description = "InformationTileMeasurement deleted correctly"),
-			@ApiResponse(responseCode = "500", description = "Error saving informationTileMeasurement")
+			@ApiResponse(responseCode = "204", description = "Information Tile Measurement deleted correctly"),
+			@ApiResponse(responseCode = "500", description = "Error saving information tile measurement")
 		}
 	)
 	@DeleteMapping(path = "/{id}")

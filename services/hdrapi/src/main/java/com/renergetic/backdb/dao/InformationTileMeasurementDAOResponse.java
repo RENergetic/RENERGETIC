@@ -34,7 +34,7 @@ public class InformationTileMeasurementDAOResponse {
 
 		if(tile.getMeasurement() != null) 
 			dao.setMeasurement(SimpleMeasurementDAO.create(tile.getMeasurement()));
-		if(tile.getMeasurement() != null) 
+		if(tile.getAsset() != null) 
 			dao.setAsset(SimpleAssetDAO.create(tile.getAsset()));
 		
 		return dao;
