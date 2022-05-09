@@ -13,7 +13,7 @@ spec:
         app: influx-db
     spec:
       containers:
-        - image: influxdb:1.8.10
+        - image: influxdb:2.2.0
           name: influx-db
           ports:
             - containerPort: 8086
@@ -27,6 +27,19 @@ spec:
 #          envFrom:
 #            - secretRef:
 #                name: influxdb-secrets
+          env:
+          - name: DOCKER_INFLUXDB_INIT_USERNAME
+            value: reninflux
+          - name: DOCKER_INFLUXDB_INIT_PASSWORD
+            value: reninflux
+          - name: DOCKER_INFLUXDB_INIT_ORG
+            value: renergetic
+          - name: DOCKER_INFLUXDB_INIT_BUCKET
+            value: renergetic
+          - name:  DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+            value: reninflux
+          - name: DOCKER_INFLUXDB_INIT_MODE
+            value: setup
       volumes:
         - name: influx-disk
           persistentVolumeClaim:

@@ -7,7 +7,7 @@ installapi='true'
 installback='false'
 installkafka='false'
 installgrafana='true'
-javafile='backinflux-0.0.1-SNAPSHOT.jar'
+javafile='measurementapi-0.0.1-SNAPSHOT.jar'
 
 while getopts n: flag
 do
@@ -36,7 +36,7 @@ fi
 if [[ $installapi = 'true' ]]
 then
     # API COMPILE TO JAR
-    cd "${current}\\..\\..\\services\\backinflux"
+    cd "${current}\\..\\..\\services\\measurementapi"
     mvn clean package -Dmaven.test.skip
     cp ".\\target\\${javafile}" "${current}\\api"
 
