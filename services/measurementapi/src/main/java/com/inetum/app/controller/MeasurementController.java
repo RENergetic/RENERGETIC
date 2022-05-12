@@ -60,7 +60,7 @@ public class MeasurementController {
 			@RequestParam("bucket") Optional<String> bucket,
 			@RequestParam("group") Optional<String> group,
 			@RequestParam(value = "field", required = true) String field,
-			/*@RequestParam("time_var") Optional<String> timeVar,*/
+			@RequestParam("time_var") Optional<String> timeVar,
 			@RequestParam Map<String, String> tags, 
 			@PathVariable(name = "measurement_name") String measurementName,
 			@PathVariable(name = "function") String function){
@@ -84,7 +84,7 @@ public class MeasurementController {
 	}
 
 	@PostMapping()
-	public ResponseEntity<?> addMeasurement(@RequestBody MeasurementDAORequest measurement){
+	public ResponseEntity<MeasurementDAOResponse> addMeasurement(@RequestBody MeasurementDAORequest measurement){
 		service.insert(measurement);
 		
 		return new ResponseEntity<>(HttpStatus.OK);

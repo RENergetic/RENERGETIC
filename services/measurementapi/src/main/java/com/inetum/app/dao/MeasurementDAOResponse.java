@@ -12,4 +12,5 @@ import lombok.Setter;
 public class MeasurementDAOResponse {
 	String measurement;
 	Map<String, String> fields;
+	Map<String, String> tags;
 }

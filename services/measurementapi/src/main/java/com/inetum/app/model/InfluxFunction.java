@@ -7,7 +7,9 @@ public enum InfluxFunction {
 	MEDIAN,
 	SUM,
 	MAX,
-	MIN;
+	MIN,
+	FIRST,
+	LAST;
 	
 	public static InfluxFunction obtain(String function) {
 		try {

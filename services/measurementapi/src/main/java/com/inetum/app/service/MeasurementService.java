@@ -2,34 +2,49 @@ package com.inetum.app.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.influxdb.InfluxDB;
-import org.influxdb.dto.Point;
-import org.influxdb.dto.Point.Builder;
-import org.influxdb.dto.Query;
-import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.inetum.app.dao.MeasurementDAORequest;
 import com.inetum.app.dao.MeasurementDAOResponse;
+import com.inetum.app.exception.InvalidArgumentException;
 import com.inetum.app.mapper.MeasurementMapper;
 import com.inetum.app.model.InfluxFunction;
+//import com.inetum.app.mapper.MeasurementMapper;
 import com.inetum.app.model.InfluxTimeUnit;
 import com.inetum.app.service.utils.FieldsFormat;
+
+import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.QueryApi;
+import com.influxdb.client.WriteApiBlocking;
+import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
+import com.influxdb.query.FluxTable;
 
 @Service
 public class MeasurementService {
 	@Autowired
-    private InfluxDB influxDB;
+    private InfluxDBClient influxDB;
 
 	public void insert(MeasurementDAORequest measurement) {
-    	Builder registry = Point.measurement(measurement.getMeasurement());
-    	registry.time(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+		WriteApiBlocking write = influxDB.getWriteApiBlocking();
+		
+		Point registry = Point.measurement(measurement.getMeasurement());
+		if (measurement.getFields().containsKey("time")) {
+			try {
+				Instant time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(measurement.getFields().get("time")).toInstant();
+				registry.time(time.toEpochMilli(), WritePrecision.MS);
+			} catch(ParseException error) {
+				error.printStackTrace();
+				throw new InvalidArgumentException("Invalid value to time field");
+			}
+		} else
+			registry.time(System.currentTimeMillis(), WritePrecision.MS);
     	Entry<String, ?> field = null;
     	
     	for (Entry<String, String> fieldString : measurement.getFields().entrySet()) {
@@ -45,57 +60,50 @@ public class MeasurementService {
     			registry.addField(field.getKey(), (Boolean) field.getValue());
     	}
     	
-    	for (Entry<String, String> tag : measurement.getTags().entrySet())
-    		registry.addField(tag.getKey(), tag.getValue());    	
+		registry.addTags(measurement.getTags());    	
 
-        influxDB.write(measurement.getBucket(), "autogen", registry.build());
+    	write.writePoint(measurement.getBucket() == null || measurement.getBucket().isBlank()
+    			? "renergetic" : measurement.getBucket(), 
+    			"renergetic", 
+    			registry);
 	}
 
 	public List<MeasurementDAOResponse> select(MeasurementDAORequest measurement, String from, String to, String timeVar) {
-		String where = String.join(" AND ", measurement.getTags().keySet().stream().map(key -> String.format("\"%s\"='%s'", key, measurement.getTags().get(key))).collect(Collectors.toList()));
+		QueryApi query = influxDB.getQueryApi();
+
+		Long fromN = 0L;
+		Long toN = 0L;
+		String where = null;
+		if (!measurement.getTags().isEmpty())
+			where = "filter(fn: (r) => " + String.join(" and ", measurement.getTags().keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, measurement.getTags().get(key))).collect(Collectors.toList())) + ") |> ";
 		
 		if (timeVar.equals("time")) {
 			if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
 				from = '\''+from.replace(" ", "T")+'Z'+'\'';
-			else from = InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
+			else fromN = InfluxTimeUnit.convertNumber(from, InfluxTimeUnit.ms);
 			
 			if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
 				to = '\''+to.replace(" ", "T")+'Z'+'\'';
-			else to = InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);
-			
-			if (!measurement.getTags().isEmpty())
-				where = String.format("%s >= %s%s", timeVar, from, !to.equals("0ms")? " AND " + timeVar + " <= " + to : "") + " AND " + where;
-			else where = String.format("%s >= %s%s", timeVar, from, !to.equals("0ms")? " AND " + timeVar + " <= " + to : "");
-		} else {
-			Long fromNum = 0L;
-			Long toNum = 0L;
-			try {
-				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					fromNum = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(from).toInstant().toEpochMilli();
-				else fromNum = InfluxTimeUnit.convertNumber(from, InfluxTimeUnit.ms);
-				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					toNum = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(to).toInstant().toEpochMilli();
-				else toNum = InfluxTimeUnit.convertNumber(to, InfluxTimeUnit.ms);
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (!measurement.getTags().isEmpty())
-				where = String.format("%s >= %d%s", timeVar, fromNum, !(toNum == 0)? " AND " + timeVar + " <= " + toNum : "") + " AND " + where;
-			else where = String.format("%s >= %d%s", timeVar, fromNum, !(toNum == 0)? " AND " + timeVar + " <= " + toNum : "");
+			else toN = InfluxTimeUnit.convertNumber(to, InfluxTimeUnit.ms);	
 		}
-		System.err.printf("SELECT * FROM %s%s\n", 
-				measurement.getMeasurement(),
-				!where.isBlank()? " WHERE " + where : "");
 		
-		Query query = new Query(String.format("SELECT * FROM %s%s", 
+		String flux = String.format(
+				"from(bucket: \"%s\") |> "
+				+ "range(start: %d, stop: %s) |> "
+				+ "filter(fn: (r) => r[\"_measurement\"] == \"%s\") |> %s"
+				+ "group(columns:[\"_measurement\"], mode:\"by\")",
+				measurement.getBucket(),
+				fromN,
+				toN != 0? toN : "now()",
 				measurement.getMeasurement(),
-				!where.isBlank()? " WHERE " + where : ""), 
-				measurement.getBucket());
-		
-        QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
+				where != null? where : "");
+
+		System.err.println(flux);
+		List<FluxTable> tables = query.query(flux);
+		return MeasurementMapper.fromFlux(tables);
+        //QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
  
-        return MeasurementMapper.fromSeries(queryResult.getResults().get(0).getSeries().get(0));
+        //return MeasurementMapper.fromSeries(queryResult.getResults().get(0).getSeries().get(0));
 	}
 	
 	/**
@@ -107,57 +115,47 @@ public class MeasurementService {
      * @return The sum of power data group by time
      */
     public List<MeasurementDAOResponse> operate(MeasurementDAORequest measurement, InfluxFunction function, String field, String from, String to, String group, String timeVar) {
-    	String where = String.join(" AND ", measurement.getTags().keySet().stream().map(key -> String.format("\"%s\"='%s'", key, measurement.getTags().get(key))).collect(Collectors.toList()));
+		QueryApi query = influxDB.getQueryApi();
 
+		Long fromN = 0L;
+		Long toN = 0L;
+		String where = null;
+		if (!measurement.getTags().isEmpty())
+			where = "filter(fn: (r) => " + String.join(" and ", measurement.getTags().keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, measurement.getTags().get(key))).collect(Collectors.toList())) + ") |> ";
+		
 		if (timeVar.equals("time")) {
 			if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
 				from = '\''+from.replace(" ", "T")+'Z'+'\'';
-			else from = InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
+			else fromN = InfluxTimeUnit.convertNumber(from, InfluxTimeUnit.ms);
 			
 			if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
 				to = '\''+to.replace(" ", "T")+'Z'+'\'';
-			else to = InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);
-			
-			if (!measurement.getTags().isEmpty())
-				where = String.format("%s >= %s%s", timeVar, from, !to.equals("0ms")? " AND " + timeVar + " <= " + to : "") + " AND " + where;
-			else where = String.format("%s >= %s%s", timeVar, from, !to.equals("0ms")? " AND " + timeVar + " <= " + to : "");
-		} else {
-			Long fromNum = 0L;
-			Long toNum = 0L;
-			try {
-				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					fromNum = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(from).toInstant().toEpochMilli();
-				else fromNum = InfluxTimeUnit.convertNumber(from, InfluxTimeUnit.ms);
-				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					toNum = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(to).toInstant().toEpochMilli();
-				else toNum = InfluxTimeUnit.convertNumber(to, InfluxTimeUnit.ms);
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (!measurement.getTags().isEmpty())
-				where = String.format("%s >= %d%s", timeVar, fromNum, !(toNum == 0)? " AND " + timeVar + " <= " + toNum : "") + " AND " + where;
-			else where = String.format("%s >= %d%s", timeVar, fromNum, !(toNum == 0)? " AND " + timeVar + " <= " + toNum : "");
+			else toN = InfluxTimeUnit.convertNumber(to, InfluxTimeUnit.ms);	
 		}
-		group = InfluxTimeUnit.convert(group, InfluxTimeUnit.ms);
+		if (group != null && !group.isBlank()) {
+			group = InfluxTimeUnit.convert(group, InfluxTimeUnit.ms);
+			group = "window(every: " + group + ", startColumn: \"_time\") |> ";
+		} else group = null;
 		
-		System.err.printf("SELECT %s(%s) FROM %s%s%s\n", 
-				function.name(),
-				field,
-				measurement.getMeasurement(),				
-				!where.isBlank()? " WHERE " + where : "",
-				!group.equals("0ms")? " GROUP BY time(" + group + ") fill(linear)" : "");
-		
-		Query query = new Query(String.format("SELECT %s(%s) FROM %s%s%s", 
-				function.name(),
-				field,
+		String flux = String.format(
+				"from(bucket: \"%s\") |> "
+				+ "range(start: %d, stop: %s) |> "
+				+ "filter(fn: (r) => r[\"_measurement\"] == \"%s\" and r[\"_field\"] == \"%s\") |> %s"
+				+ "group(columns:[\"_measurement\"], mode:\"by\") |> %s"
+				+ "%s(column: \"_value\") |> "
+				+ "set(key: \"_field\", value: \"%s\")",
+				measurement.getBucket(),
+				fromN,
+				toN != 0? toN : "now()",
 				measurement.getMeasurement(),
-				!where.isBlank()? " WHERE " + where : "",
-				!group.equals("0ms")? " GROUP BY time(" + group + ") fill(linear)" : ""), 
-				measurement.getBucket());
-		
-        QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
- 
-        return MeasurementMapper.fromSeries(queryResult.getResults().get(0).getSeries().get(0));
+				field,
+				where != null? where : "",
+				group != null? group : "",
+				function.name().toLowerCase(),
+				function.name().toLowerCase());
+
+		System.err.println(flux);
+		List<FluxTable> tables = query.query(flux);
+		return MeasurementMapper.fromFlux(tables);
     }
 }

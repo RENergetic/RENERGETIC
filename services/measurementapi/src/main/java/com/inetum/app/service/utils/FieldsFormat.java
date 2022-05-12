@@ -34,7 +34,7 @@ public class FieldsFormat {
 			}
 		} 
 		// CHECK IF IS A NUMBER
-		else if (fieldString.getValue().matches("\\d+(\\.\\d)?\\d+")) {
+		else if (fieldString.getValue().matches("\\d+(\\.\\d)?\\d*")) {
 			if (fieldString.getValue().contains("."))
 				field = new AbstractMap.SimpleEntry<>(fieldString.getKey(), Double.parseDouble(fieldString.getValue()));
 			else
@@ -44,25 +44,30 @@ public class FieldsFormat {
 		return field;
 	}
 	
-	public static Entry<String, String> parseSeries(Entry<String, Object> fieldString) {
+	public static Entry<String, String> parseSeries(String key, Object value) {
 		Entry<String, String> field;
 
 		// CHECK IF IS A NULL
-		if (fieldString.getValue() == null)
-			field = new AbstractMap.SimpleEntry<>(fieldString.getKey(), null);
+		if (value == null)
+			field = new AbstractMap.SimpleEntry<>(key, null);
 		// CHECK IF IS A BOOLEAN
-		else if (fieldString.getValue() instanceof Boolean) 
-			field = new AbstractMap.SimpleEntry<>(fieldString.getKey(), fieldString.getValue().toString());
+		else if (value instanceof Boolean) 
+			field = new AbstractMap.SimpleEntry<>(key, value.toString());
 		// CHECK IF IS A DATE
-		else if (fieldString.getKey().startsWith("time") && fieldString.getValue() instanceof Double) {
-			Date date = new Date(((Double) fieldString.getValue()).longValue());
+		else if (value instanceof Instant) {
+			Date date = new Date(((Instant) value).toEpochMilli());
 			String text = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-			field = new AbstractMap.SimpleEntry<>(fieldString.getKey(), text);
+			field = new AbstractMap.SimpleEntry<>(key, text);
+		}
+		else if (key.startsWith("time") && value instanceof Double) {
+			Date date = new Date(((Double) value).longValue());
+			String text = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+			field = new AbstractMap.SimpleEntry<>(key, text);
 		} 
 		// CHECK IF IS A NUMBER
-		else if (fieldString.getValue() instanceof Double) {
-			field = new AbstractMap.SimpleEntry<>(fieldString.getKey(), new DecimalFormat("#.#############").format(fieldString.getValue()));
-		} else field = new AbstractMap.SimpleEntry<>(fieldString.getKey(), fieldString.getValue().toString());
+		else if (value instanceof Double) {
+			field = new AbstractMap.SimpleEntry<>(key, new DecimalFormat("#.#############").format(value));
+		} else field = new AbstractMap.SimpleEntry<>(key, value.toString());
 		
 		return field;
 	}
