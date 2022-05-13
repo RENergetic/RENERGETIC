@@ -20,6 +20,9 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/influxdb
               name: influx-disk
+          volumeMounts:
+            - mountPath: /var/lib/influxdb2
+              name: influx2-disk
 #            - mountPath: /etc/influxdb/influxdb.conf
 #              name: influxdb-config
 #              subPath: influxdb.conf
@@ -44,6 +47,9 @@ spec:
         - name: influx-disk
           persistentVolumeClaim:
             claimName: influx-disk
+        - name: influx2-disk
+          persistentVolumeClaim:
+            claimName: influx2-disk
 #        - name: influxdb-config
 #          configMap:
 #            name: influxdb-config #https://octoperf.com/img/blog/kraken-kubernetes-influxdb-grafana-telegraf/influxdb-config.yaml
