@@ -1,1 +1,1 @@
-FROM influxdb:1.8.10-alpine
+FROM influxdb:2.2.0-alpine
