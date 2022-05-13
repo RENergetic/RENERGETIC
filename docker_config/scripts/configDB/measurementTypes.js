@@ -147,7 +147,7 @@ let types = [
     },
     {
         id: "16",
-        name: "flow_m3perh",
+        name: "flow_lperh",
         label: "Flow [l/h]",
         base_unit: "m3/h",
         unit: "l/h",
