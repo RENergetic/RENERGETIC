@@ -5,9 +5,10 @@ To execute the script installerWindows.sh, we need:
 
 ### Variables
 At the begining of the script, we can find these some variables, than let us to set which part of our application we need to mount:
- - buildimages -> 'true' if you want to generate docker images to resources
- - compileapps -> 'true' to compile Java, Vue and other programs before building the image 
- - installdb -> 'true' if you want to deploy postgres in minikube
- - installapi -> 'true' to deploy it to minikube
+ // deprecated: -buildimages -> 'true' if you want to generate docker images to resources
+ // deprecated: - compileapps -> 'true' to compile Java, Vue and other programs before building the image 
+ - installdb -> 'true' if you want to deploy InfluxDB in minikube
+ - installapi -> 'true' to deploy influxdb api  to minikube
  - installback -> in development, doesn't works
  - installgrafana -> 'true' to deploy it to minikube
+ - installkafka -> 'true' to deploy it to minikube

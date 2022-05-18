@@ -7,8 +7,6 @@ spec:
   selector:
     app: backinflux
   type: NodePort
-  externalIPs:
-  - 192.168.0.10
   ports:
-    - port: 8084
-      targetPort: 8084
+    - port: 8082
+      targetPort: 8082
