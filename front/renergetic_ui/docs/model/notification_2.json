@@ -1,0 +1,56 @@
+{
+    "id": 1,
+    "type": "error",
+    "tile": {
+        "id": "3",
+        "panelId": "606",
+        "layout": { x: 4, y: 0, h: 5, w: 4
+        },
+        "state": "warning",
+        "label": null,
+        "featured": true,
+        "type": "doughnut",
+        "measurements": [
+            {
+                "id": "2",
+                "name": "e5",
+                "label": "e5",
+                "unit": "kWh",
+                "message": "avg",
+                "icon": "electricity",
+                "measurement_details": {
+                    "color": "#5C6BC0"
+                },
+            },
+            {
+                "id": "3",
+                "name": "e6",
+                "label": "e6",
+                "unit": "kWh",
+                "message": "total",
+                "icon": "electricity",
+                "measurement_details": {
+                    "color": "#FF7043"
+                },
+            },
+            {
+                "id": "4",
+                "name": "e6",
+                "label": "e6",
+                "unit": "kWh",
+                "message": "total",
+                "icon": "electricity",
+                "measurement_details": {
+                    "color": "#1976D2"
+                },
+            },
+        ],
+        "props": {},
+    },
+    "asset": {
+        "id": 1
+    },
+    "message": "Building A ",
+    "date_from": 1646082303,
+    "date_to": 1646182303
+}

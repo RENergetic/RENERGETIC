@@ -37,6 +37,7 @@
   "select_asset_type": "Select asset type",
   "select_tile_type": "Select tile type",
   "select_parent_asset": "Select parent asset",
+  "select_owner": "Select owner",
   "show":"Show",
   "edit_area": "Edit area",
   "view_asset_children": "Show sub assets",

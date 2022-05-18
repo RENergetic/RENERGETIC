@@ -9,11 +9,11 @@ export default {
 </script>
 <style scoped>
 #pagelogo {
-  background-image: url("../../assets/logo.png");
+  background-image: url("../../assets/logo.svg");
   width: 7.5rem;
   height: 3rem;
   display: inherit;
-  background-size: 100%;
+  background-size: 100% 3rem;
   background-repeat: no-repeat;
   background-position: center;
 }

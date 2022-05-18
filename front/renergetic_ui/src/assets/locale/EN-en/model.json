@@ -47,7 +47,7 @@
           "location_name": "Location",
           "type": "Measurement type",
           "id": "Id",
-          "details": "details",
+          "details": "Details",
           "direction": "Direction",
           "direction_out": "Out",
           "direction_in": "In",

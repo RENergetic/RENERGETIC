@@ -21,7 +21,7 @@
     :modal="true"
     :dismissable-mask="true"
   >
-    <DashboardForm :dashboard="dashboard" @save="test" @cancel="updateDialog = false"></DashboardForm>
+    <DashboardForm :dashboard="dashboard" @save="onSave" @cancel="updateDialog = false"></DashboardForm>
   </Dialog>
 </template>
 <script>
@@ -104,11 +104,11 @@ export default {
     );
   },
   methods: {
-    test() {
-      console.error("Aqui si va");
-    },
     async onSave(dashboard) {
       await this.$ren.dashboardApi.update(dashboard).then((dashboardReq) => {
+        console.log(dashboard);
+        console.log(dashboardReq);
+        this.updateDialog = false;
         this.$store.commit("view/dashboardsUpdate", dashboardReq);
         this.$emit("UpdateMenu", null);
       });

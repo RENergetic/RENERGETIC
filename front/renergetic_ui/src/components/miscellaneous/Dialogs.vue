@@ -84,6 +84,7 @@ export default {
   methods: {
     async onSave(dashboard) {
       await this.$ren.dashboardApi.add(dashboard).then((dashboardReq) => {
+        this.mAddDashboard = false;
         this.$store.commit("view/dashboardsAdd", dashboardReq);
         this.$emit("UpdateMenu", null);
       });

@@ -1,0 +1,12 @@
+
+ {
+    "id": 2, 
+    "type": "warning", 
+    "icon": "electricity",
+    "asset": {
+        "id": 3
+    }, 
+    "message": "Building B",
+    "date_from": 1646082303,
+    "date_to": 1646182303
+}

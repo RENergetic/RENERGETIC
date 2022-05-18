@@ -6,7 +6,7 @@
   </InfoIcon>
   <!-- {{ data }} -->
 
-  <Chart v-if="data" type="line" :data="data" :options="options" />
+  <Chart v-if="data" :type="chartType" :data="data" :options="options" />
   <!-- :plugins="plugin"   "-->
   <div class="card">
     <div class="field grid">
@@ -40,6 +40,7 @@ export default {
     datasets: { type: Array, default: () => null }, //,default:
     labels: { type: Array, default: null },
     objects: { type: Array, default: null },
+    chartType: { type: String, default: "line" },
   },
   data() {
     return {
