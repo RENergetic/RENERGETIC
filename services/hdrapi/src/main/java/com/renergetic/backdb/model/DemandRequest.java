@@ -25,7 +25,7 @@ public class DemandRequest {
     private Asset asset;
 
     @OneToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "measurement_id", nullable = true)
+    @JoinColumn(name = "measurement_id", nullable = false)
     private Measurement measurement;
 
     @OneToOne(cascade = CascadeType.REFRESH)
