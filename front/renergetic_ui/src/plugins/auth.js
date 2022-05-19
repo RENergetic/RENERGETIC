@@ -208,6 +208,14 @@ export default function (Vue) {
       };
       return axios.delete(`${info.url}/admin/realms/${info.realm}/users/${userId}`, config);
     },
+    hasAccess(assignedRoles, allowedRoles) {
+      if (!allowedRoles || allowedRoles.length == 0) return true;
+      else if (!assignedRoles || assignedRoles.length == 0) return false;
+      for (var i = 0; i < allowedRoles.length; i++) {
+        if (assignedRoles.indexOf(allowedRoles[i]) !== -1) return true;
+      }
+      return false;
+    },
     async executeAfterInitialized(method) {
       const TRIES = 4;
       const TIME = 150;

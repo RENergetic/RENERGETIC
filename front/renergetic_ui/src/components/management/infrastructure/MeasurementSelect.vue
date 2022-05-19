@@ -28,7 +28,7 @@
 export default {
   name: "MeasurementSelect",
   components: {},
-  props: { current: { type: Object, default: () => null }, assetId: { type: String, default: null } },
+  props: { current: { type: Object, default: () => null }, assetId: { type: Number, default: null } },
   emits: ["select", "update:modelValue"],
   data() {
     return {

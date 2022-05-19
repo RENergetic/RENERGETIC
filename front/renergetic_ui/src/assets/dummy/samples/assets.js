@@ -1,7 +1,12 @@
 export default [
   {
     id: 1,
-    asset_type: "building",
+    type: {
+      id: 1,
+      name: "building",
+      label: "Building",
+      category: "structural",
+    },
     name: "Building_A",
     label: "Building A",
     geo_location: null,
@@ -11,7 +16,12 @@ export default [
   },
   {
     id: 2,
-    asset_type: "building",
+    type: {
+      id: 1,
+      name: "building",
+      label: "Building",
+      category: "structural",
+    },
     name: "Building_B",
     label: "Building B",
     geo_location: null,
@@ -21,7 +31,12 @@ export default [
   },
   {
     id: 2,
-    asset_type: "pv",
+    type: {
+      id: 2,
+      name: "pv",
+      label: "PV",
+      category: "energy",
+    },
     name: "PV_1",
     label: "PV 1",
     geo_location: null,

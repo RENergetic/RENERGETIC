@@ -29,7 +29,11 @@
           </Listbox> -->
           <div class="grid">
             <div class="col">
-              <Button :label="$t('view.button.submit')" @click="submit" />
+              <Button
+                :label="$t('view.button.submit')"
+                :disabled="assetList.length < 1 || !assetList.some((asset) => asset.name === selectedAsset.name)"
+                @click="submit"
+              />
             </div>
             <div class="col">
               <Button :label="$t('view.button.clear')" :disabled="selectedAsset == null" @click="clear" />
@@ -47,13 +51,18 @@
 export default {
   name: "MeasurementSelect",
   components: {},
-  props: { current: { type: Object, default: () => null }, modelValue: { type: Object, default: () => null } },
+  props: {
+    current: { type: Object, default: () => null },
+    modelValue: { type: Object, default: () => null },
+    category: { type: String, default: undefined, require: false },
+  },
   emits: ["change", "update:modelValue"],
   data() {
     return {
       assetList: [],
       selectedAsset: null,
       assetDialog: false,
+      filters: undefined,
     };
   },
   async mounted() {},
@@ -68,8 +77,11 @@ export default {
     },
     async searchAsset(event) {
       let q = event.query.trim();
+      if (this.category != undefined) {
+        this.filters = { category: this.category };
+      }
       if (q.length > 0)
-        await this.$ren.managementApi.searchAsset(q).then((assetList) => {
+        await this.$ren.managementApi.searchAsset(q, this.filters).then((assetList) => {
           // if (this.current) {
           //   if (assetList.find((it) => it.id == this.current.id) == null) {
           //     this.assetList = [this.current] + assetList;

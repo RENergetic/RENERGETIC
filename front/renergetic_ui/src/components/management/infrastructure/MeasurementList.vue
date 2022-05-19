@@ -15,8 +15,12 @@
     </Column>
     <Column field="direction" :header="$t('model.measurement.direction')">
       <template #body="slotProps">
-        <span v-if="slotProps.data.direction.direction"> {{ $t("model.measurement.direction_out") }}</span>
-        <span v-else-if="slotProps.data.direction == false"> {{ $t("model.measurement.direction_in") }}</span>
+        <span v-if="slotProps.data.direction == true || slotProps.data.direction == 'out'">
+          {{ $t("model.measurement.direction_out") }}</span
+        >
+        <span v-else-if="slotProps.data.direction == false || slotProps.data.direction == 'in'">
+          {{ $t("model.measurement.direction_in") }}</span
+        >
         <span v-else> {{ $t("model.measurement.direction_null") }}</span>
       </template>
     </Column>

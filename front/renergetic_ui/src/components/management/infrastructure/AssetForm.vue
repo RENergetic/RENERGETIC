@@ -27,7 +27,7 @@
     <div class="col">
       <Dropdown
         id="assetType"
-        v-model="mModel.asset_type"
+        v-model="mModel.type"
         :options="assetTypes"
         option-label="label"
         option-value="value"
@@ -37,7 +37,7 @@
   </div>
 
   <div class="field grid">
-    <label for="assetType" class="col-fixed" style="width: 5rem">
+    <label for="assetParent" class="col-fixed" style="width: 5rem">
       {{ $t("model.asset.parent") }}
     </label>
     <div class="col">
@@ -46,9 +46,20 @@
     </div>
   </div>
 
+  <div class="field grid">
+    <label for="owner" class="col-fixed" style="width: 5rem">
+      {{ $t("model.asset.owner") }}
+    </label>
+    <div class="col">
+      <span v-if="ownerLabel" @click="selectOwner">{{ ownerLabel }}</span>
+      <span v-else @click="selectOwner">{{ $t("view.select_owner") }}</span>
+    </div>
+  </div>
+
   <Button :label="$t('view.button.submit')" @click="submit" />
   <Button :label="$t('view.button.cancel')" @click="cancel" />
   <AssetSelect ref="assetSelectDialog" v-model="mModel.parent" />
+  <AssetSelect ref="ownerSelectDialog" v-model="mModel.owner" category="user" />
   <!-- change -->
 </template>
 
@@ -82,11 +93,23 @@ export default {
     parentLabel: function () {
       return this.mModel != null && this.mModel.parent != null ? this.mModel.parent.label : null;
     },
+    ownerLabel: function () {
+      return this.mModel != null && this.mModel.owner != null ? this.mModel.owner.label : null;
+    },
   },
   watch: {},
+  async mounted() {
+    // LOAD ASSET TYPES
+    this.assetTypes = (await this.$ren.managementApi.listAssetType()).map((type) => {
+      return { value: type.id, label: type.label };
+    });
+  },
   methods: {
     selectAsset() {
       this.$refs.assetSelectDialog.open();
+    },
+    selectOwner() {
+      this.$refs.ownerSelectDialog.open();
     },
     submit() {
       this.$emit("update:modelValue", this.mModel);

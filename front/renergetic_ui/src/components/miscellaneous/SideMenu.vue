@@ -9,6 +9,7 @@
       :notifications="notifications"
       :add-dashboard="dashboardDialog"
       @update:notifications="notifications = $event"
+      @UpdateMenu="reload"
     ></Dialogs>
   </div>
 </template>
@@ -38,7 +39,7 @@ export default {
       dashboardDialog: false,
       informationPanels: [],
       isAdmin: false, //this.$store.getters["user/isAdmin"],
-      isLogin: false,
+      user: false,
     };
   },
   watch: {
@@ -48,7 +49,7 @@ export default {
   },
 
   async created() {
-    this.isLogin = (await this.$keycloak.get()).authenticated;
+    this.user = await this.$keycloak.get();
     this.menuModel = this.initMenu();
     this.reload();
   },
@@ -79,6 +80,17 @@ export default {
           command: () => {
             this.$router.push(to);
           },
+          visible: () => {
+            let route =
+              this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "InformationPanelView")];
+            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+            else {
+              return this.$keycloak.hasAccess(
+                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+                route.meta.roles,
+              );
+            }
+          },
         };
       });
       items.push({
@@ -88,6 +100,19 @@ export default {
         command: () => {
           this.$router.push({ name: "InformationPanelList" });
         },
+        visible: () => {
+          let route =
+            this.$router.getRoutes()[
+              this.$router.getRoutes().findIndex((obj) => obj.name == "InformationPanelListView")
+            ];
+          if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+          else {
+            return this.$keycloak.hasAccess(
+              this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+              route.meta.roles,
+            );
+          }
+        },
       });
       items.push({
         //tODO:
@@ -96,6 +121,19 @@ export default {
         to: "/panel/add",
         command: () => {
           this.$router.push({ name: "InformationPanelCreator" });
+        },
+        visible: () => {
+          let route =
+            this.$router.getRoutes()[
+              this.$router.getRoutes().findIndex((obj) => obj.name == "InformationPanelCreator")
+            ];
+          if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+          else {
+            return this.$keycloak.hasAccess(
+              this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+              route.meta.roles,
+            );
+          }
         },
       });
       return items;
@@ -139,6 +177,17 @@ export default {
           command: () => {
             this.$router.push({ name: "HeatMapListView" });
           },
+          visible: () => {
+            let route =
+              this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "HeatMapListView")];
+            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+            else {
+              return this.$keycloak.hasAccess(
+                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+                route.meta.roles,
+              );
+            }
+          },
         },
         {
           // label: this.$t("menu.group_list"),
@@ -147,6 +196,17 @@ export default {
           to: "/dashboard/heatmap/add",
           command: () => {
             this.$router.push({ name: "DashboadAdd" });
+          },
+          visible: () => {
+            let route =
+              this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "HeatMapCreator")];
+            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+            else {
+              return this.$keycloak.hasAccess(
+                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+                route.meta.roles,
+              );
+            }
           },
         },
       ];
@@ -160,6 +220,16 @@ export default {
           to: "/admin/users",
           command: () => {
             this.$router.push({ name: "Users" });
+          },
+          visible: () => {
+            let route = this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "Users")];
+            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+            else {
+              return this.$keycloak.hasAccess(
+                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+                route.meta.roles,
+              );
+            }
           },
         },
       ];
@@ -180,6 +250,17 @@ export default {
               command: () => {
                 this.$router.push({ name: "AssetList" });
               },
+              visible: () => {
+                let route =
+                  this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "AssetList")];
+                if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+                else {
+                  return this.$keycloak.hasAccess(
+                    this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+                    route.meta.roles,
+                  );
+                }
+              },
             },
             {
               // label: this.$t("menu.group_list"),
@@ -190,8 +271,17 @@ export default {
                 alert("todo:");
                 // this.$router.push({ name: "Users" });
               },
+              visible: () => {
+                // NOT IMPLEMENTED YET
+              },
             },
           ],
+          visible: function () {
+            return this.items.some(function (item) {
+              console.log(item.visible);
+              return item.visible == undefined || item.visible();
+            });
+          },
         },
         {
           label: this.$t("menu.measurements"),
@@ -204,6 +294,17 @@ export default {
               command: () => {
                 this.$router.push({ name: "MeasurementList" });
               },
+              visible: () => {
+                let route =
+                  this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "MeasurementList")];
+                if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+                else {
+                  return this.$keycloak.hasAccess(
+                    this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+                    route.meta.roles,
+                  );
+                }
+              },
             },
             {
               label: this.$t("menu.view"),
@@ -213,8 +314,17 @@ export default {
                 alert("todo:");
                 // this.$router.push({ name: "Users" });
               },
+              visible: () => {
+                // NOT IMPLEMENTED YET
+              },
             },
           ],
+          visible: function () {
+            return this.items.some(function (item) {
+              console.log(item.visible);
+              return item.visible == undefined || item.visible();
+            });
+          },
         },
         {
           label: this.$t("menu.users"),
@@ -222,6 +332,9 @@ export default {
           command: () => {
             alert("todo:");
             // this.$router.push({ name: "Users" });
+          },
+          visible: () => {
+            // NOT IMPLEMENTED YET
           },
         },
       ];
@@ -232,26 +345,57 @@ export default {
           label: this.$t("menu.dashboards"),
           icon: "pi pi-fw pi-chart-line",
           items: this.dashboardItems(),
+          visible: () => {
+            let to = this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "Dashboard")];
+            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+            else {
+              return this.$keycloak.hasAccess(
+                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+                to.meta.roles,
+              );
+            }
+          },
         },
         {
           label: this.$t("menu.information_panel"),
           icon: "pi pi-fw pi-chart-line",
           items: this.panelItems(),
+          visible: function () {
+            return this.items.some(function (item) {
+              return item.visible == undefined || item.visible();
+            });
+          },
         },
         {
           label: this.$t("menu.heatmaps"),
           icon: "pi pi-fw pi-chart-line",
           items: this.heatMapItems(),
+          visible: function () {
+            return this.items.some(function (item) {
+              return item.visible == undefined || item.visible();
+            });
+          },
         },
         {
           label: this.$t("menu.infrastructure"),
           icon: "pi pi-fw pi-lock",
           items: this.infrastructureItems(),
+          visible: function () {
+            return this.items.some(function (item) {
+              return item.visible == undefined || item.visible();
+            });
+          },
         },
         {
           label: this.$t("menu.administration"),
           icon: "pi pi-fw pi-lock",
           items: this.administrationItems(),
+          visible: function () {
+            return this.items.some(function (item) {
+              console.log(item.visible);
+              return item.visible == undefined || item.visible();
+            });
+          },
         },
         {
           label: this.$t("menu.profile"),
@@ -259,6 +403,16 @@ export default {
           to: "/profile",
           command: () => {
             this.$router.push("/profile");
+          },
+          visible: () => {
+            let to = this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "Profile")];
+            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
+            else {
+              return this.$keycloak.hasAccess(
+                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
+                to.meta.roles,
+              );
+            }
           },
         },
         {
@@ -279,10 +433,18 @@ export default {
           },
         },
         {
+          label: this.$t("menu.login"),
+          icon: "pi pi-sign-in",
+          visible: () => !this.user.authenticated,
+          command: async () => {
+            this.user.login();
+          },
+        },
+        {
           label: this.$t("menu.signup"),
           icon: "pi pi-sign-in",
           to: "/signup",
-          visible: () => !this.isLogin,
+          visible: () => !this.user.authenticated,
           command: () => {
             this.$router.push({ name: "SignUp" });
           },
@@ -291,7 +453,7 @@ export default {
           label: this.$t("menu.logout"),
           icon: "pi pi-sign-out",
           to: "/",
-          visible: () => this.isLogin,
+          visible: () => this.user.authenticated,
           command: () => {
             this.$keycloak.logout();
             this.$router.push("/");

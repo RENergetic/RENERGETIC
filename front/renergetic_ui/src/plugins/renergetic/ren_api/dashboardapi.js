@@ -54,7 +54,7 @@ export default class DashboardApi extends RestComponent {
     //validate
     // TODO:
     return this.axios
-      .put(`/api/dashboard`, dashboard, {
+      .put(`/api/dashboard/${dashboard.id}`, dashboard, {
         headers: { "Content-type": "application/json; charset=UTF-8" },
       })
       .then((response) => {

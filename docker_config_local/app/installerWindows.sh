@@ -2,21 +2,14 @@ current=$(pwd -W tr / \\)
 
 namespace='app'
 
-java='services\backdb'
-javafile='backdb-0.0.1-SNAPSHOT.jar'
 javahdr='services\hdrapi'
 javafilehdr='hdrapi-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic_ui'
-
+#postgre
 installdb='true'
-installapi='true'
 installapihdr='true'  # API HDR
 installfront='true'
 installkeycloak='true'
-
-java1='services\backbuildings'
-javafile1='buildingsService-0.0.1-SNAPSHOT.jar'
-installapi1='true'
 
 while getopts n: flag
 do
@@ -33,41 +26,14 @@ then
     cd  "${current}\\db"
     # DATABASE INSTALATION
 	# delete kubernetes resources if exists
-    kubectl delete configmaps/postgres-db-config --namespace=$namespace
+    kubectl delete configmaps/postgresql-db-config --namespace=$namespace
     kubectl delete statefulsets/postgresql-db --namespace=$namespace
-    kubectl delete services/postgres-db-sv --namespace=$namespace
+    kubectl delete services/postgresql-db-sv --namespace=$namespace
 	
     # create kubernetes resources
     kubectl apply -f postgresql-configmap.yaml --namespace=$namespace
     kubectl apply -f postgresql.yaml --namespace=$namespace
     kubectl apply -f postgresql-service.yaml --namespace=$namespace
-fi
-
-if [[ $installapi = 'true' ]]
-then
-    if [[ $java != '' ]]
-    then
-        # API COMPILE TO JAR
-        cd "${current}\\..\\..\\services\\backdb"
-        mvn clean package -Dmaven.test.skip
-        cp ".\\target\\${javafile}" "${current}\\api"
-    fi
-
-    cd  "${current}\\api"
-    # API INSTALLATION
-    # set environment variables
-    eval $(minikube docker-env)
-
-    # delete kubernetes resources if exists
-    kubectl delete deployments/backdb --namespace=$namespace
-    kubectl delete services/backdb-sv --namespace=$namespace
-
-    # create docker image
-    docker build --no-cache --force-rm --tag=backdb:latest .
-    
-    # create kubernetes resources
-    kubectl apply -f backdb-deployment.yaml --force=true --namespace=$namespace
-    kubectl apply -f backdb-service.yaml --namespace=$namespace
 fi
 
 if [[ $installapihdr = 'true' ]]

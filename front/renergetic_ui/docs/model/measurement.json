@@ -1,10 +1,14 @@
 {
     "id": "2",
-    "measurement_type": {
+    "type": {
+        "id": 1,
         "name": "type_name",
-        "label": "type's label ",
+        "label": "type's label",
+        "base_unit": "Wh",
         "unit": "kWh",
-        "id": ""
+        "metric_type": "metrics_type",
+        "factor": "1000",
+        "color": "#FFFFFF"
     },
     "name": "m_2",
     "label": "M 2",
