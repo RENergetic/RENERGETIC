@@ -34,7 +34,7 @@ public class FieldsFormat {
 			}
 		} 
 		// CHECK IF IS A NUMBER
-		else if (fieldString.getValue().matches("\\d+(\\.\\d)?\\d*")) {
+		else if (fieldString.getValue().matches("-?\\d+(\\.\\d)?\\d*")) {
 			if (fieldString.getValue().contains("."))
 				field = new AbstractMap.SimpleEntry<>(fieldString.getKey(), Double.parseDouble(fieldString.getValue()));
 			else
