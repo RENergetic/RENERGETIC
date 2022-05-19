@@ -1,3 +1,5 @@
+# COMMETED LINES ARE TO UPDATE FROM INFLUX 1.8 TO INFLUX 2
+# TODO: Can't attach some volumes in Openshift
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,14 +22,14 @@ spec:
             - containerPort: 8086
           resources:
             requests:
-              cpu: 200m
-              memory: 200Mi
+              cpu: 400m
+              memory: 600Mi
             limits:
-              cpu: 350m
-              memory: 425Mi
-          volumeMounts:
-            - mountPath: /var/lib/influxdb
-              name: influx-disk
+              cpu: 850m
+              memory: 1Gi
+#          volumeMounts:
+#            - mountPath: /var/lib/influxdb
+#              name: influx-disk
           volumeMounts:
             - mountPath: /var/lib/influxdb2
               name: influx2-disk
@@ -46,9 +48,9 @@ spec:
             value: setup
 #            value: upgrade
       volumes:
-        - name: influx-disk
-          persistentVolumeClaim:
-            claimName: influx-disk
+#        - name: influx-disk
+#          persistentVolumeClaim:
+#            claimName: influx-disk
         - name: influx2-disk
           persistentVolumeClaim:
             claimName: influx2-disk

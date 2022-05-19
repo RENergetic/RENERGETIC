@@ -10,8 +10,8 @@ automatic=-1
 
 installdb='true'
 installapi='true'
-installback=''
-installkafka=''
+installback='false'
+installkafka='false'
 installgrafana='true'
 javafile='measurementapi-0.0.1-SNAPSHOT.jar'
 
