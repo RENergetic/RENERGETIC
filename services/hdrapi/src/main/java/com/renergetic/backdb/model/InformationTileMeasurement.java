@@ -40,7 +40,7 @@ public class InformationTileMeasurement {
 
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "measurement_type_id", nullable = false, insertable = true, updatable = true)
+	@JoinColumn(name = "measurement_type_id", nullable = true, insertable = true, updatable = true)
 	private MeasurementType type;
 
 	@Column(name = "direction", nullable = true, insertable = true, updatable = true)

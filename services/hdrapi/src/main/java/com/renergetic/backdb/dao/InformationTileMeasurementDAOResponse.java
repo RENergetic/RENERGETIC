@@ -32,7 +32,7 @@ public class InformationTileMeasurementDAOResponse {
 	@JsonProperty(value = "measurement_type_id", required = false)
 	private MeasurementType type;
 
-	@JsonProperty(value = "sensor_name", required = true)
+	@JsonProperty(value = "sensor_name", required = false)
 	private String sensorName;
 
 	@JsonProperty(required = false)
