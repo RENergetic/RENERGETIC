@@ -2,7 +2,10 @@ package com.renergetic.backdb.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.renergetic.backdb.model.Direction;
+import com.renergetic.backdb.model.Domain;
 import com.renergetic.backdb.model.InformationTileMeasurement;
+import com.renergetic.backdb.model.MeasurementType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,18 @@ public class InformationTileMeasurementDAOResponse {
 
     @JsonProperty(value = "measurement", required = false)
     private SimpleMeasurementDAO measurement;
+
+	@JsonProperty(value = "measurement_type_id", required = false)
+	private MeasurementType type;
+
+	@JsonProperty(value = "sensor_name", required = true)
+	private String sensorName;
+
+	@JsonProperty(required = false)
+	private Domain domain;
+
+	@JsonProperty(required = false)
+	private Direction direction;
     
     public static InformationTileMeasurementDAOResponse create(InformationTileMeasurement tile) {
     	InformationTileMeasurementDAOResponse dao = new InformationTileMeasurementDAOResponse();
@@ -36,6 +51,12 @@ public class InformationTileMeasurementDAOResponse {
 			dao.setMeasurement(SimpleMeasurementDAO.create(tile.getMeasurement()));
 		if(tile.getAsset() != null) 
 			dao.setAsset(SimpleAssetDAO.create(tile.getAsset()));
+		if(tile.getType() != null)
+			dao.setType(tile.getType());
+
+		dao.setSensorName(tile.getSensorName());
+		dao.setDomain(tile.getDomain());
+		dao.setDirection(tile.getDirection());
 		
 		return dao;
 	}
@@ -51,6 +72,13 @@ public class InformationTileMeasurementDAOResponse {
 
 		if (measurement != null)
 			tile.setMeasurement(measurement.mapToEntity());
+		
+		if (type != null)
+			tile.setType(type);
+
+		tile.setSensorName(sensorName);
+		tile.setDomain(domain);
+		tile.setDirection(direction);
 
 		return tile;
 	}

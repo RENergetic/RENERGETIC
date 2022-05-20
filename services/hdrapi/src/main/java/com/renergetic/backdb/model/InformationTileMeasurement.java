@@ -3,6 +3,8 @@ package com.renergetic.backdb.model;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,6 +34,22 @@ public class InformationTileMeasurement {
 
 	@Column(name = "props", nullable = true, insertable = true, updatable = true)
 	private String props;
+
+	@Column(name = "sensor_name", nullable = true, insertable = true, updatable = true)
+	private String sensorName;
+
+	@ManyToOne(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "measurement_type_id", nullable = false, insertable = true, updatable = true)
+	private MeasurementType type;
+
+	@Column(name = "direction", nullable = true, insertable = true, updatable = true)
+	@Enumerated(EnumType.STRING)
+	private Direction direction;
+
+	@Column(name = "domain", nullable = true, insertable = true, updatable = true)
+	@Enumerated(EnumType.STRING)
+	private Domain domain;
 	
 	// FOREIGN KEY FROM ASSET TABLE
 	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
