@@ -29,6 +29,18 @@ public class MeasurementController {
 	@Autowired
 	MeasurementService service;
 	
+	@GetMapping("")
+	public ResponseEntity<List<String>> getMeasurement(
+			@RequestParam("bucket") Optional<String> bucket){
+		List<String> ret;
+		
+		ret = service.list(bucket.orElse("renergetic"));
+		
+		if (ret != null)
+			return ResponseEntity.ok(ret);
+		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+	
 	@GetMapping("/{measurement_name}")
 	public ResponseEntity<List<MeasurementDAOResponse>> getMeasurement(
 			@RequestParam("from") Optional<String> from, 

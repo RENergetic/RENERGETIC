@@ -158,4 +158,26 @@ public class MeasurementService {
 		List<FluxTable> tables = query.query(flux);
 		return MeasurementMapper.fromFlux(tables);
     }
+	
+	/**
+     * List all measurement names
+     * @param bucket Bucket from search measurement
+     * @return A list with all measurement names in Bucket
+     */
+    public List<String> list(String bucket) {
+		QueryApi query = influxDB.getQueryApi();
+		
+		String flux = String.format("from(bucket: \"%s\")"
+				+ " |> range(start: -30y)"
+				+ " |> group(columns: [\"_measurement\"], mode:\"by\")"
+				+ " |> distinct(column: \"_measurement\")"
+				+ " |> yield(name: \"test\")",
+				bucket);
+
+		System.err.println(flux);
+		List<FluxTable> tables = query.query(flux);
+		return MeasurementMapper.fromFlux(tables)
+				.stream().map(measurement -> measurement.getMeasurement()).collect(Collectors.toList());
+    }
+    
 }
