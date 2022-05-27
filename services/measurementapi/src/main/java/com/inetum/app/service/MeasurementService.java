@@ -75,7 +75,7 @@ public class MeasurementService {
 		Long toN = 0L;
 		String where = null;
 		if (!measurement.getTags().isEmpty())
-			where = "filter(fn: (r) => " + String.join(" and ", measurement.getTags().keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, measurement.getTags().get(key))).collect(Collectors.toList())) + ") |> ";
+			where = " |> filter(fn: (r) => " + String.join(" and ", measurement.getTags().keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, measurement.getTags().get(key))).collect(Collectors.toList())) + ")";
 		
 		if (timeVar.equals("time")) {
 			if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
@@ -90,8 +90,7 @@ public class MeasurementService {
 		String flux = String.format(
 				"from(bucket: \"%s\") |> "
 				+ "range(start: %d, stop: %s) |> "
-				+ "filter(fn: (r) => r[\"_measurement\"] == \"%s\") |> %s"
-				+ "group(columns:[\"_measurement\"], mode:\"by\")",
+				+ "filter(fn: (r) => r[\"_measurement\"] == \"%s\")%s",
 				measurement.getBucket(),
 				fromN,
 				toN != 0? toN : "now()",
@@ -169,9 +168,8 @@ public class MeasurementService {
 		
 		String flux = String.format("from(bucket: \"%s\")"
 				+ " |> range(start: -30y)"
-				+ " |> group(columns: [\"_measurement\"], mode:\"by\")"
-				+ " |> distinct(column: \"_measurement\")"
-				+ " |> yield(name: \"test\")",
+				+ " |> drop(fn: (column) => column != \"_measurement\")"
+				+ " |> distinct(column: \"_measurement\")",
 				bucket);
 
 		System.err.println(flux);
