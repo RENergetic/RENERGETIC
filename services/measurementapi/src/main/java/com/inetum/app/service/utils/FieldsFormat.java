@@ -54,13 +54,15 @@ public class FieldsFormat {
 		else if (value instanceof Boolean) 
 			field = new AbstractMap.SimpleEntry<>(key, value.toString());
 		// CHECK IF IS A DATE
-		else if (value instanceof Instant) {
-			Date date = new Date(((Instant) value).toEpochMilli());
-			String text = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-			field = new AbstractMap.SimpleEntry<>(key, text);
-		}
-		else if (key.startsWith("time") && value instanceof Double) {
-			Date date = new Date(((Double) value).longValue());
+		else if (key.startsWith("time")) {
+			Date date = null;
+			if (value instanceof Long)
+				date = new Date((Long)value);
+			else if (value instanceof Double)
+				date = new Date(((Double) value).longValue());
+			else if (value instanceof Instant)
+				date = new Date(((Instant) value).toEpochMilli());
+			
 			String text = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
 			field = new AbstractMap.SimpleEntry<>(key, text);
 		} 
