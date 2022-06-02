@@ -48,6 +48,9 @@ public class AssetDAOResponse {
 
 	@JsonProperty(required = false)
 	private Long owner;
+
+	@JsonProperty(required = false)
+	private Long user;
 	
 	public static AssetDAOResponse create(Asset asset, List<Asset> childs, List<Measurement> measurements) {
 		AssetDAOResponse dao = null;
@@ -79,6 +82,8 @@ public class AssetDAOResponse {
 			}
 			if (asset.getOwner() != null) 
 				dao.setOwner(asset.getOwner().getId());
+			if (asset.getUser() != null) 
+				dao.setUser(asset.getUser().getId());
 		}
 		return dao;
 	}
@@ -101,6 +106,11 @@ public class AssetDAOResponse {
 			User entityOwner = new User();
 			entityOwner.setId(owner);
 			asset.setOwner(entityOwner);
+		}
+		if (user != null) {
+			User entityUser = new User();
+			entityUser.setId(user);
+			asset.setUser(entityUser);
 		}
 		return asset;
 	}

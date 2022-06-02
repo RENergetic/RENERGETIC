@@ -39,6 +39,9 @@ public class AssetDAORequest {
 
 	@JsonProperty(required = false)
 	private Long owner;
+
+	@JsonProperty(required = false)
+	private Long user;
 	
 	public static AssetDAORequest create(Asset asset) {
 		AssetDAORequest dao = null;
@@ -61,6 +64,9 @@ public class AssetDAORequest {
 			
 			if (asset.getOwner() != null) 
 				dao.setOwner(asset.getOwner().getId());
+			
+			if (asset.getUser() != null) 
+				dao.setUser(asset.getUser().getId());
 		}
 		return dao;
 	}
@@ -89,6 +95,11 @@ public class AssetDAORequest {
 			User entityOwner = new User();
 			entityOwner.setId(owner);
 			asset.setOwner(entityOwner);
+		}
+		if (user != null) {
+			User entityUser = new User();
+			entityUser.setId(user);
+			asset.setUser(entityUser);
 		}
 		return asset;
 	}

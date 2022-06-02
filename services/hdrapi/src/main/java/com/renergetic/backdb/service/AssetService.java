@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.renergetic.backdb.dao.AssetConnectionDAORequest;
 import com.renergetic.backdb.dao.AssetDAORequest;
 import com.renergetic.backdb.dao.AssetDAOResponse;
 import com.renergetic.backdb.dao.MeasurementDAOResponse;
@@ -23,6 +24,7 @@ import com.renergetic.backdb.model.AssetType;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.model.details.AssetDetails;
+import com.renergetic.backdb.repository.AssetConnectionRepository;
 import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.AssetTypeRepository;
 import com.renergetic.backdb.repository.MeasurementRepository;
@@ -42,6 +44,8 @@ public class AssetService {
 	MeasurementRepository measurementRepository;
 	@Autowired
 	AssetTypeRepository assetTypeRepository;
+	@Autowired
+	AssetConnectionRepository assetConnectionRepository;
 	@Autowired
 	AssetDetailsRepository assetDetailsRepository;
 	@Autowired
@@ -80,13 +84,12 @@ public class AssetService {
 				: "The asset to update doesn't exists");
 	}
 
-	public AssetDAOResponse connect(Long id, Long connectId) {
-		boolean assetExists = assetRepository.existsById(id);
+	public AssetDAOResponse connect(AssetConnectionDAORequest connection) {
+		boolean assetExists = assetRepository.existsById(connection.getAssetId());
 
-		if ( assetExists && assetRepository.existsById(connectId)) {
-			Asset asset = assetRepository.findById(id).get();
-			asset.getAssets().add(assetRepository.findById(connectId).get());
-			return AssetDAOResponse.create(assetRepository.save(asset), null, null);
+		if ( assetExists && assetRepository.existsById(connection.getAssetConnectedId())) {
+			assetConnectionRepository.save(connection.mapToEntity());
+			return AssetDAOResponse.create(assetRepository.findById(connection.getAssetId()).orElse(null), null, null);
 		} else throw new InvalidNonExistingIdException("The assets to connect don't exists");
 	}
 

@@ -70,6 +70,12 @@ public class Asset {
 	@JoinColumn(name = "owner_id", nullable = true, insertable = true, updatable = true)
 	private User owner;
 	
+	// FOREIGN KEY FROM USERS TABLE
+	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "user_id", nullable = true, insertable = true, updatable = true)
+	private User user;
+	
 	@ManyToMany(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinTable(
@@ -83,7 +89,7 @@ public class Asset {
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
 	private UUID uuid;
 
-	public Asset(String name, AssetType type, String label, String description, String location, Asset part_of_asset, User owner) {
+	public Asset(String name, AssetType type, String label, String description, String location, Asset part_of_asset, User owner, User user) {
 		super();
 		this.name = name;
 		this.type = type;
@@ -92,6 +98,7 @@ public class Asset {
 		this.location = location;
 		this.parentAsset = part_of_asset;
 		this.owner = owner;
+		this.user = user;
 	}
 	
 	static {
