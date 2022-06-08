@@ -71,29 +71,29 @@ public class MeasurementService {
 	public List<MeasurementDAOResponse> select(MeasurementDAORequest measurement, String from, String to, String timeVar) {
 		QueryApi query = influxDB.getQueryApi();
 
-		Long fromN = 0L;
-		Long toN = 0L;
 		String where = null;
 		if (!measurement.getTags().isEmpty())
 			where = " |> filter(fn: (r) => " + String.join(" and ", measurement.getTags().keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, measurement.getTags().get(key))).collect(Collectors.toList())) + ")";
 		
 		if (timeVar.equals("time")) {
-			if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-				from = '\''+from.replace(" ", "T")+'Z'+'\'';
-			else fromN = InfluxTimeUnit.convertNumber(from, InfluxTimeUnit.ms);
-			
-			if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-				to = '\''+to.replace(" ", "T")+'Z'+'\'';
-			else toN = InfluxTimeUnit.convertNumber(to, InfluxTimeUnit.ms);	
+			if (!from.isEmpty() && !from.matches("^\\d+$"))
+				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
+					from = from.replace(" ", "T")+'Z';
+				else from = "-" + InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
+
+			if (!to.isEmpty() && !to.matches("^\\d+$"))
+				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
+					to = to.replace(" ", "T")+'Z';
+				else to = "-" + InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);	
 		}
 		
 		String flux = String.format(
 				"from(bucket: \"%s\") |> "
-				+ "range(start: %d, stop: %s) |> "
+				+ "range(start: %s, stop: %s) |> "
 				+ "filter(fn: (r) => r[\"_measurement\"] == \"%s\")%s",
 				measurement.getBucket(),
-				fromN,
-				toN != 0? toN : "now()",
+				!from.isEmpty()? from : "0",
+				!to.isEmpty()? to : "now()",
 				measurement.getMeasurement(),
 				where != null? where : "");
 
@@ -116,21 +116,22 @@ public class MeasurementService {
     public List<MeasurementDAOResponse> operate(MeasurementDAORequest measurement, InfluxFunction function, String field, String from, String to, String group, String timeVar) {
 		QueryApi query = influxDB.getQueryApi();
 
-		Long fromN = 0L;
-		Long toN = 0L;
 		String where = null;
 		if (!measurement.getTags().isEmpty())
 			where = "filter(fn: (r) => " + String.join(" and ", measurement.getTags().keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, measurement.getTags().get(key))).collect(Collectors.toList())) + ") |> ";
-		
+
 		if (timeVar.equals("time")) {
-			if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-				from = '\''+from.replace(" ", "T")+'Z'+'\'';
-			else fromN = InfluxTimeUnit.convertNumber(from, InfluxTimeUnit.ms);
-			
-			if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-				to = '\''+to.replace(" ", "T")+'Z'+'\'';
-			else toN = InfluxTimeUnit.convertNumber(to, InfluxTimeUnit.ms);	
+			if (!from.isEmpty() && !from.matches("^\\d+$"))
+				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
+					from = from.replace(" ", "T")+'Z';
+				else from = "-" + InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
+
+			if (!to.isEmpty() && !to.matches("^\\d+$"))
+				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
+					to = to.replace(" ", "T")+'Z';
+				else to = "-" + InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);	
 		}
+		
 		if (group != null && !group.isBlank()) {
 			group = InfluxTimeUnit.convert(group, InfluxTimeUnit.ms);
 			group = "window(every: " + group + ", startColumn: \"_time\") |> ";
@@ -138,14 +139,14 @@ public class MeasurementService {
 		
 		String flux = String.format(
 				"from(bucket: \"%s\") |> "
-				+ "range(start: %d, stop: %s) |> "
+				+ "range(start: %s, stop: %s) |> "
 				+ "filter(fn: (r) => r[\"_measurement\"] == \"%s\" and r[\"_field\"] == \"%s\") |> %s"
 				+ "group(columns:[\"_measurement\"], mode:\"by\") |> %s"
 				+ "%s(column: \"_value\") |> "
 				+ "set(key: \"_field\", value: \"%s\")",
 				measurement.getBucket(),
-				fromN,
-				toN != 0? toN : "now()",
+				!from.isEmpty()? from : "0",
+				!to.isEmpty()? to : "now()",
 				measurement.getMeasurement(),
 				field,
 				where != null? where : "",
