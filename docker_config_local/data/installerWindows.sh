@@ -1,10 +1,10 @@
 current=$(pwd -W tr / \\)
 
-namespace='data'
+namespace='app'
 #inflixdb
-installdb='true'
+installdb=''
 #influxdb java api
-installapi='true'
+installapi=''
 #nifi
 installback='false'
 installkafka='false'
@@ -18,7 +18,7 @@ do
     esac
 done
 
-minikube start --driver=docker
+#minikube start --driver=docker
 kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]

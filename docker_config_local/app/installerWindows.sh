@@ -6,8 +6,8 @@ javahdr='services\hdrapi'
 javafilehdr='hdrapi-0.0.1-SNAPSHOT.jar'
 vue='front\renergetic_ui'
 #postgre
-installdb='true'
-installapihdr='true'  # API HDR
+installdb=''
+installapihdr=''  # API HDR
 installfront='true'
 installkeycloak='true'
 
@@ -18,7 +18,7 @@ do
     esac
 done
 
-minikube start --driver=docker
+#minikube start --driver=docker
 kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]
