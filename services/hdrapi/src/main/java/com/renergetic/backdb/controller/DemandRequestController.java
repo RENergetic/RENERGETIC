@@ -1,6 +1,7 @@
 package com.renergetic.backdb.controller;
 
 import com.renergetic.backdb.dao.DemandRequestDAO;
+import com.renergetic.backdb.dao.DemandScheduleDAO;
 import com.renergetic.backdb.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.service.DemandRequestService;
@@ -31,9 +32,9 @@ public class DemandRequestController {
             @ApiResponse(responseCode = "500", description = "Error saving demand requests")
     })
     @PostMapping(path = "/batch", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<List<DemandRequestDAO>> createBatch(@RequestBody List<DemandRequestDAO> demandRequestDAOS){
+    public ResponseEntity<List<DemandScheduleDAO>> createBatch(@RequestBody List<DemandScheduleDAO> demandScheduleDAOS){
         try{
-            return new ResponseEntity<>(demandRequestService.save(demandRequestDAOS), HttpStatus.OK);
+            return new ResponseEntity<>(demandRequestService.save(demandScheduleDAOS), HttpStatus.OK);
         } catch (InvalidCreationIdAlreadyDefinedException invalidCreationIdAlreadyDefinedException) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Exception e){
@@ -49,9 +50,9 @@ public class DemandRequestController {
             @ApiResponse(responseCode = "500", description = "Error saving demand request")
     })
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<DemandRequestDAO> create(@RequestBody DemandRequestDAO demandRequestDAO){
+    public ResponseEntity<DemandScheduleDAO> create(@RequestBody DemandScheduleDAO demandScheduleDAO){
         try{
-            return new ResponseEntity<>(demandRequestService.save(demandRequestDAO), HttpStatus.OK);
+            return new ResponseEntity<>(demandRequestService.save(demandScheduleDAO), HttpStatus.OK);
         } catch (InvalidCreationIdAlreadyDefinedException invalidCreationIdAlreadyDefinedException) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Exception e){
@@ -67,9 +68,9 @@ public class DemandRequestController {
             @ApiResponse(responseCode = "500", description = "Error saving demand request")
     })
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<DemandRequestDAO> update(@RequestBody DemandRequestDAO demandRequestDAO){
+    public ResponseEntity<DemandScheduleDAO> update(@RequestBody DemandScheduleDAO demandScheduleDAO){
         try{
-            return new ResponseEntity<>(demandRequestService.update(demandRequestDAO), HttpStatus.OK);
+            return new ResponseEntity<>(demandRequestService.update(demandScheduleDAO), HttpStatus.OK);
         } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         } catch (Exception e){
@@ -84,7 +85,7 @@ public class DemandRequestController {
             @ApiResponse(responseCode = "500", description = "Error executing demand request")
     })
     @GetMapping(path = "", produces = "application/json")
-    public ResponseEntity<List<DemandRequestDAO>> getAll(@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+    public ResponseEntity<List<DemandScheduleDAO>> getAll(@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
         //TODO: Usage of a offset + limit
         try{
             return new ResponseEntity<>(demandRequestService.getAll(offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
@@ -100,7 +101,7 @@ public class DemandRequestController {
             @ApiResponse(responseCode = "500", description = "Error executing demand request")
     })
     @GetMapping(path = "/id/{id}", produces = "application/json")
-    public ResponseEntity<DemandRequestDAO> getById(@PathVariable Long id){
+    public ResponseEntity<DemandScheduleDAO> getById(@PathVariable Long id){
         try{
             return new ResponseEntity<>(demandRequestService.getById(id), HttpStatus.OK);
         } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
@@ -117,7 +118,7 @@ public class DemandRequestController {
             @ApiResponse(responseCode = "500", description = "Error executing demand request")
     })
     @GetMapping(path = "/userId/{userId}", produces = "application/json")
-    public ResponseEntity<List<DemandRequestDAO>> getByUserId(@PathVariable String userId,
+    public ResponseEntity<List<DemandScheduleDAO>> getByUserId(@PathVariable String userId,
                                                               @RequestParam(required = false) Optional<Long> offset,
                                                               @RequestParam(required = false) Optional<Integer> limit){
         try{
@@ -137,7 +138,7 @@ public class DemandRequestController {
             @ApiResponse(responseCode = "500", description = "Error executing demand request")
     })
     @GetMapping(path = "/assetId/{assetId}", produces = "application/json")
-    public ResponseEntity<DemandRequestDAO> getByUuid(@PathVariable Long assetId){
+    public ResponseEntity<DemandScheduleDAO> getByUuid(@PathVariable Long assetId){
         try{
             return new ResponseEntity<>(demandRequestService.getByAssetIdAndActual(assetId), HttpStatus.OK);
         } catch (Exception e){

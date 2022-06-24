@@ -22,7 +22,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "demand_schedule")
+@Table(name = "user_demand_schedule")
 @RequiredArgsConstructor
 @Getter
 @Setter
@@ -33,10 +33,10 @@ public class DemandSchedule {
 	private Long id;
 
 	@Column(name = "demand_start", nullable = false, insertable = true, updatable = true)
-	private LocalDateTime demand_start;
+	private LocalDateTime demandStart;
 
 	@Column(name = "demand_stop", nullable = true, insertable = true, updatable = true)
-	private LocalDateTime demand_stop;
+	private LocalDateTime demandStop;
 
 	@Column(name = "update_date", nullable = true, insertable = true, updatable = true)
 	private LocalDateTime update;
@@ -44,6 +44,12 @@ public class DemandSchedule {
 	// FOREIGN KEY FROM DEMAND TABLE
 	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "asset_id", nullable = false, insertable = true, updatable = true)
+	private Asset asset;
+
+	// FOREIGN KEY FROM DEMAND TABLE
+	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "demand_id", nullable = false, insertable = true, updatable = true)
-	private DemandRequest demand;
+	private DemandDefinition demandDefinition;
 }
