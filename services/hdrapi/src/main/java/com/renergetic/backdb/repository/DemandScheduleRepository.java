@@ -10,13 +10,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DemandScheduleRepository extends JpaRepository<DemandSchedule, Long> {
-    @Query(value = "SELECT demand_request.* " +
-            "FROM ((asset " +
-            "INNER JOIN user_roles ON asset.UUID = user_roles.UUID) " +
-            "INNER JOIN demand_request ON asset.id = demand_request.asset_id) " +
-            "WHERE user_roles.user_id = :userId " +
-            "AND demand_request.demand_request_start <= :currentLocalDateTime " +
-            "AND demand_request.demand_request_stop >= :currentLocalDateTime " +
+    @Query(value = "SELECT user_demand_schedule.* " +
+            "FROM (asset_connection" +
+            "INNER JOIN asset asset_user ON asset_usr.id = asset_connection.asset_id" +
+            "INNER JOIN asset asset_conn ON asset_conn.id = asset_connection.connected_asset_id" +
+            "INNER JOIN user_demand_schedule ON user_demand_schedule.asset_id = asset_conn.asset_id)" +
+            "WHERE asset_user.user_id = :userId" +
+            "AND user_demand_schedule.demand_start <= :currentLocalDateTime" +
+            "AND user_demand_schedule.demand_stop >= :currentLocalDateTime" +
             "LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<DemandSchedule> findByUserId(Long userId, LocalDateTime currentLocalDateTime, long offset, int limit);
     public Optional<DemandSchedule> findByAssetIdAndDemandStartLessThanEqualAndStopGreaterThanEqual(Long id, LocalDateTime dateTime, LocalDateTime dateTime2);
