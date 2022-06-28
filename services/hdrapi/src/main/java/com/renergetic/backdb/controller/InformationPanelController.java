@@ -77,6 +77,7 @@ public class InformationPanelController {
         try {
             return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
         } catch (Exception e) {
+        	e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

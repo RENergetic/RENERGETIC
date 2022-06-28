@@ -23,8 +23,8 @@ public class InformationTileMeasurementDAOResponse {
     @JsonProperty(required = true)
     private String props;
 
-    @JsonProperty(value = "asset", required = false)
-    private SimpleAssetDAO asset;
+//    @JsonProperty(value = "asset", required = false)
+//    private SimpleAssetDAO asset;
 
     @JsonProperty(value = "measurement", required = false)
     private SimpleMeasurementDAO measurement;
@@ -49,8 +49,8 @@ public class InformationTileMeasurementDAOResponse {
 
 		if(tile.getMeasurement() != null) 
 			dao.setMeasurement(SimpleMeasurementDAO.create(tile.getMeasurement()));
-		if(tile.getAsset() != null) 
-			dao.setAsset(SimpleAssetDAO.create(tile.getAsset()));
+//		if(tile.getAsset() != null) 
+//			dao.setAsset(SimpleAssetDAO.create(tile.getAsset()));
 		if(tile.getType() != null)
 			dao.setType(tile.getType());
 
@@ -67,8 +67,8 @@ public class InformationTileMeasurementDAOResponse {
 		tile.setId(id);
 		tile.setProps(props);
 		
-		if (asset != null) 
-			tile.setAsset(asset.mapToEntity());
+//		if (asset != null) 
+//			tile.setAsset(asset.mapToEntity());
 
 		if (measurement != null)
 			tile.setMeasurement(measurement.mapToEntity());

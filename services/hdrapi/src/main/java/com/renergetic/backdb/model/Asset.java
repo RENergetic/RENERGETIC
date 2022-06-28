@@ -52,8 +52,22 @@ public class Asset {
 	@Column(name = "label", nullable = true, insertable = true, updatable = true)
 	private String label;
 
-	@Column(name = "description", nullable = true, insertable = true, updatable = true)
-	private String description;
+	@ManyToMany(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinTable(
+			name = "asset_connection",
+			joinColumns = @JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true),
+			inverseJoinColumns = @JoinColumn(name = "connected_asset_id"))
+	private List<Asset> assets;
+	
+	// REFERENCES ASSET_DASHBOARD
+	@ManyToMany(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinTable(
+			name = "asset_dashboard",
+			joinColumns = @JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true),
+			inverseJoinColumns = @JoinColumn(name = "dashboard_id"))
+	private List<Dashboard> assetsDashboard;
 
 	@Column(name = "geo_location", nullable = true, insertable = true, updatable = true)
 	private String location;
@@ -65,10 +79,7 @@ public class Asset {
 	private Asset parentAsset;
 	
 	// FOREIGN KEY FROM USERS TABLE
-	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
-	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "owner_id", nullable = true, insertable = true, updatable = true)
-	private User owner;
+	
 	
 	// FOREIGN KEY FROM USERS TABLE
 	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
@@ -76,28 +87,30 @@ public class Asset {
 	@JoinColumn(name = "user_id", nullable = true, insertable = true, updatable = true)
 	private User user;
 	
-	@ManyToMany(cascade = CascadeType.REFRESH)
-	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinTable(
-			name = "asset_connection",
-			joinColumns = @JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true),
-			inverseJoinColumns = @JoinColumn(name = "connected_asset_id"))
-	private List<Asset> assets;
+
 
 	@OneToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
 	private UUID uuid;
+	
+	
+	@ManyToMany(cascade = CascadeType.REFRESH, mappedBy= "assets")
+	@NotFound(action = NotFoundAction.IGNORE)
+	private List<InformationPanel> informationPanels;
+	
+
+	
 
 	public Asset(String name, AssetType type, String label, String description, String location, Asset part_of_asset, User owner, User user) {
 		super();
 		this.name = name;
 		this.type = type;
 		this.label = label;
-		this.description = description;
+		
 		this.location = location;
 		this.parentAsset = part_of_asset;
-		this.owner = owner;
+		//this.owner = owner;
 		this.user = user;
 	}
 	

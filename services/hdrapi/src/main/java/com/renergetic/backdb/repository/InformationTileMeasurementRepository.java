@@ -13,6 +13,6 @@ public interface InformationTileMeasurementRepository extends JpaRepository<Info
 	
 	InformationTileMeasurement save(InformationTileMeasurement tile);
 
-	List<InformationTileMeasurement> findByAsset(Asset asset);
+	//List<InformationTileMeasurement> findByAsset(Asset asset);
 	List<InformationTileMeasurement> findByMeasurement(Measurement parent);
 }

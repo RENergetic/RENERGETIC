@@ -28,7 +28,7 @@ public class UserDAORequest {
 			dao = new UserDAORequest();
 
 			dao.setId(user.getId());
-			dao.setName(user.getName());
+			//dao.setName(user.getName());
 		}
 		return dao;
 	}
@@ -37,7 +37,7 @@ public class UserDAORequest {
 		User user = new User();
 		
 		user.setId(id);
-		user.setName(name);
+		//user.setName(name);
 
 		return user;
 	}

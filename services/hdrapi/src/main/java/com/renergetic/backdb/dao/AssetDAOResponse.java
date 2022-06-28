@@ -62,7 +62,7 @@ public class AssetDAOResponse {
 			dao.setName(asset.getName());
 			dao.setType(asset.getType());
 			dao.setLabel(asset.getLabel());
-			dao.setDescription(asset.getDescription());
+			//dao.setDescription(asset.getDescription());
 			dao.setGeo_location(asset.getLocation());
 			
 			if (asset.getParentAsset() != null) 
@@ -80,8 +80,8 @@ public class AssetDAOResponse {
 					mapMeasurements.add(SimpleMeasurementDAO.create(measurement));
 				dao.setMeasurements(mapMeasurements);
 			}
-			if (asset.getOwner() != null) 
-				dao.setOwner(asset.getOwner().getId());
+//			if (asset.getOwner() != null) 
+//				dao.setOwner(asset.getOwner().getId());
 			if (asset.getUser() != null) 
 				dao.setUser(asset.getUser().getId());
 		}
@@ -97,21 +97,21 @@ public class AssetDAOResponse {
 			asset.setType(type);
 		
 		asset.setLabel(label);
-		asset.setDescription(description);
+		//asset.setDescription(description);
 		asset.setLocation(geo_location);
 		if (parent != null) 
 			asset.setParentAsset(parent.mapToEntity());
 		
-		if (owner != null) {
-			User entityOwner = new User();
-			entityOwner.setId(owner);
-			asset.setOwner(entityOwner);
-		}
-		if (user != null) {
-			User entityUser = new User();
-			entityUser.setId(user);
-			asset.setUser(entityUser);
-		}
+//		if (owner != null) {
+//			User entityOwner = new User();
+//			entityOwner.setId(owner);
+////			asset.setOwner(entityOwner);
+//		}
+//		if (user != null) {
+//			User entityUser = new User();
+//			entityUser.setId(user);
+//			asset.setUser(entityUser);
+//		}
 		return asset;
 	}
 }

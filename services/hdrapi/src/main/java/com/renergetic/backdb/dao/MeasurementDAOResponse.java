@@ -61,8 +61,8 @@ public class MeasurementDAOResponse {
 			if (measurement.getType() != null)
 				dao.setType(measurement.getType());
 			dao.setLabel(measurement.getLabel());
-			dao.setDescription(measurement.getDescription());
-			dao.setIcon(measurement.getIcon());
+			//dao.setDescription(measurement.getDescription());
+			//dao.setIcon(measurement.getIcon());
 			dao.setDomain(measurement.getDomain());
 			dao.setDirection(measurement.getDirection());
 			
@@ -81,8 +81,8 @@ public class MeasurementDAOResponse {
 		if (type != null) 
 			measurement.setType(type);
 		measurement.setLabel(label);
-		measurement.setDescription(description);
-		measurement.setIcon(icon);
+		//measurement.setDescription(description);
+		//measurement.setIcon(icon);
 		measurement.setDomain(domain);
 		measurement.setDirection(direction);
 

@@ -25,8 +25,8 @@ public class InformationTileMeasurementDAORequest {
     @JsonProperty(required = true)
     private String props;
 
-    @JsonProperty(value = "asset_id", required = false)
-    private Long assetId;
+//    @JsonProperty(value = "asset_id", required = false)
+//    private Long assetId;
 
     @JsonProperty(value = "measurement_id", required = false)
     private Long measurementId;
@@ -50,7 +50,7 @@ public class InformationTileMeasurementDAORequest {
 		dao.setProps(tile.getProps());
 
 		if(tile.getMeasurement() != null) dao.setMeasurementId(tile.getMeasurement().getId());
-		if(tile.getAsset() != null) dao.setAssetId(tile.getAsset().getId());
+		//if(tile.getAsset() != null) dao.setAssetId(tile.getAsset().getId());
 		if(tile.getType() != null) dao.setTypeId(tile.getType().getId());
 
 		dao.setSensorName(tile.getSensorName());
@@ -66,11 +66,11 @@ public class InformationTileMeasurementDAORequest {
 		tile.setId(id);
 		tile.setProps(props);
 		
-		if (assetId != null) {
-			Asset asset = new Asset();
-			asset.setId(assetId);
-			tile.setAsset(asset);
-		}
+//		if (assetId != null) {
+//			Asset asset = new Asset();
+//			asset.setId(assetId);
+//			tile.setAsset(asset);
+//		}
 		if (measurementId != null) {
 			Measurement measurement = new Measurement();
 			measurement.setId(measurementId);

@@ -108,14 +108,14 @@ public class UserService {
 	Page<User> users = userRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<User> stream = users.stream();
 		
-		if (filters != null)
-			stream.filter(user -> {
-				boolean equals = true;
-				
-				if (filters.containsKey("name"))
-					equals = user.getName().equalsIgnoreCase(filters.get("name"));
-				return equals;
-			});
+//		if (filters != null)
+//			stream.filter(user -> {
+//				boolean equals = true;
+//				
+////				if (filters.containsKey("name"))
+////					equals = user.getName().equalsIgnoreCase(filters.get("name"));
+////				return equals;
+//			});
 		return stream
 				.map(user -> UserDAOResponse.create(user, userRolesRepository.findByUserId(user.getId()), userSettingsRepository.findByUserId(user.getId())))
 				.collect(Collectors.toList());

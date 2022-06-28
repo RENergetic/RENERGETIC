@@ -5,7 +5,10 @@ import com.renergetic.backdb.dao.InformationPanelDAOResponse;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.exception.NotFoundException;
 import com.renergetic.backdb.mapper.InformationPanelMapper;
+import com.renergetic.backdb.model.InformationPanel;
+import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.repository.InformationPanelRepository;
+import com.renergetic.backdb.repository.UuidRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,8 @@ public class InformationPanelService {
 
     @Autowired
     InformationPanelMapper informationPanelMapper;
+	@Autowired
+	UuidRepository uuidRepository;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit){
         return informationPanelRepository.findAll(new OffSetPaging(offset, limit))
@@ -40,7 +45,9 @@ public class InformationPanelService {
 
     public InformationPanelDAOResponse save(InformationPanelDAORequest informationPanel) {
         informationPanel.setId(null);
-        return informationPanelMapper.toDTO(informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel)));
+        InformationPanel infoPanelEntity = informationPanelMapper.toEntity(informationPanel);
+        infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
     }
 
     public InformationPanelDAOResponse update(InformationPanelDAORequest informationPanel) {

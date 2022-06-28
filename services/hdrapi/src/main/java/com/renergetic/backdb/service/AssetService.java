@@ -119,8 +119,8 @@ public class AssetService {
 				}
 				if (equals && filters.containsKey("location"))
 					equals = asset.getLocation().equalsIgnoreCase(filters.get("location"));
-				if (equals && filters.containsKey("owner"))
-					equals = asset.getOwner() != null? String.valueOf(asset.getOwner().getId()).equalsIgnoreCase(filters.get("owner")) : false;
+//				if (equals && filters.containsKey("owner"))
+//					equals = asset.getOwner() != null? String.valueOf(asset.getOwner().getId()).equalsIgnoreCase(filters.get("owner")) : false;
 				if (equals && filters.containsKey("parent"))
 					equals = asset.getParentAsset() != null? String.valueOf(asset.getParentAsset().getId()).equalsIgnoreCase(filters.get("parent")) : false;
 				
@@ -175,7 +175,7 @@ public class AssetService {
 	
 	// ASSETTYPE CRUD OPERATIONS
 	public AssetType saveType(AssetType type) {
-		//type.setId(null);
+		type.setId(null);
 		return assetTypeRepository.save(type);
 	}
 	

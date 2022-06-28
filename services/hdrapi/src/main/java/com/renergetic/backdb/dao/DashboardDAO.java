@@ -66,7 +66,7 @@ public class DashboardDAO {
 			dao.setLabel(dashboard.getLabel());
 			dao.setGrafanaId(dashboard.getGrafanaId());
 			dao.setExt(dashboard.getExt());
-			dao.setLabel(dashboard.getLabel());
+			//dao.setLabel(dashboard.getLabel());
 			if (dashboard.getUser() != null)
 				dao.setUserId(dashboard.getUser().getId());
 			

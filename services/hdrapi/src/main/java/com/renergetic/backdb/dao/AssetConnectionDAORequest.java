@@ -34,7 +34,7 @@ public class AssetConnectionDAORequest {
 		if (connection != null) {
 			dao = new AssetConnectionDAORequest();
 
-			dao.setId(connection.getId());
+			//dao.setId(connection.getId());
 			
 			if (connection.getAsset() != null)
 				dao.setAssetId(connection.getAsset().getId());

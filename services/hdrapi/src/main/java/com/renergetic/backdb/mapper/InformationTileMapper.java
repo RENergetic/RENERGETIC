@@ -25,7 +25,7 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
         tileType.setId(dto.getType());
         entity.setType(tileType);
         
-        entity.setFeatured(dto.getFeatured());
+        //entity.setFeatured(dto.getFeatured());
         entity.setLayout(dto.getLayout());
         entity.setProps(dto.getProps());
         
@@ -47,7 +47,7 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
         dao.setLabel(entity.getLabel());
         if(entity.getType() != null)
             dao.setType(entity.getType().getName());
-        dao.setFeatured(entity.getFeatured());
+       // dao.setFeatured(entity.getFeatured());
         dao.setLayout(entity.getLayout());
         dao.setProps(entity.getProps());
         dao.setMeasurements(new ArrayList<>());

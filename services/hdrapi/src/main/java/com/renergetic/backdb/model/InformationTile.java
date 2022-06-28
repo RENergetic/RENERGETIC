@@ -26,8 +26,7 @@ public class InformationTile {
     @Column(name = "label")
     private String label;
 
-    @Column(name = "featured", nullable = true)
-    private Boolean featured;
+   
 
     @Column(name = "layout")
     private String layout;

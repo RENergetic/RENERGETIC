@@ -65,11 +65,7 @@ public class Notification {
 	@JoinColumn(name = "information_tile_id", nullable = true, insertable = true, updatable = true)
 	private InformationTile informationTile;
 
-	@OneToOne(cascade = CascadeType.REFRESH)
-	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
-	private UUID uuid;
-
+	
 	public Notification(NotificationType type, String message, LocalDateTime date_from, LocalDateTime date_to) {
 		super();
 		this.type = type;

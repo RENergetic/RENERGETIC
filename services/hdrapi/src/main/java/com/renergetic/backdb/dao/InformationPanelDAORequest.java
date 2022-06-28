@@ -20,9 +20,9 @@ public class InformationPanelDAORequest {
     @JsonProperty()
     private String label;
 
-    @JsonProperty()
-    private String uuid;
+//    @JsonProperty()
+//    private String uuid;
 
-    @JsonProperty()
-    private Long owner_id;
+//    @JsonProperty()
+//    private Long owner_id;
 }

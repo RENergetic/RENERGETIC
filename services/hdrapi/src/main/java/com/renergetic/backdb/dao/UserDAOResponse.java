@@ -39,7 +39,7 @@ public class UserDAOResponse {
 			dao = new UserDAOResponse();
 
 			dao.setId(user.getId());
-			dao.setName(user.getName());
+			//dao.setName(user.getName());
 			
 			if (roles != null)
 				dao.setRoles(roles.stream().map(role -> UserRolesDAO.create(role)).collect(Collectors.toList()));
@@ -54,7 +54,7 @@ public class UserDAOResponse {
 		User user = new User();
 		
 		user.setId(id);
-		user.setName(name);
+		//user.setName(name);
 
 		return user;
 	}

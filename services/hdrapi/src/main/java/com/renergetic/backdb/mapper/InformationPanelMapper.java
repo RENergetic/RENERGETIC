@@ -24,12 +24,11 @@ public class InformationPanelMapper implements MapperReponseRequest<InformationP
         entity.setId(dto.getId());
         entity.setLabel(dto.getLabel());
         entity.setName(dto.getName());
-        entity.setUuid(new UUID(dto.getUuid()));
-        if(dto.getOwner_id() != null){
-            User user = new User();
-            user.setId(dto.getOwner_id());
-            entity.setUser(user);
-        }
+       // entity.setUuid(new UUID(dto.getUuid()));
+//        if(dto.getOwner_id() != null){
+//            User user = new User();
+//            user.setId(dto.getOwner_id());
+//        @GeneratedValue(strategy = GenerationType.AUTO)
         return entity;
     }
 

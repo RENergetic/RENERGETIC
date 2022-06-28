@@ -36,7 +36,7 @@ public class SimpleAssetDAO {
 		}
 		
 		dao.setLabel(asset.getLabel());
-		dao.setDescription(asset.getDescription());
+		//dao.setDescription(asset.getDescription());
 		dao.setGeo_location(asset.getLocation());
 		
 		return dao;
@@ -48,7 +48,7 @@ public class SimpleAssetDAO {
 		asset.setId(id);
 		asset.setName(name);
 		asset.setLabel(label);
-		asset.setDescription(description);
+		//asset.setDescription(description);
 		asset.setLocation(geo_location);
 
 		return asset;
