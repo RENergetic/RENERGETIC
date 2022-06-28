@@ -1,20 +1,18 @@
 package com.renergetic.backdb.service;
 
-import com.renergetic.backdb.dao.DemandRequestDAO;
 import com.renergetic.backdb.dao.DemandScheduleDAO;
 import com.renergetic.backdb.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.mapper.DemandRequestMapper;
-import com.renergetic.backdb.model.DemandRequest;
 import com.renergetic.backdb.model.DemandSchedule;
-import com.renergetic.backdb.repository.DemandRequestRepository;
 import com.renergetic.backdb.repository.DemandScheduleRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,7 +76,7 @@ public class DemandRequestService {
 
     public DemandScheduleDAO getByAssetIdAndActual(Long assetId){
         LocalDateTime localDateTime = LocalDateTime.now();
-        Optional<DemandSchedule> demandRequest = demandScheduleRepository.findByAssetIdAndDemandStartLessThanEqualAndStopGreaterThanEqual(assetId, localDateTime, localDateTime);
+        Optional<DemandSchedule> demandRequest = demandScheduleRepository.findByAssetIdAndDemandStartLessThanEqualAndDemandStopGreaterThanEqual(assetId, localDateTime, localDateTime);
         if (demandRequest.isEmpty())
             return null;
 

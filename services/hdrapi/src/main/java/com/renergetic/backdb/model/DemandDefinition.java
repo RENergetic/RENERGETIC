@@ -21,10 +21,12 @@ public class DemandDefinition {
     private Long id;
 
     @Column(name = "action_type", nullable = false, insertable = true, updatable = true)
-    private String actionType;
+    @Enumerated(EnumType.STRING)
+    private DemandDefinitionActionType actionType;
 
     @Column(nullable = false)
-    private String action;
+    @Enumerated(EnumType.STRING)
+    private DemandDefinitionAction action;
 
     @Column(length = 255)
     private String message;
