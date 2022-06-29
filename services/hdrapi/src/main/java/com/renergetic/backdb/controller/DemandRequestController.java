@@ -1,5 +1,6 @@
 package com.renergetic.backdb.controller;
 
+import com.renergetic.backdb.dao.DemandDefinitionDAO;
 import com.renergetic.backdb.dao.DemandRequestDAO;
 import com.renergetic.backdb.dao.DemandScheduleDAO;
 import com.renergetic.backdb.exception.InvalidCreationIdAlreadyDefinedException;
@@ -141,6 +142,93 @@ public class DemandRequestController {
     public ResponseEntity<DemandScheduleDAO> getByUuid(@PathVariable Long assetId){
         try{
             return new ResponseEntity<>(demandRequestService.getByAssetIdAndActual(assetId), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /* Basic requests for schedule definition */
+
+    @Operation(summary = "Get one demand definition by its id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "500", description = "Error executing demand request")
+    })
+    @GetMapping(path = "/definition/{id}", produces = "application/json")
+    public ResponseEntity<DemandDefinitionDAO> getDefinitionById(@PathVariable Long id){
+        try{
+            return new ResponseEntity<>(demandRequestService.getDefinitionById(id), HttpStatus.OK);
+        } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Create one demand definition")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "400", description = "The demand requests had an id"),
+            @ApiResponse(responseCode = "500", description = "Error saving demand request")
+    })
+    @PostMapping(path = "/definition", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<DemandDefinitionDAO> createDefinition(@RequestBody DemandDefinitionDAO demandDefinitionDAO){
+        try{
+            return new ResponseEntity<>(demandRequestService.saveDefinition(demandDefinitionDAO), HttpStatus.OK);
+        } catch (InvalidCreationIdAlreadyDefinedException invalidCreationIdAlreadyDefinedException) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Update one demand definition")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "400", description = "The demand requests had an id"),
+            @ApiResponse(responseCode = "500", description = "Error saving demand request")
+    })
+    @PutMapping(path = "/definition", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<DemandDefinitionDAO> updateDefinition(@RequestBody DemandDefinitionDAO demandDefinitionDAO){
+        try{
+            return new ResponseEntity<>(demandRequestService.updateDefinition(demandDefinitionDAO), HttpStatus.OK);
+        } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Get all demand definition")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "500", description = "Error executing demand request")
+    })
+    @GetMapping(path = "/definition", produces = "application/json")
+    public ResponseEntity<List<DemandDefinitionDAO>> getAllDefinition(@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+        try{
+            return new ResponseEntity<>(demandRequestService.listDefinitions(offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Delete one demand definition by its id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "500", description = "Error executing demand request")
+    })
+    @DeleteMapping(path = "/definition/{id}", produces = "application/json")
+    public ResponseEntity<Boolean> deleteDefinitionById(@PathVariable Long id){
+        try{
+            return new ResponseEntity<>(demandRequestService.deleteDefinition(id), HttpStatus.OK);
+        } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

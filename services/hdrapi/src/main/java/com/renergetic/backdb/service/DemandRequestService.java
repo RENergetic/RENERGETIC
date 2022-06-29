@@ -1,10 +1,13 @@
 package com.renergetic.backdb.service;
 
+import com.renergetic.backdb.dao.DemandDefinitionDAO;
 import com.renergetic.backdb.dao.DemandScheduleDAO;
 import com.renergetic.backdb.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.mapper.DemandRequestMapper;
+import com.renergetic.backdb.model.DemandDefinition;
 import com.renergetic.backdb.model.DemandSchedule;
+import com.renergetic.backdb.repository.DemandDefinitionRepository;
 import com.renergetic.backdb.repository.DemandScheduleRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 public class DemandRequestService {
     @Autowired
     DemandScheduleRepository demandScheduleRepository;
+    @Autowired
+    DemandDefinitionRepository demandDefinitionRepository;
     @Autowired
     DemandRequestMapper demandRequestMapper;
 
@@ -81,5 +86,37 @@ public class DemandRequestService {
             return null;
 
         return DemandScheduleDAO.create(demandRequest.get());
+    }
+
+    /* Basic CRUD for schedule definition */
+
+    public DemandDefinitionDAO getDefinitionById(Long id){
+        Optional<DemandDefinition> demandDefinition = demandDefinitionRepository.findById(id);
+        if (demandDefinition.isEmpty())
+            throw new InvalidNonExistingIdException();
+        return DemandDefinitionDAO.create(demandDefinition.get());
+    }
+
+    public DemandDefinitionDAO saveDefinition(DemandDefinitionDAO demandDefinitionDAO){
+        return DemandDefinitionDAO.create(demandDefinitionRepository.save(demandDefinitionDAO.mapToEntity()));
+    }
+
+    public DemandDefinitionDAO updateDefinition(DemandDefinitionDAO demandDefinitionDAO){
+        Optional<DemandDefinition> demandDefinition = demandDefinitionRepository.findById(demandDefinitionDAO.getId());
+        if (demandDefinition.isEmpty())
+            throw new InvalidNonExistingIdException();
+        return DemandDefinitionDAO.create(demandDefinitionRepository.save(demandDefinitionDAO.mapToEntity()));
+    }
+
+    public boolean deleteDefinition(Long id){
+        Optional<DemandDefinition> demandDefinition = demandDefinitionRepository.findById(id);
+        if (demandDefinition.isEmpty())
+            throw new InvalidNonExistingIdException();
+        demandDefinitionRepository.deleteById(id);
+        return true;
+    }
+
+    public List<DemandDefinitionDAO> listDefinitions(long offset, int limit){
+        return demandDefinitionRepository.findAll(new OffSetPaging(offset, limit)).stream().map(DemandDefinitionDAO::create).collect(Collectors.toList());
     }
 }

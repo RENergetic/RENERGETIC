@@ -2,6 +2,8 @@ package com.renergetic.backdb.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.backdb.model.DemandDefinition;
+import com.renergetic.backdb.model.DemandDefinitionAction;
+import com.renergetic.backdb.model.DemandDefinitionActionType;
 import com.renergetic.backdb.model.InformationTile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +32,8 @@ public class DemandDefinitionDAO {
     public static DemandDefinitionDAO create(DemandDefinition demandDefinition){
         DemandDefinitionDAO demandDefinitionDAO = new DemandDefinitionDAO();
         demandDefinitionDAO.setId(demandDefinition.getId());
-        demandDefinitionDAO.setActionType(demandDefinition.getActionType());
-        demandDefinitionDAO.setAction(demandDefinition.getAction());
+        demandDefinitionDAO.setActionType(demandDefinition.getActionType().toString());
+        demandDefinitionDAO.setAction(demandDefinition.getAction().toString());
         if(demandDefinition.getInformationTile() != null)
             demandDefinitionDAO.setInformationTileId(demandDefinition.getInformationTile().getId());
         demandDefinitionDAO.setMessage(demandDefinition.getMessage());
@@ -43,8 +45,8 @@ public class DemandDefinitionDAO {
     public DemandDefinition mapToEntity() {
         DemandDefinition demandDefinition = new DemandDefinition();
         demandDefinition.setId(this.getId());
-        demandDefinition.setActionType(this.getActionType());
-        demandDefinition.setAction(this.getAction());
+        demandDefinition.setActionType(DemandDefinitionActionType.valueOf(this.getActionType()));
+        demandDefinition.setAction(DemandDefinitionAction.valueOf(this.getAction()));
         if(this.getInformationTileId() != null){
             InformationTile informationTile = new InformationTile();
             informationTile.setId(this.getInformationTileId());
