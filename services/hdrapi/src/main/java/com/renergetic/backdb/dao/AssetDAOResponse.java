@@ -8,6 +8,7 @@ import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.AssetType;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.User;
+import com.renergetic.backdb.model.details.AssetDetails;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +81,41 @@ public class AssetDAOResponse {
 					mapMeasurements.add(SimpleMeasurementDAO.create(measurement));
 				dao.setMeasurements(mapMeasurements);
 			}
+//			if (asset.getOwner() != null) 
+//				dao.setOwner(asset.getOwner().getId());
+			if (asset.getUser() != null) 
+				dao.setUser(asset.getUser().getId());
+		}
+		return dao;
+	}
+	public static AssetDAOResponse create(Asset asset, List<AssetDetails> measurements) {
+		AssetDAOResponse dao = null;
+		
+		if (asset != null) {
+			dao = new AssetDAOResponse();
+			
+			dao.setId(asset.getId());
+			dao.setName(asset.getName());
+			dao.setType(asset.getType());
+			dao.setLabel(asset.getLabel());
+			//dao.setDescription(asset.getDescription());
+			dao.setGeo_location(asset.getLocation());
+			
+			if (asset.getParentAsset() != null) 
+				dao.setParent(SimpleAssetDAO.create(asset.getParentAsset()));
+			
+//			if (childs != null) {
+//				List<SimpleAssetDAO> mapChilds = new ArrayList<>();
+//				for (Asset child : childs)
+//					mapChilds.add(SimpleAssetDAO.create(child));
+//				dao.setChild(mapChilds);
+//			}
+//			if (measurements != null) {
+//				List<SimpleMeasurementDAO> mapMeasurements = new ArrayList<>();
+//				for (Measurement measurement : measurements)
+//					mapMeasurements.add(SimpleMeasurementDAO.create(measurement));
+//				dao.setMeasurements(mapMeasurements);
+//			}
 //			if (asset.getOwner() != null) 
 //				dao.setOwner(asset.getOwner().getId());
 			if (asset.getUser() != null) 

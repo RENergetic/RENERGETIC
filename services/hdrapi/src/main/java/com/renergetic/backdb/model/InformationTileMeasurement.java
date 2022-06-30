@@ -58,6 +58,8 @@ public class InformationTileMeasurement {
 	@JoinColumn(name = "measurement_id", nullable = true, insertable = true, updatable = true)
 	private Measurement measurement;
 	
+
+	
 //	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
 //	@NotFound(action = NotFoundAction.IGNORE)
 //	@JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true)
