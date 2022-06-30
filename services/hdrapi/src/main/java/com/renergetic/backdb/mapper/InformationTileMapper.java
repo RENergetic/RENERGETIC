@@ -4,7 +4,6 @@ import com.renergetic.backdb.dao.InformationTileDAORequest;
 import com.renergetic.backdb.dao.InformationTileDAOResponse;
 import com.renergetic.backdb.model.InformationPanel;
 import com.renergetic.backdb.model.InformationTile;
-import com.renergetic.backdb.model.InformationTileType;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,9 +20,7 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
         entity.setName(dto.getName());
         entity.setLabel(dto.getLabel());
         
-        InformationTileType tileType = new InformationTileType();
-        tileType.setId(dto.getType());
-        entity.setType(tileType);
+        entity.setType(dto.getType());
         
         //entity.setFeatured(dto.getFeatured());
         entity.setLayout(dto.getLayout());
@@ -46,7 +43,7 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
         if(entity.getType() != null)
-            dao.setType(entity.getType().getName());
+            dao.setType(entity.getType());
        // dao.setFeatured(entity.getFeatured());
         dao.setLayout(entity.getLayout());
         dao.setProps(entity.getProps());

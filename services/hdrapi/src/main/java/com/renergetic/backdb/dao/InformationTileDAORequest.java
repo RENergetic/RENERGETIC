@@ -1,6 +1,7 @@
 package com.renergetic.backdb.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.backdb.model.InformationTileType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class InformationTileDAORequest {
     private String label;
 
     @JsonProperty()
-    private Long type;
+    private InformationTileType type;
     
     @JsonProperty()
     private Boolean featured;

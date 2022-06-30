@@ -35,6 +35,9 @@ public class InformationTileMeasurement {
 	@Column(name = "props", nullable = true, insertable = true, updatable = true)
 	private String props;
 
+	@Column(name = "measurement_name", nullable = true, insertable = true, updatable = true)
+	private String measurementName;
+
 	@Column(name = "sensor_name", nullable = true, insertable = true, updatable = true)
 	private String sensorName;
 
@@ -59,9 +62,9 @@ public class InformationTileMeasurement {
 	private Measurement measurement;
 	
 
-	
-//	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
-//	@NotFound(action = NotFoundAction.IGNORE)
-//	@JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true)
-//	private Asset asset;
+	@ManyToOne(optional = false, cascade = CascadeType.REFRESH)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "information_tile_id", nullable = false, insertable = true, updatable = true)
+    private InformationTile informationTile;
+
 }
