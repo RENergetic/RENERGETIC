@@ -8,13 +8,10 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.renergetic.backdb.dao.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.backdb.dao.AssetConnectionDAORequest;
-import com.renergetic.backdb.dao.AssetDAORequest;
-import com.renergetic.backdb.dao.AssetDAOResponse;
-import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.exception.InvalidArgumentException;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.exception.NotFoundException;
@@ -213,6 +210,11 @@ public class AssetService {
 
 	public AssetType getTypeById(Long id) {
 		return assetTypeRepository.findById(id).orElse(null);
+	}
+
+	public List<AssetDAOResponse> findByUserId(Long id, long offset, int limit){
+		return assetRepository.findByUserId(id, offset, limit).stream()
+				.map(x -> AssetDAOResponse.create(x, assetRepository.findByParentAsset(x), measurementRepository.findByAsset(x))).collect(Collectors.toList());
 	}
 	
 	// ASSETDETAILS CRUD OPERATIONS

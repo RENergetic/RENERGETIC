@@ -2,6 +2,7 @@ package com.renergetic.backdb.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.renergetic.backdb.model.InformationTileMeasurement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -38,6 +39,6 @@ public class InformationTileDAORequest {
     @JsonProperty()
     private String props;
 
-    @JsonProperty()
-    private List<MeasurementDAORequest> measurements;
+    @JsonProperty(required = true, value = "information_tile_measurements")
+    private List<InformationTileMeasurementDAORequest> informationTileMeasurements;
 }

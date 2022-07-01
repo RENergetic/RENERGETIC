@@ -16,7 +16,6 @@ public interface DemandScheduleRepository extends JpaRepository<DemandSchedule, 
             "INNER JOIN user_demand_schedule ON user_demand_schedule.asset_id = asset_conn.id) " +
             "WHERE user_demand_schedule.demand_start <= :currentLocalDateTime " +
             "AND user_demand_schedule.demand_stop >= :currentLocalDateTime " +
-            "AND :userId = :userId " +
             "LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<DemandSchedule> findByUserId(Long userId, LocalDateTime currentLocalDateTime, long offset, int limit);
     public Optional<DemandSchedule> findByAssetIdAndDemandStartLessThanEqualAndDemandStopGreaterThanEqual(Long id, LocalDateTime dateTime, LocalDateTime dateTime2);

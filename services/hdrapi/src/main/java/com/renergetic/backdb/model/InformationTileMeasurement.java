@@ -50,7 +50,11 @@ public class InformationTileMeasurement {
 	@Column(name = "domain", nullable = true, insertable = true, updatable = true)
 	@Enumerated(EnumType.STRING)
 	private Domain domain;
-	
+
+	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "information_tile_id", nullable = true, insertable = true, updatable = true)
+	private InformationTile informationTile;
 
 	// FOREIGN KEY FROM MEASUREMENT TABLE
 	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
