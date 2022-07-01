@@ -49,7 +49,7 @@ public class InformationTileService {
         InformationPanel informationPanel = informationPanelRepository.findById(informationPanelId).orElseThrow(InvalidNonExistingIdException::new);
         InformationTile entity = informationTileMapper.toEntity(informationTile);
         informationTileRepository.save(entity);
-        //informationPanel.getTiles().add(entity);
+        informationPanel.getTiles().add(entity);
         informationPanelRepository.save(informationPanel);
 
         return informationTileMapper.toDTO(entity);
