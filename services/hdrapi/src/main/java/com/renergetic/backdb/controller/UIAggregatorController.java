@@ -29,52 +29,10 @@ public class UIAggregatorController {
     @Autowired
     private InformationPanelService informationPanelService;
 
-    @Operation(summary = "Test")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/test/{userId}", produces = "application/json")
-    public ResponseEntity<List<AssetDAOResponse>> test (@PathVariable String userId,
-                                                        @RequestParam(required = false) Optional<Long> offset,
-                                                        @RequestParam(required = false) Optional<Integer> limit){
-        return new ResponseEntity<>(getAssets(userId, offset, limit), HttpStatus.OK);
-    }
-
-    @Operation(summary = "Test")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/test2/{userId}", produces = "application/json")
-    public ResponseEntity<List<DemandScheduleDAO>> testBis (@PathVariable String userId,
-                                                            @RequestParam(required = false) Optional<Long> offset,
-                                                            @RequestParam(required = false) Optional<Integer> limit){
-        return new ResponseEntity<>(getDemandSchedules(userId, offset, limit), HttpStatus.OK);
-    }
-
-    @Operation(summary = "Test")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/test3/{userId}", produces = "application/json")
-    public ResponseEntity<List<InformationPanelDAOResponse>> testTris (@PathVariable String userId,
-                                                                       @RequestParam(required = false) Optional<Long> offset,
-                                                                       @RequestParam(required = false) Optional<Integer> limit){
-        return new ResponseEntity<>(getPanels(userId, offset, limit), HttpStatus.OK);
-    }
-
-    @Operation(summary = "Test")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/test5/{userId}", produces = "application/json")
-    public ResponseEntity<List<AssetPanelDAO>> testMore (@PathVariable String userId,
-                                                                       @RequestParam(required = false) Optional<Long> offset,
-                                                                       @RequestParam(required = false) Optional<Integer> limit){
-        return new ResponseEntity<>(getAssetPanels(userId, offset, limit), HttpStatus.OK);
-    }
-
     @Operation(summary = "API wrapper for front-end")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = "/wrapper/{userId}", produces = "application/json")
     public ResponseEntity<WrapperResponseDAO> apiWrapper(@PathVariable String userId, @RequestBody WrapperRequestDAO wrapperRequestBodyDAO){
-        /*
-        * TODO:
-        *  response entity with optional
-        *  filter based on body content
-        */
-
         WrapperResponseDAO wrapperResponseDAO = new WrapperResponseDAO();
 
         if(wrapperRequestBodyDAO.getCalls().getAssets() != null) {
