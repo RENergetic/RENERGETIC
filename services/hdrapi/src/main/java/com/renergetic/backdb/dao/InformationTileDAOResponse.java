@@ -1,6 +1,7 @@
 package com.renergetic.backdb.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.backdb.model.InformationTileType;
 
 import com.renergetic.backdb.model.InformationTile;
 import com.renergetic.backdb.model.Measurement;
@@ -31,7 +32,7 @@ public class InformationTileDAOResponse {
     private String label;
 
     @JsonProperty
-    private String type;
+    private InformationTileType type;
 
     @JsonProperty(required = false)
     private Boolean featured;
@@ -61,7 +62,7 @@ public class InformationTileDAOResponse {
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
         if(entity.getType() != null)
-            dao.setType(entity.getType().getName());
+            dao.setType(entity.getType());
         // dao.setFeatured(entity.getFeatured());
         dao.setLayout(entity.getLayout());
         dao.setProps(entity.getProps());

@@ -11,4 +11,5 @@ public interface AssetDetailsRepository extends JpaRepository<AssetDetails, Long
 	AssetDetails save(AssetDetails information);
 
 	List<AssetDetails> findByAssetId(long resource_id);
+	
 }

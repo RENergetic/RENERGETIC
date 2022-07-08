@@ -13,7 +13,7 @@ public class DemandRequestMapper implements Mapper<DemandRequest, DemandRequestD
     @Override
     public DemandRequest toEntity(DemandRequestDAO dto) {
         DemandRequest entity = new DemandRequest();
-        entity.setId(dto.getId());
+//        entity.setId(dto.getId());
         entity.setUuid(dto.getUuid());
 
         Asset asset = new Asset();
@@ -44,7 +44,7 @@ public class DemandRequestMapper implements Mapper<DemandRequest, DemandRequestD
     @Override
     public DemandRequestDAO toDTO(DemandRequest entity) {
         DemandRequestDAO dao = new DemandRequestDAO();
-        dao.setId(entity.getId());
+//        dao.setId(entity.getId());
         dao.setUuid(entity.getUuid());
         dao.setAssetId(entity.getAsset().getId());
         if(entity.getMeasurement() != null)

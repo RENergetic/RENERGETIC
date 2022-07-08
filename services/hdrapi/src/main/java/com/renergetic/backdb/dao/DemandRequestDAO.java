@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class DemandRequestDAO {
-    private Long id;
+//    private Long id;
 
     private String uuid;
 

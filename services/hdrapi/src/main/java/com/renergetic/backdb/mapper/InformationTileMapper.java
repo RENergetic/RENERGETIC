@@ -18,13 +18,11 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
         if(dto == null)
             return null;
         InformationTile entity = new InformationTile();
-        entity.setId(dto.getId());
+//        entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setLabel(dto.getLabel());
         
-        InformationTileType tileType = new InformationTileType();
-        tileType.setId(dto.getType());
-        entity.setType(tileType);
+        entity.setType(dto.getType());
         
         //entity.setFeatured(dto.getFeatured());
         entity.setLayout(dto.getLayout());
@@ -48,12 +46,12 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
         if(entity == null)
             return null;
         InformationTileDAOResponse dao = new InformationTileDAOResponse();
-        dao.setId(entity.getId());
+//        dao.setId(entity.getId());
         dao.setPanelId(entity.getInformationPanel().getId());
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
         if(entity.getType() != null)
-            dao.setType(entity.getType().getName());
+            dao.setType(entity.getType());
        // dao.setFeatured(entity.getFeatured());
         dao.setLayout(entity.getLayout());
         dao.setProps(entity.getProps());

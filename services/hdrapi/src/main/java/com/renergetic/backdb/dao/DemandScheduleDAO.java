@@ -1,6 +1,7 @@
 package com.renergetic.backdb.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.DemandSchedule;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @ToString
 public class DemandScheduleDAO {
+	@JsonProperty(access = Access.READ_ONLY)
     private Long id;
 
     @JsonProperty("asset_id")

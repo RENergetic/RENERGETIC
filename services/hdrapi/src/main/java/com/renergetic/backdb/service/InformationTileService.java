@@ -9,7 +9,6 @@ import com.renergetic.backdb.model.InformationPanel;
 import com.renergetic.backdb.model.InformationTile;
 import com.renergetic.backdb.repository.InformationPanelRepository;
 import com.renergetic.backdb.repository.InformationTileRepository;
-import com.renergetic.backdb.repository.InformationTileTypeRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,8 +24,6 @@ public class InformationTileService {
     private InformationTileRepository informationTileRepository;
     @Autowired
     private InformationPanelRepository informationPanelRepository;
-    @Autowired
-    private InformationTileTypeRepository informationTileTypeRepository;
     
     public List<InformationTileDAOResponse> getAllByPanelId(Long panelId, long offset, int limit){
         return informationTileRepository.findAllByInformationPanelId(new OffSetPaging(offset, limit), panelId).stream().map(x -> informationTileMapper.toDTO(x)).collect(Collectors.toList());
@@ -43,20 +40,16 @@ public class InformationTileService {
     public InformationTileDAOResponse update(InformationTileDAORequest informationTile){
         if(informationTile.getId() == null || !informationTileRepository.existsById(informationTile.getId()))
             throw new InvalidNonExistingIdException();
-        if (!informationTileTypeRepository.existsById(informationTile.getType()))
-            throw new InvalidNonExistingIdException();
 
         return informationTileMapper.toDTO(informationTileRepository.save(informationTileMapper.toEntity(informationTile)));
     }
 
     public InformationTileDAOResponse save(Long informationPanelId, InformationTileDAORequest informationTile) {
         informationTile.setId(null);
-        if (!informationTileTypeRepository.existsById(informationTile.getType()))
-            throw new InvalidNonExistingIdException();
         InformationPanel informationPanel = informationPanelRepository.findById(informationPanelId).orElseThrow(InvalidNonExistingIdException::new);
         InformationTile entity = informationTileMapper.toEntity(informationTile);
         informationTileRepository.save(entity);
-        //informationPanel.getTiles().add(entity);
+        informationPanel.getTiles().add(entity);
         informationPanelRepository.save(informationPanel);
 
         return informationTileMapper.toDTO(entity);

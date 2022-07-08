@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.renergetic.backdb.model.Asset;
 import org.springframework.data.jpa.repository.Query;
+import com.renergetic.backdb.model.Measurement;
+import com.renergetic.backdb.model.User;
 
 @SuppressWarnings("unchecked")
 public interface AssetRepository extends JpaRepository<Asset, Long> {
@@ -22,4 +24,6 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 			"INNER JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId)" +
 			"LIMIT :limit OFFSET :offset ;", nativeQuery = true)
 	public List<Asset> findByUserId(Long userId, long offset, int limit);
+
+	List<Asset> findByUser(User userId);
 }
