@@ -1,34 +1,24 @@
 package com.renergetic.backdb.service;
 
+import com.renergetic.backdb.dao.*;
+import com.renergetic.backdb.exception.InvalidArgumentException;
+import com.renergetic.backdb.exception.InvalidNonExistingIdException;
+import com.renergetic.backdb.exception.NotFoundException;
+import com.renergetic.backdb.model.*;
+import com.renergetic.backdb.model.details.AssetDetails;
+import com.renergetic.backdb.repository.*;
+import com.renergetic.backdb.repository.information.AssetDetailsRepository;
+import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
+import com.renergetic.backdb.service.utils.OffSetPaging;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-import com.renergetic.backdb.dao.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.renergetic.backdb.exception.InvalidArgumentException;
-import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.model.Asset;
-import com.renergetic.backdb.model.AssetCategory;
-import com.renergetic.backdb.model.AssetType;
-import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.model.UUID;
-import com.renergetic.backdb.model.details.AssetDetails;
-import com.renergetic.backdb.repository.AssetConnectionRepository;
-import com.renergetic.backdb.repository.AssetRepository;
-import com.renergetic.backdb.repository.AssetTypeRepository;
-import com.renergetic.backdb.repository.MeasurementRepository;
-import com.renergetic.backdb.repository.UuidRepository;
-import com.renergetic.backdb.repository.information.AssetDetailsRepository;
-import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
 public class AssetService {
@@ -215,6 +205,12 @@ public class AssetService {
 	public List<AssetDAOResponse> findByUserId(Long id, long offset, int limit){
 		return assetRepository.findByUserId(id, offset, limit).stream()
 				.map(x -> AssetDAOResponse.create(x, assetRepository.findByParentAsset(x), measurementRepository.findByAsset(x))).collect(Collectors.toList());
+	}
+
+	public List<AssetPanelDAO> findAssetsPanelsByUserId(Long id, long offset, int limit){
+		return assetRepository.findByUserId(id, offset, limit).stream()
+				.map(x -> x.getInformationPanels().stream().map(y -> AssetPanelDAO.fromEntities(x, y)).collect(Collectors.toList()))
+				.flatMap(List::stream).collect(Collectors.toList());
 	}
 	
 	// ASSETDETAILS CRUD OPERATIONS

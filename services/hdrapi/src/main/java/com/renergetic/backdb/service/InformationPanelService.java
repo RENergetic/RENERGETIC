@@ -1,6 +1,9 @@
 package com.renergetic.backdb.service;
 
-import com.renergetic.backdb.dao.*;
+import com.renergetic.backdb.dao.InformationPanelDAORequest;
+import com.renergetic.backdb.dao.InformationPanelDAOResponse;
+import com.renergetic.backdb.dao.InformationTileDAOResponse;
+import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.exception.NotFoundException;
 import com.renergetic.backdb.mapper.InformationPanelMapper;
@@ -15,8 +18,6 @@ import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,7 +92,9 @@ public class InformationPanelService {
     }
 
     private List<MeasurementDAOResponse> getMeasurementInferredFromTile(Long userId, InformationTileMeasurement tileM){
-        return measurementRepository.findByUserIdAndBySensorNameAndDomainAndDirectionAndType(userId, tileM.getSensorName(), tileM.getDomain(), tileM.getDirection(), tileM.getType())
+        return measurementRepository
+                .findByUserIdAndBySensorNameAndDomainAndDirectionAndType(userId, tileM.getSensorName(),
+                        tileM.getDomain().name(), tileM.getDirection().name(), tileM.getType().getId())
                 .stream().map(x -> MeasurementDAOResponse.create(x, measurementDetailsRepository.findByMeasurementId(x.getId()))).collect(Collectors.toList());
     }
 
