@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Map;
+
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class WrapperRequestDAO {
         @JsonProperty(required = false, value = "asset_panels")
         private PaginationArgsWrapperRequestDAO assetPanels;
         @JsonProperty(required = false)
-        private PaginationArgsWrapperRequestDAO data;
+        private InfluxArgsWrapperRequestDAO data;
         @JsonProperty(required = false)
         private PaginationArgsWrapperRequestDAO demands;
         @JsonProperty(required = false)
@@ -40,5 +42,22 @@ public class WrapperRequestDAO {
         private Long offset;
         @JsonProperty(required = false)
         private Integer limit;
+    }
+
+    @Getter
+    @Setter
+    @RequiredArgsConstructor
+    @ToString
+    public static class InfluxArgsWrapperRequestDAO {
+        @JsonProperty(required = false)
+        private String from;
+        @JsonProperty(required = false)
+        private String to;
+        @JsonProperty(required = false)
+        private String bucket;
+        @JsonProperty(required = false)
+        private String field;
+        @JsonProperty(required = false)
+        private Map<String, String> tags;
     }
 }

@@ -2,6 +2,7 @@ package com.renergetic.backdb.controller;
 
 import com.renergetic.backdb.dao.*;
 import com.renergetic.backdb.service.AssetService;
+import com.renergetic.backdb.service.DataService;
 import com.renergetic.backdb.service.DemandRequestService;
 import com.renergetic.backdb.service.InformationPanelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*")
@@ -28,6 +31,8 @@ public class UIAggregatorController {
     private AssetService assetService;
     @Autowired
     private InformationPanelService informationPanelService;
+    @Autowired
+    DataService dataService;
 
     @Operation(summary = "API wrapper for front-end")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -44,7 +49,15 @@ public class UIAggregatorController {
             wrapperResponseDAO.setAssetPanels(getAssetPanels(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
         }
         if(wrapperRequestBodyDAO.getCalls().getData() != null) {
-            //TODO
+            WrapperRequestDAO.InfluxArgsWrapperRequestDAO args = wrapperRequestBodyDAO.getCalls().getData();
+            Map<String, String> params = new HashMap<>();
+            if (args.getFrom() != null) params.put("from", args.getFrom());
+            if (args.getTo() != null) params.put("to", args.getTo());
+            if (args.getBucket() != null) params.put("bucket", args.getBucket());
+            if (args.getField() != null) params.put("field", args.getField());
+            if (args.getTags() != null) params.putAll(args.getTags());
+
+            wrapperResponseDAO.setData(getData(userId, params));
         }
         if(wrapperRequestBodyDAO.getCalls().getDemands() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDemands();
@@ -59,12 +72,10 @@ public class UIAggregatorController {
     }
 
     private List<AssetDAOResponse> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit){
-        // Ok and ready
         return assetService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
 
     private List<DemandScheduleDAO> getDemandSchedules(String userId, Optional<Long> offset, Optional<Integer> limit){
-        // Ok and ready
         return demandRequestService.getByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
 
@@ -76,8 +87,8 @@ public class UIAggregatorController {
         return assetService.findAssetsPanelsByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
 
-    private List<Object> getData(String userId, Optional<Long> offset, Optional<Integer> limit){
-        return null;
+    private DataDAO getData(String userId, Map<String, String> params){
+        return dataService.getByUserId(Long.parseLong(userId), params);
     }
 
 }

@@ -1,18 +1,5 @@
 package com.renergetic.backdb.service;
 
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-import org.json.JSONArray;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.renergetic.backdb.dao.DataDAO;
 import com.renergetic.backdb.exception.NotFoundException;
 import com.renergetic.backdb.model.InformationPanel;
@@ -21,7 +8,19 @@ import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.repository.InformationPanelRepository;
 import com.renergetic.backdb.repository.InformationTileMeasurementRepository;
 import com.renergetic.backdb.repository.InformationTileRepository;
+import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.service.utils.HttpAPIs;
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class DataService {
@@ -32,9 +31,37 @@ public class DataService {
 	InformationPanelRepository panelRepository;
 	@Autowired
 	InformationTileRepository tileRepository;
+	@Autowired
+	MeasurementRepository measurementRepository;
 	
 	@Autowired
 	InformationTileMeasurementRepository tileMeasurementRepository;
+
+	public DataDAO getByUserId(Long userId, Map<String, String> params){
+		List<Measurement> measurements = measurementRepository.findByUserId(userId);
+		if (!params.containsKey("field"))
+			params.put("field", "renewability");
+		DataDAO ret = new DataDAO();
+		measurements.forEach(measurement -> {
+			HttpResponse<String> responseLast = HttpAPIs.sendRequest(
+					String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/last", measurement.getName()),
+					"GET", params, null, null);
+			HttpResponse<String> responseMax = HttpAPIs.sendRequest(
+					String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/max", measurement.getName()),
+					"GET", params, null, null);
+			if (responseLast != null && responseLast.statusCode() < 300) {
+				JSONArray array = new JSONArray(responseLast.body());
+				if (array.length() > 0)
+					ret.getCurrent().getLast().put(measurement.getId().toString(), Double.parseDouble(array.getJSONObject(0).getJSONObject("fields").getString("last")));
+			}
+			if (responseMax != null && responseMax.statusCode() < 300) {
+				JSONArray array = new JSONArray(responseMax.body());
+				if (array.length() > 0)
+					ret.getCurrent().getMax().put(measurement.getId().toString(), Double.parseDouble(array.getJSONObject(0).getJSONObject("fields").getString("max")));
+			}
+		});
+		return ret;
+	}
 
 	public DataDAO getByPanel(Long id, Map<String, String> params) {
 		InformationPanel panel = panelRepository.findById(id).orElse(null);

@@ -20,7 +20,7 @@ public class WrapperResponseDAO {
     private List<AssetPanelDAO> assetPanels;
 
     @JsonProperty(required = false)
-    private List<Void> data;
+    private DataDAO data;
 
     @JsonProperty(required = false)
     private List<DemandScheduleDAO> demands;

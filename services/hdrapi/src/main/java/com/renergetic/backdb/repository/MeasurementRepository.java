@@ -12,6 +12,14 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
 	
 	Measurement save(Measurement measurement);
 	List<Measurement> findByAsset(Asset assetId);
+
+	@Query(value = "SELECT measurement.* " +
+			"FROM (measurement " +
+			"INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
+			"INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
+			"INNER JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId) ", nativeQuery = true)
+	public List<Measurement> findByUserId(Long userId);
+
 	@Query(value = "SELECT measurement.* " +
 			"FROM (measurement " +
 			"INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
@@ -22,7 +30,6 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
 			"AND measurement.direction = :direction " +
 			"AND measurement.measurement_type_id = :type ", nativeQuery = true)
 	public List<Measurement> findByUserIdAndBySensorNameAndDomainAndDirectionAndType(Long userId, String sensorName, String domain, String direction, Long type);
-
 
 	@Query(value = "SELECT measurement.* " +
 			"FROM (asset asset_conn " +
