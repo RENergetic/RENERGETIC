@@ -22,6 +22,8 @@ import com.inetum.app.dao.MeasurementDAOResponse;
 import com.inetum.app.model.InfluxFunction;
 import com.inetum.app.service.MeasurementService;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/measurement")
@@ -29,7 +31,8 @@ public class MeasurementController {
 
 	@Autowired
 	MeasurementService service;
-	
+
+	@Operation(summary = "Get measurementd names")
 	@GetMapping("")
 	public ResponseEntity<List<String>> getMeasurement(
 			@RequestParam("bucket") Optional<String> bucket){
@@ -41,7 +44,8 @@ public class MeasurementController {
 			return ResponseEntity.ok(ret);
 		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
-	
+
+	@Operation(summary = "Get measurement entries")
 	@GetMapping("/{measurement_name}")
 	public ResponseEntity<List<MeasurementDAOResponse>> getMeasurement(
 			@RequestParam("from") Optional<String> from, 
@@ -66,6 +70,7 @@ public class MeasurementController {
 		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
+	@Operation(summary = "Get measurement entries and operate it")
 	@GetMapping("/{measurement_name}/{function}")
 	public ResponseEntity<List<MeasurementDAOResponse>> getProcessedMeasurement(
 			@RequestParam("from") Optional<String> from, 
@@ -96,6 +101,7 @@ public class MeasurementController {
 		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
+	@Operation(summary = "Insert an entry in a measurement")
 	@PostMapping()
 	public ResponseEntity<MeasurementDAOResponse> addMeasurement(@RequestBody MeasurementDAORequest measurement){
 		service.insert(measurement);
@@ -103,6 +109,7 @@ public class MeasurementController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@Operation(summary = "Delete a measurement")
 	@DeleteMapping("/{measurement_name}")
 	public ResponseEntity<MeasurementDAOResponse> delMeasurement(
 			@RequestParam("bucket") Optional<String> bucket,
