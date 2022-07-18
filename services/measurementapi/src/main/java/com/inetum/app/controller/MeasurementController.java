@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -98,6 +99,22 @@ public class MeasurementController {
 	@PostMapping()
 	public ResponseEntity<MeasurementDAOResponse> addMeasurement(@RequestBody MeasurementDAORequest measurement){
 		service.insert(measurement);
+		
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@DeleteMapping("/{measurement_name}")
+	public ResponseEntity<MeasurementDAOResponse> delMeasurement(
+			@RequestParam("bucket") Optional<String> bucket,
+			@PathVariable(name = "measurement_name") String measurementName,
+			@RequestParam("from") Optional<String> from, 
+			@RequestParam("to") Optional<String> to){
+
+		MeasurementDAORequest measurement = new MeasurementDAORequest();
+		measurement.setMeasurement(measurementName);
+		measurement.setBucket(bucket.orElse("renergetic"));
+		
+		service.delete(measurement, from.orElse(""), to.orElse(""));
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

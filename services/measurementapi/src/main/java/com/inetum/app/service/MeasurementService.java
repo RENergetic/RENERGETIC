@@ -3,6 +3,8 @@ package com.inetum.app.service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -18,10 +20,11 @@ import com.inetum.app.model.InfluxFunction;
 //import com.inetum.app.mapper.MeasurementMapper;
 import com.inetum.app.model.InfluxTimeUnit;
 import com.inetum.app.service.utils.FieldsFormat;
-
+import com.influxdb.client.DeleteApi;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.QueryApi;
 import com.influxdb.client.WriteApiBlocking;
+import com.influxdb.client.domain.DeletePredicateRequest;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import com.influxdb.query.FluxTable;
@@ -178,5 +181,26 @@ public class MeasurementService {
 		return MeasurementMapper.fromFlux(tables)
 				.stream().map(measurement -> measurement.getMeasurement()).collect(Collectors.toList());
     }
+
+	public void delete(MeasurementDAORequest measurement, String from, String to) {
+		try {
+			DeleteApi delete = influxDB.getDeleteApi();
+			DeletePredicateRequest request = new DeletePredicateRequest();
+			request.setPredicate("_measurement = " + measurement.getMeasurement());
+			
+			if (!from.isBlank())
+				request.setStart(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(from).toInstant()
+					  .atOffset(ZoneOffset.UTC));
+			else request.setStart(Instant.ofEpochMilli(0).atOffset(ZoneOffset.UTC));
+			if (!to.isBlank())
+				request.setStop(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(to).toInstant()
+					  .atOffset(ZoneOffset.UTC));
+			else request.setStop(Instant.now().plus(36500, ChronoUnit.DAYS).atOffset(ZoneOffset.UTC));
+			
+			delete.delete(request, measurement.getBucket(), "renergetic");
+		} catch(ParseException e) {
+			System.err.println("Date from or to dates haven't a valid format");
+		}
+	}
     
 }
