@@ -1,7 +1,6 @@
 package com.renergetic.backdb.controller;
 
 import com.renergetic.backdb.dao.DemandDefinitionDAO;
-import com.renergetic.backdb.dao.DemandRequestDAO;
 import com.renergetic.backdb.dao.DemandScheduleDAO;
 import com.renergetic.backdb.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;

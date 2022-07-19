@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.AssetType;
 import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.model.User;
 import com.renergetic.backdb.model.details.AssetDetails;
 
 import lombok.Getter;

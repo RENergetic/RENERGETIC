@@ -3,8 +3,6 @@ package com.renergetic.backdb.mapper;
 import com.renergetic.backdb.dao.InformationPanelDAORequest;
 import com.renergetic.backdb.dao.InformationPanelDAOResponse;
 import com.renergetic.backdb.model.InformationPanel;
-import com.renergetic.backdb.model.UUID;
-import com.renergetic.backdb.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

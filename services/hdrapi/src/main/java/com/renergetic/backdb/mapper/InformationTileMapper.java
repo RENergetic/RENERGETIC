@@ -4,7 +4,6 @@ import com.renergetic.backdb.dao.*;
 import com.renergetic.backdb.model.InformationPanel;
 import com.renergetic.backdb.model.InformationTile;
 import com.renergetic.backdb.model.InformationTileMeasurement;
-import com.renergetic.backdb.model.InformationTileType;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

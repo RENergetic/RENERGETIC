@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.backdb.model.InformationTileType;
 
 import com.renergetic.backdb.model.InformationTile;
-import com.renergetic.backdb.model.Measurement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

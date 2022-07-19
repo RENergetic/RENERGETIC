@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.renergetic.backdb.dao.AssetDAOResponse;
-import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.dao.UserDAORequest;
 import com.renergetic.backdb.dao.UserDAOResponse;
 import com.renergetic.backdb.dao.UserRolesDAO;

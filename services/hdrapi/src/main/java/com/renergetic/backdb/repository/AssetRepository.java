@@ -1,14 +1,11 @@
 package com.renergetic.backdb.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import com.renergetic.backdb.model.DemandSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.renergetic.backdb.model.Asset;
 import org.springframework.data.jpa.repository.Query;
-import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.User;
 
 @SuppressWarnings("unchecked")

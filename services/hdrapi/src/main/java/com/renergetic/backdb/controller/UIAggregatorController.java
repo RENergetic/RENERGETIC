@@ -24,8 +24,6 @@ import java.util.Optional;
 @RequestMapping("/api/ui")
 public class UIAggregatorController {
     @Autowired
-    private InformationTileController informationTileController;
-    @Autowired
     private DemandRequestService demandRequestService;
     @Autowired
     private AssetService assetService;

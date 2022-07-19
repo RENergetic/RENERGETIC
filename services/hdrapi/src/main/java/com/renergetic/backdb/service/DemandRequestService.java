@@ -4,7 +4,6 @@ import com.renergetic.backdb.dao.DemandDefinitionDAO;
 import com.renergetic.backdb.dao.DemandScheduleDAO;
 import com.renergetic.backdb.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.mapper.DemandRequestMapper;
 import com.renergetic.backdb.model.DemandDefinition;
 import com.renergetic.backdb.model.DemandSchedule;
 import com.renergetic.backdb.repository.DemandDefinitionRepository;
@@ -24,8 +23,6 @@ public class DemandRequestService {
     DemandScheduleRepository demandScheduleRepository;
     @Autowired
     DemandDefinitionRepository demandDefinitionRepository;
-    @Autowired
-    DemandRequestMapper demandRequestMapper;
 
     @Autowired
     UserService userService;
