@@ -15,25 +15,31 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @ToString
 public class DemandDefinitionDAO {
+    @JsonProperty(required = false)
     private Long id;
 
-    @JsonProperty("action_type")
+    @JsonProperty(value = "action_type", required = true)
     private String actionType;
 
+    @JsonProperty(required = true)
     private String action;
 
-    @JsonProperty("information_tile_id")
-    private Long informationTileId;
-
+    @JsonProperty(required = false)
     private String message;
+    
+    @JsonProperty(value = "information_tile_id", required = false)
+    private Long informationTileId;
 
     private String ext;
 
     public static DemandDefinitionDAO create(DemandDefinition demandDefinition){
         DemandDefinitionDAO demandDefinitionDAO = new DemandDefinitionDAO();
         demandDefinitionDAO.setId(demandDefinition.getId());
-        demandDefinitionDAO.setActionType(demandDefinition.getActionType().toString());
-        demandDefinitionDAO.setAction(demandDefinition.getAction().toString());
+        
+        if (demandDefinition.getActionType() != null)
+        	demandDefinitionDAO.setActionType(demandDefinition.getActionType().toString());
+        if (demandDefinition.getAction() != null)
+        	demandDefinitionDAO.setAction(demandDefinition.getAction().toString());
         if(demandDefinition.getInformationTile() != null)
             demandDefinitionDAO.setInformationTileId(demandDefinition.getInformationTile().getId());
         demandDefinitionDAO.setMessage(demandDefinition.getMessage());
@@ -45,8 +51,11 @@ public class DemandDefinitionDAO {
     public DemandDefinition mapToEntity() {
         DemandDefinition demandDefinition = new DemandDefinition();
         demandDefinition.setId(this.getId());
-        demandDefinition.setActionType(DemandDefinitionActionType.valueOf(this.getActionType()));
-        demandDefinition.setAction(DemandDefinitionAction.valueOf(this.getAction()));
+        
+        if (this.getActionType() != null)
+        	demandDefinition.setActionType(DemandDefinitionActionType.valueOf(this.getActionType()));
+        if (this.getAction() != null)
+        	demandDefinition.setAction(DemandDefinitionAction.valueOf(this.getAction()));
         if(this.getInformationTileId() != null){
             InformationTile informationTile = new InformationTile();
             informationTile.setId(this.getInformationTileId());

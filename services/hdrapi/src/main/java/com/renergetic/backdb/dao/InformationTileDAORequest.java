@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -26,9 +24,6 @@ public class InformationTileDAORequest {
 
     @JsonProperty()
     private InformationTileType type;
-    
-    @JsonProperty()
-    private Boolean featured;
 
     @JsonProperty(required = true, value = "panel_id")
     private Long panelId;
@@ -38,7 +33,4 @@ public class InformationTileDAORequest {
 
     @JsonProperty()
     private String props;
-
-    @JsonProperty(required = true, value = "information_tile_measurements")
-    private List<InformationTileMeasurementDAORequest> informationTileMeasurements;
 }

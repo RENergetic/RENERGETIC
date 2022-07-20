@@ -274,12 +274,12 @@ public class AssetController {
 		}
 	)
 	@PutMapping(path = "/connect", produces = "application/json")
-	public ResponseEntity<AssetDAOResponse> connectAssets(@RequestParam("asset_id") Long id, @RequestParam("connected_asset_id") Long connectId, @RequestParam("type") ConnectionType type) {
+	public ResponseEntity<AssetDAOResponse> connectAssets(@RequestParam("asset_id") Long id, @RequestParam("connected_asset_id") Long connectId, @RequestParam(value = "type", required = false) Optional<ConnectionType> type) {
 		try {
 			AssetConnectionDAORequest connection = new AssetConnectionDAORequest();
 			connection.setAssetId(id);
 			connection.setAssetConnectedId(connectId);
-			connection.setType(type);
+			connection.setType(type.orElse(null));
 			AssetDAOResponse _asset = assetSv.connect(connection);
 			return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 		} catch (Exception e) {

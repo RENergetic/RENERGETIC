@@ -1,5 +1,6 @@
 package com.renergetic.backdb.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -182,13 +183,18 @@ public class UserService {
 		if(user==null) {
 			throw new InvalidNonExistingIdException("No user realated with id"+id);
 		}else {
-			List<Asset> assets= assetRepository.findByUser(user);
-			if(assets != null && assets.size()>0)
-				return assets.stream()
-						.filter(obj-> obj.getType().getCategory()==AssetCategory.structural)
+			List<Asset> userAssets = assetRepository.findByUser(user);
+			List<AssetDAOResponse> assets = new ArrayList<>();
+
+			if(userAssets != null && userAssets.size() > 0) {
+				for (Asset userAsset : userAssets)
+					assets.addAll(userAsset.getAssets().stream()
+						.filter(obj -> obj.getType().getCategory().equals(AssetCategory.structural))
 						.map(obj -> AssetDAOResponse.create(obj, assetDetailsRepository.findByAssetId(obj.getId())))
-						.collect(Collectors.toList());
-			else throw new NotFoundException("User"+id+"hasn't related asset");
+						.collect(Collectors.toList()));
+				return assets;
+			}
+			else throw new NotFoundException("User " + id + " hasn't related asset");
 		}
 	}
 }

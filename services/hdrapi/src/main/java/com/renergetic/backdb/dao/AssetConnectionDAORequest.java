@@ -59,7 +59,7 @@ public class AssetConnectionDAORequest {
 		if (assetConnectedId != null) {
 			Asset asset = new Asset();
 			asset.setId(assetConnectedId);
-			connection.setAsset(asset);
+			connection.setConnectedAsset(asset);
 		}
 		return connection;
 	}

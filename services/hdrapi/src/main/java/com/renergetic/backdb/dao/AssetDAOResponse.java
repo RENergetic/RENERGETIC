@@ -32,9 +32,6 @@ public class AssetDAOResponse {
 	private String label;
 
 	@JsonProperty(required = false)
-	private String description;
-
-	@JsonProperty(required = false)
 	private String geo_location;
 
 	@JsonProperty(required = false)
@@ -45,9 +42,6 @@ public class AssetDAOResponse {
 
 	@JsonProperty(required = false)
 	private List<SimpleMeasurementDAO> measurements;
-
-	@JsonProperty(required = false)
-	private Long owner;
 
 	@JsonProperty(required = false)
 	private Long user;
@@ -62,7 +56,6 @@ public class AssetDAOResponse {
 			dao.setName(asset.getName());
 			dao.setType(asset.getType());
 			dao.setLabel(asset.getLabel());
-			//dao.setDescription(asset.getDescription());
 			dao.setGeo_location(asset.getLocation());
 			
 			if (asset.getParentAsset() != null) 
@@ -80,8 +73,6 @@ public class AssetDAOResponse {
 					mapMeasurements.add(SimpleMeasurementDAO.create(measurement));
 				dao.setMeasurements(mapMeasurements);
 			}
-//			if (asset.getOwner() != null) 
-//				dao.setOwner(asset.getOwner().getId());
 			if (asset.getUser() != null) 
 				dao.setUser(asset.getUser().getId());
 		}
@@ -97,7 +88,6 @@ public class AssetDAOResponse {
 			dao.setName(asset.getName());
 			dao.setType(asset.getType());
 			dao.setLabel(asset.getLabel());
-			//dao.setDescription(asset.getDescription());
 			dao.setGeo_location(asset.getLocation());
 			
 			if (asset.getParentAsset() != null) 
@@ -115,8 +105,6 @@ public class AssetDAOResponse {
 //					mapMeasurements.add(SimpleMeasurementDAO.create(measurement));
 //				dao.setMeasurements(mapMeasurements);
 //			}
-//			if (asset.getOwner() != null) 
-//				dao.setOwner(asset.getOwner().getId());
 			if (asset.getUser() != null) 
 				dao.setUser(asset.getUser().getId());
 		}
