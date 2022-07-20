@@ -10,6 +10,7 @@ import com.renergetic.backdb.mapper.InformationPanelMapper;
 import com.renergetic.backdb.model.InformationPanel;
 import com.renergetic.backdb.model.InformationTileMeasurement;
 import com.renergetic.backdb.model.UUID;
+import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.InformationPanelRepository;
 import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.repository.UuidRepository;
@@ -35,6 +36,9 @@ public class InformationPanelService {
 	@Autowired
     MeasurementDetailsRepository measurementDetailsRepository;
 
+	@Autowired
+	AssetRepository assetRepository;
+	
 	@Autowired
     MeasurementRepository measurementRepository;
 
@@ -101,4 +105,15 @@ public class InformationPanelService {
     private List<MeasurementDAOResponse> getMeasurementFromTileMeasurement(InformationTileMeasurement tileM){
         return Collections.singletonList(MeasurementDAOResponse.create(tileM.getMeasurement(), measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId())));
     }
+    
+	public InformationPanelDAOResponse connect(Long id, Long assetId) {
+		boolean panelExists = informationPanelRepository.existsById(id);
+
+		if ( panelExists && assetRepository.existsById(assetId)) {
+			InformationPanel asset = informationPanelRepository.findById(id).get();
+			asset.getAssets().add(assetRepository.findById(assetId).get());
+			return InformationPanelDAOResponse.create(informationPanelRepository.save(asset));
+		} else if (!panelExists) throw new InvalidNonExistingIdException("The panel to connect doesn't exists");
+		else throw new InvalidNonExistingIdException("The asset to connect doesn't exists");
+	}
 }
