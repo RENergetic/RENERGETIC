@@ -45,11 +45,11 @@ public class DataService {
 
 			params.put("field", measurement.getType().getName());
 			HttpResponse<String> responseLast = HttpAPIs.sendRequest(
-					String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/last", measurement.getName()),
+					String.format("http://backinflux-sv:8082/api/measurement/%s/last", measurement.getName()),
 					"GET", params, null, null);
 			
 			HttpResponse<String> responseMax = HttpAPIs.sendRequest(
-					String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/max", measurement.getName()),
+					String.format("http://backinflux-sv:8082/api/measurement/%s/max", measurement.getName()),
 					"GET", params, null, null);
 			
 			if (responseLast != null && responseLast.statusCode() < 300) {
