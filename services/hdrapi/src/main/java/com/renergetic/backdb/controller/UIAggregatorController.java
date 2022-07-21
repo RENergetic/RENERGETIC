@@ -52,7 +52,7 @@ public class UIAggregatorController {
             if (args.getFrom() != null) params.put("from", args.getFrom());
             if (args.getTo() != null) params.put("to", args.getTo());
             if (args.getBucket() != null) params.put("bucket", args.getBucket());
-            if (args.getField() != null) params.put("field", args.getField());
+//            if (args.getField() != null) params.put("field", args.getField());
             if (args.getTags() != null) params.putAll(args.getTags());
 
             wrapperResponseDAO.setData(getData(userId, params));
@@ -69,7 +69,7 @@ public class UIAggregatorController {
         return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
     }
 
-    private List<AssetDAOResponse> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit){
+    private List<SimpleAssetDAO> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit){
         return assetService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
 

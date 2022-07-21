@@ -55,8 +55,9 @@ public class WrapperRequestDAO {
         private String to;
         @JsonProperty(required = false)
         private String bucket;
-        @JsonProperty(required = false)
-        private String field;
+// The wrapper API can return many measurements with different fields, for now, I propose use the name of measurement type as field
+//        @JsonProperty(required = false)
+//        private String field;
         @JsonProperty(required = false)
         private Map<String, String> tags;
     }

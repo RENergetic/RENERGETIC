@@ -202,9 +202,9 @@ public class AssetService {
 		return assetTypeRepository.findById(id).orElse(null);
 	}
 
-	public List<AssetDAOResponse> findByUserId(Long id, long offset, int limit){
+	public List<SimpleAssetDAO> findByUserId(Long id, long offset, int limit){
 		return assetRepository.findByUserId(id, offset, limit).stream()
-				.map(x -> AssetDAOResponse.create(x, assetRepository.findByParentAsset(x), measurementRepository.findByAsset(x))).collect(Collectors.toList());
+				.map(x -> SimpleAssetDAO.create(x)).collect(Collectors.toList());
 	}
 
 	public List<AssetPanelDAO> findAssetsPanelsByUserId(Long id, long offset, int limit){

@@ -25,14 +25,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Table(name = "asset")
 @RequiredArgsConstructor
 @Getter
 @Setter
-@ToString
+//@ToString // TODO: java.lang.StackOverflowError occurs when wrapper API is called
 public class Asset {
 	@JsonIgnore
 	public static Map<String, AssetCategory> ALLOWED_TYPES;

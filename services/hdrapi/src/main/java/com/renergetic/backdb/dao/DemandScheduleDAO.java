@@ -51,7 +51,6 @@ public class DemandScheduleDAO {
         DemandSchedule demandSchedule = new DemandSchedule();
         demandSchedule.setId(this.getId());
         
-        System.err.println(this.getDemandDefinition());
         if(this.getDemandDefinition() != null)
             demandSchedule.setDemandDefinition(this.getDemandDefinition().mapToEntity());
         if(this.getAssetId() != null){

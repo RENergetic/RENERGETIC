@@ -39,26 +39,29 @@ public class DataService {
 
 	public DataDAO getByUserId(Long userId, Map<String, String> params){
 		List<Measurement> measurements = measurementRepository.findByUserId(userId);
-		if (!params.containsKey("field"))
-			params.put("field", "renewability");
+
 		DataDAO ret = new DataDAO();
 		measurements.forEach(measurement -> {
+
+			params.put("field", measurement.getType().getName());
 			HttpResponse<String> responseLast = HttpAPIs.sendRequest(
 					String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/last", measurement.getName()),
 					"GET", params, null, null);
+			
 			HttpResponse<String> responseMax = HttpAPIs.sendRequest(
 					String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/max", measurement.getName()),
 					"GET", params, null, null);
+			
 			if (responseLast != null && responseLast.statusCode() < 300) {
 				JSONArray array = new JSONArray(responseLast.body());
 				if (array.length() > 0)
 					ret.getCurrent().getLast().put(measurement.getId().toString(), Double.parseDouble(array.getJSONObject(0).getJSONObject("fields").getString("last")));
-			}
+			} else System.err.println(responseMax.body());
 			if (responseMax != null && responseMax.statusCode() < 300) {
 				JSONArray array = new JSONArray(responseMax.body());
 				if (array.length() > 0)
 					ret.getCurrent().getMax().put(measurement.getId().toString(), Double.parseDouble(array.getJSONObject(0).getJSONObject("fields").getString("max")));
-			}
+			} else System.err.println(responseMax.body());
 		});
 		return ret;
 	}
