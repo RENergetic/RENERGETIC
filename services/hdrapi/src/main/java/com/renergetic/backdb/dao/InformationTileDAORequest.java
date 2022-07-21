@@ -1,13 +1,12 @@
 package com.renergetic.backdb.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.backdb.model.InformationTileType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -24,10 +23,7 @@ public class InformationTileDAORequest {
     private String label;
 
     @JsonProperty()
-    private Long type;
-    
-    @JsonProperty()
-    private Boolean featured;
+    private InformationTileType type;
 
     @JsonProperty(required = true, value = "panel_id")
     private Long panelId;
@@ -37,7 +33,4 @@ public class InformationTileDAORequest {
 
     @JsonProperty()
     private String props;
-
-    @JsonProperty()
-    private List<MeasurementDAORequest> measurements;
 }

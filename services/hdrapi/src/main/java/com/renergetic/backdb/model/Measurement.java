@@ -41,11 +41,12 @@ public class Measurement {
 	@Column(name = "label", nullable = true, insertable = true, updatable = true)
 	private String label;
 
-	@Column(name = "description", nullable = true, insertable = true, updatable = true)
-	private String description;
-
-	@Column(name = "icon", nullable = true, insertable = true, updatable = true)
-	private String icon;
+	
+	@ManyToOne(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true)
+	private Asset asset;
+	
 
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -64,20 +65,21 @@ public class Measurement {
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "energy_island_asset_id", nullable = true, insertable = true, updatable = true)
-	private Asset asset;
+	private Asset island;
 
 	@OneToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
 	private UUID uuid;
 	
-	public Measurement(Long id, String uuid, String name, String label, String description, String icon, Direction direction) {
+	public Measurement(Long id, String uuid, String name, String label,Asset asset, String description, String icon, Direction direction) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.label = label;
-		this.description = description;
-		this.icon = icon;
+		this.asset = asset;
+		//this.description = description;
+		//this.icon = icon;
 		this.direction = direction;
 		this.type = new MeasurementType();
 	}

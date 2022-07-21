@@ -1,35 +1,24 @@
 package com.renergetic.backdb.service;
 
+import com.renergetic.backdb.dao.*;
+import com.renergetic.backdb.exception.InvalidArgumentException;
+import com.renergetic.backdb.exception.InvalidNonExistingIdException;
+import com.renergetic.backdb.exception.NotFoundException;
+import com.renergetic.backdb.model.*;
+import com.renergetic.backdb.model.details.AssetDetails;
+import com.renergetic.backdb.repository.*;
+import com.renergetic.backdb.repository.information.AssetDetailsRepository;
+import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
+import com.renergetic.backdb.service.utils.OffSetPaging;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.renergetic.backdb.dao.AssetDAORequest;
-import com.renergetic.backdb.dao.AssetDAOResponse;
-import com.renergetic.backdb.dao.MeasurementDAOResponse;
-import com.renergetic.backdb.exception.InvalidArgumentException;
-import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.model.Asset;
-import com.renergetic.backdb.model.AssetCategory;
-import com.renergetic.backdb.model.AssetType;
-import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.model.UUID;
-import com.renergetic.backdb.model.details.AssetDetails;
-import com.renergetic.backdb.repository.AssetRepository;
-import com.renergetic.backdb.repository.AssetTypeRepository;
-import com.renergetic.backdb.repository.MeasurementRepository;
-import com.renergetic.backdb.repository.UuidRepository;
-import com.renergetic.backdb.repository.information.AssetDetailsRepository;
-import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
 public class AssetService {
@@ -42,6 +31,8 @@ public class AssetService {
 	MeasurementRepository measurementRepository;
 	@Autowired
 	AssetTypeRepository assetTypeRepository;
+	@Autowired
+	AssetConnectionRepository assetConnectionRepository;
 	@Autowired
 	AssetDetailsRepository assetDetailsRepository;
 	@Autowired
@@ -80,13 +71,12 @@ public class AssetService {
 				: "The asset to update doesn't exists");
 	}
 
-	public AssetDAOResponse connect(Long id, Long connectId) {
-		boolean assetExists = assetRepository.existsById(id);
+	public AssetDAOResponse connect(AssetConnectionDAORequest connection) {
+		boolean assetExists = assetRepository.existsById(connection.getAssetId());
 
-		if ( assetExists && assetRepository.existsById(connectId)) {
-			Asset asset = assetRepository.findById(id).get();
-			asset.getAssets().add(assetRepository.findById(connectId).get());
-			return AssetDAOResponse.create(assetRepository.save(asset), null, null);
+		if ( assetExists && assetRepository.existsById(connection.getAssetConnectedId())) {
+			assetConnectionRepository.save(connection.mapToEntity());
+			return AssetDAOResponse.create(assetRepository.findById(connection.getAssetId()).orElse(null), null, null);
 		} else throw new InvalidNonExistingIdException("The assets to connect don't exists");
 	}
 
@@ -116,8 +106,8 @@ public class AssetService {
 				}
 				if (equals && filters.containsKey("location"))
 					equals = asset.getLocation().equalsIgnoreCase(filters.get("location"));
-				if (equals && filters.containsKey("owner"))
-					equals = asset.getOwner() != null? String.valueOf(asset.getOwner().getId()).equalsIgnoreCase(filters.get("owner")) : false;
+//				if (equals && filters.containsKey("owner"))
+//					equals = asset.getOwner() != null? String.valueOf(asset.getOwner().getId()).equalsIgnoreCase(filters.get("owner")) : false;
 				if (equals && filters.containsKey("parent"))
 					equals = asset.getParentAsset() != null? String.valueOf(asset.getParentAsset().getId()).equalsIgnoreCase(filters.get("parent")) : false;
 				
@@ -210,6 +200,17 @@ public class AssetService {
 
 	public AssetType getTypeById(Long id) {
 		return assetTypeRepository.findById(id).orElse(null);
+	}
+
+	public List<SimpleAssetDAO> findByUserId(Long id, long offset, int limit){
+		return assetRepository.findByUserId(id, offset, limit).stream()
+				.map(x -> SimpleAssetDAO.create(x)).collect(Collectors.toList());
+	}
+
+	public List<AssetPanelDAO> findAssetsPanelsByUserId(Long id, long offset, int limit){
+		return assetRepository.findByUserId(id, offset, limit).stream()
+				.map(x -> x.getInformationPanels().stream().map(y -> AssetPanelDAO.fromEntities(x, y)).collect(Collectors.toList()))
+				.flatMap(List::stream).collect(Collectors.toList());
 	}
 	
 	// ASSETDETAILS CRUD OPERATIONS

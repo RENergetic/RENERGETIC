@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.renergetic.backdb.dao.AssetDAOResponse;
 import com.renergetic.backdb.dao.UserDAORequest;
 import com.renergetic.backdb.dao.UserDAOResponse;
 import com.renergetic.backdb.dao.UserRolesDAO;
@@ -86,6 +87,16 @@ public class UserController {
 		
 		return new ResponseEntity<>(settings, HttpStatus.OK);
 	}
+	
+	@Operation (summary="Get Assets from User with specific id")
+
+	@GetMapping(path ="/assets/{id}", produces="application/json")
+	public ResponseEntity<List<AssetDAOResponse>> getAssets (@PathVariable Long id){
+		List<AssetDAOResponse> assets = null;
+		assets= userSv.getAssets(id);
+		return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+	
 //=== POST REQUESTS ===================================================================================
 	
 	@Operation(summary = "Create a new User")

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.backdb.model.Direction;
 import com.renergetic.backdb.model.Domain;
+import com.renergetic.backdb.model.InformationTile;
 import com.renergetic.backdb.model.InformationTileMeasurement;
 import com.renergetic.backdb.model.MeasurementType;
 
@@ -23,9 +24,6 @@ public class InformationTileMeasurementDAOResponse {
     @JsonProperty(required = true)
     private String props;
 
-    @JsonProperty(value = "asset", required = false)
-    private SimpleAssetDAO asset;
-
     @JsonProperty(value = "measurement", required = false)
     private SimpleMeasurementDAO measurement;
 
@@ -40,6 +38,9 @@ public class InformationTileMeasurementDAOResponse {
 
 	@JsonProperty(required = false)
 	private Direction direction;
+
+	@JsonProperty(value = "information_tile_id", required = false)
+	private Long informationTile;
     
     public static InformationTileMeasurementDAOResponse create(InformationTileMeasurement tile) {
     	InformationTileMeasurementDAOResponse dao = new InformationTileMeasurementDAOResponse();
@@ -49,14 +50,13 @@ public class InformationTileMeasurementDAOResponse {
 
 		if(tile.getMeasurement() != null) 
 			dao.setMeasurement(SimpleMeasurementDAO.create(tile.getMeasurement()));
-		if(tile.getAsset() != null) 
-			dao.setAsset(SimpleAssetDAO.create(tile.getAsset()));
 		if(tile.getType() != null)
 			dao.setType(tile.getType());
 
 		dao.setSensorName(tile.getSensorName());
 		dao.setDomain(tile.getDomain());
 		dao.setDirection(tile.getDirection());
+		if(tile.getInformationTile() != null) dao.setInformationTile(tile.getInformationTile().getId());
 		
 		return dao;
 	}
@@ -66,9 +66,6 @@ public class InformationTileMeasurementDAOResponse {
 		
 		tile.setId(id);
 		tile.setProps(props);
-		
-		if (asset != null) 
-			tile.setAsset(asset.mapToEntity());
 
 		if (measurement != null)
 			tile.setMeasurement(measurement.mapToEntity());
@@ -79,6 +76,13 @@ public class InformationTileMeasurementDAOResponse {
 		tile.setSensorName(sensorName);
 		tile.setDomain(domain);
 		tile.setDirection(direction);
+		
+		if (informationTile != null) {
+			InformationTile infoTile = new InformationTile();
+			infoTile.setId(informationTile);
+			tile.setInformationTile(infoTile);
+		}
+
 
 		return tile;
 	}

@@ -1,7 +1,8 @@
-const { default: axios } = require("axios");
-const API_URL = "http://front-ren-prototype.apps.paas-dev.psnc.pl/api-postgre/1.0/api/assets/type"
 
-let types = [
+import { post } from "../utils.js";
+const path = "api/assets/type"
+
+const types = [
     {
         id: "1",
         name: "room",
@@ -137,8 +138,7 @@ let types = [
     },
 ];
 
-for (let type of types)
-    axios.post(API_URL, type,
-    {
-        headers: { "Content-type": "application/json; charset=UTF-8" },
-    }).then(response => console.log(response.data));
+export function generateAssetTypes() {
+    for (let type of types)
+        post(path, type);
+}

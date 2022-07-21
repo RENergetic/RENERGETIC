@@ -1,5 +1,6 @@
 package com.renergetic.backdb.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,18 +13,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import com.renergetic.backdb.dao.AssetDAOResponse;
 import com.renergetic.backdb.dao.UserDAORequest;
 import com.renergetic.backdb.dao.UserDAOResponse;
 import com.renergetic.backdb.dao.UserRolesDAO;
 import com.renergetic.backdb.dao.UserSettingsDAO;
+import com.renergetic.backdb.exception.InvalidNonExistingIdException;
+import com.renergetic.backdb.exception.NotFoundException;
+import com.renergetic.backdb.model.Asset;
+import com.renergetic.backdb.model.AssetCategory;
 import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.model.User;
 import com.renergetic.backdb.model.UserRoles;
 import com.renergetic.backdb.model.UserSettings;
+import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.UserRepository;
 import com.renergetic.backdb.repository.UserRolesRepository;
 import com.renergetic.backdb.repository.UserSettingsRepository;
 import com.renergetic.backdb.repository.UuidRepository;
+import com.renergetic.backdb.repository.information.AssetDetailsRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 
 @Service
@@ -39,6 +47,10 @@ public class UserService {
 	UserSettingsRepository userSettingsRepository;
 	@Autowired
 	UuidRepository uuidRepository;
+	@Autowired
+	AssetRepository assetRepository;
+	@Autowired
+	AssetDetailsRepository assetDetailsRepository;
 
 	// USER CRUD OPERATIONS
 	public UserDAOResponse save(UserDAORequest user) {
@@ -108,14 +120,14 @@ public class UserService {
 	Page<User> users = userRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<User> stream = users.stream();
 		
-		if (filters != null)
-			stream.filter(user -> {
-				boolean equals = true;
-				
-				if (filters.containsKey("name"))
-					equals = user.getName().equalsIgnoreCase(filters.get("name"));
-				return equals;
-			});
+//		if (filters != null)
+//			stream.filter(user -> {
+//				boolean equals = true;
+//				
+////				if (filters.containsKey("name"))
+////					equals = user.getName().equalsIgnoreCase(filters.get("name"));
+////				return equals;
+//			});
 		return stream
 				.map(user -> UserDAOResponse.create(user, userRolesRepository.findByUserId(user.getId()), userSettingsRepository.findByUserId(user.getId())))
 				.collect(Collectors.toList());
@@ -163,5 +175,26 @@ public class UserService {
 		User user = userRepository.findById(id).orElse(null);
 		
 		return UserDAOResponse.create(user, userRolesRepository.findByUserId(user.getId()), userSettingsRepository.findByUserId(user.getId()));
+	}
+	
+	public List <AssetDAOResponse> getAssets(Long id){
+		
+		User user= userRepository.findById(id).orElse(null);
+		if(user==null) {
+			throw new InvalidNonExistingIdException("No user realated with id"+id);
+		}else {
+			List<Asset> userAssets = assetRepository.findByUser(user);
+			List<AssetDAOResponse> assets = new ArrayList<>();
+
+			if(userAssets != null && userAssets.size() > 0) {
+				for (Asset userAsset : userAssets)
+					assets.addAll(userAsset.getAssets().stream()
+						.filter(obj -> obj.getType().getCategory().equals(AssetCategory.structural))
+						.map(obj -> AssetDAOResponse.create(obj, assetDetailsRepository.findByAssetId(obj.getId())))
+						.collect(Collectors.toList()));
+				return assets;
+			}
+			else throw new NotFoundException("User " + id + " hasn't related asset");
+		}
 	}
 }

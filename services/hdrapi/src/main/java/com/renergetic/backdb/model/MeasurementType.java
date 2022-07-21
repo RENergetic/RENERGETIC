@@ -40,9 +40,9 @@ public class MeasurementType {
 	@JsonProperty(required = false)
 	private String unit;
 	
-	@Column(name = "metric_type", nullable = true, insertable = true, updatable = true)
-	@JsonProperty(value = "metric_type", required = false)
-	private String metricType;
+	@Column(name = "description", nullable = true, insertable = true, updatable = true)
+	@JsonProperty(value = "description", required = false)
+	private String description;
 	
 	@Column(name = "factor", nullable = true, insertable = true, updatable = true)
 	@JsonProperty(required = false)
@@ -59,7 +59,7 @@ public class MeasurementType {
 		this.label = label;
 		this.baseUnit = baseUnit;
 		this.unit = unit;
-		this.metricType = metricType;
+		this.description = metricType;
 		this.factor = factor;
 		this.color = color;
 	}

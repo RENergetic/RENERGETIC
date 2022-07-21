@@ -2,9 +2,9 @@ package com.renergetic.backdb.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.backdb.model.Asset;
 import com.renergetic.backdb.model.Direction;
 import com.renergetic.backdb.model.Domain;
+import com.renergetic.backdb.model.InformationTile;
 import com.renergetic.backdb.model.InformationTileMeasurement;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.MeasurementType;
@@ -25,9 +25,6 @@ public class InformationTileMeasurementDAORequest {
     @JsonProperty(required = true)
     private String props;
 
-    @JsonProperty(value = "asset_id", required = false)
-    private Long assetId;
-
     @JsonProperty(value = "measurement_id", required = false)
     private Long measurementId;
 
@@ -42,6 +39,9 @@ public class InformationTileMeasurementDAORequest {
 
 	@JsonProperty(required = false)
 	private Direction direction;
+
+	@JsonProperty(value = "information_tile_id", required = false)
+	private Long informationTile;
     
     public static InformationTileMeasurementDAORequest create(InformationTileMeasurement tile) {
     	InformationTileMeasurementDAORequest dao = new InformationTileMeasurementDAORequest();
@@ -50,12 +50,12 @@ public class InformationTileMeasurementDAORequest {
 		dao.setProps(tile.getProps());
 
 		if(tile.getMeasurement() != null) dao.setMeasurementId(tile.getMeasurement().getId());
-		if(tile.getAsset() != null) dao.setAssetId(tile.getAsset().getId());
 		if(tile.getType() != null) dao.setTypeId(tile.getType().getId());
 
 		dao.setSensorName(tile.getSensorName());
 		dao.setDomain(tile.getDomain());
 		dao.setDirection(tile.getDirection());
+		if(tile.getInformationTile() != null) dao.setInformationTile(tile.getInformationTile().getId());
 		
 		return dao;
 	}
@@ -66,11 +66,6 @@ public class InformationTileMeasurementDAORequest {
 		tile.setId(id);
 		tile.setProps(props);
 		
-		if (assetId != null) {
-			Asset asset = new Asset();
-			asset.setId(assetId);
-			tile.setAsset(asset);
-		}
 		if (measurementId != null) {
 			Measurement measurement = new Measurement();
 			measurement.setId(measurementId);
@@ -80,6 +75,11 @@ public class InformationTileMeasurementDAORequest {
 			MeasurementType type = new MeasurementType();
 			type.setId(typeId);
 			tile.setType(type);
+		}
+		if (informationTile != null) {
+			InformationTile infoTile = new InformationTile();
+			infoTile.setId(informationTile);
+			tile.setInformationTile(infoTile);
 		}
 
 		tile.setSensorName(sensorName);

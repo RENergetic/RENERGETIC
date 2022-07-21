@@ -2,14 +2,24 @@ package com.renergetic.backdb.service;
 
 import com.renergetic.backdb.dao.InformationPanelDAORequest;
 import com.renergetic.backdb.dao.InformationPanelDAOResponse;
+import com.renergetic.backdb.dao.InformationTileDAOResponse;
+import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.exception.InvalidNonExistingIdException;
 import com.renergetic.backdb.exception.NotFoundException;
 import com.renergetic.backdb.mapper.InformationPanelMapper;
+import com.renergetic.backdb.model.InformationPanel;
+import com.renergetic.backdb.model.InformationTileMeasurement;
+import com.renergetic.backdb.model.UUID;
+import com.renergetic.backdb.repository.AssetRepository;
 import com.renergetic.backdb.repository.InformationPanelRepository;
+import com.renergetic.backdb.repository.MeasurementRepository;
+import com.renergetic.backdb.repository.UuidRepository;
+import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
 import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +30,17 @@ public class InformationPanelService {
 
     @Autowired
     InformationPanelMapper informationPanelMapper;
+	@Autowired
+	UuidRepository uuidRepository;
+
+	@Autowired
+    MeasurementDetailsRepository measurementDetailsRepository;
+
+	@Autowired
+	AssetRepository assetRepository;
+	
+	@Autowired
+    MeasurementRepository measurementRepository;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit){
         return informationPanelRepository.findAll(new OffSetPaging(offset, limit))
@@ -40,7 +61,9 @@ public class InformationPanelService {
 
     public InformationPanelDAOResponse save(InformationPanelDAORequest informationPanel) {
         informationPanel.setId(null);
-        return informationPanelMapper.toDTO(informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel)));
+        InformationPanel infoPanelEntity = informationPanelMapper.toEntity(informationPanel);
+        infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
     }
 
     public InformationPanelDAOResponse update(InformationPanelDAORequest informationPanel) {
@@ -56,4 +79,41 @@ public class InformationPanelService {
         informationPanelRepository.deleteById(id);
         return true;
     }
+
+    public List<InformationPanelDAOResponse> findByUserId(Long id, long offset, int limit){
+        /*
+            Highly inefficient !!
+            Just as a first draft to get it working but there is really a structural issue in the data highlighted here as this is a pure mess to get the request.
+        */
+        List<InformationPanel> informationPanels = informationPanelRepository.findByUserId(id, offset, limit);
+        return informationPanels.stream().map(panel -> InformationPanelDAOResponse.create(panel,
+                panel.getTiles().stream().map(tile -> InformationTileDAOResponse.create(tile,
+                        tile.getInformationTileMeasurements().stream().map(tileM -> tileM.getMeasurement() == null ?
+                                getMeasurementInferredFromTile(id, tileM)
+                                : getMeasurementFromTileMeasurement(tileM)).flatMap(List::stream).collect(Collectors.toList())
+                )).collect(Collectors.toList())
+        )).collect(Collectors.toList());
+    }
+
+    private List<MeasurementDAOResponse> getMeasurementInferredFromTile(Long userId, InformationTileMeasurement tileM){
+        return measurementRepository
+                .findByUserIdAndBySensorNameAndDomainAndDirectionAndType(userId, tileM.getSensorName(),
+                        tileM.getDomain().name(), tileM.getDirection().name(), tileM.getType().getId())
+                .stream().map(x -> MeasurementDAOResponse.create(x, measurementDetailsRepository.findByMeasurementId(x.getId()))).collect(Collectors.toList());
+    }
+
+    private List<MeasurementDAOResponse> getMeasurementFromTileMeasurement(InformationTileMeasurement tileM){
+        return Collections.singletonList(MeasurementDAOResponse.create(tileM.getMeasurement(), measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId())));
+    }
+    
+	public InformationPanelDAOResponse connect(Long id, Long assetId) {
+		boolean panelExists = informationPanelRepository.existsById(id);
+
+		if ( panelExists && assetRepository.existsById(assetId)) {
+			InformationPanel asset = informationPanelRepository.findById(id).get();
+			asset.getAssets().add(assetRepository.findById(assetId).get());
+			return InformationPanelDAOResponse.create(informationPanelRepository.save(asset));
+		} else if (!panelExists) throw new InvalidNonExistingIdException("The panel to connect doesn't exists");
+		else throw new InvalidNonExistingIdException("The asset to connect doesn't exists");
+	}
 }

@@ -7,4 +7,5 @@ import com.renergetic.backdb.model.User;
 @SuppressWarnings("unchecked")
 public interface UserRepository extends JpaRepository<User, Long> {
 	User save(User user);
+	
 }

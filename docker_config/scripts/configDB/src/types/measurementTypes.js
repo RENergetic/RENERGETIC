@@ -1,10 +1,11 @@
-const { default: axios } = require("axios");
-const API_URL = "http://front-ren-prototype.apps.paas-dev.psnc.pl/api-postgre/1.0/api/measurements/type"
 
-let types = [
+import { post } from "../utils.js";
+const path = "api/measurements/type"
+
+const types = [
     {
     id: "1",
-    name: "electricity_power_w",
+    name: "power_w",
     label: "Power [W]",
     unit: "W",
     base_unit: "W",
@@ -24,7 +25,7 @@ let types = [
     },
     {
         id: "7",
-        name: "power_mw",
+        name: "power",
         label: "Power [MW]",
         base_unit: "W",
         unit: "MW",
@@ -101,7 +102,7 @@ let types = [
     },
     {
       id: "5",
-      name: "ratio_percent",
+      name: "percentage",
       label: "Ratio[%]",
       unit: "%",
       base_unit: " %",
@@ -156,8 +157,7 @@ let types = [
     },
 ];
 
-for (let type of types)
-    axios.post(API_URL, type,
-    {
-        headers: { "Content-type": "application/json; charset=UTF-8" },
-    }).then(response => console.log(response.data));
+export function generateMeasurementTypes() {
+    for (let type of types)
+        post(path, type).then(response => console.log(response));
+}

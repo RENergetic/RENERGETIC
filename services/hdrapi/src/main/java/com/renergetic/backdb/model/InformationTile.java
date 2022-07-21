@@ -8,6 +8,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "information_tile")
@@ -26,21 +27,21 @@ public class InformationTile {
     @Column(name = "label")
     private String label;
 
-    @Column(name = "featured", nullable = true)
-    private Boolean featured;
-
     @Column(name = "layout")
     private String layout;
 
     @Column(name = "props")
     private String props;
+    
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private InformationTileType type;
 
     @ManyToOne
     @JoinColumn(name = "information_panel_id")
     private InformationPanel informationPanel;
 
-    @ManyToOne(cascade = CascadeType.REFRESH)
+    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "informationTile")
     @NotFound(action = NotFoundAction.IGNORE)
-    @JoinColumn(name = "information_tile_type_id", nullable = false)
-    private InformationTileType type;
+    private List<InformationTileMeasurement> informationTileMeasurements;
 }

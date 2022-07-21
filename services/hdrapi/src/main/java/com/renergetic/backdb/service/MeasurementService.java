@@ -74,8 +74,8 @@ public class MeasurementService {
 					equals = measurement.getName().equalsIgnoreCase(filters.get("name"));
 				if (equals && filters.containsKey("type"))
 					equals = measurement.getType().getName().equalsIgnoreCase(filters.get("type"));
-				if (equals && filters.containsKey("icon"))
-					equals = measurement.getIcon().equalsIgnoreCase(filters.get("icon"));
+//				if (equals && filters.containsKey("icon"))
+//					equals = measurement.getIcon().equalsIgnoreCase(filters.get("icon"));
 				if (equals && filters.containsKey("direction"))
 					equals = measurement.getDirection().equals(Direction.valueOf(filters.get("direction")));
 				if (equals && filters.containsKey("asset_id") && measurement.getAsset() != null) {

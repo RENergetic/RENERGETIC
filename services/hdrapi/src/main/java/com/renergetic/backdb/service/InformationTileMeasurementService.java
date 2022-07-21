@@ -60,8 +60,8 @@ public class InformationTileMeasurementService {
 			tiles = stream.filter(tile -> {
 				boolean equals = true;
 				
-				if (filters.containsKey("asset") && tile.getAsset() != null)
-					equals = String.valueOf(tile.getAsset().getId()).equals(filters.get("asset"));
+//				if (filters.containsKey("asset") && tile.getAsset() != null)
+//					equals = String.valueOf(tile.getAsset().getId()).equals(filters.get("asset"));
 				if (equals && filters.containsKey("measurement") && tile.getMeasurement() != null)
 					equals = String.valueOf(tile.getMeasurement().getId()).equals(filters.get("measurement"));
 				

@@ -77,6 +77,7 @@ public class InformationPanelController {
         try {
             return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
         } catch (Exception e) {
+        	e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -94,6 +95,24 @@ public class InformationPanelController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+	@Operation(summary = "Connect a Panel with a existing Asset")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Asset and panel connected correctly"),
+			@ApiResponse(responseCode = "404", description = "Asset and panel or panel didn't found"),
+			@ApiResponse(responseCode = "500", description = "Error connecting asset")
+		}
+	)
+	@PutMapping(path = "/connect", produces = "application/json")
+	public ResponseEntity<InformationPanelDAOResponse> connectPanelAsset(@RequestParam("panel_id") Long id, @RequestParam("asset_id") Long assetId) {
+		try {
+			InformationPanelDAOResponse _panel = informationPanelService.connect(id, assetId);
+			return new ResponseEntity<>(_panel, _panel != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
     @Operation(summary = "Delete Panel by id")
     @ApiResponses({

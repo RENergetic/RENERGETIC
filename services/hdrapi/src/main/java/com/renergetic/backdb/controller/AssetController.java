@@ -19,11 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.renergetic.backdb.dao.AssetConnectionDAORequest;
 import com.renergetic.backdb.dao.AssetDAORequest;
 import com.renergetic.backdb.dao.AssetDAOResponse;
 import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.model.AssetCategory;
 import com.renergetic.backdb.model.AssetType;
+import com.renergetic.backdb.model.ConnectionType;
 import com.renergetic.backdb.model.details.AssetDetails;
 import com.renergetic.backdb.repository.information.AssetDetailsRepository;
 import com.renergetic.backdb.service.AssetService;
@@ -272,9 +274,13 @@ public class AssetController {
 		}
 	)
 	@PutMapping(path = "/connect", produces = "application/json")
-	public ResponseEntity<AssetDAOResponse> connectAssets(@RequestParam("asset_id") Long id, @RequestParam("connected_asset_id") Long connectId) {
+	public ResponseEntity<AssetDAOResponse> connectAssets(@RequestParam("asset_id") Long id, @RequestParam("connected_asset_id") Long connectId, @RequestParam(value = "type", required = false) Optional<ConnectionType> type) {
 		try {
-			AssetDAOResponse _asset = assetSv.connect(id, connectId);
+			AssetConnectionDAORequest connection = new AssetConnectionDAORequest();
+			connection.setAssetId(id);
+			connection.setAssetConnectedId(connectId);
+			connection.setType(type.orElse(null));
+			AssetDAOResponse _asset = assetSv.connect(connection);
 			return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			e.printStackTrace();

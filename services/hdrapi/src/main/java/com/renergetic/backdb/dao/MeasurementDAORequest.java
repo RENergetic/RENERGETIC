@@ -60,8 +60,8 @@ public class MeasurementDAORequest {
 			if (measurement.getType() != null)
 				dao.setType(measurement.getType().getId());
 			dao.setLabel(measurement.getLabel());
-			dao.setDescription(measurement.getDescription());
-			dao.setIcon(measurement.getIcon());
+			//dao.setDescription(measurement.getDescription());
+			//dao.setIcon(measurement.getIcon());
 			dao.setDomain(measurement.getDomain());
 			dao.setDirection(measurement.getDirection());
 			if (measurement.getAsset() != null)
@@ -81,8 +81,8 @@ public class MeasurementDAORequest {
 			measurement.setType(entityType);
 		}
 		measurement.setLabel(label);
-		measurement.setDescription(description);
-		measurement.setIcon(icon);
+		//measurement.setDescription(description);
+		//measurement.setIcon(icon);
 		measurement.setDomain(domain);
 		measurement.setDirection(direction);
 		measurement.setSensorName(sensorName);

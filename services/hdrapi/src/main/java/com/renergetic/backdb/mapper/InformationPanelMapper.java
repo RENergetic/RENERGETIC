@@ -3,8 +3,6 @@ package com.renergetic.backdb.mapper;
 import com.renergetic.backdb.dao.InformationPanelDAORequest;
 import com.renergetic.backdb.dao.InformationPanelDAOResponse;
 import com.renergetic.backdb.model.InformationPanel;
-import com.renergetic.backdb.model.UUID;
-import com.renergetic.backdb.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +22,11 @@ public class InformationPanelMapper implements MapperReponseRequest<InformationP
         entity.setId(dto.getId());
         entity.setLabel(dto.getLabel());
         entity.setName(dto.getName());
-        entity.setUuid(new UUID(dto.getUuid()));
-        if(dto.getOwner_id() != null){
-            User user = new User();
-            user.setId(dto.getOwner_id());
-            entity.setUser(user);
-        }
+       // entity.setUuid(new UUID(dto.getUuid()));
+//        if(dto.getOwner_id() != null){
+//            User user = new User();
+//            user.setId(dto.getOwner_id());
+//        @GeneratedValue(strategy = GenerationType.AUTO)
         return entity;
     }
 
