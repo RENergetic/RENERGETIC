@@ -7,7 +7,7 @@ export function generate(scenario = undefined) {
             break;
         case "1":
             console.info("Generating scenario 1");
-            scenario1().then(console.info("Scenario 1 has been generated"));
+            scenario1();
             break;
         default:
             console.warn("The specified scenario doesn't exists");
