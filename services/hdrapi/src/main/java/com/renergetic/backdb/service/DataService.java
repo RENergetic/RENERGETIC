@@ -12,6 +12,7 @@ import com.renergetic.backdb.repository.MeasurementRepository;
 import com.renergetic.backdb.service.utils.HttpAPIs;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -24,6 +25,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class DataService {
+	@Value("${influx.api.url}")
+	String influxURL;
+	
 	@PersistenceContext
 	EntityManager entityManager;
 	
@@ -45,23 +49,23 @@ public class DataService {
 
 			params.put("field", measurement.getType().getName());
 			HttpResponse<String> responseLast = HttpAPIs.sendRequest(
-					String.format("http://backinflux-sv:8082/api/measurement/%s/last", measurement.getName()),
+					String.format(influxURL + "/api/measurement/%s/last", measurement.getName()),
 					"GET", params, null, null);
 			
 			HttpResponse<String> responseMax = HttpAPIs.sendRequest(
-					String.format("http://backinflux-sv:8082/api/measurement/%s/max", measurement.getName()),
+					String.format(influxURL + "/api/measurement/%s/max", measurement.getName()),
 					"GET", params, null, null);
 			
 			if (responseLast != null && responseLast.statusCode() < 300) {
 				JSONArray array = new JSONArray(responseLast.body());
 				if (array.length() > 0)
 					ret.getCurrent().getLast().put(measurement.getId().toString(), Double.parseDouble(array.getJSONObject(0).getJSONObject("fields").getString("last")));
-			} else System.err.println(responseMax.body());
+			} else System.err.println(responseLast == null? "URL not found" : responseLast.body());
 			if (responseMax != null && responseMax.statusCode() < 300) {
 				JSONArray array = new JSONArray(responseMax.body());
 				if (array.length() > 0)
 					ret.getCurrent().getMax().put(measurement.getId().toString(), Double.parseDouble(array.getJSONObject(0).getJSONObject("fields").getString("max")));
-			} else System.err.println(responseMax.body());
+			} else System.err.println(responseMax == null? "URL not found" : responseMax.body());
 		});
 		return ret;
 	}
@@ -90,11 +94,10 @@ public class DataService {
 			}
 			DataDAO ret = new DataDAO();
 			for (Measurement measurement : measurements) {
-				if (!params.containsKey("field"))
-					params.put("field", "value");
+				params.put("field", measurement.getType().getName());
 				// Execute request to Measurement API to get max and last values
-				HttpResponse<String> responseLast = HttpAPIs.sendRequest(String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/last", measurement.getName()), "GET", params, null, null);
-				HttpResponse<String> responseMax = HttpAPIs.sendRequest(String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/max", measurement.getName()), "GET", params, null, null);
+				HttpResponse<String> responseLast = HttpAPIs.sendRequest(String.format(influxURL + "/api/measurement/%s/last", measurement.getName()), "GET", params, null, null);
+				HttpResponse<String> responseMax = HttpAPIs.sendRequest(String.format(influxURL + "/api/measurement/%s/max", measurement.getName()), "GET", params, null, null);
 				// If request are successfully executed format data
 				if (responseLast.statusCode() < 300) {
 					JSONArray array = new JSONArray(responseLast.body());
@@ -134,11 +137,10 @@ public class DataService {
 			}).collect(Collectors.toList()));
 			DataDAO ret = new DataDAO();
 			for (Measurement measurement : measurements) {
-				if (!params.containsKey("field"))
-					params.put("field", "value");
+				params.put("field", measurement.getType().getName());
 				// Execute request to Measurement API to get max and last values
-				HttpResponse<String> responseLast = HttpAPIs.sendRequest(String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/last", measurement.getName()), "GET", params, null, null);
-				HttpResponse<String> responseMax = HttpAPIs.sendRequest(String.format("http://influx-api-swagger-ren-prototype.apps.paas-dev.psnc.pl/api/measurement/%s/max", measurement.getName()), "GET", params, null, null);
+				HttpResponse<String> responseLast = HttpAPIs.sendRequest(String.format(influxURL + "/api/measurement/%s/last", measurement.getName()), "GET", params, null, null);
+				HttpResponse<String> responseMax = HttpAPIs.sendRequest(String.format(influxURL + "/api/measurement/%s/max", measurement.getName()), "GET", params, null, null);
 				// If request are successfully executed format data
 				if (responseLast.statusCode() < 300) {
 					JSONArray array = new JSONArray(responseLast.body());
@@ -153,6 +155,6 @@ public class DataService {
 			}
 			return ret;
 		}
-		else throw new NotFoundException("No panel found related with id " + id);
+		else throw new NotFoundException("No tile found related with id " + id);
 	}
 }
