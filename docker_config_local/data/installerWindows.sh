@@ -1,15 +1,18 @@
 current=$(pwd -W tr / \\)
 
 namespace='app'
-#inflixdb
-installdb=''
+#influxdb
+installdb='true'
 #influxdb java api
-installapi=''
+installapi='true'
+#influxdb ingestion java api
+installIngestionApi='true'
 #nifi
 installback='false'
 installkafka='false'
 installgrafana='true'
 javafile='measurementapi-0.0.1-SNAPSHOT.jar'
+javafileInjest='ingestionAPI-0.0.1-SNAPSHOT.jar'
 
 while getopts n: flag
 do
@@ -18,7 +21,7 @@ do
     esac
 done
 
-#minikube start --driver=docker
+minikube start --driver=docker
 kubectl create namespace $namespace
 
 if [[ $installdb = 'true' ]]
@@ -57,6 +60,30 @@ then
     # create kubernetes resources
     kubectl apply -f backinflux-deployment.yaml --force=true --namespace=$namespace
     kubectl apply -f backinflux-service.yaml --namespace=$namespace
+fi
+
+if [[ $installIngestionApi = 'true' ]]
+then
+    # API COMPILE TO JAR
+    cd "${current}\\..\\..\\services\\ingestionAPI"
+    mvn clean package -Dmaven.test.skip
+    cp ".\\target\\${javafileInjest}" "${current}\\ingestion-api"
+
+    cd  "${current}\\ingestion-api"
+    # API INSTALLATION
+    # set environment variables
+    eval $(minikube docker-env)
+
+    # delete kubernetes resources if exists
+    kubectl delete deployments/ingestion-api --namespace=$namespace
+    kubectl delete services/ingestion-api-sv --namespace=$namespace
+
+    # create docker image
+    docker build --no-cache --force-rm --tag=ingestionapi:latest .
+    
+    # create kubernetes resources
+    kubectl apply -f ingestion-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f ingestion-service.yaml --namespace=$namespace
 fi
 
 if [[ $installback = 'true' ]]
@@ -112,5 +139,5 @@ fi
 
 echo "Installation has finished :). Remember to execute in a different console:"
 	echo "	minikube service grafana-sv --namespace ${namespace}"
-#    read -p "Press any key to end ..."
+    read -p "Press any key to end ..."
 clear
