@@ -92,7 +92,7 @@ const types = [
     },
     {
       id: "4",
-      name: "temperature_c",
+      name: "temperature",
       label: "Temperature[°C]",
       unit: "°C",
       base_unit: "°C",

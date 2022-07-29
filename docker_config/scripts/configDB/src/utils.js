@@ -53,10 +53,12 @@ export function filterArgs(argv = undefined) {
     const args = {};
     
     (argv? argv : process.argv).filter(arg => {
-        return arg.startsWith("--") && arg.includes("=")
+        return arg.startsWith("--");
     }).forEach(arg => {
-        const pair = arg.trim().split("=");
-        args[pair[0].slice(2)] = pair[1];
+        if (arg.includes("=")) {
+            const pair = arg.trim().split("=");
+            args[pair[0].slice(2)] = pair[1];
+        } else args[arg.slice(2)] = "true"; 
     })
     return args;
 }

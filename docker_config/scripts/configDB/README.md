@@ -14,23 +14,30 @@ To configure the API URL and other paramenters you can modify the [.env file](.e
 
 The command to run the scripts is `npm generate`
 
-It have three parameters:
+It have some parameters:
  - --scenario: to set the scenario to create, if the scenario isn't exists show a message, if you call the command without this parameter no scenario is created
  - --assetTypes: setting it to *false* the asset types isn't created
  - --measurementTypes: setting it to *false* the measurement types isn't created
+ - --influxRequirements: setting it to *true* create allowed measurements and tags (Is recommended generate measurement types also using measurementTypes argument)
 
 The parameters should be write after *' -- '* and to set a value to it use *'='* operator
 
 ### Examples
 
-Set you CLI at this folder and execute this command to generate types and a scenario:
+Set you CLI at this folder and:
+
+To generate only the scenario (*WARN | The scenario can need that the types are in the database*)
 
 `npm generate -- --scenario=1`
 
 If you only want generate the types:
 
-`npm generate`
+`npm generate -- --assetTypes --measurementTypes`
 
-To generate only the scenario (*WARN | The scenario can need that the types are in the database*)
+To generate InfluxDB requirements (measurements and tags)
 
-`npm generate -- --scenario=1 --assetTypes=false --measurementTypes=false`
+`npm generate -- --influxRequirements`
+
+To generate all
+
+`npm generate -- --scenario=1 --assetTypes --measurementTypes --influxRequirements`
