@@ -4,11 +4,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,12 +21,25 @@ import com.renergetic.ingestionapi.dao.FieldRestrictionsDAO;
 import com.renergetic.ingestionapi.dao.MeasurementDAO;
 import com.renergetic.ingestionapi.dao.RestrictionsDAO;
 import com.renergetic.ingestionapi.model.PrimitiveType;
+import com.renergetic.ingestionapi.model.Tags;
+import com.renergetic.ingestionapi.repository.MeasurementRepository;
+import com.renergetic.ingestionapi.repository.MeasurementTypeRepository;
+import com.renergetic.ingestionapi.repository.TagsRepository;
 import com.renergetic.ingestionapi.service.utils.Restrictions;
 
 @Service
 public class MeasurementService {
 	@Autowired
     private InfluxDBClient influxDB;
+	
+	@Autowired
+	private MeasurementRepository repository;
+	
+	@Autowired
+	private MeasurementTypeRepository typeRepository;
+	
+	@Autowired
+	private TagsRepository tagsRepository;
 
 	public Map<MeasurementDAO, Boolean> insert(List<MeasurementDAO> measurements, String bucket, RestrictionsDAO restrictions) {
 		WriteApi api = influxDB.makeWriteApi();
@@ -80,33 +93,36 @@ public class MeasurementService {
 	}
 	
 	public List<String> getMeasurementNames(){
-		return Arrays.asList(new String[]{"heat_pump", "energy_meter", "pv", "battery", "hot_water", "cold_water",
-				"weather", "heat_exchange", "cooling_circuits", "chiller", "heat_meter", "dh_temperature",
-				"dhw_temperature", "tapping_water", "thermostate", "temperature", "cpu", "renewability"});
+		return repository.findByAssetIsNull().stream().map(measurement -> measurement.getName()).collect(Collectors.toList());
+//				Arrays.asList(new String[]{"heat_pump", "energy_meter", "pv", "battery", "hot_water", "cold_water",
+//				"weather", "heat_exchange", "cooling_circuits", "chiller", "heat_meter", "dh_temperature",
+//				"dhw_temperature", "tapping_water", "thermostate", "temperature", "cpu", "renewability"});
 	}
 	
 	public List<FieldRestrictionsDAO> getFieldRestrictions(){
-		return Arrays.asList(new FieldRestrictionsDAO[]{
-			new FieldRestrictionsDAO("power", PrimitiveType.DOUBLE, null),
-			new FieldRestrictionsDAO("energy", PrimitiveType.DOUBLE, null),
-			new FieldRestrictionsDAO("percentage", PrimitiveType.INTEGER, null),
-			new FieldRestrictionsDAO("co2_eq", PrimitiveType.DOUBLE, null),
-			new FieldRestrictionsDAO("flow", PrimitiveType.DOUBLE, null),
-			new FieldRestrictionsDAO("voltage", PrimitiveType.DOUBLE, null),
-			new FieldRestrictionsDAO("temperature", PrimitiveType.DOUBLE, null),
-			new FieldRestrictionsDAO("pressure", PrimitiveType.DOUBLE, null),
-		});
+		return typeRepository.findAll().stream().map(type -> new FieldRestrictionsDAO(type.getName(), PrimitiveType.DOUBLE, null)).collect(Collectors.toList());
+//			Arrays.asList(new FieldRestrictionsDAO[]{
+//			new FieldRestrictionsDAO("power", PrimitiveType.DOUBLE, null),
+//			new FieldRestrictionsDAO("energy", PrimitiveType.DOUBLE, null),
+//			new FieldRestrictionsDAO("percentage", PrimitiveType.INTEGER, null),
+//			new FieldRestrictionsDAO("co2_eq", PrimitiveType.DOUBLE, null),
+//			new FieldRestrictionsDAO("flow", PrimitiveType.DOUBLE, null),
+//			new FieldRestrictionsDAO("voltage", PrimitiveType.DOUBLE, null),
+//			new FieldRestrictionsDAO("temperature", PrimitiveType.DOUBLE, null),
+//			new FieldRestrictionsDAO("pressure", PrimitiveType.DOUBLE, null),
+//		});
 	}
 	
 	public Map<String, String> getTagsRestrictions(){
-		Map<String, String> tags = new HashMap<>();
+//		Map<String, String> tags = new HashMap<>();
+//		
+//		tags.put("asset_name", null);
+//		tags.put("prediction_window", "\\d+[Mdhms]");
+//		tags.put("predictive_model", null);
+//		tags.put("direction", "(?i)((in)|(out)|(none))");
+//		tags.put("domain", "(?i)((heat)|(electricity))");
+		tagsRepository.findAll().forEach(System.err::println);
 		
-		tags.put("asset_name", null);
-		tags.put("prediction_window", "\\d+[Mdhms]");
-		tags.put("predictive_model", null);
-		tags.put("direction", "(?i)((in)|(out)|(none))");
-		tags.put("domain", "(?i)((heat)|(electricity))");
-		
-		return tags;
+		return tagsRepository.findAll().stream().collect(HashMap<String, String>::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
 	}
 }
