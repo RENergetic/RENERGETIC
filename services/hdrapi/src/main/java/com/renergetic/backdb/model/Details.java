@@ -26,7 +26,7 @@ public class Details {
 	@Column(name = "key", nullable = false, insertable = true, updatable = true)
 	private String key;
 	
-	@Column(name = "value", nullable = false, insertable = true, updatable = true)
+	@Column(name = "value", nullable = true, insertable = true, updatable = true)
 	private String value;
 
 	public Details(String key, String value) {

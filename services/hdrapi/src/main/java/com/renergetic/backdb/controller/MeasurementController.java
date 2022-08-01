@@ -26,6 +26,7 @@ import com.renergetic.backdb.dao.MeasurementDAOResponse;
 import com.renergetic.backdb.model.Measurement;
 import com.renergetic.backdb.model.MeasurementType;
 import com.renergetic.backdb.model.details.MeasurementDetails;
+import com.renergetic.backdb.model.details.MeasurementTags;
 import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
 import com.renergetic.backdb.service.MeasurementService;
 
@@ -149,7 +150,9 @@ public class MeasurementController {
 	@PostMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementDetails> insertInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id){
 		try {
-			detail.setId(measurement_id);
+			Measurement measurement = new Measurement();
+			measurement.setId(measurement_id);
+			detail.setMeasurement(measurement);
 			MeasurementDetails _detail = measurementSv.saveDetail(detail);
 			return new ResponseEntity<>(_detail, HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -167,7 +170,9 @@ public class MeasurementController {
 	@PutMapping(path = "{measurement_id}/info/{info_id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementDetails> updateInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id, @PathVariable Long info_id){
 		try {
-			detail.setId(measurement_id);
+			Measurement measurement = new Measurement();
+			measurement.setId(measurement_id);
+			detail.setMeasurement(measurement);
 			MeasurementDetails _detail = measurementSv.updateDetail(detail, info_id);
 			return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
@@ -177,13 +182,74 @@ public class MeasurementController {
 	
 	@Operation(summary = "Delete Information from its id")
 	@ApiResponses({
-		@ApiResponse(responseCode = "204", description = "Information delete"),
+		@ApiResponse(responseCode = "204", description = "Information deleted"),
 		@ApiResponse(responseCode = "500", description = "Error deleting information")
 	})
 	@DeleteMapping(path = "{measurement_id}/info/{info_id}")
 	public ResponseEntity<MeasurementDetails> deleteInformation (@PathVariable Long measurement_id, @PathVariable Long info_id){
 		try {
-			measurementSv.deleteById(info_id);
+			measurementSv.deleteDetailById(info_id);
+			
+			return ResponseEntity.noContent().build();
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	//=== TAGS REQUESTS ===================================================================================	
+
+	@Operation(summary = "Get All Tags")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "tags", produces = "application/json")
+	public ResponseEntity<List<MeasurementTags>> getAllTags (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<MeasurementTags> tags = new ArrayList<>();
+		
+		tags = measurementSv.getTags(null, offset.orElse(0L), limit.orElse(20));
+		
+		return new ResponseEntity<>(tags, HttpStatus.OK);
+	}
+
+	@Operation(summary = "Insert tags")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Tag saved correctly"),
+		@ApiResponse(responseCode = "500", description = "Error saving tag")
+	})
+	@PostMapping(path = "tags", produces = "application/json", consumes = "application/json")
+	public ResponseEntity<MeasurementTags> insertTag (@RequestBody MeasurementTags tag){
+		try {
+			MeasurementTags _tag = measurementSv.saveTag(tag);
+			return new ResponseEntity<>(_tag, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@Operation(summary = "Update tags")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Tag saved correctly"),
+		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
+		@ApiResponse(responseCode = "404", description = "Tag not exist"),
+		@ApiResponse(responseCode = "500", description = "Error saving information")
+	})
+	@PutMapping(path = "tags/{tag_id}", produces = "application/json", consumes = "application/json")
+	public ResponseEntity<MeasurementTags> updateTag (@RequestBody MeasurementTags tag, @PathVariable Long tag_id){
+		try {
+			MeasurementTags _tag = measurementSv.updateTag(tag, tag_id);
+			return new ResponseEntity<>(_tag, _tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@Operation(summary = "Delete tags")
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", description = "Tag deleted"),
+		@ApiResponse(responseCode = "500", description = "Error deleting tag")
+	})
+	@DeleteMapping(path = "tags/{tag_id}")
+	public ResponseEntity<MeasurementDetails> deleteInformation (@PathVariable Long tag_id){
+		try {
+			measurementSv.deleteTagById(tag_id);
 			
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {

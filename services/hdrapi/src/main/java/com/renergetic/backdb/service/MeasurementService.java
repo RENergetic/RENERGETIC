@@ -20,7 +20,9 @@ import com.renergetic.backdb.model.MeasurementType;
 import com.renergetic.backdb.model.UUID;
 import com.renergetic.backdb.model.Unit;
 import com.renergetic.backdb.model.details.MeasurementDetails;
+import com.renergetic.backdb.model.details.MeasurementTags;
 import com.renergetic.backdb.repository.MeasurementRepository;
+import com.renergetic.backdb.repository.MeasurementTagsRepository;
 import com.renergetic.backdb.repository.MeasurementTypeRepository;
 import com.renergetic.backdb.repository.UuidRepository;
 import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
@@ -37,6 +39,8 @@ public class MeasurementService {
 	MeasurementTypeRepository measurementTypeRepository;
 	@Autowired
 	MeasurementDetailsRepository measurementDetailsRepository;
+	@Autowired
+	MeasurementTagsRepository measurementTagsRepository;
 	@Autowired
 	UuidRepository uuidRepository;
 
@@ -133,6 +137,46 @@ public class MeasurementService {
 
 	public MeasurementType getTypeById(Long id) {
 		return measurementTypeRepository.findById(id).orElse(null);
+	}
+	
+	// MEASUREMENTTAGS CRUD OPERATIONS
+	public MeasurementTags saveTag(MeasurementTags tag) {
+		tag.setId(null);
+		return measurementTagsRepository.save(tag);
+	}
+	
+	public MeasurementTags updateTag(MeasurementTags tag, Long id) {
+		if ( measurementTagsRepository.existsById(id)) {
+			tag.setId(id);
+			return measurementTagsRepository.save(tag);
+		} else return null;
+	}
+
+	public boolean deleteTagById(Long id) {
+		if (id != null && measurementTagsRepository.existsById(id)) {
+			measurementTagsRepository.deleteById(id);
+			return true;
+		} else return false;
+	}
+	
+	public List<MeasurementTags> getTags(Map<String, String> filters, long offset, int limit) {
+		Page<MeasurementTags> tags = measurementTagsRepository.findAll(new OffSetPaging(offset, limit));
+		Stream<MeasurementTags> stream = tags.stream();
+		
+		if (filters != null)
+			stream.filter(Detail -> {
+				boolean equals = true;
+				
+				if (filters.containsKey("key"))
+					equals = Detail.getKey().equalsIgnoreCase(filters.get("key"));
+				
+				return equals;
+			});
+		return stream.collect(Collectors.toList());
+	}
+
+	public MeasurementTags getTagById(Long id) {
+		return measurementTagsRepository.findById(id).orElse(null);
 	}
 	
 	// MEASUREMENTDETAILS CRUD OPERATIONS

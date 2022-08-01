@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.backdb.model.Details;
 import com.renergetic.backdb.model.Measurement;
 
@@ -29,6 +31,7 @@ import lombok.ToString;
 @ToString
 public class MeasurementTags extends Details{
 	// FOREIGN KEY FROM CONNECTION TABLE
+	@JsonProperty(required = false, access = Access.READ_ONLY)
 	@ManyToMany(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinTable(
