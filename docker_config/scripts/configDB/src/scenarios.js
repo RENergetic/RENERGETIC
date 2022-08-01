@@ -1,13 +1,14 @@
 import { post, put } from "./utils.js";
 
-export function generate(scenario = undefined) {
+export async function generate(scenario = undefined) {
     switch (scenario) {
         case undefined:
             console.warn("You should to specify a scenario");
             break;
         case "1":
             console.info("Generating scenario 1");
-            scenario1();
+            await scenario1();
+            console.info("Scenario 1 generated");
             break;
         default:
             console.warn("The specified scenario doesn't exists");

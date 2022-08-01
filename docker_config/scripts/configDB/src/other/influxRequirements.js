@@ -94,15 +94,38 @@ const measurements = [
     }
 ];
 
-export function generateMeasurements() {
+const tags = [
+    {
+        key: "asset_name",
+        value: null
+    },
+    {
+        key: "prediction_window",
+        value: "\\d+[Mdhms]"
+    },
+    {
+        key: "predictive_model",
+        value: null
+    },
+    {
+        key: "direction",
+        value: "(?i)((in)|(out)|(none))"
+    },
+    {
+        key: "domain",
+        value: "(?i)((heat)|(electricity))"
+    }
+]
+
+export async function generateMeasurements() {
     const path = "api/measurements"
     for (let measurement of measurements)
-        post(path, measurement);
+        await post(path, measurement);
 }
 
 // TODO: There aren't path to add tags to database in HDR API
-// export function generateTags() {
-//     const path = "api/assets/type"
-//     for (let tag of tags)
-//         post(path, tag);
-// }
+export async function generateTags() {
+    const path = "api/measurements/tags"
+    for (let tag of tags)
+        await post(path, tag);
+}

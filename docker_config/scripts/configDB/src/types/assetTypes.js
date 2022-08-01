@@ -138,7 +138,7 @@ const types = [
     },
 ];
 
-export function generateAssetTypes() {
+export async function generateAssetTypes() {
     for (let type of types)
-        post(path, type);
+        await post(path, type);
 }

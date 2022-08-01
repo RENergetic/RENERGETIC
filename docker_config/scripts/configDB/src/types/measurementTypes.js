@@ -157,7 +157,7 @@ const types = [
     },
 ];
 
-export function generateMeasurementTypes() {
+export async function generateMeasurementTypes() {
     for (let type of types)
-        post(path, type).then(response => console.log(response));
+        await post(path, type).then(response => console.log(response));
 }
