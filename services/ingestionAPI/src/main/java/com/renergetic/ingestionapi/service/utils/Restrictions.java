@@ -73,7 +73,7 @@ public class Restrictions {
 		// CHECK IF IS A INTEGER
 		else if (fieldRestrictions.get(key) == PrimitiveType.INTEGER && value.matches("^\\d+$"))
 			field = new AbstractMap.SimpleEntry<>(key, Long.parseLong(value));
-		else if (fieldRestrictions.get(key) == PrimitiveType.DOUBLE && value.matches("^\\d+.\\d+$"))
+		else if (fieldRestrictions.get(key) == PrimitiveType.DOUBLE && value.matches("^\\d+(.\\d+)?$"))
 			field = new AbstractMap.SimpleEntry<>(key, Double.parseDouble(value));
 		else field = new AbstractMap.SimpleEntry<>(key, value);;
 		

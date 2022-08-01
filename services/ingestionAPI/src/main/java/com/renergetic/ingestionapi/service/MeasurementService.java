@@ -21,7 +21,6 @@ import com.renergetic.ingestionapi.dao.FieldRestrictionsDAO;
 import com.renergetic.ingestionapi.dao.MeasurementDAO;
 import com.renergetic.ingestionapi.dao.RestrictionsDAO;
 import com.renergetic.ingestionapi.model.PrimitiveType;
-import com.renergetic.ingestionapi.model.Tags;
 import com.renergetic.ingestionapi.repository.MeasurementRepository;
 import com.renergetic.ingestionapi.repository.MeasurementTypeRepository;
 import com.renergetic.ingestionapi.repository.TagsRepository;
