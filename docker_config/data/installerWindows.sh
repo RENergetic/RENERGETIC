@@ -10,6 +10,7 @@ automatic=-1
 
 installdb='true'
 installapi='true'
+installIngestionApi='true'
 installback='false'
 installkafka='false'
 installgrafana='true'
@@ -82,6 +83,36 @@ then
     # create kubernetes resources
     kubectl apply -f backinflux-deployment.yaml --force=true
     kubectl apply -f backinflux-service.yaml
+fi
+
+if [[ $installIngestionApi = 'true' ]]
+then
+    # API COMPILE TO JAR
+    cd "${current}\\..\\..\\services\\ingestionAPI"
+    mvn clean package -Dmaven.test.skip
+    cp ".\\target\\${javafileInjest}" "${current}\\ingestion-api"
+
+    cd  "${current}\\ingestion-api"
+    # API INSTALLATION
+    # set environment variables
+    eval $(minikube docker-env)
+
+    # delete kubernetes resources if exists
+    kubectl delete deployments/ingestion-api --namespace=$namespace
+    kubectl delete services/ingestion-api-sv --namespace=$namespace
+
+    # create docker image
+    if [[ $buildimages = 'true' ]]
+    then
+        # create docker image
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/ingestionapi:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/ingestionapi:latest
+    fi
+    
+    # create kubernetes resources
+    kubectl apply -f ingestion-deployment.yaml --force=true --namespace=$namespace
+    kubectl apply -f ingestion-service.yaml --namespace=$namespace
 fi
 
 if [[ $installback = 'true' ]]
