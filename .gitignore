@@ -2,6 +2,7 @@ docker_config/_credentials.properties
 docker_config/app/api/*.jar
 docker_config/app/hdr-api/*.jar
 docker_config/data/api/*.jar
+docker_config/data/ingestion-api/*.jar
 docker_config/app/buildings/*.jar
 docker_config/app/front/dist
 docker_config/app/keycloak/themes
