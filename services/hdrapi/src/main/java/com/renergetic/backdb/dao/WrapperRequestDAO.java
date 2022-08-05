@@ -50,9 +50,9 @@ public class WrapperRequestDAO {
     @ToString
     public static class InfluxArgsWrapperRequestDAO {
         @JsonProperty(required = false)
-        private String from;
+        private Long from;
         @JsonProperty(required = false)
-        private String to;
+        private Long to;
         @JsonProperty(required = false)
         private String bucket;
 // The wrapper API can return many measurements with different fields, for now, I propose use the name of measurement type as field
