@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.Transient;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 @Getter
@@ -13,6 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @ToString
 public class WrapperRequestDAO {
+    private static SimpleDateFormat influxdbDateFormat = new SimpleDateFormat("aaaa-MM-dd hh:mm:ss");
     @JsonProperty(required = true)
     private CallsWrapperRequestDAO calls;
 
@@ -51,11 +55,22 @@ public class WrapperRequestDAO {
     public static class InfluxArgsWrapperRequestDAO {
         @JsonProperty(required = false)
         private Long from;
+
+        @Transient
+        public String parseFrom() {
+            return influxdbDateFormat.format(new Date(from));
+        }
+
+        @Transient
+        public String parseTo() {
+            return influxdbDateFormat.format(new Date(to));
+        }
+
         @JsonProperty(required = false)
         private Long to;
         @JsonProperty(required = false)
         private String bucket;
-// The wrapper API can return many measurements with different fields, for now, I propose use the name of measurement type as field
+        // The wrapper API can return many measurements with different fields, for now, I propose use the name of measurement type as field
 //        @JsonProperty(required = false)
 //        private String field;
         @JsonProperty(required = false)

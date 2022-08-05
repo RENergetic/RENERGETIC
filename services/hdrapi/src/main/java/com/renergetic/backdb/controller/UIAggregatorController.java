@@ -52,8 +52,9 @@ public class UIAggregatorController {
         if (wrapperRequestBodyDAO.getCalls().getData() != null) {
             WrapperRequestDAO.InfluxArgsWrapperRequestDAO args = wrapperRequestBodyDAO.getCalls().getData();
             Map<String, String> params = new HashMap<>();
-            if (args.getFrom() != null) params.put("from", args.getFrom().toString());
-            if (args.getTo() != null) params.put("to", args.getTo().toString());
+
+            if (args.getFrom() != null) params.put("from", args.parseFrom());
+            if (args.getTo() != null) params.put("to", args.parseTo());
             if (args.getBucket() != null) params.put("bucket", args.getBucket());
 //            if (args.getField() != null) params.put("field", args.getField());
             if (args.getTags() != null) params.putAll(args.getTags());
