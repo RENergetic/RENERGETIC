@@ -75,7 +75,8 @@ public class WrapperRequestDAO {
 //        private String field;
         @JsonProperty(required = false)
         private Map<String, String> tags;
-        @JsonProperty(required = false)
+        @JsonProperty(value = "panel_id", required = false)
         private Integer panelId;
+
     }
 }
