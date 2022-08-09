@@ -1,14 +1,14 @@
 current=$(pwd -W tr / \\)
 
-namespace='app'
+namespace='data'
 #inflixdb
-installdb=''
+installdb='true'
 #influxdb java api
 installapi=''
 #nifi
 installback='false'
 installkafka='false'
-installgrafana='true'
+installgrafana='false'
 javafile='measurementapi-0.0.1-SNAPSHOT.jar'
 
 while getopts n: flag
