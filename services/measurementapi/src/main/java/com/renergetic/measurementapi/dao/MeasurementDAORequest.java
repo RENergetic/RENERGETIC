@@ -1,4 +1,4 @@
-package com.inetum.app.dao;
+package com.renergetic.measurementapi.dao;
 
 import java.util.Map;
 

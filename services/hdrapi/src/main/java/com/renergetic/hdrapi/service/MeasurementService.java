@@ -1,4 +1,4 @@
-package com.renergetic.backdb.service;
+package com.renergetic.hdrapi.service;
 
 import java.util.List;
 import java.util.Map;
@@ -12,21 +12,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.backdb.dao.MeasurementDAORequest;
-import com.renergetic.backdb.dao.MeasurementDAOResponse;
-import com.renergetic.backdb.model.Direction;
-import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.model.MeasurementType;
-import com.renergetic.backdb.model.UUID;
-import com.renergetic.backdb.model.Unit;
-import com.renergetic.backdb.model.details.MeasurementDetails;
-import com.renergetic.backdb.model.details.MeasurementTags;
-import com.renergetic.backdb.repository.MeasurementRepository;
-import com.renergetic.backdb.repository.MeasurementTagsRepository;
-import com.renergetic.backdb.repository.MeasurementTypeRepository;
-import com.renergetic.backdb.repository.UuidRepository;
-import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
+import com.renergetic.hdrapi.dao.MeasurementDAORequest;
+import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
+import com.renergetic.hdrapi.model.Direction;
+import com.renergetic.hdrapi.model.Measurement;
+import com.renergetic.hdrapi.model.MeasurementType;
+import com.renergetic.hdrapi.model.UUID;
+import com.renergetic.hdrapi.model.Unit;
+import com.renergetic.hdrapi.model.details.MeasurementDetails;
+import com.renergetic.hdrapi.model.details.MeasurementTags;
+import com.renergetic.hdrapi.repository.MeasurementRepository;
+import com.renergetic.hdrapi.repository.MeasurementTagsRepository;
+import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
+import com.renergetic.hdrapi.repository.UuidRepository;
+import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 @Service
 public class MeasurementService {

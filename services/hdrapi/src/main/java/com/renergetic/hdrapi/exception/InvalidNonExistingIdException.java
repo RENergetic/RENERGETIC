@@ -1,4 +1,4 @@
-package com.renergetic.backdb.exception;
+package com.renergetic.hdrapi.exception;
 
 public class InvalidNonExistingIdException extends RuntimeException{
 

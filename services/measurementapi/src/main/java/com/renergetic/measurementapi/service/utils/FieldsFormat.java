@@ -1,4 +1,4 @@
-package com.inetum.app.service.utils;
+package com.renergetic.measurementapi.service.utils;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -8,7 +8,7 @@ import java.util.AbstractMap;
 import java.util.Date;
 import java.util.Map.Entry;
 
-import com.inetum.app.exception.InvalidArgumentException;
+import com.renergetic.measurementapi.exception.InvalidArgumentException;
 
 public class FieldsFormat {
 	

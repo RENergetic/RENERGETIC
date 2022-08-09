@@ -1,9 +1,5 @@
-package com.renergetic.backdb.controller;
+package com.renergetic.hdrapi.controller;
 
-import com.renergetic.backdb.dao.InformationPanelDAORequest;
-import com.renergetic.backdb.dao.InformationPanelDAOResponse;
-import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.service.InformationPanelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,6 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.renergetic.hdrapi.dao.InformationPanelDAORequest;
+import com.renergetic.hdrapi.dao.InformationPanelDAOResponse;
+import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.service.InformationPanelService;
 
 import java.util.List;
 import java.util.Optional;

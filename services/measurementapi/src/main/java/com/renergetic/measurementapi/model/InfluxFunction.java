@@ -1,4 +1,4 @@
-package com.inetum.app.model;
+package com.renergetic.measurementapi.model;
 
 public enum InfluxFunction {
 	COUNT,

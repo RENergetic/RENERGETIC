@@ -1,4 +1,4 @@
-package com.renergetic.backdb.model;
+package com.renergetic.hdrapi.model;
 
 import java.util.HashMap;
 import java.util.List;

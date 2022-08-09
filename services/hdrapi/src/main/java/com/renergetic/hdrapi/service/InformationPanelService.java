@@ -1,23 +1,24 @@
-package com.renergetic.backdb.service;
+package com.renergetic.hdrapi.service;
 
-import com.renergetic.backdb.dao.InformationPanelDAORequest;
-import com.renergetic.backdb.dao.InformationPanelDAOResponse;
-import com.renergetic.backdb.dao.InformationTileDAOResponse;
-import com.renergetic.backdb.dao.MeasurementDAOResponse;
-import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.mapper.InformationPanelMapper;
-import com.renergetic.backdb.model.InformationPanel;
-import com.renergetic.backdb.model.InformationTileMeasurement;
-import com.renergetic.backdb.model.UUID;
-import com.renergetic.backdb.repository.AssetRepository;
-import com.renergetic.backdb.repository.InformationPanelRepository;
-import com.renergetic.backdb.repository.MeasurementRepository;
-import com.renergetic.backdb.repository.UuidRepository;
-import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.renergetic.hdrapi.dao.InformationPanelDAORequest;
+import com.renergetic.hdrapi.dao.InformationPanelDAOResponse;
+import com.renergetic.hdrapi.dao.InformationTileDAOResponse;
+import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
+import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.mapper.InformationPanelMapper;
+import com.renergetic.hdrapi.model.InformationPanel;
+import com.renergetic.hdrapi.model.InformationTileMeasurement;
+import com.renergetic.hdrapi.model.UUID;
+import com.renergetic.hdrapi.repository.AssetRepository;
+import com.renergetic.hdrapi.repository.InformationPanelRepository;
+import com.renergetic.hdrapi.repository.MeasurementRepository;
+import com.renergetic.hdrapi.repository.UuidRepository;
+import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 import java.util.Collections;
 import java.util.List;

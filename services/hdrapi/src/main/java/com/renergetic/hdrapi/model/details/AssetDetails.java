@@ -1,4 +1,4 @@
-package com.renergetic.backdb.model.details;
+package com.renergetic.hdrapi.model.details;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,8 +9,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import com.renergetic.backdb.model.Asset;
-import com.renergetic.backdb.model.Details;
+import com.renergetic.hdrapi.model.Asset;
+import com.renergetic.hdrapi.model.Details;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,9 +1,10 @@
-package com.renergetic.backdb.repository;
+package com.renergetic.hdrapi.repository;
 
-import com.renergetic.backdb.model.InformationTile;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import com.renergetic.hdrapi.model.InformationTile;
 
 import java.util.List;
 import java.util.Optional;

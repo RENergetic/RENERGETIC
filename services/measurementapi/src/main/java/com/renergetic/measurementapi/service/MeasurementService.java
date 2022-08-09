@@ -1,4 +1,4 @@
-package com.inetum.app.service;
+package com.renergetic.measurementapi.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,14 +12,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.inetum.app.dao.MeasurementDAORequest;
-import com.inetum.app.dao.MeasurementDAOResponse;
-import com.inetum.app.exception.InvalidArgumentException;
-import com.inetum.app.mapper.MeasurementMapper;
-import com.inetum.app.model.InfluxFunction;
-//import com.inetum.app.mapper.MeasurementMapper;
-import com.inetum.app.model.InfluxTimeUnit;
-import com.inetum.app.service.utils.FieldsFormat;
 import com.influxdb.client.DeleteApi;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.QueryApi;
@@ -28,6 +20,13 @@ import com.influxdb.client.domain.DeletePredicateRequest;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import com.influxdb.query.FluxTable;
+import com.renergetic.measurementapi.dao.MeasurementDAORequest;
+import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
+import com.renergetic.measurementapi.exception.InvalidArgumentException;
+import com.renergetic.measurementapi.mapper.MeasurementMapper;
+import com.renergetic.measurementapi.model.InfluxFunction;
+import com.renergetic.measurementapi.model.InfluxTimeUnit;
+import com.renergetic.measurementapi.service.utils.FieldsFormat;
 
 @Service
 public class MeasurementService {

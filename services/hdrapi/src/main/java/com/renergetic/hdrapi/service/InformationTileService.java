@@ -1,17 +1,18 @@
-package com.renergetic.backdb.service;
+package com.renergetic.hdrapi.service;
 
-import com.renergetic.backdb.dao.InformationTileDAORequest;
-import com.renergetic.backdb.dao.InformationTileDAOResponse;
-import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.mapper.InformationTileMapper;
-import com.renergetic.backdb.model.InformationPanel;
-import com.renergetic.backdb.model.InformationTile;
-import com.renergetic.backdb.repository.InformationPanelRepository;
-import com.renergetic.backdb.repository.InformationTileRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.renergetic.hdrapi.dao.InformationTileDAORequest;
+import com.renergetic.hdrapi.dao.InformationTileDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
+import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.mapper.InformationTileMapper;
+import com.renergetic.hdrapi.model.InformationPanel;
+import com.renergetic.hdrapi.model.InformationTile;
+import com.renergetic.hdrapi.repository.InformationPanelRepository;
+import com.renergetic.hdrapi.repository.InformationTileRepository;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 import java.util.List;
 import java.util.stream.Collectors;

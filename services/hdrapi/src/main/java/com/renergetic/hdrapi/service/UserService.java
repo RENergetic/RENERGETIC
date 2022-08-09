@@ -1,4 +1,4 @@
-package com.renergetic.backdb.service;
+package com.renergetic.hdrapi.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,26 +13,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.backdb.dao.AssetDAOResponse;
-import com.renergetic.backdb.dao.UserDAORequest;
-import com.renergetic.backdb.dao.UserDAOResponse;
-import com.renergetic.backdb.dao.UserRolesDAO;
-import com.renergetic.backdb.dao.UserSettingsDAO;
-import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.model.Asset;
-import com.renergetic.backdb.model.AssetCategory;
-import com.renergetic.backdb.model.UUID;
-import com.renergetic.backdb.model.User;
-import com.renergetic.backdb.model.UserRoles;
-import com.renergetic.backdb.model.UserSettings;
-import com.renergetic.backdb.repository.AssetRepository;
-import com.renergetic.backdb.repository.UserRepository;
-import com.renergetic.backdb.repository.UserRolesRepository;
-import com.renergetic.backdb.repository.UserSettingsRepository;
-import com.renergetic.backdb.repository.UuidRepository;
-import com.renergetic.backdb.repository.information.AssetDetailsRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
+import com.renergetic.hdrapi.dao.AssetDAOResponse;
+import com.renergetic.hdrapi.dao.UserDAORequest;
+import com.renergetic.hdrapi.dao.UserDAOResponse;
+import com.renergetic.hdrapi.dao.UserRolesDAO;
+import com.renergetic.hdrapi.dao.UserSettingsDAO;
+import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
+import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.model.Asset;
+import com.renergetic.hdrapi.model.AssetCategory;
+import com.renergetic.hdrapi.model.UUID;
+import com.renergetic.hdrapi.model.User;
+import com.renergetic.hdrapi.model.UserRoles;
+import com.renergetic.hdrapi.model.UserSettings;
+import com.renergetic.hdrapi.repository.AssetRepository;
+import com.renergetic.hdrapi.repository.UserRepository;
+import com.renergetic.hdrapi.repository.UserRolesRepository;
+import com.renergetic.hdrapi.repository.UserSettingsRepository;
+import com.renergetic.hdrapi.repository.UuidRepository;
+import com.renergetic.hdrapi.repository.information.AssetDetailsRepository;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 @Service
 public class UserService {

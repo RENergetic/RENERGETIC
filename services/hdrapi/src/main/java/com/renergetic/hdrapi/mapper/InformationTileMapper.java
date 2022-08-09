@@ -1,9 +1,10 @@
-package com.renergetic.backdb.mapper;
+package com.renergetic.hdrapi.mapper;
 
-import com.renergetic.backdb.dao.*;
-import com.renergetic.backdb.model.InformationPanel;
-import com.renergetic.backdb.model.InformationTile;
 import org.springframework.stereotype.Service;
+
+import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.model.InformationPanel;
+import com.renergetic.hdrapi.model.InformationTile;
 
 @Service
 public class InformationTileMapper implements MapperReponseRequest<InformationTile, InformationTileDAOResponse, InformationTileDAORequest> {

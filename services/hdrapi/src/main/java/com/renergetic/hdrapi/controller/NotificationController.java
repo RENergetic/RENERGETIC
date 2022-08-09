@@ -1,4 +1,4 @@
-package com.renergetic.backdb.controller;
+package com.renergetic.hdrapi.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.backdb.dao.NotificationDAO;
-import com.renergetic.backdb.repository.NotificationRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
+import com.renergetic.hdrapi.dao.NotificationDAO;
+import com.renergetic.hdrapi.repository.NotificationRepository;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

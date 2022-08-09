@@ -1,10 +1,11 @@
-package com.renergetic.backdb.mapper;
+package com.renergetic.hdrapi.mapper;
 
-import com.renergetic.backdb.dao.InformationPanelDAORequest;
-import com.renergetic.backdb.dao.InformationPanelDAOResponse;
-import com.renergetic.backdb.model.InformationPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.renergetic.hdrapi.dao.InformationPanelDAORequest;
+import com.renergetic.hdrapi.dao.InformationPanelDAOResponse;
+import com.renergetic.hdrapi.model.InformationPanel;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;

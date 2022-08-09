@@ -1,4 +1,4 @@
-package com.inetum.app.model;
+package com.renergetic.measurementapi.model;
 
 import java.util.Map;
 

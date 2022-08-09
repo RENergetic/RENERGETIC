@@ -1,10 +1,5 @@
-package com.renergetic.backdb.controller;
+package com.renergetic.hdrapi.controller;
 
-import com.renergetic.backdb.dao.*;
-import com.renergetic.backdb.service.AssetService;
-import com.renergetic.backdb.service.DataService;
-import com.renergetic.backdb.service.DemandRequestService;
-import com.renergetic.backdb.service.InformationPanelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.service.AssetService;
+import com.renergetic.hdrapi.service.DataService;
+import com.renergetic.hdrapi.service.DemandRequestService;
+import com.renergetic.hdrapi.service.InformationPanelService;
 
 import java.util.HashMap;
 import java.util.List;

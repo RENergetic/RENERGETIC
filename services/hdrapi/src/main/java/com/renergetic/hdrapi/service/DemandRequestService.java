@@ -1,16 +1,17 @@
-package com.renergetic.backdb.service;
+package com.renergetic.hdrapi.service;
 
-import com.renergetic.backdb.dao.DemandDefinitionDAO;
-import com.renergetic.backdb.dao.DemandScheduleDAO;
-import com.renergetic.backdb.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.model.DemandDefinition;
-import com.renergetic.backdb.model.DemandSchedule;
-import com.renergetic.backdb.repository.DemandDefinitionRepository;
-import com.renergetic.backdb.repository.DemandScheduleRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.renergetic.hdrapi.dao.DemandDefinitionDAO;
+import com.renergetic.hdrapi.dao.DemandScheduleDAO;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
+import com.renergetic.hdrapi.model.DemandDefinition;
+import com.renergetic.hdrapi.model.DemandSchedule;
+import com.renergetic.hdrapi.repository.DemandDefinitionRepository;
+import com.renergetic.hdrapi.repository.DemandScheduleRepository;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 import java.time.LocalDateTime;
 import java.util.List;

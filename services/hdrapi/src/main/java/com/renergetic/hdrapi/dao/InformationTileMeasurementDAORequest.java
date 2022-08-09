@@ -1,13 +1,13 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.backdb.model.Direction;
-import com.renergetic.backdb.model.Domain;
-import com.renergetic.backdb.model.InformationTile;
-import com.renergetic.backdb.model.InformationTileMeasurement;
-import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.model.MeasurementType;
+import com.renergetic.hdrapi.model.Direction;
+import com.renergetic.hdrapi.model.Domain;
+import com.renergetic.hdrapi.model.InformationTile;
+import com.renergetic.hdrapi.model.InformationTileMeasurement;
+import com.renergetic.hdrapi.model.Measurement;
+import com.renergetic.hdrapi.model.MeasurementType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.renergetic.backdb.service.utils;
+package com.renergetic.hdrapi.service.utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

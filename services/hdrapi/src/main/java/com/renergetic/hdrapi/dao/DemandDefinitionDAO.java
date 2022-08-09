@@ -1,10 +1,11 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.backdb.model.DemandDefinition;
-import com.renergetic.backdb.model.DemandDefinitionAction;
-import com.renergetic.backdb.model.DemandDefinitionActionType;
-import com.renergetic.backdb.model.InformationTile;
+import com.renergetic.hdrapi.model.DemandDefinition;
+import com.renergetic.hdrapi.model.DemandDefinitionAction;
+import com.renergetic.hdrapi.model.DemandDefinitionActionType;
+import com.renergetic.hdrapi.model.InformationTile;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

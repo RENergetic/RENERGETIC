@@ -1,4 +1,4 @@
-package com.renergetic.backdb.model.details;
+package com.renergetic.hdrapi.model.details;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +15,8 @@ import org.hibernate.annotations.NotFoundAction;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.backdb.model.Details;
-import com.renergetic.backdb.model.Measurement;
+import com.renergetic.hdrapi.model.Details;
+import com.renergetic.hdrapi.model.Measurement;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

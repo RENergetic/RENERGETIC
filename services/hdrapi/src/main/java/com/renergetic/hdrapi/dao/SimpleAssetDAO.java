@@ -1,6 +1,6 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
-import com.renergetic.backdb.model.Asset;
+import com.renergetic.hdrapi.model.Asset;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,13 +1,13 @@
-package com.renergetic.backdb.repository;
+package com.renergetic.hdrapi.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.renergetic.backdb.model.Area;
-import com.renergetic.backdb.model.Asset;
-import com.renergetic.backdb.model.Dashboard;
-import com.renergetic.backdb.model.Heatmap;
+import com.renergetic.hdrapi.model.Area;
+import com.renergetic.hdrapi.model.Asset;
+import com.renergetic.hdrapi.model.Dashboard;
+import com.renergetic.hdrapi.model.Heatmap;
 
 @SuppressWarnings("unchecked")
 public interface AreaRepository extends JpaRepository<Area, Long> {

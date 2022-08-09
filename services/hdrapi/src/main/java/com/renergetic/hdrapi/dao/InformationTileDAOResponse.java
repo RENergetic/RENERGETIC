@@ -1,9 +1,9 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.backdb.model.InformationTileType;
+import com.renergetic.hdrapi.model.InformationTile;
+import com.renergetic.hdrapi.model.InformationTileType;
 
-import com.renergetic.backdb.model.InformationTile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

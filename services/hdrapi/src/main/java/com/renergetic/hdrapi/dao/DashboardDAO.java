@@ -1,4 +1,4 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
 
 import javax.validation.constraints.Pattern;
@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.backdb.model.Dashboard;
-import com.renergetic.backdb.model.User;
+import com.renergetic.hdrapi.model.Dashboard;
+import com.renergetic.hdrapi.model.User;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

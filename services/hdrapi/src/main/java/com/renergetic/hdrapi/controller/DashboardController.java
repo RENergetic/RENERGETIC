@@ -1,4 +1,4 @@
-package com.renergetic.backdb.controller;
+package com.renergetic.hdrapi.controller;
 
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.backdb.dao.DashboardDAO;
-import com.renergetic.backdb.service.DashboardService;
+import com.renergetic.hdrapi.dao.DashboardDAO;
+import com.renergetic.hdrapi.service.DashboardService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

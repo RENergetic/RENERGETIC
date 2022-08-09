@@ -1,8 +1,8 @@
-package com.renergetic.backdb.repository;
+package com.renergetic.hdrapi.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.renergetic.backdb.model.AssetConnection;
+import com.renergetic.hdrapi.model.AssetConnection;
 
 @SuppressWarnings("unchecked")
 public interface AssetConnectionRepository extends JpaRepository<AssetConnection, Long> {

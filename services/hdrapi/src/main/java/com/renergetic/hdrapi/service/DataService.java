@@ -1,19 +1,20 @@
-package com.renergetic.backdb.service;
+package com.renergetic.hdrapi.service;
 
-import com.renergetic.backdb.dao.DataDAO;
-import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.model.InformationPanel;
-import com.renergetic.backdb.model.InformationTile;
-import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.repository.InformationPanelRepository;
-import com.renergetic.backdb.repository.InformationTileMeasurementRepository;
-import com.renergetic.backdb.repository.InformationTileRepository;
-import com.renergetic.backdb.repository.MeasurementRepository;
-import com.renergetic.backdb.service.utils.HttpAPIs;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.renergetic.hdrapi.dao.DataDAO;
+import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.model.InformationPanel;
+import com.renergetic.hdrapi.model.InformationTile;
+import com.renergetic.hdrapi.model.Measurement;
+import com.renergetic.hdrapi.repository.InformationPanelRepository;
+import com.renergetic.hdrapi.repository.InformationTileMeasurementRepository;
+import com.renergetic.hdrapi.repository.InformationTileRepository;
+import com.renergetic.hdrapi.repository.MeasurementRepository;
+import com.renergetic.hdrapi.service.utils.HttpAPIs;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

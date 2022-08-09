@@ -1,4 +1,4 @@
-package com.renergetic.backdb.controller;
+package com.renergetic.hdrapi.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,16 +19,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.backdb.dao.AssetConnectionDAORequest;
-import com.renergetic.backdb.dao.AssetDAORequest;
-import com.renergetic.backdb.dao.AssetDAOResponse;
-import com.renergetic.backdb.dao.MeasurementDAOResponse;
-import com.renergetic.backdb.model.AssetCategory;
-import com.renergetic.backdb.model.AssetType;
-import com.renergetic.backdb.model.ConnectionType;
-import com.renergetic.backdb.model.details.AssetDetails;
-import com.renergetic.backdb.repository.information.AssetDetailsRepository;
-import com.renergetic.backdb.service.AssetService;
+import com.renergetic.hdrapi.dao.AssetConnectionDAORequest;
+import com.renergetic.hdrapi.dao.AssetDAORequest;
+import com.renergetic.hdrapi.dao.AssetDAOResponse;
+import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
+import com.renergetic.hdrapi.model.AssetCategory;
+import com.renergetic.hdrapi.model.AssetType;
+import com.renergetic.hdrapi.model.ConnectionType;
+import com.renergetic.hdrapi.model.details.AssetDetails;
+import com.renergetic.hdrapi.repository.information.AssetDetailsRepository;
+import com.renergetic.hdrapi.service.AssetService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

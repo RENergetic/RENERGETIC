@@ -1,8 +1,9 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.backdb.model.Asset;
-import com.renergetic.backdb.model.InformationPanel;
+import com.renergetic.hdrapi.model.Asset;
+import com.renergetic.hdrapi.model.InformationPanel;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

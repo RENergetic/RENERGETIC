@@ -1,14 +1,14 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.backdb.model.Asset;
-import com.renergetic.backdb.model.Dashboard;
-import com.renergetic.backdb.model.InformationTile;
-import com.renergetic.backdb.model.Notification;
-import com.renergetic.backdb.model.NotificationType;
+import com.renergetic.hdrapi.model.Asset;
+import com.renergetic.hdrapi.model.Dashboard;
+import com.renergetic.hdrapi.model.InformationTile;
+import com.renergetic.hdrapi.model.Notification;
+import com.renergetic.hdrapi.model.NotificationType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

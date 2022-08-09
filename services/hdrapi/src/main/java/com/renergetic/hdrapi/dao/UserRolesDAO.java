@@ -1,13 +1,13 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
 
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.backdb.model.RoleType;
-import com.renergetic.backdb.model.User;
-import com.renergetic.backdb.model.UserRoles;
+import com.renergetic.hdrapi.model.RoleType;
+import com.renergetic.hdrapi.model.User;
+import com.renergetic.hdrapi.model.UserRoles;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

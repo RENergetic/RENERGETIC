@@ -1,17 +1,18 @@
-package com.renergetic.backdb.service;
+package com.renergetic.hdrapi.service;
 
-import com.renergetic.backdb.dao.*;
-import com.renergetic.backdb.exception.InvalidArgumentException;
-import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.model.*;
-import com.renergetic.backdb.model.details.AssetDetails;
-import com.renergetic.backdb.repository.*;
-import com.renergetic.backdb.repository.information.AssetDetailsRepository;
-import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.exception.InvalidArgumentException;
+import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
+import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.model.*;
+import com.renergetic.hdrapi.model.details.AssetDetails;
+import com.renergetic.hdrapi.repository.*;
+import com.renergetic.hdrapi.repository.information.AssetDetailsRepository;
+import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

@@ -1,7 +1,8 @@
-package com.renergetic.backdb.repository;
+package com.renergetic.hdrapi.repository;
 
-import com.renergetic.backdb.model.DemandDefinition;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.renergetic.hdrapi.model.DemandDefinition;
 
 public interface DemandDefinitionRepository extends JpaRepository<DemandDefinition, Long> {
 }

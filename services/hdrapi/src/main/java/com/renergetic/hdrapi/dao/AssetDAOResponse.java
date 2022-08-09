@@ -1,13 +1,13 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.backdb.model.Asset;
-import com.renergetic.backdb.model.AssetType;
-import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.model.details.AssetDetails;
+import com.renergetic.hdrapi.model.Asset;
+import com.renergetic.hdrapi.model.AssetType;
+import com.renergetic.hdrapi.model.Measurement;
+import com.renergetic.hdrapi.model.details.AssetDetails;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

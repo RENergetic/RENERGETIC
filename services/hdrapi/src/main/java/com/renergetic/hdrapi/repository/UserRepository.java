@@ -1,8 +1,8 @@
-package com.renergetic.backdb.repository;
+package com.renergetic.hdrapi.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.renergetic.backdb.model.User;
+import com.renergetic.hdrapi.model.User;
 
 @SuppressWarnings("unchecked")
 public interface UserRepository extends JpaRepository<User, Long> {

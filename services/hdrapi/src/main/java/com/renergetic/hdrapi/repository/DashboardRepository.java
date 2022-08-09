@@ -1,11 +1,11 @@
-package com.renergetic.backdb.repository;
+package com.renergetic.hdrapi.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.renergetic.backdb.model.Dashboard;
-import com.renergetic.backdb.model.User;
+import com.renergetic.hdrapi.model.Dashboard;
+import com.renergetic.hdrapi.model.User;
 
 @SuppressWarnings("unchecked")
 public interface DashboardRepository extends JpaRepository<Dashboard, Long> {

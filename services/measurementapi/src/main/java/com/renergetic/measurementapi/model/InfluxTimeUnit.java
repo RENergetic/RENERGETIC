@@ -1,4 +1,4 @@
-package com.inetum.app.model;
+package com.renergetic.measurementapi.model;
 
 public enum InfluxTimeUnit {
 	ns (86400000000000., "nanosecond"),

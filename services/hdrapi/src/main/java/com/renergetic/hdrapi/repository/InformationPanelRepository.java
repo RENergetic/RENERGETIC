@@ -1,8 +1,9 @@
-package com.renergetic.backdb.repository;
+package com.renergetic.hdrapi.repository;
 
-import com.renergetic.backdb.model.InformationPanel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import com.renergetic.hdrapi.model.InformationPanel;
 
 import java.util.List;
 import java.util.Optional;

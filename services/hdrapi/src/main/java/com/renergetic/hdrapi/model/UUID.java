@@ -1,4 +1,4 @@
-package com.renergetic.backdb.model;
+package com.renergetic.hdrapi.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

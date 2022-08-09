@@ -1,4 +1,4 @@
-package com.renergetic.backdb.controller;
+package com.renergetic.hdrapi.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.backdb.dao.AssetDAOResponse;
-import com.renergetic.backdb.dao.UserDAORequest;
-import com.renergetic.backdb.dao.UserDAOResponse;
-import com.renergetic.backdb.dao.UserRolesDAO;
-import com.renergetic.backdb.dao.UserSettingsDAO;
-import com.renergetic.backdb.service.UserService;
+import com.renergetic.hdrapi.dao.AssetDAOResponse;
+import com.renergetic.hdrapi.dao.UserDAORequest;
+import com.renergetic.hdrapi.dao.UserDAOResponse;
+import com.renergetic.hdrapi.dao.UserRolesDAO;
+import com.renergetic.hdrapi.dao.UserSettingsDAO;
+import com.renergetic.hdrapi.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

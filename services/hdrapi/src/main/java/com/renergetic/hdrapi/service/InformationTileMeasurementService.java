@@ -1,4 +1,4 @@
-package com.renergetic.backdb.service;
+package com.renergetic.hdrapi.service;
 
 import java.util.List;
 import java.util.Map;
@@ -11,15 +11,15 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.backdb.dao.InformationTileMeasurementDAORequest;
-import com.renergetic.backdb.dao.InformationTileMeasurementDAOResponse;
-import com.renergetic.backdb.exception.InvalidNonExistingIdException;
-import com.renergetic.backdb.exception.NotFoundException;
-import com.renergetic.backdb.model.InformationTileMeasurement;
-import com.renergetic.backdb.repository.HeatmapRepository;
-import com.renergetic.backdb.repository.InformationTileMeasurementRepository;
-import com.renergetic.backdb.repository.UuidRepository;
-import com.renergetic.backdb.service.utils.OffSetPaging;
+import com.renergetic.hdrapi.dao.InformationTileMeasurementDAORequest;
+import com.renergetic.hdrapi.dao.InformationTileMeasurementDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
+import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.model.InformationTileMeasurement;
+import com.renergetic.hdrapi.repository.HeatmapRepository;
+import com.renergetic.hdrapi.repository.InformationTileMeasurementRepository;
+import com.renergetic.hdrapi.repository.UuidRepository;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 @Service
 public class InformationTileMeasurementService {

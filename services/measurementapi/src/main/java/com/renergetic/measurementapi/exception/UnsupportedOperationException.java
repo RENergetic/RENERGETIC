@@ -1,4 +1,4 @@
-package com.inetum.app.exception;
+package com.renergetic.measurementapi.exception;
 
 public class UnsupportedOperationException extends RuntimeException{
 

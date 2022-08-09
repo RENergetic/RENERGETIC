@@ -1,13 +1,13 @@
-package com.renergetic.backdb.dao;
+package com.renergetic.hdrapi.dao;
 
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.backdb.model.AggregationType;
-import com.renergetic.backdb.model.AlertThreshold;
-import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.model.ThresholdType;
+import com.renergetic.hdrapi.model.AggregationType;
+import com.renergetic.hdrapi.model.AlertThreshold;
+import com.renergetic.hdrapi.model.Measurement;
+import com.renergetic.hdrapi.model.ThresholdType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

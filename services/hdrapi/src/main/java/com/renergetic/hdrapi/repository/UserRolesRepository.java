@@ -1,10 +1,10 @@
-package com.renergetic.backdb.repository;
+package com.renergetic.hdrapi.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.renergetic.backdb.model.UserRoles;
+import com.renergetic.hdrapi.model.UserRoles;
 
 @SuppressWarnings("unchecked")
 public interface UserRolesRepository extends JpaRepository<UserRoles, Long> {

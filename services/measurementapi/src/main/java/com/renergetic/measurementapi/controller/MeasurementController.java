@@ -1,4 +1,4 @@
-package com.inetum.app.controller;
+package com.renergetic.measurementapi.controller;
 
 import java.util.List;
 import java.util.Map;
@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import com.inetum.app.dao.MeasurementDAORequest;
-import com.inetum.app.dao.MeasurementDAOResponse;
-import com.inetum.app.model.InfluxFunction;
-import com.inetum.app.service.MeasurementService;
+import com.renergetic.measurementapi.dao.MeasurementDAORequest;
+import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
+import com.renergetic.measurementapi.model.InfluxFunction;
+import com.renergetic.measurementapi.service.MeasurementService;
+
+import org.springframework.web.bind.annotation.RequestBody;
 
 import io.swagger.v3.oas.annotations.Operation;
 

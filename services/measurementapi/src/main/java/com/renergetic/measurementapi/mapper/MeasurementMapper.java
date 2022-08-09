@@ -1,15 +1,15 @@
 
-package com.inetum.app.mapper;
+package com.renergetic.measurementapi.mapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.inetum.app.dao.MeasurementDAOResponse;
-import com.inetum.app.service.utils.FieldsFormat;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
+import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
+import com.renergetic.measurementapi.service.utils.FieldsFormat;
 
 public abstract class MeasurementMapper {
 	public static List<MeasurementDAOResponse> fromFlux(List<FluxTable> tables) {

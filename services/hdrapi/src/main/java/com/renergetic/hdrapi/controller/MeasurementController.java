@@ -1,4 +1,4 @@
-package com.renergetic.backdb.controller;
+package com.renergetic.hdrapi.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +21,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.renergetic.backdb.dao.MeasurementDAORequest;
-import com.renergetic.backdb.dao.MeasurementDAOResponse;
-import com.renergetic.backdb.model.Measurement;
-import com.renergetic.backdb.model.MeasurementType;
-import com.renergetic.backdb.model.details.MeasurementDetails;
-import com.renergetic.backdb.model.details.MeasurementTags;
-import com.renergetic.backdb.repository.information.MeasurementDetailsRepository;
-import com.renergetic.backdb.service.MeasurementService;
+import com.renergetic.hdrapi.dao.MeasurementDAORequest;
+import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
+import com.renergetic.hdrapi.model.Measurement;
+import com.renergetic.hdrapi.model.MeasurementType;
+import com.renergetic.hdrapi.model.details.MeasurementDetails;
+import com.renergetic.hdrapi.model.details.MeasurementTags;
+import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.service.MeasurementService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
