@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: renergetic-ui
+  name: renergetic-ui
+spec:
+  selector:
+      matchLabels:
+        app: renergetic-ui
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: renergetic-ui
+    spec:
+      containers:
+        - name: renergetic-ui
+          image: renergetic-ui:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 50Mi
+            limits:
+              cpu: 150m
+              memory: 50Mi
+      restartPolicy: Always

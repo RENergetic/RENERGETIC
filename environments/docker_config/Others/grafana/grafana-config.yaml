@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-ini
+data:
+  grafana.ini: |
+    [server]
+      domain = grafana-ren-prototype.apps.paas-dev.psnc.pl
+      root_url = http://grafana-ren-prototype.apps.paas-dev.psnc.pl
+      serve_from_sub_path = false
+    [security]
+      allow_embedding = true
+    [auth]
+      oauth_auto_login = true
+      signout_redirect_url = http://front-ren-prototype.apps.paas-dev.psnc.pl/auth/realms/realm-renergetic/protocol/openid-connect/logout?redirect_uri=http%3A%2F%2Fgrafana-ren-prototype.apps.paas-dev.psnc.pl
+    [auth.generic_oauth]
+      enabled = true
+      allow_sign_up = true
+      name = OAuth
+      allow_sign_up = true
+      client_id = grafana
+      client_secret = NpD4ZN6sqt3zhOmVHbkRxpApBzIINH4B
+      auth_url = http://front-ren-prototype.apps.paas-dev.psnc.pl/auth/realms/realm-renergetic/protocol/openid-connect/auth
+      token_url = http://keycloak-sv:8080/auth/realms/realm-renergetic/protocol/openid-connect/token
+      api_url = http://keycloak-sv:8080/auth/realms/realm-renergetic/protocol/openid-connect/userinfo
+      scopes = openid email profile
+      id_token_attribute_name = access_token
+      email_attribute_name = email:primary
+      login_attribute_path = preferred_username
+      role_attribute_path = contains(resource_access.grafana.roles, 'grafana-admin') && 'Admin' || contains(resource_access.grafana.roles, 'grafana-editor') && 'Editor' || contains(resource_access."renergetic-app".roles, 'ren-dev') && 'Admin' || contains(resource_access."renergetic-app".roles, 'ren-admin') && 'Admin' || contains(resource_access."renergetic-app".roles, 'ren-manager') && 'Editor' || 'Viewer'
+      org_attribute_path = 1
+      use_pkce = false

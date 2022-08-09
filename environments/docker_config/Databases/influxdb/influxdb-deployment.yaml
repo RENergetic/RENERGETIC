@@ -1,0 +1,56 @@
+# COMMETED LINES ARE TO UPDATE FROM INFLUX 1.8 TO INFLUX 2
+# TODO: Can't attach some volumes in Openshift
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influx-db
+spec:
+  selector:
+    matchLabels:
+      app: influx-db
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: influx-db
+    spec:
+      containers:
+        - image: docker-registry.default.svc:5000/ren-prototype/influx:latest
+          name: influx-db
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8086
+          resources:
+            requests:
+              cpu: 400m
+              memory: 600Mi
+            limits:
+              cpu: 850m
+              memory: 1Gi
+#          volumeMounts:
+#            - mountPath: /var/lib/influxdb
+#              name: influx-disk
+          volumeMounts:
+            - mountPath: /var/lib/influxdb2
+              name: influx2-disk
+          env:
+          - name: DOCKER_INFLUXDB_INIT_USERNAME
+            value: reninflux
+          - name: DOCKER_INFLUXDB_INIT_PASSWORD
+            value: reninflux
+          - name: DOCKER_INFLUXDB_INIT_ORG
+            value: renergetic
+          - name: DOCKER_INFLUXDB_INIT_BUCKET
+            value: renergetic
+          - name:  DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+            value: reninflux
+          - name: DOCKER_INFLUXDB_INIT_MODE
+            value: setup
+#            value: upgrade
+      volumes:
+#        - name: influx-disk
+#          persistentVolumeClaim:
+#            claimName: influx-disk
+        - name: influx2-disk
+          persistentVolumeClaim:
+            claimName: influx2-disk
