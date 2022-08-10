@@ -1,12 +1,7 @@
 package com.renergetic.hdrapi.dao;
 
-<<<<<<< HEAD:services/hdrapi/src/main/java/com/renergetic/backdb/dao/SimpleAssetDAO.java
-import com.renergetic.backdb.model.Asset;
-import com.renergetic.backdb.model.AssetType;
-=======
 import com.renergetic.hdrapi.model.Asset;
 
->>>>>>> aff9b8cd8f3c20c51d14c02d39a634dd17c4b41f:services/hdrapi/src/main/java/com/renergetic/hdrapi/dao/SimpleAssetDAO.java
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

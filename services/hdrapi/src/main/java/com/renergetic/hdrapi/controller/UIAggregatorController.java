@@ -76,7 +76,7 @@ public class UIAggregatorController {
         return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
     }
 
-    private List<SimpleAssetDAO> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
+    private List<AssetDAOResponse> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
         return assetService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
 
