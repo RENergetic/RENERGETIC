@@ -3,8 +3,8 @@ current=$(pwd -W tr / \\)
 apisPath=$(grep -ioP "(apisPath\s*=\s*)\K.+" _installers.properties)
 uiPath=$(grep -ioP "(uiPath\s*=\s*)\K.+" _installers.properties)
 
-[[ -z "$apisPath" ]] && apisPath="${current}/../services"
-[[ -z "$uiPath" ]] && uiPath="${current}/../front"
+[[ "$apisPath" = "default"  ]] && apisPath="${current}/../services"
+[[ "$uiPath" = "default" ]] && uiPath="${current}/../front"
 
 # Minikube namespace
 project=$(grep -ioP "(project\s*=\s*)\K.+" _installers.properties)

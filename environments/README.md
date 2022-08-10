@@ -17,7 +17,7 @@ See [more information](https://atlassian.gfi.es/confluence/display/RENERGETIC/Do
 
  - Open [_installer.properties](_installers.properties) file
  - Set a *name* to the kubernetes namespace (`project` variable)
- - Set your APIs and UI folders or set it empty to use default folders
+ - Set your APIs and UI folders or set it to *default* to use default folders
  - Set to *true* the components that you want to install
  - Execute [deploy_local.sh](deploy_local.sh) in a Git Bash or other CLI that allow execute Linux commands
 
@@ -27,7 +27,7 @@ See [more information](https://atlassian.gfi.es/confluence/display/RENERGETIC/Do
  - Set your user and password
  - Open [_installer.properties](_installers.properties) file
  - Set your Openshif project
- - Set your APIs and UI folders or set it empty to use default folders
+ - Set your APIs and UI folders or set it to *default* to use default folders
  - Set to *true* the components that you want to install
  - Execute [deploy_psnc.sh](deploy_psnc.sh) in a Git Bash or other CLI that allow execute Linux commands
 
