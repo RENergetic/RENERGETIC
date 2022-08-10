@@ -3,8 +3,8 @@ current=$(pwd -W tr / \\)
 apisPath=$(grep -ioP "(apisPath\s*=\s*)\K.+" _installers.properties)
 uiPath=$(grep -ioP "(uiPath\s*=\s*)\K.+" _installers.properties)
 
-[[ -z "$apisPath" ]] && apisPath="${current}/../services"
-[[ -z "$uiPath" ]] && uiPath="${current}/../front"
+[[ "$apisPath" = "default"  ]] && apisPath="${current}/../services"
+[[ "$uiPath" = "default" ]] && uiPath="${current}/../front"
 
 serverUrl=$(grep -ioP "(server\s*=\s*)\K.+" _credentials.properties)
 
@@ -244,8 +244,8 @@ then
         docker push registry.apps.paas-dev.psnc.pl/$project/renergetic-ui:latest
 
         # create kubernetes resources
-        kubectl apply -f renergetic-ui-deployment.yaml --force=true
-        kubectl apply -f renergetic-ui-service.yaml
+        kubectl apply -f ui-deployment.yaml --force=true
+        kubectl apply -f ui-service.yaml
     fi
 
 fi
