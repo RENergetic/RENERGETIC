@@ -1,0 +1,84 @@
+package com.renergetic.hdrapi.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.renergetic.hdrapi.dao.DataDAO;
+import com.renergetic.hdrapi.service.DataService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@CrossOrigin(origins = "*")
+@RestController
+@Tag(name = "Data Controller", description = "Allows collect data about Influx measurement")
+@RequestMapping("/api/data")
+public class DataController {
+	
+	@Autowired
+	DataService dataSv;
+
+//=== GET REQUESTS ====================================================================================
+	
+	@Operation(summary = "Get Data related with a panel id")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+		@ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
+	})
+	@GetMapping(path = "panel/{panel_id}", produces = "application/json")
+	public ResponseEntity<DataDAO> getDataByPanel (
+			@PathVariable Long panel_id,
+			@RequestParam("from") Optional<String> from, 
+			@RequestParam("to") Optional<String> to,
+			@RequestParam("bucket") Optional<String> bucket,
+			@RequestParam("field") Optional<String> field,
+			@RequestParam Map<String, String> tags){
+		
+		Map<String, String> params = new HashMap<>();
+		if (from.isPresent()) params.put("from", from.get());
+		if (to.isPresent()) params.put("to", from.get());
+		if (bucket.isPresent()) params.put("bucket", from.get());
+		if (field.isPresent()) params.put("field", from.get());
+		if (tags != null) params.putAll(tags);
+		
+		return new ResponseEntity<>(dataSv.getByPanel(panel_id, params), HttpStatus.OK);
+	}
+	
+	@Operation(summary = "Get Data related with a tile id")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+		@ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
+	})
+	@GetMapping(path = "tile/{tile_id}", produces = "application/json")
+	public ResponseEntity<DataDAO> getDataByTile (
+			@PathVariable Long tile_id,
+			@RequestParam("from") Optional<String> from, 
+			@RequestParam("to") Optional<String> to,
+			@RequestParam("bucket") Optional<String> bucket,
+			@RequestParam("field") Optional<String> field,
+			@RequestParam Map<String, String> tags){
+		
+		Map<String, String> params = new HashMap<>();
+		if (from.isPresent()) params.put("from", from.get());
+		if (to.isPresent()) params.put("to", from.get());
+		if (bucket.isPresent()) params.put("bucket", from.get());
+		if (field.isPresent()) params.put("field", from.get());
+		if (tags != null) params.putAll(tags);
+		
+		return new ResponseEntity<>(dataSv.getByPanel(tile_id, params), HttpStatus.OK);
+	}
+
+}

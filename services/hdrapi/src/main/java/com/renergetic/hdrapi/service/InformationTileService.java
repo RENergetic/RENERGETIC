@@ -1,0 +1,65 @@
+package com.renergetic.hdrapi.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.renergetic.hdrapi.dao.InformationTileDAORequest;
+import com.renergetic.hdrapi.dao.InformationTileDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
+import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.mapper.InformationTileMapper;
+import com.renergetic.hdrapi.model.InformationPanel;
+import com.renergetic.hdrapi.model.InformationTile;
+import com.renergetic.hdrapi.repository.InformationPanelRepository;
+import com.renergetic.hdrapi.repository.InformationTileRepository;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class InformationTileService {
+    @Autowired
+    private InformationTileMapper informationTileMapper;
+    @Autowired
+    private InformationTileRepository informationTileRepository;
+    @Autowired
+    private InformationPanelRepository informationPanelRepository;
+    
+    public List<InformationTileDAOResponse> getAllByPanelId(Long panelId, long offset, int limit){
+        return informationTileRepository.findAllByInformationPanelId(new OffSetPaging(offset, limit), panelId).stream().map(x -> informationTileMapper.toDTO(x)).collect(Collectors.toList());
+    }
+
+    public InformationTileDAOResponse getById(Long id){
+        return informationTileMapper.toDTO(informationTileRepository.findById(id).orElseThrow(NotFoundException::new));
+    }
+
+    public InformationTileDAOResponse getByName(String name){
+        return informationTileMapper.toDTO(informationTileRepository.findByName(name).orElseThrow(NotFoundException::new));
+    }
+
+    public InformationTileDAOResponse update(InformationTileDAORequest informationTile){
+        if(informationTile.getId() == null || !informationTileRepository.existsById(informationTile.getId()))
+            throw new InvalidNonExistingIdException();
+
+        return informationTileMapper.toDTO(informationTileRepository.save(informationTileMapper.toEntity(informationTile)));
+    }
+
+    public InformationTileDAOResponse save(Long informationPanelId, InformationTileDAORequest informationTile) {
+        informationTile.setId(null);
+        InformationPanel informationPanel = informationPanelRepository.findById(informationPanelId).orElseThrow(InvalidNonExistingIdException::new);
+        InformationTile entity = informationTileMapper.toEntity(informationTile);
+        informationTileRepository.save(entity);
+        informationPanel.getTiles().add(entity);
+        informationPanelRepository.save(informationPanel);
+
+        return informationTileMapper.toDTO(entity);
+    }
+
+    public boolean delete(Long id){
+        if(id == null || !informationTileRepository.existsById(id))
+            throw new InvalidNonExistingIdException();
+        informationTileRepository.deleteById(id);
+        return true;
+    }
+}

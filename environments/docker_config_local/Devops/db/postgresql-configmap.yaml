@@ -1,0 +1,12 @@
+# PostgreSQL StatefulSet ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-db-config
+  labels:
+    app: postgresql-db
+data:
+  POSTGRES_DB: devops
+  POSTGRES_USER: devops
+  POSTGRES_PASSWORD: renergetic
+  PGDATA: /data/pgdata
