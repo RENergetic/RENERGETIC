@@ -8,5 +8,6 @@ services/**/.metadata
 services/**/target
 
 front/**
+!front/README.md
 
 configuration/**/node_modules
