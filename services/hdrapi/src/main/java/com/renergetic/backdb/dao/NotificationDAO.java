@@ -1,7 +1,5 @@
 package com.renergetic.backdb.dao;
 
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.backdb.model.Asset;
@@ -10,6 +8,7 @@ import com.renergetic.backdb.model.InformationTile;
 import com.renergetic.backdb.model.Notification;
 import com.renergetic.backdb.model.NotificationType;
 
+import com.renergetic.backdb.service.utils.DateConverter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -32,11 +31,11 @@ public class NotificationDAO {
 	@JsonProperty(required = false)
 	private String icon;
 
-	@JsonProperty(required = true)
-	private LocalDateTime date_from;
+	@JsonProperty(value = "date_from",required = true)
+	private Long dateFrom;
 
-	@JsonProperty(required = false)
-	private LocalDateTime date_to;
+	@JsonProperty(value = "date_to",required = false)
+	private Long dateTo;
 
 	@JsonProperty(value = "asset_id", required = false)
 	private Long assetId;
@@ -57,8 +56,9 @@ public class NotificationDAO {
 			dao.setType(notification.getType());
 			dao.setMessage(notification.getMessage());
 			dao.setIcon(notification.getIcon());
-			dao.setDate_from(notification.getDateFrom());
-			dao.setDate_to(notification.getDateTo());
+
+			dao.setDateFrom(DateConverter.toEpoch(notification.getDateFrom()));
+			dao.setDateTo(DateConverter.toEpoch(notification.getDateTo()));
 			if (notification.getAsset() != null)
 				dao.setAssetId(notification.getAsset().getId());
 			if (notification.getDashboard() != null)
@@ -77,8 +77,9 @@ public class NotificationDAO {
 		notification.setType(type);
 		notification.setMessage(message);
 		notification.setIcon(icon);
-		notification.setDateFrom(date_from);
-		notification.setDateTo(date_to);
+		notification.setDateFrom(DateConverter.toLocalDateTime(dateFrom));
+		notification.setDateTo(DateConverter.toLocalDateTime(dateTo));
+
 		if (assetId != null) {
 			Asset asset = new Asset();
 			asset.setId(assetId);

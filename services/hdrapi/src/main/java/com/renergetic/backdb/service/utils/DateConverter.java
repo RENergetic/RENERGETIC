@@ -22,23 +22,23 @@ public final class DateConverter {
         return date.getTime();
     }
 
-    public LocalDateTime toLocalDateTime(Long epoch) {
+    public static LocalDateTime toLocalDateTime(Long epoch) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(epoch), getTimezone());
     }
 
-    public Date toDate(Long epoch) {
+    public static Date toDate(Long epoch) {
         return new Date(epoch);
     }
 
-    public String toString(long epoch) {
+    public static String toString(long epoch) {
         return dateFormat.format(new Date(epoch));
     }
 
-    public String toString(Date date) {
+    public static String toString(Date date) {
         return dateFormat.format(date);
     }
 
-    public String toString(LocalDateTime localDateTime) {
+    public static String toString(LocalDateTime localDateTime) {
         return dateFormat.format(localDateTime);
     }
 
