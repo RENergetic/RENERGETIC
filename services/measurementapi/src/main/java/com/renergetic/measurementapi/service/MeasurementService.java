@@ -169,10 +169,8 @@ public class MeasurementService {
     public List<String> list(String bucket) {
 		QueryApi query = influxDB.getQueryApi();
 		
-		String flux = String.format("from(bucket: \"%s\")"
-				+ " |> range(start: -30y)"
-				+ " |> drop(fn: (column) => column != \"_measurement\")"
-				+ " |> distinct(column: \"_measurement\")",
+		String flux = String.format("import \"influxdata/influxdb/schema\""
+				+ "schema.measurements(bucket: \"%s\", start: -30y)",
 				bucket);
 
 		System.err.println(flux);

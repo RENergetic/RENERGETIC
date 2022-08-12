@@ -12,6 +12,8 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @ToString
 public class SimpleAssetDAO {
+    //TODO: query DB for all child assets  (inferred from parent id)
+    //TODO: add parent asset reference here ->  it's just an idea ???
     private Long id;
 
     private String name;
@@ -46,7 +48,6 @@ public class SimpleAssetDAO {
 
     public Asset mapToEntity() {
         Asset asset = new Asset();
-
         asset.setId(id);
         asset.setName(name);
         asset.setLabel(label);

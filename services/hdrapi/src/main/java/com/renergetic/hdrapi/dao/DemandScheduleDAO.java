@@ -2,8 +2,10 @@ package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 import com.renergetic.hdrapi.model.Asset;
 import com.renergetic.hdrapi.model.DemandSchedule;
+import com.renergetic.hdrapi.service.utils.DateConverter;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +29,13 @@ public class DemandScheduleDAO {
     private DemandDefinitionDAO demandDefinition;
 
     @JsonProperty("demand_start")
-    private LocalDateTime demandStart;
+    private Long demandStart;
 
     @JsonProperty("demand_stop")
-    private LocalDateTime demandStop;
+    private Long demandStop;
 
     @JsonProperty("demand_update")
-    private LocalDateTime update;
+    private Long update;
 
     public static DemandScheduleDAO create(DemandSchedule demandSchedule){
         DemandScheduleDAO demandScheduleDAO = new DemandScheduleDAO();
@@ -41,9 +43,9 @@ public class DemandScheduleDAO {
         if(demandSchedule.getDemandDefinition() != null)
             demandScheduleDAO.setDemandDefinition(DemandDefinitionDAO.create(demandSchedule.getDemandDefinition()));
         demandScheduleDAO.setAssetId(demandSchedule.getAsset().getId());
-        demandScheduleDAO.setDemandStart(demandSchedule.getDemandStart());
-        demandScheduleDAO.setDemandStop(demandSchedule.getDemandStop());
-        demandScheduleDAO.setUpdate(demandSchedule.getUpdate());
+        demandScheduleDAO.setDemandStart(DateConverter.toEpoch(demandSchedule.getDemandStart()));
+        demandScheduleDAO.setDemandStop(DateConverter.toEpoch(demandSchedule.getDemandStop()));
+        demandScheduleDAO.setUpdate(DateConverter.toEpoch(demandSchedule.getUpdate()));
 
         return demandScheduleDAO;
     }
@@ -59,9 +61,9 @@ public class DemandScheduleDAO {
             asset.setId(this.getAssetId());
             demandSchedule.setAsset(asset);
         }
-        demandSchedule.setDemandStart(this.getDemandStart());
-        demandSchedule.setDemandStop(this.getDemandStop());
-        demandSchedule.setUpdate(this.getUpdate());
+        demandSchedule.setDemandStart(DateConverter.toLocalDateTime(this.getDemandStart()));
+        demandSchedule.setDemandStop(DateConverter.toLocalDateTime(this.getDemandStop()));
+        demandSchedule.setUpdate(DateConverter.toLocalDateTime(this.getUpdate()));
 
         return demandSchedule;
     }

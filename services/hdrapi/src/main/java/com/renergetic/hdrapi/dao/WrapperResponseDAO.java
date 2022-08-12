@@ -14,7 +14,7 @@ import java.util.List;
 @ToString
 public class WrapperResponseDAO {
     @JsonProperty(required = false)
-    private List<AssetDAOResponse> assets;
+    private List<SimpleAssetDAO> assets;
 
     @JsonProperty(required = false, value = "asset_panels")
     private List<AssetPanelDAO> assetPanels;
