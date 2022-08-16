@@ -32,6 +32,11 @@ spec:
           envFrom:
           - configMapRef:
               name: postgresql-db-config
+          readinessProbe:
+            exec:
+              command: ["psql", "-w", "-U", "postgres", "-d", "postgres", "-c", "SELECT 1"]
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
   # Volume Claim
   volumeClaimTemplates:
     - metadata:

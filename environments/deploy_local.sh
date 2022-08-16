@@ -50,6 +50,11 @@ then
         kubectl apply -f postgresql-configmap.yaml --namespace=$project
         kubectl apply -f postgresql-statefulset.yaml --namespace=$project
         kubectl apply -f postgresql-service.yaml --namespace=$project
+        
+        while [[ $(kubectl -n ${project} get pods -l app=postgresql-db -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; 
+            do echo "Waiting to PostgreSQL pod to create databases" && sleep 1; 
+        done
+        kubectl exec statefulset/postgresql-db --namespace=$project -- bin/bash -c "psql -U postgres < ./scripts/init.sql"
     fi
 
     if [[ $influxDB = 'true' ]]
