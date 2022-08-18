@@ -2,20 +2,20 @@ package com.renergetic.ingestionapi.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.ingestionapi.dao.MeasurementDAO;
+import com.renergetic.ingestionapi.dao.RequestInfo;
 import com.renergetic.ingestionapi.dao.RestrictionsDAO;
 import com.renergetic.ingestionapi.exception.TooLargeRequestException;
 import com.renergetic.ingestionapi.service.MeasurementService;
@@ -43,20 +43,20 @@ public class MeasurementController {
 	}
 	
 	@Operation(summary = "Insert entries in InfluxDB")
-	@PostMapping("ingest/{bucket}")
-	public ResponseEntity<Map<String, List<MeasurementDAO>>> addMeasurement(@PathVariable String bucket, @RequestBody List<MeasurementDAO> measurements){
+	@PostMapping("ingest")
+	public ResponseEntity<RequestInfo<MeasurementDAO>> addMeasurement(@RequestParam(required=false) Optional<String> bucket, @RequestBody List<MeasurementDAO> measurements){
 		RestrictionsDAO restrictions = restrictionsSv.get();
 		
 		if (measurements.size() > restrictions.getRequestSize())
 			throw new TooLargeRequestException("The request is too large, the max request size is %d", restrictions.getRequestSize());
 		
-		Map<String, List<MeasurementDAO>> ret = new TreeMap<>();
-		ret.put("inserted", new ArrayList<>());
-		ret.put("errors", new ArrayList<>());
+		RequestInfo<MeasurementDAO> ret = new RequestInfo<>();
+		ret.setInserted(0L);
+		ret.setErrors(new ArrayList<>());
 
-		service.insert(measurements, bucket, restrictions).forEach((key, value) -> {
-			if (value) ret.get("inserted").add(key); 
-			else ret.get("errors").add(key); 
+		service.insert(measurements, bucket.orElse("renergetic"), restrictions).forEach((key, value) -> {
+			if (value) ret.setInserted(ret.getInserted() + 1); 
+			else ret.getErrors().add(key); 
 		});
 		
 		return new ResponseEntity<>(ret, HttpStatus.CREATED);
