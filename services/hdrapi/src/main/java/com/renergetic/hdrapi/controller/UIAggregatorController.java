@@ -43,7 +43,7 @@ public class UIAggregatorController {
         if (wrapperRequestBodyDAO.getCalls().getAssets() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssets();
             wrapperResponseDAO.setAssets(
-                    getAssets(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
+                    getSimpleAssets(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
         }
         if (wrapperRequestBodyDAO.getCalls().getAssetPanels() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssetPanels();
@@ -78,6 +78,9 @@ public class UIAggregatorController {
 
     private List<AssetDAOResponse> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
         return assetService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+    }
+    private List<SimpleAssetDAO> getSimpleAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
+        return assetService.findSimpleByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
 
     private List<DemandScheduleDAO> getDemandSchedules(String userId, Optional<Long> offset, Optional<Integer> limit) {

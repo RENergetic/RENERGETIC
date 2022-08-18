@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.dao;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.hdrapi.model.Asset;
 
 import lombok.Getter;
@@ -7,30 +8,50 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @RequiredArgsConstructor
 @ToString
 public class SimpleAssetDAO {
+
     //TODO: query DB for all child assets  (inferred from parent id)
-    //TODO: add parent asset reference here ->  it's just an idea ???
+    @JsonProperty()
     private Long id;
 
+    @JsonProperty()
     private String name;
-
+    @JsonProperty()
+    private SimpleAssetDAO parent;
+    @JsonProperty()
+    //TODO:? name can be discussed :)
+    //assets children , its different than connections
+    private List<SimpleAssetDAO> child = new ArrayList<>();
+    @JsonProperty()
     private AssetTypeDAO type;
 
+    @JsonProperty()
     private String label;
 
+    @JsonProperty()
     private String description;
 
-    private String geo_location;
+    @JsonProperty(value = "geo_location")
+    private String geoLocation;
 
     public static SimpleAssetDAO create(Asset asset) {
         SimpleAssetDAO dao = new SimpleAssetDAO();
 
         dao.setId(asset.getId());
         dao.setName(asset.getName());
+        if(asset.getParentAsset()!=null){
+            dao.setParent(SimpleAssetDAO.create(asset.getParentAsset()));
+        }
+        if(asset.getParentAsset()!=null){
+            dao.setParent(SimpleAssetDAO.create(asset.getParentAsset()));
+        }
 
         if (asset.getType() != null) {
             AssetTypeDAO assetTypeDAO = AssetTypeDAO.create(asset.getType());
@@ -41,7 +62,7 @@ public class SimpleAssetDAO {
 
         dao.setLabel(asset.getLabel());
         //dao.setDescription(asset.getDescription());
-        dao.setGeo_location(asset.getLocation());
+        dao.setGeoLocation(asset.getLocation());
 
         return dao;
     }
@@ -52,7 +73,7 @@ public class SimpleAssetDAO {
         asset.setName(name);
         asset.setLabel(label);
         //asset.setDescription(description);
-        asset.setLocation(geo_location);
+        asset.setLocation(geoLocation);
 
         return asset;
     }

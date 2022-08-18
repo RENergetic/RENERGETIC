@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.service;
 
+import com.renergetic.hdrapi.service.utils.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class DemandRequestService {
             throw new InvalidCreationIdAlreadyDefinedException();
 
         List<DemandSchedule> processed = demandScheduleDAOS.stream().map(d -> {
-            d.setUpdate(currentDateTime);
+            d.setUpdate(DateConverter.toEpoch(currentDateTime));
             return d.mapToEntity();
         }).collect(Collectors.toList());
 
@@ -44,7 +45,7 @@ public class DemandRequestService {
     }
 
     public DemandScheduleDAO save(DemandScheduleDAO demandScheduleDAO) throws InvalidCreationIdAlreadyDefinedException {
-        demandScheduleDAO.setUpdate(LocalDateTime.now());
+        demandScheduleDAO.setUpdate(DateConverter.toEpoch(LocalDateTime.now()));
         if (demandScheduleDAO.getId() != null)
             throw new InvalidCreationIdAlreadyDefinedException();
 
@@ -52,7 +53,7 @@ public class DemandRequestService {
     }
 
     public DemandScheduleDAO update(DemandScheduleDAO demandRequestDAO) throws InvalidNonExistingIdException {
-        demandRequestDAO.setUpdate(LocalDateTime.now());
+        demandRequestDAO.setUpdate(DateConverter.toEpoch(LocalDateTime.now()));
         if(!demandScheduleRepository.existsById(demandRequestDAO.getId()))
             throw new InvalidNonExistingIdException();
 

@@ -2,7 +2,6 @@ package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.hdrapi.model.InformationPanel;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -29,13 +28,16 @@ public class InformationPanelDAOResponse {
     @JsonProperty()
     private List<InformationTileDAOResponse> tiles;
 
-    public static InformationPanelDAOResponse create(InformationPanel entity){
+    public static InformationPanelDAOResponse create(InformationPanel entity) {
+
         return create(entity, entity.getTiles() != null ? entity.getTiles()
                 .stream().map(InformationTileDAOResponse::create).collect(Collectors.toList()) : new ArrayList<>());
+
     }
 
-    public static InformationPanelDAOResponse create(InformationPanel entity, List<InformationTileDAOResponse> informationTileDAOResponses){
-        if(entity == null)
+    public static InformationPanelDAOResponse create(InformationPanel entity,
+                                                     List<InformationTileDAOResponse> informationTileDAOResponses) {
+        if (entity == null)
             return null;
         InformationPanelDAOResponse dao = new InformationPanelDAOResponse();
         dao.setId(entity.getId());
