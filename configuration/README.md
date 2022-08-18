@@ -19,6 +19,6 @@ Contains JSON files with NIFI templates
 
  - [DummyDataGenerator](nifi/DummyDataGenerator.xml): Template to insert dummy data into InfluxDB < 2.0
  - [DummyDataGeneratorAPI](nifi/DummyDataGeneratorAPI.xml): Template insert dummy data into InfluxDB using a API
- - [FlowFilesGenerator](nifi/FlowFilesGenerator.xml): Template with a random flowfiles generatorº
+ - [FlowFilesGenerator](nifi/FlowFilesGenerator.xml): Template with a random flowfiles generator
  - [Renergetic](nifi/renergetic.xml): Template to insert data into influx from CSV file
  - [RenergeticFTP](nifi/renergeticFTP.xml): Template to insert data into influx from CSV file from a FTP server
