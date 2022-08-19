@@ -31,3 +31,5 @@ INSERT INTO measurement_type ( id, name, label, unit, base_unit, factor, color )
     VALUES( 15, "flow_m3perh", "Flow [m3/h]", "m3/h", "m3/h", 1, "#4CAF50");
 INSERT INTO measurement_type ( id, name, label, unit, base_unit, factor, color ) 
     VALUES( 16, "flow_lperh", "Flow [l/h]", "m3/h", "l/h", 0.001, "#4CAF50");
+
+COMMIT;
