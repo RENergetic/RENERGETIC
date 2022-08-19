@@ -175,8 +175,8 @@ public class MeasurementService {
 
 		System.err.println(flux);
 		List<FluxTable> tables = query.query(flux);
-		return MeasurementMapper.fromFlux(tables)
-				.stream().map(measurement -> measurement.getMeasurement()).collect(Collectors.toList());
+		return tables.get(0).getRecords()
+				.stream().map(row -> row.getValue().toString()).collect(Collectors.toList());
     }
 
 	public void delete(MeasurementDAORequest measurement, String from, String to) {
