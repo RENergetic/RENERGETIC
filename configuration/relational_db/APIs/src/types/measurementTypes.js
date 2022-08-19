@@ -16,7 +16,7 @@ const types = [
     {
         id: "6",
         name: "power_kw",
-        label: "ower [kW]",
+        label: "Power [kW]",
         base_unit: "W",
         unit: "kW",
         metric_type: "electricity",
@@ -36,7 +36,7 @@ const types = [
     {
       id: "2",
       name: "electricity_energy_wh",
-      label: "Energy[Wh]",
+      label: "Energy [Wh]",
       base_unit: "Wh",
       unit: "Wh",
       metric_type: "electricity",
@@ -93,7 +93,7 @@ const types = [
     {
       id: "4",
       name: "temperature",
-      label: "Temperature[°C]",
+      label: "Temperature [°C]",
       unit: "°C",
       base_unit: "°C",
       metric_type: "temperature",
@@ -103,7 +103,7 @@ const types = [
     {
       id: "5",
       name: "percentage",
-      label: "Ratio[%]",
+      label: "Ratio [%]",
       unit: "%",
       base_unit: " %",
       metric_type: "renewability",
