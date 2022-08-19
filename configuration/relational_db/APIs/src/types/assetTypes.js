@@ -90,7 +90,7 @@ const types = [
     {
         id: "13",
         name: "solar_thermal_collector",
-        label: "Solar thermal collectro",
+        label: "Solar thermal collector",
         category: "energy",
         renovable: 100
     }, 
@@ -126,7 +126,7 @@ const types = [
         id: "18",
         name: "user",
         label: "User",
-        category: "infrastructure",
+        category: "user",
         renovable: null
     },
     {
