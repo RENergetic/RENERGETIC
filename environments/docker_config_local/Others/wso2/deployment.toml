@@ -19,11 +19,11 @@ url = "jdbc:postgresql://postgresql-db-sv:5432/wso"
 username = "postgres"
 password = "postgres"
 driver="org.postgresql.Driver"
-pool_options.maxActive=300
+pool_options.maxActive=50
 pool_options.maxWait = 60000
 pool_options.testOnBorrow = true
 pool_options.validationQuery="SELECT 1; COMMIT"
-pool_options.validationInterval="30000"
+pool_options.validationInterval="240"
 pool_options.defaultAutoCommit = false
 
 [database.shared_db]
@@ -32,11 +32,11 @@ url = "jdbc:postgresql://postgresql-db-sv:5432/wso"
 username = "postgres"
 password = "postgres"
 driver="org.postgresql.Driver"
-pool_options.maxActive=300
+pool_options.maxActive=50
 pool_options.maxWait = 60000
 pool_options.testOnBorrow = true
 pool_options.validationQuery="SELECT 1; COMMIT"
-pool_options.validationInterval="30000"
+pool_options.validationInterval="240"
 pool_options.defaultAutoCommit = false
 
 [keystore.tls]

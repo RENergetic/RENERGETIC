@@ -1,2 +1,2 @@
 FROM postgres:latest
-COPY *.sql /scripts/
+COPY config/*.sql /scripts/
