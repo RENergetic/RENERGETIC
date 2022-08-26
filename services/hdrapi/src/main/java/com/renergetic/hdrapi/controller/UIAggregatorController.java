@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.controller;
 
+import com.renergetic.hdrapi.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,10 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.service.AssetService;
-import com.renergetic.hdrapi.service.DataService;
-import com.renergetic.hdrapi.service.DemandRequestService;
-import com.renergetic.hdrapi.service.InformationPanelService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +28,9 @@ public class UIAggregatorController {
     @Autowired
     private InformationPanelService informationPanelService;
     @Autowired
-    DataService dataService;
+    private DataService dataService;
+    @Autowired
+    private DashboardService dashboardService;
 
     @Operation(summary = "API wrapper for front-end")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -72,6 +71,10 @@ public class UIAggregatorController {
             wrapperResponseDAO.setPanels(
                     getPanels(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
         }
+        if(wrapperRequestBodyDAO.getCalls().getDashboards() != null){
+            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDashboards();
+            wrapperResponseDAO.setDashboards(getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
+        }
 
         return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
     }
@@ -97,6 +100,10 @@ public class UIAggregatorController {
 
     private DataDAO getData(String userId, Map<String, String> params) {
         return dataService.getByUserId(Long.parseLong(userId), params);
+    }
+
+    private List<DashboardDAO> getDashboards(String userId, Optional<Long> offset, Optional<Integer> limit){
+        return dashboardService.getAvailableToUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
 
 }
