@@ -35,6 +35,9 @@ public class WrapperRequestDAO {
         private PaginationArgsWrapperRequestDAO demands;
         @JsonProperty(required = false)
         private PaginationArgsWrapperRequestDAO panels;
+        //TODO: handle dashboards
+        @JsonProperty(required = false)
+        private PaginationArgsWrapperRequestDAO dashboards;
     }
 
     @Getter
@@ -46,6 +49,10 @@ public class WrapperRequestDAO {
         private Long offset;
         @JsonProperty(required = false)
         private Integer limit;
+        //TODO: return data by id
+        @JsonProperty(required = false)
+        private Integer id;
+
     }
 
     @Getter

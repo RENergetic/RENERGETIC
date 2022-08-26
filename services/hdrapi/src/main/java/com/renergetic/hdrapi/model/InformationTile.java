@@ -21,6 +21,7 @@ public class InformationTile {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    //TODO: this field can be considered to be removed
     @Column(name = "name", nullable = false)
     private String name;
 

@@ -1,8 +1,10 @@
 package com.renergetic.hdrapi.dao;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.hdrapi.dao.details.MeasurementDetailsDAO;
 import com.renergetic.hdrapi.model.Direction;
 import com.renergetic.hdrapi.model.Domain;
 import com.renergetic.hdrapi.model.Measurement;
@@ -46,15 +48,15 @@ public class MeasurementDAOResponse {
 	@JsonProperty(required = false)
 	private Direction direction;
 
-	@JsonProperty(required = false)
-	private List<MeasurementDetails> measurement_details;
-	
+	@JsonProperty(value = "measurement_details",required = false)
+	private List<MeasurementDetailsDAO> measurementDetails;
+
 	public static MeasurementDAOResponse create(Measurement measurement, List<MeasurementDetails> details) {
 		MeasurementDAOResponse dao = null;
-		
+
 		if (measurement != null) {
 			dao = new MeasurementDAOResponse();
-			
+
 			dao.setId(measurement.getId());
 			dao.setName(measurement.getName());
 			dao.setSensorName(measurement.getSensorName());
@@ -65,20 +67,25 @@ public class MeasurementDAOResponse {
 			//dao.setIcon(measurement.getIcon());
 			dao.setDomain(measurement.getDomain());
 			dao.setDirection(measurement.getDirection());
-			
-			if (details != null)
-				dao.setMeasurement_details(details);
+
+			if (details != null) {
+				List<MeasurementDetailsDAO> detailsDao = details.stream().map(
+						it -> new MeasurementDetailsDAO(it.getKey(), it.getValue(), it.getMeasurement().getId())).collect(
+						Collectors.toList());
+				dao.setMeasurementDetails(detailsDao);
+			}
+
 		}
 		return dao;
 	}
-	
+
 	public Measurement mapToEntity() {
 		Measurement measurement = new Measurement();
-		
+
 		measurement.setId(id);
 		measurement.setName(name);
 		measurement.setSensorName(sensorName);
-		if (type != null) 
+		if (type != null)
 			measurement.setType(type);
 		measurement.setLabel(label);
 		//measurement.setDescription(description);

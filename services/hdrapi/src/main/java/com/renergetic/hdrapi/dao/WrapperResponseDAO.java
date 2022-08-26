@@ -27,4 +27,8 @@ public class WrapperResponseDAO {
 
     @JsonProperty(required = false)
     private List<InformationPanelDAOResponse> panels;
+
+    //TODO: dashboards
+    @JsonProperty(required = false)
+    private List<DashboardDAO> dashboards;
 }
