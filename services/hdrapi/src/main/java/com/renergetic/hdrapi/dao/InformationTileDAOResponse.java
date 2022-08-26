@@ -59,7 +59,7 @@ public class InformationTileDAOResponse {
             return null;
         InformationTileDAOResponse dao = new InformationTileDAOResponse();
         dao.setId(entity.getId());
-        dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel()));
+        dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel(), null));
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
         if(entity.getType() != null)
