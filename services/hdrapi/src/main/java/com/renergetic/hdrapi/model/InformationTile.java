@@ -22,7 +22,7 @@ public class InformationTile {
     private Long id;
 
     //TODO: this field can be considered to be removed
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = true)
     private String name;
 
     @Column(name = "label")

@@ -3,7 +3,6 @@ package com.renergetic.hdrapi.dao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.hdrapi.model.InformationTile;
 import com.renergetic.hdrapi.model.InformationTileType;
-
 import com.renergetic.hdrapi.service.utils.Json;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONObject;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +26,11 @@ public class InformationTileDAOResponse {
 
     @JsonProperty(value = "panel")
     private InformationPanelDAOResponse panel;
+    //TODO: tile containing nested panel?
+//    @JsonProperty(value = "child_panel")
+//    private InformationPanelDAOResponse childPanel;
 
-    @JsonProperty(required = true)
+    @JsonProperty(required = false)
     private String name;
 
     @JsonProperty()
@@ -47,22 +50,27 @@ public class InformationTileDAOResponse {
     @JsonProperty
     private JSONObject layout;
 
-    public static InformationTileDAOResponse create(InformationTile entity)  {
+    public static InformationTileDAOResponse create(InformationTile entity) {
         return create(entity, entity.getInformationTileMeasurements() != null ?
                 entity.getInformationTileMeasurements()
-                        .stream().map(x -> MeasurementDAOResponse.create(x.getMeasurement(), null)).collect(Collectors.toList()) :
+                        .stream().map(x -> MeasurementDAOResponse.create(x.getMeasurement(), null)).collect(
+                        Collectors.toList()) :
                 new ArrayList<>());
     }
 
-    public static InformationTileDAOResponse create(InformationTile entity, List<MeasurementDAOResponse> measurements)  {
-        if(entity == null)
+    public static InformationTileDAOResponse create(InformationTile entity, List<MeasurementDAOResponse> measurements) {
+        if (entity == null)
             return null;
         InformationTileDAOResponse dao = new InformationTileDAOResponse();
         dao.setId(entity.getId());
-        dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel()));
+        if(entity.getInformationPanel()!=null){
+            InformationPanelDAOResponse ipr = new InformationPanelDAOResponse();
+            ipr.setId(entity.getInformationPanel().getId());
+            dao.setPanel(ipr);
+        }
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
-        if(entity.getType() != null)
+        if (entity.getType() != null)
             dao.setType(entity.getType());
 
         // dao.setFeatured(entity.getFeatured());

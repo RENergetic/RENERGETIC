@@ -28,6 +28,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Measurement {
+
+	//todo: unique key: name-asset-sensor-type-direction
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
