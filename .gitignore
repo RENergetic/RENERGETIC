@@ -11,3 +11,4 @@ front/**
 !front/README.md
 
 configuration/**/node_modules
+docker_config_local/app/front/dist/
