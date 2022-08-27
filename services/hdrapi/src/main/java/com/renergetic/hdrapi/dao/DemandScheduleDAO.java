@@ -22,6 +22,8 @@ public class DemandScheduleDAO {
 //    private Long assetId;
     @JsonProperty("asset")
     private SimpleAssetDAO asset;
+//    @JsonProperty(value = "asset_id", required = false)
+//    private Long assetId;
 
     @JsonProperty("demand_definition")
     private DemandDefinitionDAO demandDefinition;

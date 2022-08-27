@@ -11,8 +11,7 @@ public class Json {
         if (json == null) {
             return new JSONObject();
         }
-        JSONParser parser = new JSONParser(json);
-        return (JSONObject) parser.parse();
+        return new JSONObject(json);
     }
 
     public static String toJson(JSONObject json) {

@@ -16,7 +16,7 @@ public class InformationTileDAORequest {
     @JsonProperty()
     private Long id;
 
-    @JsonProperty(required = true)
+    @JsonProperty( )
     private String name;
 
     @JsonProperty()
