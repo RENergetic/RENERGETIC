@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: wso
-          image: wso2:latest
+          image: wso:latest
           imagePullPolicy: Never
           ports:
           - name: api-https
