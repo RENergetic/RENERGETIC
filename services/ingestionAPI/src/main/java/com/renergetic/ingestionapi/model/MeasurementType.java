@@ -3,7 +3,8 @@ package com.renergetic.ingestionapi.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
+
+import org.hibernate.annotations.Subselect;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,7 +14,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "measurement_type")
+@Subselect("select * from measurement_type")
 @Getter
 @Setter
 @RequiredArgsConstructor

@@ -5,7 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.Table;
+
+import org.hibernate.annotations.Subselect;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,11 +15,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+@Entity
+@Subselect("select * from asset_type")
+@RequiredArgsConstructor
 @Getter
 @Setter
-@Entity
-@Table(name = "asset_type")
-@RequiredArgsConstructor
 @ToString
 public class AssetType {
 	@Id
