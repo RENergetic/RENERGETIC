@@ -12,8 +12,7 @@ import lombok.ToString;
 import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -42,15 +41,15 @@ public class InformationTileDAOResponse {
     private List<MeasurementDAOResponse> measurements;
 
     @JsonProperty
-    private JSONObject props;
+    private Map props;
 
     @JsonProperty
-    private JSONObject layout;
+    private Map layout;
 
     public static InformationTileDAOResponse create(InformationTile entity)  {
         return create(entity, entity.getInformationTileMeasurements() != null ?
                 entity.getInformationTileMeasurements()
-                        .stream().map(x -> MeasurementDAOResponse.create(x.getMeasurement(), null)).collect(Collectors.toList()) :
+                        .stream().map(x -> MeasurementDAOResponse.create(x.getMeasurement(), Collections.emptyList())).collect(Collectors.toList()) :
                 new ArrayList<>());
     }
 
@@ -68,13 +67,13 @@ public class InformationTileDAOResponse {
         // dao.setFeatured(entity.getFeatured());
 
         try {
-            dao.setLayout(Json.parse(entity.getLayout()));
+            dao.setLayout(Json.parse(entity.getLayout()).toMap());
         } catch (ParseException e) {
             //tODO: verify catch
             dao.setLayout(null);
         }
         try {
-            dao.setProps(Json.parse(entity.getProps()));
+            dao.setProps(Json.parse(entity.getProps()).toMap());
         } catch (ParseException e) {
             //tODO: verify catch
             dao.setLayout(null);

@@ -24,10 +24,11 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
 
         entity.setLayout(dto.getLayout());
         entity.setProps(dto.getProps());
-
-        InformationPanel infoPanel = new InformationPanel();
-        infoPanel.setId(dto.getPanelId());
-        entity.setInformationPanel(infoPanel);
+        if(dto.getPanelId()!=null) {
+            InformationPanel infoPanel = new InformationPanel();
+            infoPanel.setId(dto.getPanelId());
+            entity.setInformationPanel(infoPanel);
+        }
 
         return entity;
     }
@@ -39,15 +40,15 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
                 return null;
             InformationTileDAOResponse dao = new InformationTileDAOResponse();
             dao.setId(entity.getId());
-
+            if(entity.getInformationPanel()!=null)
             dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel()));
 
             dao.setName(entity.getName());
             dao.setLabel(entity.getLabel());
             if (entity.getType() != null)
                 dao.setType(entity.getType());
-            dao.setLayout(Json.parse(entity.getLayout()));
-            dao.setProps(Json.parse(entity.getProps()));
+            dao.setLayout(Json.parse(entity.getLayout()).toMap());
+            dao.setProps(Json.parse(entity.getProps()).toMap());
             return dao;
         } catch (ParseException e) {
             e.printStackTrace();

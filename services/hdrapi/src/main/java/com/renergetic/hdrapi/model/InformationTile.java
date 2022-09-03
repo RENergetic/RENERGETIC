@@ -39,7 +39,7 @@ public class InformationTile {
     private InformationTileType type;
 
     @ManyToOne
-    @JoinColumn(name = "information_panel_id")
+    @JoinColumn(name = "information_panel_id",nullable = true)
     private InformationPanel informationPanel;
 
     @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "informationTile")

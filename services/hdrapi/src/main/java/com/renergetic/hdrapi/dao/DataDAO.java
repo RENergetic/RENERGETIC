@@ -12,6 +12,7 @@ import lombok.Setter;
 @Setter
 public class DataDAO {
 
+
 	@JsonProperty(value = "current", required = false)
 	private Data current;
 
@@ -26,7 +27,7 @@ public class DataDAO {
 	@Getter
 	@Setter
 	public class Data {
-		@JsonProperty(value = "default", required = false)
+		@JsonProperty(value = "last", required = false)
 		private Map<String, Double> last;
 		
 		@JsonProperty(value = "max", required = false)

@@ -1,6 +1,8 @@
 package com.renergetic.hdrapi.controller;
 
+import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.service.*;
+import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.renergetic.hdrapi.dao.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +42,8 @@ public class UIAggregatorController {
         if (wrapperRequestBodyDAO.getCalls().getAssets() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssets();
             wrapperResponseDAO.setAssets(
-                    getSimpleAssets(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
+                    getSimpleAssets(userId, Optional.ofNullable(data.getOffset()),
+                            Optional.ofNullable(data.getLimit())));
         }
         if (wrapperRequestBodyDAO.getCalls().getAssetPanels() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssetPanels();
@@ -59,21 +60,32 @@ public class UIAggregatorController {
 //            if (args.getField() != null) params.put("field", args.getField());
             if (args.getTags() != null) params.putAll(args.getTags());
 
-            wrapperResponseDAO.setData(getData(userId, params));
+            wrapperResponseDAO.appendData(getData(userId, params));
         }
         if (wrapperRequestBodyDAO.getCalls().getDemands() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDemands();
             wrapperResponseDAO.setDemands(getDemandSchedules(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
+            if (wrapperResponseDAO.getDemands().isEmpty()) {
+                //tODO: if test mode
+                List<DemandScheduleDAO> schedule =
+                        demandRequestService.getByUserIdGroup(Long.parseLong(userId), 0, 10);
+                schedule = DummyDataGenerator.getDemand(schedule);
+                wrapperResponseDAO.setDemands(schedule);
+            }
+            DataDAO demandData = DummyDataGenerator.getDemandData(wrapperResponseDAO.getDemands());
+            wrapperResponseDAO.appendData(demandData);
+
         }
         if (wrapperRequestBodyDAO.getCalls().getPanels() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getPanels();
             wrapperResponseDAO.setPanels(
                     getPanels(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
         }
-        if(wrapperRequestBodyDAO.getCalls().getDashboards() != null){
+        if (wrapperRequestBodyDAO.getCalls().getDashboards() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDashboards();
-            wrapperResponseDAO.setDashboards(getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
+            wrapperResponseDAO.setDashboards(
+                    getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
         }
 
         return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
@@ -82,6 +94,7 @@ public class UIAggregatorController {
     private List<AssetDAOResponse> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
         return assetService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
+
     private List<SimpleAssetDAO> getSimpleAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
         return assetService.findSimpleByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
@@ -102,7 +115,7 @@ public class UIAggregatorController {
         return dataService.getByUserId(Long.parseLong(userId), params);
     }
 
-    private List<DashboardDAO> getDashboards(String userId, Optional<Long> offset, Optional<Integer> limit){
+    private List<DashboardDAO> getDashboards(String userId, Optional<Long> offset, Optional<Integer> limit) {
         return dashboardService.getAvailableToUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
     }
 

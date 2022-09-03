@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.dao;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,7 +75,6 @@ public class MeasurementDAOResponse {
 						Collectors.toList());
 				dao.setMeasurementDetails(detailsDao);
 			}
-
 		}
 		return dao;
 	}

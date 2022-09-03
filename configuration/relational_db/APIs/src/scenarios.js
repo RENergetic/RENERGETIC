@@ -187,18 +187,20 @@ async function scenario1() {
 		 return tile;
 	}
 	let tiles = [
+	await addTileF(null,"Heat",{ "x": 5, "y": 3, "w": 2,"h": 2},"single" , { icon: "heat"} ),
+	await addTileF(null,"Heat" ,{ "x": 7, "y":1, "w": 5,"h": 4},"multi_knob"  ,{ icon: "heat"} ), 
 	await addTileF(panels[2].id,"Total energy production of own usage",{ "x": 0, "y": 0, "w": 12,"h": 1},"single"  ),
 	await addTileF(panels[2].id,"Electricity",{ "x": 0, "y": 1, "w": 5,"h": 4},"multi_knob" ,{ icon: "electricity"} ),
 	await addTileF(panels[2].id,"Electricity",{ "x": 5, "y": 1, "w": 2,"h": 2},"single" ,{ icon: "electricity"}  ),
-	await addTileF(panels[2].id,"Heat",{ "x": 5, "y": 3, "w": 5,"h": 2},"single" , { icon: "heat"} ),
-	await addTileF(panels[2].id,"Heat" ,{ "x": 7, "y": 3, "w": 5,"h": 4},"multi_knob"  ,{ icon: "heat"} ),
+	await addTileF(panels[2].id,"Heat",{ "x": 5, "y": 3, "w": 2,"h": 2},"single" , { icon: "heat"} ),
+	await addTileF(panels[2].id,"Heat" ,{ "x": 7, "y":1, "w": 5,"h": 4},"multi_knob"  ,{ icon: "heat"} ),
 	
 	
 	await addTileF(panels[1].id,"Total energy production of own usage",{ "x": 0, "y": 0, "w": 12,"h": 1},"single"  ),
-	await addTileF(panels[1].id,"Electricity",{ "x": 0, "y": 1, "w": 5,"h": 4},"multi_knob" ,{ icon: "electricity"} ),
-	await addTileF(panels[1].id,null,{ "x": 5, "y": 1, "w": 2,"h": 2},"single" ,{ } ),
-	await addTileF(panels[1].id,null,{ "x": 5, "y": 3, "w": 5,"h": 2},"single" , ),
-	await addTileF(panels[1].id, "Heat" ,{ "x": 7, "y": 3, "w": 5,"h": 4},"multi_knob"  ,{ icon: "heat"} ),
+	await addTileF(panels[1].id,"Electricity",{ "x": 0, "y": 1, "w": 5,"h": 4},"doughnut" ,{ icon: "electricity"} ),
+	await addTileF(panels[1].id,"Electricity",{ "x": 5, "y": 1, "w": 2,"h": 2},"single" ,{ } ),
+	await addTileF(panels[1].id,"Heat",{ "x": 5, "y": 3, "w": 2,"h": 2},"single" , ),
+	await addTileF(panels[1].id, "Heat" ,{ "x": 7, "y": 1, "w": 5,"h": 4},"doughnut"  ,{ icon: "heat"} ),
 	]; 
 
 	tile.id = (await post(path, tile)).id;
@@ -206,15 +208,33 @@ async function scenario1() {
 
  
     let tileMeasurements = [ 
-	{"measurement_id": renewability[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[0].id},
-	{"measurement_id": energyProduced[3].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[1].id},
-	{"measurement_id": energyProduced[4].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[1].id},
-	{"measurement_id": energyProduced[5].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[1].id},
+	{"measurement_id": renewability[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[0].id},
+	{"measurement_id": energyProduced[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[1].id},
+	{"measurement_id": energyProduced[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[1].id},
+	{"measurement_id": energyProduced[2].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[1].id   },
+	
 	{"measurement_id": renewability[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[2].id},
-	{"measurement_id": renewability[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[3].id},
-	{"measurement_id": energyProduced[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[4].id},
-	{"measurement_id": energyProduced[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[4].id},
-	{"measurement_id": energyProduced[2].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[4].id   },
+	{"measurement_id": energyProduced[3].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[3].id},
+	{"measurement_id": energyProduced[4].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[3].id},
+	{"measurement_id": energyProduced[5].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[3].id},
+	{"measurement_id": renewability[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[4].id},
+	{"measurement_id": renewability[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[5].id},
+	{"measurement_id": energyProduced[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[6].id},
+	{"measurement_id": energyProduced[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[6].id},
+	{"measurement_id": energyProduced[2].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[6].id },
+	
+	
+	{"measurement_id": renewability[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[7].id},
+	{"measurement_id": energyProduced[3].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[8].id},
+	{"measurement_id": energyProduced[4].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[8].id},
+	{"measurement_id": energyProduced[5].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[8].id},
+	{"measurement_id": renewability[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[9].id},
+	{"measurement_id": renewability[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[10].id},
+	{"measurement_id": energyProduced[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[11].id},
+	{"measurement_id": energyProduced[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[11].id},
+	{"measurement_id": energyProduced[2].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[11].id },
+	
+	
 	{
         "measurement_id": renewability[0].id,
         "domain": null,
@@ -259,7 +279,14 @@ async function scenario1() {
     definitions[1] = {
       "action": "DECREASE_TEMPERATURE",
       "message": "Please, decrease the temperature",
-      "action_type": "DECREASE"
+      "action_type": "DECREASE",
+	  "tile":{"id":tiles[1].id}
+    };
+    definitions[2] = {
+      "action": "DECREASE_TEMPERATURE",
+      "message": "Please, decrease the temperature",
+      "action_type": "DECREASE",
+	  "tile":{"id":tiles[0].id}
     };
     for (let i = 0; i < definitions.length; i++) {
         definitions[i].id = (await post(path, definitions[i])).id;

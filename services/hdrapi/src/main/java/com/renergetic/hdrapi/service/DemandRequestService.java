@@ -78,6 +78,12 @@ public class DemandRequestService {
         return demandRequest.stream().map(DemandScheduleDAO::create).collect(Collectors.toList());
     }
 
+    public List<DemandScheduleDAO> getByUserIdGroup(Long userId, long offset, int limit) throws InvalidNonExistingIdException {
+        List<DemandSchedule> demandRequest = demandScheduleRepository.findByUserIdGroup(userId, offset, limit);
+
+        return demandRequest.stream().map(DemandScheduleDAO::create).collect(Collectors.toList());
+    }
+
     public DemandScheduleDAO getByAssetIdAndActual(Long assetId){
         LocalDateTime localDateTime = LocalDateTime.now();
         Optional<DemandSchedule> demandRequest = demandScheduleRepository.findByAssetIdAndDemandStartLessThanEqualAndDemandStopGreaterThanEqual(assetId, localDateTime, localDateTime);
