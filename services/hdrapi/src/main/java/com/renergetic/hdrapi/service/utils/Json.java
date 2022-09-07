@@ -1,6 +1,5 @@
 package com.renergetic.hdrapi.service.utils;
 
-import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONObject;
 

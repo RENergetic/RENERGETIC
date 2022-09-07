@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,9 @@ import java.util.Optional;
 @Tag(name = "Ui aggregator Controller", description = "Aggregates data from multiple controller to simplify UI requests")
 @RequestMapping("/api/ui")
 public class UIAggregatorController {
+	@Value("${api.generate.dummy-data}")
+	private Boolean generateDummy;
+	
     @Autowired
     private DemandRequestService demandRequestService;
     @Autowired
@@ -66,16 +70,17 @@ public class UIAggregatorController {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDemands();
             wrapperResponseDAO.setDemands(getDemandSchedules(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
-            if (wrapperResponseDAO.getDemands().isEmpty()) {
+            if (wrapperResponseDAO.getDemands().isEmpty() && generateDummy) {
                 //tODO: if test mode
                 List<DemandScheduleDAO> schedule =
                         demandRequestService.getByUserIdGroup(Long.parseLong(userId), 0, 10);
                 schedule = DummyDataGenerator.getDemand(schedule);
                 wrapperResponseDAO.setDemands(schedule);
             }
-            DataDAO demandData = DummyDataGenerator.getDemandData(wrapperResponseDAO.getDemands());
-            wrapperResponseDAO.appendData(demandData);
-
+            if(generateDummy) {
+            	DataDAO demandData = DummyDataGenerator.getDemandData(wrapperResponseDAO.getDemands());
+            	wrapperResponseDAO.appendData(demandData);
+            }
         }
         if (wrapperRequestBodyDAO.getCalls().getPanels() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getPanels();

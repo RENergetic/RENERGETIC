@@ -208,7 +208,6 @@ public class AssetService {
 				.map(x -> AssetDAOResponse.create(x, assetRepository.findByParentAsset(x), measurementRepository.findByAsset(x))).collect(Collectors.toList());
 	}
 	public List<SimpleAssetDAO> findSimpleByUserId(Long id, long offset, int limit){
-		List<Asset> assets = assetRepository.findByUserId(id, offset, limit);
 		return assetRepository.findByUserId(id, offset, limit).stream()
 				.map(x -> SimpleAssetDAO.create(x)).collect(Collectors.toList());
 	}
