@@ -37,6 +37,7 @@ public abstract class MeasurementMapper {
 					measurement.getFields().put(field.getKey(), field.getValue());
 				}
 				// Add tags
+				if (measurement.getTags() == null) measurement.setTags(new HashMap<String, String>());
 				for(String key : record.getValues().keySet()) {
 					if (key != null && !(key.startsWith("_") || key.equalsIgnoreCase("table") || key.equalsIgnoreCase("result")))
 						measurement.getTags().put(key, record.getValueByKey(key).toString());
