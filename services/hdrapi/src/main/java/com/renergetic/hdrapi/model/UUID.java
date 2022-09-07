@@ -20,10 +20,10 @@ import lombok.ToString;
 @ToString
 public class UUID {
 	@Id
-	private String id;
+	private String uuid;
 	
 	@PrePersist
 	private void generateID() {
-		this.setId(java.util.UUID.randomUUID().toString());
+		this.setUuid(java.util.UUID.randomUUID().toString());
 	}
 }

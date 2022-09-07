@@ -22,5 +22,7 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 			"LIMIT :limit OFFSET :offset ;", nativeQuery = true)
 	public List<Asset> findByUserId(Long userId, long offset, int limit);
 
+
+
 	List<Asset> findByUser(User userId);
 }

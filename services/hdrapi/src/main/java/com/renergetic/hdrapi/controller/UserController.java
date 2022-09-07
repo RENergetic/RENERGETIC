@@ -51,19 +51,33 @@ public class UserController {
 		
 		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
-	
+
 	@Operation(summary = "Get User by id")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
-		@ApiResponse(responseCode = "404", description = "No users found with this id")
+			@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+			@ApiResponse(responseCode = "404", description = "No users found with this id")
 	})
-	@GetMapping(path = "{id}", produces = "application/json")
+	@GetMapping(path = "id/{id}", produces = "application/json")
 	public ResponseEntity<UserDAOResponse> getUsersById (@PathVariable Long id){
 		UserDAOResponse user = null;
-		
+
 		user = userSv.getById(id);
-		
+
 		return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}	@Operation(summary = "Get current user profile")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+			@ApiResponse(responseCode = "404", description = "No users found with this id")
+	})
+	@GetMapping(path = "/profile", produces = "application/json")
+	public ResponseEntity<UserDAOResponse> getProfile ( ){
+		//TODO: implement
+		return null;
+//		UserDAOResponse user = null;
+//
+//		user = userSv.getById(id);
+//
+//		return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Get All Users Roles")

@@ -19,7 +19,7 @@ data:
       name = OAuth
       allow_sign_up = true
       client_id = grafana
-      client_secret = NpD4ZN6sqt3zhOmVHbkRxpApBzIINH4B
+      client_secret = LlrDkU2FlROuE6tfrN06jZr7bUgBxn3v
       auth_url = http://front-ren-prototype.apps.paas-dev.psnc.pl/auth/realms/realm-renergetic/protocol/openid-connect/auth
       token_url = http://keycloak-sv:8080/auth/realms/realm-renergetic/protocol/openid-connect/token
       api_url = http://keycloak-sv:8080/auth/realms/realm-renergetic/protocol/openid-connect/userinfo

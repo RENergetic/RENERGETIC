@@ -1,4 +1,4 @@
-FROM wso2/wso2am:4.1.0-alpine
+FROM wso2/wso2am:4.1.0
 
 RUN chown 802:wso2 /home/wso2carbon/wso2am-4.1.0 && \
     chown -R 802:wso2 /home/wso2carbon/wso2am-4.1.0 && \

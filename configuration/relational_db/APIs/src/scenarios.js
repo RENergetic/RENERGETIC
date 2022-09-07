@@ -1,4 +1,4 @@
-import { post, put } from "./utils.js";
+import { post, put , upperFirst} from "./utils.js";
 
 export async function generate(scenario = undefined) {
     switch (scenario) {
@@ -114,135 +114,158 @@ async function scenario1() {
 
     // Create measurements
     path = "api/measurements";
-    const renewability = [];
-    renewability[0] = {
-        "name": "renewability",
-        "label": "Renewability",
-        "type": 5,
-        "domain": "heat",
-        "sensor_name": "renewability",
-        "asset_id": residences[0].id
-    };
-    renewability[1] = {
-        "name": "renewability",
-        "label": "Renewability",
-        "type": 5,
-        "domain": "heat",
-        "sensor_name": "renewability",
-        "asset_id": residences[1].id
-    };
-    for (let i = 0; i < renewability.length; i++) {
-        renewability[i].id = (await post(path, renewability[i])).id;
-    }
+	
+	var addRenewabilityF = async function (asset_id,domain){
+		 let measurement = {"name": "renewability","label": "Renewability","type": 5,"domain": domain,"sensor_name": "renewability","asset_id": asset_id};
+		 measurement.id = (await post(path, measurement)).id;
+		 return measurement;
+	}
+	var renewability = [
+	await addRenewabilityF(residences[0].id,"heat"),	await addRenewabilityF(residences[0].id,"electricity"),
+	await addRenewabilityF(residences[1].id,"heat"),	await addRenewabilityF(residences[1].id,"electricity")
+	]; 
+	
+	var addHeatF = async function (asset_id ){
+		 let measurement = { "name": "heat_consumed", "label": "Heat Consumed" , "type": 7,  "domain": "heat",  "direction": "in",  "sensor_name": "thermostat", "asset_id":asset_id};
+		 measurement.id = (await post(path, measurement)).id; return measurement;
+	}
+    var heatConsumed = [await addHeatF(residences[0].id), await addHeatF(residences[1].id),await addHeatF(building.id)];
+ 
+	var addEnergyF = async function (asset_id,domain  ){
+		 let type_id = domain=="heat"? 3:8;			 
+		 let measurement = { "name": `${domain}_consumed`, "label": `${upperFirst(domain)} Consumed`,
+		 "type": type_id,  "domain":domain, "direction": "in",  "sensor_name": "energy_meter", "asset_id":asset_id };
+		 measurement.id = (await post(path, measurement)).id; return measurement;
+	}
+    var energyUsed = [
+		await addEnergyF(residences[0].id,"heat"),await addEnergyF(residences[0].id,"electricity"),
+		await addEnergyF(residences[1].id,"heat"),await addEnergyF(residences[1].id,"electricity"), 
+		await addEnergyF(building.id,"heat"),await addEnergyF(building.id,"electricity")
+	];
+	var addEnergyProducedF = async function (asset_id,domain,suffix=""  ){
+		suffix = suffix==null ? "": "_"+suffix
+		 let type_id = domain=="heat"? 3:8;			 
+		 let measurement = { "name": `${domain}_produced${suffix}`, "label": `${upperFirst(domain)} produced${suffix} `,
+		 "type": type_id,  "domain":domain, "direction": "out",  "sensor_name": "energy_meter", "asset_id":asset_id };
+		 measurement.id = (await post(path, measurement)).id; return measurement;
+	}
+    var energyProduced = [ 
+		await addEnergyProducedF(building.id,"heat",null),await addEnergyProducedF(building.id,"heat","dirty"),await addEnergyProducedF(building.id,"heat","import"),
+		await addEnergyProducedF(building.id,"electricity",null),
+		await addEnergyProducedF(building.id,"electricity","dirty"),
+		await addEnergyProducedF(building.id,"electricity","import")
+	];
+	
+	var heatSupplyF = async function (asset_id ,sensor_name){
+		 let measurement = { "name": "heat_consumed", "label": "Heat Consumed" , "type": 7,  "domain": "heat",  "direction": "in",  "sensor_name":sensor_name, "asset_id":asset_id};
+		 measurement.id = (await post(path, measurement)).id; return measurement;
+	}
+    var heatSupply = [await heatSupplyF(energy[0].id,"gas_boiler"),await heatSupplyF( energy[1].id,"gas_boiler"),await heatSupplyF(energy[2].id,"solar_collector")];
 
-    const heatConsumed = [];
-    heatConsumed[0] = {
-        "name": "heat_consumed",
-        "label": "Heat Consumed",
-        "type": 7,
-        "domain": "heat",
-        "direction": "in",
-        "sensor_name": "thermostat",
-        "asset_id": residences[0].id
-    };
-    heatConsumed[1] = {
-        "name": "heat_consumed",
-        "label": "Heat Consumed",
-        "type": 7,
-        "domain": "heat",
-        "direction": "in",
-        "sensor_name": "thermostat",
-        "asset_id": residences[1].id
-    };
-    heatConsumed[2] = {
-        "name": "heat_consumed",
-        "label": "Heat Consumed",
-        "type": 7,
-        "domain": "heat",
-        "direction": "in",
-        "sensor_name": "thermostat",
-        "asset_id": building.id
-    };
-    for (let i = 0; i < heatConsumed.length; i++) {
-        heatConsumed[i].id = (await post(path, heatConsumed[i])).id;
-    }
-
-    const heatSupply = [];
-    heatSupply[0] = {
-        "name": "heat_supply",
-        "label": "Heat Supply",
-        "type": 7,
-        "domain": "heat",
-        "direction": "out",
-        "sensor_name": "gas_boiler",
-        "asset_id": energy[0].id
-    };
-    heatSupply[1] = {
-        "name": "heat_supply",
-        "label": "Heat Supply",
-        "type": 7,
-        "domain": "heat",
-        "direction": "out",
-        "sensor_name": "gas_boiler",
-        "asset_id": energy[1].id
-    };
-    heatSupply[2] = {
-        "name": "heat_supply",
-        "label": "Heat Supply",
-        "type": 7,
-        "domain": "heat",
-        "direction": "out",
-        "sensor_name": "solar_collector",
-        "asset_id": energy[2].id
-    };
-    for (let i = 0; i < heatSupply.length; i++) {
-        heatSupply[i].id = (await post(path, heatSupply[i])).id;
-    }
-
+ 
     // Create tiles and panels
     path = "api/informationPanel";
-    let panel = {
-        "name": "panel1",
-        "label": "Panel 1"        
-    };
-    panel.id = (await post(path, panel)).id;
-
+	var addPanelF = async function (panelName,panelLabel,is_template){
+		 let panel = { "name": panelName,  "label": panelLabel ,"is_template":is_template};
+		 panel.id = (await post(path, panel)).id;
+		 return panel;
+	}
+	 var panels = [ await addPanelF("panel1", "Panel 1",0),await addPanelF("renewability_panel", "Renewability panel",1),
+	 await addPanelF("renewability_panel_template", "Renewability panel for {asset}",1) ];
+	 
     path = "api/informationTile";
     const tile = {
         "name": "renewability",
         "label": "Renewability",
         "type": "knob",
         "layout": null,
-        "panel_id": panel.id
+        "panel_id": panels[0].id
     }
-    tile.id = (await post(path, tile)).id;
+	var addTileF = async function ( panel_id,label,layout,type="single",props={icon_visibility: false}){
+		 let tile = {  "panel_id":panel_id,  "label": label ,"type":type,"props":JSON.stringify(props),"layout":JSON.stringify(layout)};
+		 tile.id = (await post(path, tile)).id;
+		 return tile;
+	}
+	let tiles = [
+	await addTileF(null,"Heat",{ "x": 5, "y": 3, "w": 2,"h": 2},"single" , { icon: "heat"} ),
+	await addTileF(null,"Heat" ,{ "x": 7, "y":1, "w": 5,"h": 4},"multi_knob"  ,{ icon: "heat"} ), 
+	await addTileF(panels[2].id,"Total energy production of own usage",{ "x": 0, "y": 0, "w": 12,"h": 1},"single"  ),
+	await addTileF(panels[2].id,"Electricity",{ "x": 0, "y": 1, "w": 5,"h": 4},"multi_knob" ,{ icon: "electricity"} ),
+	await addTileF(panels[2].id,"Electricity",{ "x": 5, "y": 1, "w": 2,"h": 2},"single" ,{ icon: "electricity"}  ),
+	await addTileF(panels[2].id,"Heat",{ "x": 5, "y": 3, "w": 2,"h": 2},"single" , { icon: "heat"} ),
+	await addTileF(panels[2].id,"Heat" ,{ "x": 7, "y":1, "w": 5,"h": 4},"multi_knob"  ,{ icon: "heat"} ),
+	
+	
+	await addTileF(panels[1].id,"Total energy production of own usage",{ "x": 0, "y": 0, "w": 12,"h": 1},"single"  ),
+	await addTileF(panels[1].id,"Electricity",{ "x": 0, "y": 1, "w": 5,"h": 4},"doughnut" ,{ icon: "electricity"} ),
+	await addTileF(panels[1].id,"Electricity",{ "x": 5, "y": 1, "w": 2,"h": 2},"single" ,{ } ),
+	await addTileF(panels[1].id,"Heat",{ "x": 5, "y": 3, "w": 2,"h": 2},"single" , ),
+	await addTileF(panels[1].id, "Heat" ,{ "x": 7, "y": 1, "w": 5,"h": 4},"doughnut"  ,{ icon: "heat"} ),
+	]; 
 
-    path = "api/informationTileMeasurement";
-    const tileMeasurements = [];
-    tileMeasurements[0] = {
+	tile.id = (await post(path, tile)).id;
+	path = "api/informationTileMeasurement";
+
+ 
+    let tileMeasurements = [ 
+	{"measurement_id": renewability[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[0].id},
+	{"measurement_id": energyProduced[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[1].id},
+	{"measurement_id": energyProduced[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[1].id},
+	{"measurement_id": energyProduced[2].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[1].id   },
+	
+	{"measurement_id": renewability[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[2].id},
+	{"measurement_id": energyProduced[3].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[3].id},
+	{"measurement_id": energyProduced[4].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[3].id},
+	{"measurement_id": energyProduced[5].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[3].id},
+	{"measurement_id": renewability[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[4].id},
+	{"measurement_id": renewability[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[5].id},
+	{"measurement_id": energyProduced[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[6].id},
+	{"measurement_id": energyProduced[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[6].id},
+	{"measurement_id": energyProduced[2].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[6].id },
+	
+	
+	{"measurement_id": renewability[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[7].id},
+	{"measurement_id": energyProduced[3].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[8].id},
+	{"measurement_id": energyProduced[4].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[8].id},
+	{"measurement_id": energyProduced[5].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[8].id},
+	{"measurement_id": renewability[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[9].id},
+	{"measurement_id": renewability[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[10].id},
+	{"measurement_id": energyProduced[0].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[11].id},
+	{"measurement_id": energyProduced[1].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[11].id},
+	{"measurement_id": energyProduced[2].id,  "domain": null,     "direction": null, "measurement_type_id": null,  "sensor_name": null, "information_tile_id": tiles[11].id },
+	
+	
+	{
         "measurement_id": renewability[0].id,
         "domain": null,
         "direction": null,
         "measurement_type_id": null,
         "sensor_name": null,
         "information_tile_id": tile.id
-    };
-    tileMeasurements[1] = {
+    },{
         "measurement_id": renewability[1].id,
         "domain": null,
         "direction": null,
         "measurement_type_id": null,
         "sensor_name": null,
         "information_tile_id": tile.id
-    };
+    }];
     for (let i = 0; i < tileMeasurements.length; i++) {
         tileMeasurements[i].id = (await post(path, tileMeasurements[i])).id;
     }
 
     // Connect asset with panels
-    path = `api/informationPanel/connect?panel_id=${panel.id}&asset_id=${residences[0].id}`;
+    path = `api/informationPanel/connect?panel_id=${panels[2].id}&asset_id=${residences[0].id}`;
     put(path);
-    path = `api/informationPanel/connect?panel_id=${panel.id}&asset_id=${residences[1].id}`;
+    path = `api/informationPanel/connect?panel_id=${panels[2].id}&asset_id=${residences[1].id}`;
+    put(path);
+    path = `api/informationPanel/connect?panel_id=${panels[1].id}&asset_id=${residences[0].id}`;
+    put(path);
+    path = `api/informationPanel/connect?panel_id=${panels[1].id}&asset_id=${residences[1].id}`;
+    put(path);
+    path = `api/informationPanel/connect?panel_id=${panels[1].id}&asset_id=${building.id}`;
+    put(path);
+    path = `api/informationPanel/connect?panel_id=${panels[1].id}&asset_id=${building.id}`;
     put(path);
 
     // Creating user demands definitions
@@ -256,7 +279,14 @@ async function scenario1() {
     definitions[1] = {
       "action": "DECREASE_TEMPERATURE",
       "message": "Please, decrease the temperature",
-      "action_type": "DECREASE"
+      "action_type": "DECREASE",
+	  "tile":{"id":tiles[1].id}
+    };
+    definitions[2] = {
+      "action": "DECREASE_TEMPERATURE",
+      "message": "Please, decrease the temperature",
+      "action_type": "DECREASE",
+	  "tile":{"id":tiles[0].id}
     };
     for (let i = 0; i < definitions.length; i++) {
         definitions[i].id = (await post(path, definitions[i])).id;
@@ -268,31 +298,31 @@ async function scenario1() {
     let now = new Date();    
     //now = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
     schedules[0] = {
-        "asset_id": residences[0].id,
+        "asset":{"id": residences[0].id},
         "demand_definition": {
           "id": definitions[0].id
         },
-        "demand_start": now.toISOString(),
-        "demand_stop": (new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, now.getMinutes(), now.getSeconds())).toISOString(),
-        "demand_update": now.toISOString()
+        "demand_start": now.getTime(),
+        "demand_stop": (new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, now.getMinutes(), now.getSeconds())).getTime(),
+        "demand_update": now.getTime()
     };
     schedules[1] = {
-        "asset_id": residences[1].id,
+        "asset":{"id":  residences[1].id},
         "demand_definition": {
           "id": definitions[1].id
         },
-        "demand_start": now.toISOString(),
-        "demand_stop": (new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, now.getMinutes(), now.getSeconds())).toISOString(),
-        "demand_update": now.toISOString()
+        "demand_start": now.getTime(),
+        "demand_stop": (new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, now.getMinutes(), now.getSeconds())).getTime(),
+        "demand_update": now.getTime()
     };
     schedules[2] = {
-        "asset_id": residences[1].id,
+        "asset":{"id":  residences[1].id},
         "demand_definition": {
           "id": definitions[1].id
         },
-        "demand_start": (new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() - 2, now.getMinutes(), now.getSeconds())).toISOString(),
-        "demand_stop": (new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() - 1, now.getMinutes(), now.getSeconds())).toISOString(),
-        "demand_update": now.toISOString()
+        "demand_start": (new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() - 2, now.getMinutes(), now.getSeconds())).getTime(),
+        "demand_stop": (new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() - 1, now.getMinutes(), now.getSeconds())).getTime(),
+        "demand_update": now.getTime()
     };
     for (let i = 0; i < schedules.length; i++) {
         schedules[i].id = (await post(path, schedules[i])).id;

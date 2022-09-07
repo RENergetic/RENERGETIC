@@ -19,6 +19,9 @@ public class AssetPanelDAO {
 
     @JsonProperty(required = true)
     private PanelSimplifiedDAO panel;
+    //TODO: generate panel for asset using given panel template
+//    @JsonProperty(required = true)
+//    private InformationPanelDAOResponse panel;
 
     public static AssetPanelDAO fromEntities(Asset asset, InformationPanel panel){
         AssetPanelDAO assetPanelDAO = new AssetPanelDAO();

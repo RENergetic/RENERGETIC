@@ -108,4 +108,17 @@ public class DashboardService {
 			else throw new NotFoundException("No dashboards found related with given user id " + id);
 		} else throw new NotFoundException("No users found related with id " + id);
 	}
+
+	public List<DashboardDAO> getAvailableToUserId(Long userId, Long offset, Integer limit){
+		User user = userRepository.findById(userId).orElse(null);
+		if(user == null)
+			throw new NotFoundException("No users found related with id " + userId);
+
+		List<Dashboard> dashboards = dashboardRepository.findAvailableForUserId(userId, offset, limit);
+		if (dashboards != null)
+			return dashboards.stream()
+					.map(DashboardDAO::create)
+					.collect(Collectors.toList());
+		else throw new NotFoundException("No dashboards found related with given user id " + userId);
+	}
 }

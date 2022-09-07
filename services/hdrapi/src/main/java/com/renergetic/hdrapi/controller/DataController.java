@@ -1,9 +1,11 @@
 package com.renergetic.hdrapi.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.renergetic.hdrapi.dao.DataWrapperDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +40,7 @@ public class DataController {
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
 		@ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
 	})
-	@GetMapping(path = "panel/{panel_id}", produces = "application/json")
+	@GetMapping(path = "influxdb/panel/{panel_id}", produces = "application/json")
 	public ResponseEntity<DataDAO> getDataByPanel (
 			@PathVariable Long panel_id,
 			@RequestParam("from") Optional<String> from, 
@@ -56,7 +58,38 @@ public class DataController {
 		
 		return new ResponseEntity<>(dataSv.getByPanel(panel_id, params), HttpStatus.OK);
 	}
-	
+	@Operation(summary = "Get Data related with a panel id")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+			@ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
+	})
+	@GetMapping(path = "panel/{panelId}", produces = "application/json")
+	public ResponseEntity<DataWrapperDAO> getPanelData (
+			@PathVariable Long panelId,
+			@RequestParam("from") Optional<Long> from,
+			@RequestParam("to") Optional<Long> to){
+//			@RequestParam Map<String, String> tags){
+
+		Map<String, String> params = new HashMap<>();
+		return new ResponseEntity<>(dataSv.getPanelData(panelId, from.orElse((new Date()).getTime()-3600000),to), HttpStatus.OK);
+	}
+
+	@Operation(summary = "Get Data related with a panel id and asset")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Request executed correctly"),
+			@ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
+	})
+	@GetMapping(path = "panel/{panelId}/asset/{assetId}", produces = "application/json")
+	public ResponseEntity<DataWrapperDAO> getAssetPanelData (
+			@PathVariable Long panelId,
+			@PathVariable Long assetId,
+			@RequestParam("from") Optional<Long> from,
+			@RequestParam("to") Optional<Long> to){
+//			@RequestParam Map<String, String> tags){
+
+		return new ResponseEntity<>(dataSv.getPanelData(panelId,assetId, from.orElse((new Date()).getTime()-3600000),to), HttpStatus.OK);
+	}
+
 	@Operation(summary = "Get Data related with a tile id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),

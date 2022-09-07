@@ -21,7 +21,8 @@ public class InformationTile {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    //TODO: this field can be considered to be removed
+    @Column(name = "name", nullable = true)
     private String name;
 
     @Column(name = "label")
@@ -38,7 +39,7 @@ public class InformationTile {
     private InformationTileType type;
 
     @ManyToOne
-    @JoinColumn(name = "information_panel_id")
+    @JoinColumn(name = "information_panel_id",nullable = true)
     private InformationPanel informationPanel;
 
     @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "informationTile")

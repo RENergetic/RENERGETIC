@@ -14,7 +14,7 @@ import java.util.List;
 @ToString
 public class WrapperResponseDAO {
     @JsonProperty(required = false)
-    private List<AssetDAOResponse> assets;
+    private List<SimpleAssetDAO> assets;
 
     @JsonProperty(required = false, value = "asset_panels")
     private List<AssetPanelDAO> assetPanels;
@@ -27,4 +27,18 @@ public class WrapperResponseDAO {
 
     @JsonProperty(required = false)
     private List<InformationPanelDAOResponse> panels;
+
+    //TODO: dashboards
+    @JsonProperty(required = false)
+    private List<DashboardDAO> dashboards;
+
+    public void appendData(DataDAO data) {
+        if(this.data==null){
+            this.data = data;
+        }
+        else {
+            this.data.getCurrent().getLast().putAll(data.getCurrent().getLast());
+            this.data.getPrediction().getLast().putAll(data.getPrediction().getLast());
+        }
+    }
 }

@@ -4,6 +4,9 @@ import env from "dotenv";
 env.config();
 const API_URL = process.env.API_URL;
 const SHOW_LOGS = process.env.API_LOGS.toLowerCase();
+export function upperFirst(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 export async function post(path = "", body = null) {
     const url = path.startsWith("/") || path == ""? API_URL + path : `${API_URL}/${path}`;

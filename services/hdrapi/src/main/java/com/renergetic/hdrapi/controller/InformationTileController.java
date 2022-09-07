@@ -83,6 +83,7 @@ public class InformationTileController {
             @ApiResponse(responseCode = "500", description = "Error saving Information Tile")
     })
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
+//    @PostMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationTileDAOResponse> updateInformationPanel(@RequestBody InformationTileDAORequest informationTileDAORequest) {
         try {
             return new ResponseEntity<>(informationTileService.update(informationTileDAORequest), HttpStatus.OK);
