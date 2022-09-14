@@ -61,10 +61,35 @@ public class MeasurementController {
 		measurement.setTags(tags);
 		
 		List<MeasurementDAOResponse> ret;
+		tags.remove("bucket");
 		tags.remove("from");
 		tags.remove("to");
 		
 		ret = service.select(measurement, from.orElse(""), to.orElse(""), "time");
+		
+		if (ret != null)
+			return ResponseEntity.ok(ret);
+		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	@Operation(summary = "Get entries filter by measurements, tags or fields")
+	@GetMapping("/data")
+	public ResponseEntity<List<MeasurementDAOResponse>> getData(
+			@RequestParam(name = "measurements", required = false) List<String> measurements, 
+			@RequestParam(name = "fields", required = false) List<String> fields, 
+			@RequestParam("from") Optional<String> from,
+			@RequestParam("to") Optional<String> to,
+			@RequestParam("bucket") Optional<String> bucket,
+			@RequestParam Map<String, String> tags){
+		
+		List<MeasurementDAOResponse> ret;
+		tags.remove("measurements");
+		tags.remove("fields");
+		tags.remove("bucket");
+		tags.remove("from");
+		tags.remove("to");
+		
+		ret = service.data(bucket.orElse("renergetic"), measurements, fields, tags, from.orElse(""), to.orElse(""), "time");
 		
 		if (ret != null)
 			return ResponseEntity.ok(ret);

@@ -5,7 +5,9 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -105,6 +107,49 @@ public class MeasurementService {
         //QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
  
         //return MeasurementMapper.fromSeries(queryResult.getResults().get(0).getSeries().get(0));
+	}
+
+	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, String> tags, String from, String to, String timeVar) {
+		QueryApi query = influxDB.getQueryApi();
+
+		List<String> fluxQuery = new ArrayList<>();
+
+		if (timeVar.equals("time")) {
+			if (!from.isEmpty() && !from.matches("^\\d+$"))
+				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
+					from = from.replace(" ", "T")+'Z';
+				else from = "-" + InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
+
+			if (!to.isEmpty() && !to.matches("^\\d+$"))
+				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
+					to = to.replace(" ", "T")+'Z';
+				else to = "-" + InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);	
+		}
+		// ADD REQUEST BUCKET AND TIME RANGE
+		fluxQuery.add(String.format("from(bucket: \"%s\")", bucket));
+		fluxQuery.add(String.format("range(start: %s, stop: %s)", !from.isEmpty()? from : "0", !to.isEmpty()? to : "now()"));
+		
+		// FILTER MEASUREMENTS IN MEASUREMENTS LIST IF LIST IS EMPTY SEARCH IN ALL MEASUREMENTS
+		if (measurements != null && !measurements.isEmpty())
+			fluxQuery.add( String.format("filter(fn: (r) => %s)",
+					measurements.stream().map(measurement -> String.format("r[\"_measurement\"] == \"%s\"", measurement)).collect(Collectors.joining(" or "))) );
+
+		// FILTER FIELDS IN FIELDS LIST IF LIST IS EMPTY SEARCH IN ALL FIELDS
+		if (fields != null && !fields.isEmpty())
+			fluxQuery.add( String.format("filter(fn: (r) => %s)",
+					fields.stream().map(field -> String.format("r[\"_field\"] == \"%s\"", field)).collect(Collectors.joining(" or "))) );
+
+		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
+		if (tags != null && !tags.isEmpty())
+			fluxQuery.add( String.format("filter(fn: (r) => %s)",
+					tags.keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, tags.get(key))).collect(Collectors.joining(" and "))) );
+		
+		
+		String flux = fluxQuery.stream().collect(Collectors.joining(" |> "));
+
+		System.err.println(flux);
+		List<FluxTable> tables = query.query(flux);
+		return MeasurementMapper.fromFlux(tables);
 	}
 	
 	/**
