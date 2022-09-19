@@ -45,6 +45,9 @@ public class AssetDAOResponse {
 
 	@JsonProperty(required = false)
 	private Long user;
+
+	@JsonProperty(required = false)
+	private AssetCategoryDAO asset_category;
 	
 	public static AssetDAOResponse create(Asset asset, List<Asset> childs, List<Measurement> measurements) {
 		AssetDAOResponse dao = null;
@@ -75,6 +78,8 @@ public class AssetDAOResponse {
 			}
 			if (asset.getUser() != null) 
 				dao.setUser(asset.getUser().getId());
+			if(asset.getAssetCategory() != null)
+				dao.setAsset_category(AssetCategoryDAO.create(asset.getAssetCategory()));
 		}
 		return dao;
 	}
@@ -107,6 +112,8 @@ public class AssetDAOResponse {
 //			}
 			if (asset.getUser() != null) 
 				dao.setUser(asset.getUser().getId());
+			if(asset.getAssetCategory() != null)
+				dao.setAsset_category(AssetCategoryDAO.create(asset.getAssetCategory()));
 		}
 		return dao;
 	}
@@ -124,6 +131,9 @@ public class AssetDAOResponse {
 		asset.setLocation(geo_location);
 		if (parent != null) 
 			asset.setParentAsset(parent.mapToEntity());
+
+		if(asset_category != null)
+			asset.setAssetCategory(asset_category.mapToEntity());
 		
 //		if (owner != null) {
 //			User entityOwner = new User();

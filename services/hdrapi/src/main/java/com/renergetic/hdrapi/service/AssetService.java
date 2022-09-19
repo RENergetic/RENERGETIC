@@ -103,7 +103,7 @@ public class AssetService {
 					equals = asset.getType().getName().equalsIgnoreCase(filters.get("type")) ||
 							asset.getType().getLabel().equalsIgnoreCase(filters.get("type"));
 				if (equals && filters.containsKey("category") && asset.getType() != null) {
-					equals = asset.getType().getCategory().equals(AssetCategory.valueOf(filters.get("category")));
+					equals = asset.getType().getTypeCategory().equals(AssetTypeCategory.valueOf(filters.get("category")));
 				}
 				if (equals && filters.containsKey("location"))
 					equals = asset.getLocation().equalsIgnoreCase(filters.get("location"));
@@ -131,6 +131,12 @@ public class AssetService {
 		if (asset != null)
 			return AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAsset(asset));
 		else throw new NotFoundException("No asset found related with id " + id);
+	}
+
+	public List<AssetDAOResponse> getByCategory(Long categoryId, long offset, int limit) {
+		return assetRepository.findByAssetCategory(categoryId, new OffSetPaging(offset, limit))
+				.stream().map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAsset(asset)))
+				.collect(Collectors.toList());
 	}
 
 	public List<AssetDAOResponse> getConnectedTo(Long id) {
@@ -192,7 +198,7 @@ public class AssetService {
 					equals = type.getName().equalsIgnoreCase(filters.get("name")) ||
 							type.getLabel().equalsIgnoreCase(filters.get("name"));
 				if (equals && filters.containsKey("category"))
-					equals = type.getCategory().equals(AssetCategory.valueOf(filters.get("category")));
+					equals = type.getTypeCategory().equals(AssetTypeCategory.valueOf(filters.get("category")));
 
 				return equals;
 			}).collect(Collectors.toList());

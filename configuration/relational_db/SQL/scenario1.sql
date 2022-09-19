@@ -1,6 +1,12 @@
 
 INSERT INTO uuid VALUES ('2');
 
+/* CREATE ASSET CATEGORIES */
+INSERT INTO asset_category ( id, name, description )
+    VALUES( 1, 'Boiler', NULL );
+INSERT INTO asset_category ( id, name, description )
+    VALUES( 2, 'Photovoltaic Panel', NULL );
+
 /* CREATE USERS */
 INSERT INTO users ( id, uuid ) 
     VALUES( 1, '2' );
@@ -25,12 +31,12 @@ INSERT INTO asset ( id, name, label, asset_type_id, parent_asset_id, uuid )
     VALUES( 6, 'building1', 'Building 1', 3, 3, '2' );
 
 /* CREATE ENERGY ASSETS */
-INSERT INTO asset ( id, name, label, asset_type_id, uuid ) 
-    VALUES( 7, 'gas_boiler1', 'Gas Boiler 1', 7, '2' );
-INSERT INTO asset ( id, name, label, asset_type_id, uuid ) 
-    VALUES( 8, 'gas_boiler2', 'Gas Boiler 2', 7, '2' );
-INSERT INTO asset ( id, name, label, asset_type_id, uuid ) 
-    VALUES( 9, 'solar_collector1', 'Solar Collector 1', 13, '2' );
+INSERT INTO asset ( id, name, label, asset_type_id, uuid, asset_category_id )
+    VALUES( 7, 'gas_boiler1', 'Gas Boiler 1', 7, '2', 1 );
+INSERT INTO asset ( id, name, label, asset_type_id, uuid, asset_category_id )
+    VALUES( 8, 'gas_boiler2', 'Gas Boiler 2', 7, '2', 1 );
+INSERT INTO asset ( id, name, label, asset_type_id, uuid, asset_category_id )
+    VALUES( 9, 'solar_collector1', 'Solar Collector 1', 13, '2', 2 );
 
 /* CONNECT ASSETS */
 -- Conecction_type:
