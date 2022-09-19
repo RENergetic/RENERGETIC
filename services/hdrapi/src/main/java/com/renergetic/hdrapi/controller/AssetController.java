@@ -23,7 +23,7 @@ import com.renergetic.hdrapi.dao.AssetConnectionDAORequest;
 import com.renergetic.hdrapi.dao.AssetDAORequest;
 import com.renergetic.hdrapi.dao.AssetDAOResponse;
 import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
-import com.renergetic.hdrapi.model.AssetCategory;
+import com.renergetic.hdrapi.model.AssetTypeCategory;
 import com.renergetic.hdrapi.model.AssetType;
 import com.renergetic.hdrapi.model.ConnectionType;
 import com.renergetic.hdrapi.model.details.AssetDetails;
@@ -52,7 +52,7 @@ public class AssetController {
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
 	public ResponseEntity<List<AssetDAOResponse>> getAllAssets (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit, 
-			@RequestParam(required=false) Optional<AssetCategory> category,
+			@RequestParam(required=false) Optional<AssetTypeCategory> category,
 			@RequestParam(required=false) Optional<String> type,
 			@RequestParam(required=false) Optional<String> name,
 			@RequestParam(required=false) Optional<Long> owner_id,
@@ -112,15 +112,15 @@ public class AssetController {
 		
 		return new ResponseEntity<>(measurements, measurements != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
-	
+
 	@Operation(summary = "Get All Assets Types")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "/type", produces = "application/json")
 	public ResponseEntity<List<AssetType>> getAllMeasurementsTypes(@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
 		List<AssetType> type = new ArrayList<>();
-		
+
 		type = assetSv.getTypes(null, offset.orElse(0L), limit.orElse(20));
-		
+
 		return new ResponseEntity<>(type, HttpStatus.OK);
 	}
 	

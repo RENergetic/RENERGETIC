@@ -34,7 +34,7 @@ import lombok.Setter;
 //@ToString // TODO: java.lang.StackOverflowError occurs when wrapper API is called
 public class Asset {
 	@JsonIgnore
-	public static Map<String, AssetCategory> ALLOWED_TYPES;
+	public static Map<String, AssetTypeCategory> ALLOWED_TYPES;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -97,6 +97,11 @@ public class Asset {
 	@ManyToMany(cascade = CascadeType.REFRESH, mappedBy= "assets")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private List<InformationPanel> informationPanels;
+
+	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "asset_category_id", nullable = true, insertable = true, updatable = true)
+	private AssetCategory assetCategory;
 	
 
 	
@@ -116,27 +121,27 @@ public class Asset {
 	static {
 		ALLOWED_TYPES =  new HashMap<>();
 
-		ALLOWED_TYPES.put("user", AssetCategory.user);
+		ALLOWED_TYPES.put("user", AssetTypeCategory.user);
 
-		ALLOWED_TYPES.put("room", AssetCategory.structural);
-		ALLOWED_TYPES.put("flat", AssetCategory.structural);
-		ALLOWED_TYPES.put("building", AssetCategory.structural);
-		ALLOWED_TYPES.put("energy island", AssetCategory.structural);
+		ALLOWED_TYPES.put("room", AssetTypeCategory.structural);
+		ALLOWED_TYPES.put("flat", AssetTypeCategory.structural);
+		ALLOWED_TYPES.put("building", AssetTypeCategory.structural);
+		ALLOWED_TYPES.put("energy island", AssetTypeCategory.structural);
 		
-		ALLOWED_TYPES.put("ev charging station", AssetCategory.energy);
-		ALLOWED_TYPES.put("generation plant", AssetCategory.energy);
-		ALLOWED_TYPES.put("heatpump", AssetCategory.energy);
-		ALLOWED_TYPES.put("gas boiler", AssetCategory.energy);
-		ALLOWED_TYPES.put("co-generation unit", AssetCategory.energy);
-		ALLOWED_TYPES.put("coal plant", AssetCategory.energy);
-		ALLOWED_TYPES.put("pv plant", AssetCategory.energy);
-		ALLOWED_TYPES.put("external heat grid", AssetCategory.energy);
-		ALLOWED_TYPES.put("external electricity grid", AssetCategory.energy);
-		ALLOWED_TYPES.put("solar thermal collector", AssetCategory.energy);
+		ALLOWED_TYPES.put("ev charging station", AssetTypeCategory.energy);
+		ALLOWED_TYPES.put("generation plant", AssetTypeCategory.energy);
+		ALLOWED_TYPES.put("heatpump", AssetTypeCategory.energy);
+		ALLOWED_TYPES.put("gas boiler", AssetTypeCategory.energy);
+		ALLOWED_TYPES.put("co-generation unit", AssetTypeCategory.energy);
+		ALLOWED_TYPES.put("coal plant", AssetTypeCategory.energy);
+		ALLOWED_TYPES.put("pv plant", AssetTypeCategory.energy);
+		ALLOWED_TYPES.put("external heat grid", AssetTypeCategory.energy);
+		ALLOWED_TYPES.put("external electricity grid", AssetTypeCategory.energy);
+		ALLOWED_TYPES.put("solar thermal collector", AssetTypeCategory.energy);
 		
-		ALLOWED_TYPES.put("steam", AssetCategory.infrastructure);
-		ALLOWED_TYPES.put("district heating", AssetCategory.infrastructure);
-		ALLOWED_TYPES.put("district cooling", AssetCategory.infrastructure);
-		ALLOWED_TYPES.put("electricity", AssetCategory.infrastructure);
+		ALLOWED_TYPES.put("steam", AssetTypeCategory.infrastructure);
+		ALLOWED_TYPES.put("district heating", AssetTypeCategory.infrastructure);
+		ALLOWED_TYPES.put("district cooling", AssetTypeCategory.infrastructure);
+		ALLOWED_TYPES.put("electricity", AssetTypeCategory.infrastructure);
 	}
 }

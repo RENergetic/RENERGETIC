@@ -2,10 +2,7 @@ package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.hdrapi.model.Asset;
-import com.renergetic.hdrapi.model.AssetType;
-import com.renergetic.hdrapi.model.Dashboard;
-import com.renergetic.hdrapi.model.User;
+import com.renergetic.hdrapi.model.*;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +42,9 @@ public class AssetDAORequest {
 	private Long user;
 
 	@JsonProperty(required = false)
+	private Long asset_category;
+
+	@JsonProperty(required = false)
 	private List<Long> dashboards;
 	
 	public static AssetDAORequest create(Asset asset) {
@@ -67,6 +67,9 @@ public class AssetDAORequest {
 			
 			if (asset.getUser() != null) 
 				dao.setUser(asset.getUser().getId());
+
+			if(asset.getAssetCategory() != null)
+				dao.setAsset_category(asset.getAssetCategory().getId());
 
 			if (asset.getAssetsDashboard() != null){
 				List<Long> dashboardIds = new ArrayList<>();
@@ -101,6 +104,11 @@ public class AssetDAORequest {
 			User entityUser = new User();
 			entityUser.setId(user);
 			asset.setUser(entityUser);
+		}
+		if(asset_category != null){
+			AssetCategory assetCategory = new AssetCategory();
+			assetCategory.setId(asset_category);
+			asset.setAssetCategory(assetCategory);
 		}
 		if(dashboards != null){
 			List<Dashboard> dashboardsEntities = new ArrayList<>();

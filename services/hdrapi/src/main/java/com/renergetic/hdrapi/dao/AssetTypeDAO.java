@@ -1,7 +1,7 @@
 package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.hdrapi.model.AssetCategory;
+import com.renergetic.hdrapi.model.AssetTypeCategory;
 import com.renergetic.hdrapi.model.AssetType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class AssetTypeDAO {
             dao.setName(assetType.getName());
             dao.setLabel(assetType.getLabel());
             if (dao.getCategory() != null)
-                dao.setCategory(assetType.getCategory().name());
+                dao.setCategory(assetType.getTypeCategory().name());
         }
         return dao;
     }
@@ -63,7 +63,7 @@ public class AssetTypeDAO {
         assetType.setName(name);
         assetType.setLabel(label);
         if (category != null) {
-            assetType.setCategory(AssetCategory.valueOf(category));
+            assetType.setTypeCategory(AssetTypeCategory.valueOf(category));
         }
         return assetType;
     }

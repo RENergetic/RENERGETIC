@@ -101,13 +101,22 @@ public class UserController {
 		
 		return new ResponseEntity<>(settings, HttpStatus.OK);
 	}
-	
-	@Operation (summary="Get Assets from User with specific id")
 
+	@Operation (summary="Get Assets from User with specific id")
 	@GetMapping(path ="/assets/{id}", produces="application/json")
 	public ResponseEntity<List<AssetDAOResponse>> getAssets (@PathVariable Long id){
 		List<AssetDAOResponse> assets = null;
 		assets= userSv.getAssets(id);
+		return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+
+	@Operation (summary="Get Assets from User with specific id and specific category id")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path ="/assets/{id}/{categoryId}", produces="application/json")
+	public ResponseEntity<List<AssetDAOResponse>> getAssets (@PathVariable Long id, @PathVariable Long categoryId,
+															 @RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<AssetDAOResponse> assets = null;
+		assets= userSv.getAssetsByCategory(id, categoryId, offset.orElse(0L), limit.orElse(20));
 		return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	

@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.renergetic.hdrapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -21,16 +22,11 @@ import com.renergetic.hdrapi.dao.UserSettingsDAO;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.Asset;
-import com.renergetic.hdrapi.model.AssetCategory;
+import com.renergetic.hdrapi.model.AssetTypeCategory;
 import com.renergetic.hdrapi.model.UUID;
 import com.renergetic.hdrapi.model.User;
 import com.renergetic.hdrapi.model.UserRoles;
 import com.renergetic.hdrapi.model.UserSettings;
-import com.renergetic.hdrapi.repository.AssetRepository;
-import com.renergetic.hdrapi.repository.UserRepository;
-import com.renergetic.hdrapi.repository.UserRolesRepository;
-import com.renergetic.hdrapi.repository.UserSettingsRepository;
-import com.renergetic.hdrapi.repository.UuidRepository;
 import com.renergetic.hdrapi.repository.information.AssetDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
@@ -51,6 +47,8 @@ public class UserService {
 	AssetRepository assetRepository;
 	@Autowired
 	AssetDetailsRepository assetDetailsRepository;
+	@Autowired
+	MeasurementRepository measurementRepository;
 
 	// USER CRUD OPERATIONS
 	public UserDAOResponse save(UserDAORequest user) {
@@ -189,12 +187,18 @@ public class UserService {
 			if(userAssets != null && userAssets.size() > 0) {
 				for (Asset userAsset : userAssets)
 					assets.addAll(userAsset.getAssets().stream()
-						.filter(obj -> obj.getType().getCategory().equals(AssetCategory.structural))
+						.filter(obj -> obj.getType().getTypeCategory().equals(AssetTypeCategory.structural))
 						.map(obj -> AssetDAOResponse.create(obj, assetDetailsRepository.findByAssetId(obj.getId())))
 						.collect(Collectors.toList()));
 				return assets;
 			}
 			else throw new NotFoundException("User " + id + " hasn't related asset");
 		}
+	}
+
+	public List <AssetDAOResponse> getAssetsByCategory(Long id, Long categoryId, long offset, int limit){
+		return assetRepository.findByUserIdAndCategoryId(id, categoryId, offset, limit)
+				.stream().map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAsset(asset)))
+				.collect(Collectors.toList());
 	}
 }
