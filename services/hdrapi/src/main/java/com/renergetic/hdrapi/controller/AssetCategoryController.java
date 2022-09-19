@@ -85,7 +85,7 @@ public class AssetCategoryController {
             @ApiResponse(responseCode = "500", description = "Error executing the request")
     }
     )
-    @GetMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
+    @GetMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<AssetCategoryDAO> getAssetCategoryById(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(assetCategoryService.getById(id), HttpStatus.OK);
@@ -103,7 +103,7 @@ public class AssetCategoryController {
             @ApiResponse(responseCode = "500", description = "Error executing the request")
     }
     )
-    @GetMapping(path = "/search/{term}", produces = "application/json", consumes = "application/json")
+    @GetMapping(path = "/search/{term}", produces = "application/json")
     public ResponseEntity<List<AssetCategoryDAO>> getAssetCategoriesByTerm(@PathVariable String term) {
         try {
             return new ResponseEntity<>(assetCategoryService.search(term), HttpStatus.OK);
@@ -121,7 +121,7 @@ public class AssetCategoryController {
             @ApiResponse(responseCode = "500", description = "Error executing the request")
     }
     )
-    @DeleteMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
+    @DeleteMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<Boolean> deleteAssetCategory(@PathVariable Long id) {
         try {
             boolean deleted = assetCategoryService.deleteById(id);
