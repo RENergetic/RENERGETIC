@@ -187,7 +187,7 @@ then
     then
         rm -f -r "${current}/docker_config_local/Others/Keycloak/themes"
         mkdir -p "${current}/docker_config_local/Others/keycloak/themes"
-        cp -f -r "${current}/keycloak_themes/" "${current}/docker_config_local/Others/keycloak/themes"
+        cp -f -rT "${current}/keycloak_themes" "${current}/docker_config_local/Others/keycloak/themes"
 
         cd "${current}/docker_config_local/Others/keycloak"
         # KEYCLOAK INSTALLATION
