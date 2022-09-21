@@ -203,6 +203,10 @@ public class AssetService {
 		return assetTypeRepository.findById(id).orElse(null);
 	}
 
+	public AssetType getTypeByName(String name) {
+		return assetTypeRepository.findByName(name).orElse(null);
+	}
+
 	public List<AssetDAOResponse> findByUserId(Long id, long offset, int limit){
 		return assetRepository.findByUserId(id, offset, limit).stream()
 				.map(x -> AssetDAOResponse.create(x, assetRepository.findByParentAsset(x), measurementRepository.findByAsset(x))).collect(Collectors.toList());

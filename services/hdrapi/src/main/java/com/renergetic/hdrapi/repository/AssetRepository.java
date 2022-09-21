@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,10 +11,11 @@ import com.renergetic.hdrapi.model.User;
 
 @SuppressWarnings("unchecked")
 public interface AssetRepository extends JpaRepository<Asset, Long> {
-	Asset save(Asset asset);
+	public Asset save(Asset asset);
 	
-	List<Asset> findByParentAsset(Asset parentAsset);
-	List<Asset> findByAssets(Asset asset);
+	public List<Asset> findByParentAsset(Asset parentAsset);
+	public List<Asset> findByAssets(Asset asset);
+	public Optional<Asset> findByName(String name);
 
 	@Query(value = "SELECT asset_conn.* " +
 			"FROM (asset asset_conn " +

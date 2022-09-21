@@ -24,6 +24,7 @@ public class HttpAPIs {
             String parseParams = mapParams(params);
             parseParams = parseParams.isBlank() ? parseParams : '?' + parseParams;
             URI uri = URI.create(url + parseParams);
+            System.err.println(uri.toString());
             // Prepare Request
             ObjectMapper mapper = new ObjectMapper();
             HttpRequest.Builder builder = HttpRequest.newBuilder(uri);

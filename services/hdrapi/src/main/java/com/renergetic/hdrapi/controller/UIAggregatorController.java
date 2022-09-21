@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.model.Domain;
 import com.renergetic.hdrapi.service.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +97,51 @@ public class UIAggregatorController {
         }
 
         return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
+    }
+
+    @Operation(summary = "API wrapper to get all production for front-end")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/wrapper/production/{panelId}", produces = "application/json")
+    public ResponseEntity<Map<String, Object>> apiWrapperProduction(
+    		@PathVariable Long panelId,
+    		@RequestParam(required = false) Optional<String> bucket,
+    		@RequestParam(required = false) Optional<Long> from,
+    		@RequestParam(required = false) Optional<Long> to) {
+    	Map<String, Object> ret = new HashMap<>();
+    	Instant fromInstant = Instant.ofEpochMilli(from.orElse(0L));
+    	Instant toInstant = Instant.ofEpochMilli(to.orElse(0L));
+    	
+    	// Set to a from parameters to search production of current year if they are empty
+    	if (from.isEmpty()) {
+	        Calendar calendar = Calendar.getInstance();
+
+	        calendar.set(Calendar.MILLISECOND, 0);
+	        calendar.set(Calendar.SECOND, 0);
+	        calendar.set(Calendar.MINUTE, 0);
+	        calendar.set(Calendar.HOUR_OF_DAY, 0);
+	        calendar.set(Calendar.DATE, 1);
+	        calendar.set(Calendar.MONTH, 0);
+	        fromInstant = calendar.toInstant();
+    	}
+    	if (to.isEmpty()) {
+	        Calendar calendar = Calendar.getInstance();
+
+	        calendar.set(Calendar.MILLISECOND, 999);
+	        calendar.set(Calendar.SECOND, 59);
+	        calendar.set(Calendar.MINUTE, 59);
+	        calendar.set(Calendar.HOUR_OF_DAY, 23);
+	        calendar.set(Calendar.DATE, 31);
+	        calendar.set(Calendar.MONTH, 11);
+	        toInstant = calendar.toInstant();
+    	}
+    	// Search panel with the ID sent
+    	ret.put("panel", informationPanelService.getById(panelId));
+    	
+    	// Get heat and electricity productions
+    	ret.put("heat", dataService.getProduction(bucket.orElse("renergetic"), fromInstant, toInstant, Domain.heat));
+    	ret.put("electricity", dataService.getProduction(bucket.orElse("renergetic"), fromInstant, toInstant, Domain.electricity));
+    	
+    	return new ResponseEntity<>(ret, HttpStatus.OK);
     }
 
     private List<AssetDAOResponse> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
