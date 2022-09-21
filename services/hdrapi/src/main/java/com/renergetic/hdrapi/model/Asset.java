@@ -40,7 +40,7 @@ public class Asset {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Column(name = "name", nullable = false, insertable = true, updatable = true)
+	@Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)
 	private String name;
 
 	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
