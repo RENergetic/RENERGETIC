@@ -37,25 +37,25 @@ public class AssetType {
 	@Column(name = "category", nullable = true, insertable = true, updatable = true)
 	@Enumerated(EnumType.STRING)
 	@JsonProperty(required = false)
-	private AssetCategory category;
+	private AssetTypeCategory typeCategory;
 	
 	@Column(name = "renovable", nullable = true, insertable = true, updatable = true)
 	@JsonProperty(required = false)
 	private Long renovable;
 
-	public AssetType(long id, String name, String label, AssetCategory category, Long renovable) {
+	public AssetType(long id, String name, String label, AssetTypeCategory typeCategory, Long renovable) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.label = label;
-		this.category = category;
+		this.typeCategory = typeCategory;
 		this.renovable = renovable;
 	}
-	public AssetType(long id, String name, String label, AssetCategory category ) {
+	public AssetType(long id, String name, String label, AssetTypeCategory typeCategory) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.label = label;
-		this.category = category;
+		this.typeCategory = typeCategory;
 	}
 }
