@@ -8,11 +8,13 @@ import com.renergetic.hdrapi.model.Domain;
 import com.renergetic.hdrapi.model.InformationPanel;
 import com.renergetic.hdrapi.model.InformationTile;
 import com.renergetic.hdrapi.model.Measurement;
+import com.renergetic.hdrapi.model.MeasurementType;
 import com.renergetic.hdrapi.repository.AssetRepository;
 import com.renergetic.hdrapi.repository.InformationPanelRepository;
 import com.renergetic.hdrapi.repository.InformationTileMeasurementRepository;
 import com.renergetic.hdrapi.repository.InformationTileRepository;
 import com.renergetic.hdrapi.repository.MeasurementRepository;
+import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import com.renergetic.hdrapi.service.utils.HttpAPIs;
 import org.json.JSONArray;
@@ -50,6 +52,8 @@ public class DataService {
     AssetRepository assetRepository;
     @Autowired
     MeasurementRepository measurementRepository;
+    @Autowired
+    MeasurementTypeRepository measurementTypeRepository;
 
     @Autowired
     InformationTileMeasurementRepository tileMeasurementRepository;
@@ -238,12 +242,17 @@ public class DataService {
                 null, null);
         // If request are successfully executed format data
         if (responseConsumption.statusCode() < 300) {
+        	List<MeasurementType> types = measurementTypeRepository.findAll().stream()
+        			.filter(type -> type.getBaseUnit().equalsIgnoreCase("Wh"))
+        			.collect(Collectors.toList());
         	JSONArray data = new JSONArray(responseConsumption.body());
         	
         	if (!data.isEmpty()) {
 	        	for (Object obj : data) {
 	        		JSONObject jsonObj = (JSONObject) obj;
-	        		ret.put("total", ret.get("total") + jsonObj.getJSONObject("fields").optDouble("energy", 0));
+	        		MeasurementType jsonType = types.stream().filter(type -> jsonObj.keySet().contains(type.getName()))
+	        				.findFirst().orElse(null);
+	        		ret.put("total", ret.get("total") + (jsonObj.getJSONObject("fields").optDouble(jsonType.getName(), 0) * jsonType.getFactor()));
 	        	}
         	}
         }
