@@ -250,7 +250,7 @@ public class DataService {
         	if (!data.isEmpty()) {
 	        	for (Object obj : data) {
 	        		JSONObject jsonObj = (JSONObject) obj;
-	        		MeasurementType jsonType = types.stream().filter(type -> jsonObj.keySet().contains(type.getName()))
+	        		MeasurementType jsonType = types.stream().filter(type -> jsonObj.getJSONObject("fields").keySet().contains(type.getName()))
 	        				.findFirst().orElse(null);
 	        		ret.put("total", ret.get("total") + (jsonObj.getJSONObject("fields").optDouble(jsonType.getName(), 0) * jsonType.getFactor()));
 	        	}
