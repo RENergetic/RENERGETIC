@@ -44,12 +44,22 @@ public class InformationPanelService {
     MeasurementRepository measurementRepository;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit){
-        return informationPanelRepository.findAll(new OffSetPaging(offset, limit))
+    	List<InformationPanelDAOResponse> list = informationPanelRepository.findAll(new OffSetPaging(offset, limit))
                 .stream().map(x -> informationPanelMapper.toDTO(x)).collect(Collectors.toList());
+    	
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No information panels exists");
     }
 
     public List<InformationPanelDAOResponse> getAll(Long ownerId){
-        return informationPanelRepository.findAllByOwnerId(ownerId).stream().map(x -> informationPanelMapper.toDTO(x)).collect(Collectors.toList());
+    	List<InformationPanelDAOResponse> list = informationPanelRepository.findAllByOwnerId(ownerId).stream()
+    			.map(x -> informationPanelMapper.toDTO(x))
+    			.collect(Collectors.toList());
+    	
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No information panels related with user " + ownerId + " found");
     }
 
     public InformationPanelDAOResponse getById(Long id){
@@ -76,7 +86,7 @@ public class InformationPanelService {
 
     public boolean deleteById(Long id) {
         if(id == null || !informationPanelRepository.existsById(id))
-            throw new NotFoundException();
+            throw new InvalidNonExistingIdException();
         informationPanelRepository.deleteById(id);
         return true;
     }
@@ -87,24 +97,37 @@ public class InformationPanelService {
             Just as a first draft to get it working but there is really a structural issue in the data highlighted here as this is a pure mess to get the request.
         */
         List<InformationPanel> informationPanels = informationPanelRepository.findByUserId(id, offset, limit);
-        return informationPanels.stream().map(panel -> InformationPanelDAOResponse.create(panel,
+        List<InformationPanelDAOResponse> list = informationPanels.stream().map(panel -> InformationPanelDAOResponse.create(panel,
                 panel.getTiles().stream().map(tile -> InformationTileDAOResponse.create(tile,
                         tile.getInformationTileMeasurements().stream().map(tileM -> tileM.getMeasurement() == null ?
                                 getMeasurementInferredFromTile(id, tileM)
                                 : getMeasurementFromTileMeasurement(tileM)).flatMap(List::stream).collect(Collectors.toList())
                 )).collect(Collectors.toList())
         )).collect(Collectors.toList());
+    	
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No information panels related with user " + id + " found");
     }
 
     private List<MeasurementDAOResponse> getMeasurementInferredFromTile(Long userId, InformationTileMeasurement tileM){
-        return measurementRepository
+    	List<MeasurementDAOResponse> list = measurementRepository
                 .findByUserIdAndBySensorNameAndDomainAndDirectionAndType(userId, tileM.getSensorName(),
                         tileM.getDomain().name(), tileM.getDirection().name(), tileM.getType().getId())
-                .stream().map(x -> MeasurementDAOResponse.create(x, measurementDetailsRepository.findByMeasurementId(x.getId()))).collect(Collectors.toList());
+                .stream().map(x -> MeasurementDAOResponse.create(x, measurementDetailsRepository.findByMeasurementId(x.getId())))
+                .collect(Collectors.toList());
+
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No measurements related with the user " + userId + " and with the tile data found");
     }
 
     private List<MeasurementDAOResponse> getMeasurementFromTileMeasurement(InformationTileMeasurement tileM){
-        return Collections.singletonList(MeasurementDAOResponse.create(tileM.getMeasurement(), measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId())));
+    	List<MeasurementDAOResponse> list = Collections.singletonList(MeasurementDAOResponse.create(tileM.getMeasurement(), measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId())));
+    	
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No measurements related with the tile data found");
     }
     
 	public InformationPanelDAOResponse connect(Long id, Long assetId) {

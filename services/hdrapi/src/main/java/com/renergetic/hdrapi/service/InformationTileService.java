@@ -26,8 +26,12 @@ public class InformationTileService {
     private InformationPanelRepository informationPanelRepository;
 
     public List<InformationTileDAOResponse> getAllByPanelId(Long panelId, long offset, int limit) {
-        return informationTileRepository.findAllByInformationPanelId(new OffSetPaging(offset, limit),
+    	List<InformationTileDAOResponse> list = informationTileRepository.findAllByInformationPanelId(new OffSetPaging(offset, limit),
                 panelId).stream().map(x -> informationTileMapper.toDTO(x)).collect(Collectors.toList());
+
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No tiles related with the panel " + panelId + " found");
     }
 
     public InformationTileDAOResponse getById(Long id) {

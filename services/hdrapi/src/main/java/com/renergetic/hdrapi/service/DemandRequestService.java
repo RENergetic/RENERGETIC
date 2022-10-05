@@ -8,6 +8,7 @@ import com.renergetic.hdrapi.dao.DemandDefinitionDAO;
 import com.renergetic.hdrapi.dao.DemandScheduleDAO;
 import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
+import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.DemandDefinition;
 import com.renergetic.hdrapi.model.DemandSchedule;
 import com.renergetic.hdrapi.repository.DemandDefinitionRepository;
@@ -46,7 +47,7 @@ public class DemandRequestService {
 
     public DemandScheduleDAO save(DemandScheduleDAO demandScheduleDAO) throws InvalidCreationIdAlreadyDefinedException {
         demandScheduleDAO.setUpdate(DateConverter.toEpoch(LocalDateTime.now()));
-        if (demandScheduleDAO.getId() != null)
+        if (demandScheduleRepository.existsById(demandScheduleDAO.getId()))
             throw new InvalidCreationIdAlreadyDefinedException();
 
         return DemandScheduleDAO.create(demandScheduleRepository.save(demandScheduleDAO.mapToEntity()));
@@ -61,34 +62,44 @@ public class DemandRequestService {
     }
 
     public List<DemandScheduleDAO> getAll(long offset, int limit){
-        return demandScheduleRepository.findAll(new OffSetPaging(offset, limit)).stream().map(DemandScheduleDAO::create).collect(Collectors.toList());
+    	List<DemandScheduleDAO> list = demandScheduleRepository.findAll(new OffSetPaging(offset, limit)).stream().map(DemandScheduleDAO::create).collect(Collectors.toList());
+    	
+    	if (list != null && list.size() > 0)
+    		return list;
+    	else throw new NotFoundException("No demand schedules found");
     }
 
-    public DemandScheduleDAO getById(Long id) throws InvalidNonExistingIdException {
+    public DemandScheduleDAO getById(Long id) {
         Optional<DemandSchedule> demandRequest = demandScheduleRepository.findById(id);
         if (demandRequest.isEmpty())
-            throw new InvalidNonExistingIdException();
+            throw new NotFoundException("No demand schedule with id " + id + " found");
 
         return DemandScheduleDAO.create(demandRequest.get());
     }
 
-    public List<DemandScheduleDAO> getByUserId(Long userId, long offset, int limit) throws InvalidNonExistingIdException {
+    public List<DemandScheduleDAO> getByUserId(Long userId, long offset, int limit) {
         List<DemandSchedule> demandRequest = demandScheduleRepository.findByUserId(userId, LocalDateTime.now(), offset, limit);
 
-        return demandRequest.stream().map(DemandScheduleDAO::create).collect(Collectors.toList());
+        List<DemandScheduleDAO> list = demandRequest.stream().map(DemandScheduleDAO::create).collect(Collectors.toList());
+    	if (list != null && list.size() > 0)
+    		return list;
+    	else throw new NotFoundException("No demand schedules related with user " + userId + " found");
     }
 
     public List<DemandScheduleDAO> getByUserIdGroup(Long userId, long offset, int limit) throws InvalidNonExistingIdException {
         List<DemandSchedule> demandRequest = demandScheduleRepository.findByUserIdGroup(userId, offset, limit);
 
-        return demandRequest.stream().map(DemandScheduleDAO::create).collect(Collectors.toList());
+        List<DemandScheduleDAO> list = demandRequest.stream().map(DemandScheduleDAO::create).collect(Collectors.toList());
+    	if (list != null && list.size() > 0)
+    		return list;
+    	else throw new NotFoundException("No demand schedules related with user " + userId + " found");
     }
 
     public DemandScheduleDAO getByAssetIdAndActual(Long assetId){
         LocalDateTime localDateTime = LocalDateTime.now();
         Optional<DemandSchedule> demandRequest = demandScheduleRepository.findByAssetIdAndDemandStartLessThanEqualAndDemandStopGreaterThanEqual(assetId, localDateTime, localDateTime);
         if (demandRequest.isEmpty())
-            return null;
+            throw new NotFoundException("No demand schedule related with asset  " + assetId + " found");
 
         return DemandScheduleDAO.create(demandRequest.get());
     }
@@ -98,11 +109,15 @@ public class DemandRequestService {
     public DemandDefinitionDAO getDefinitionById(Long id){
         Optional<DemandDefinition> demandDefinition = demandDefinitionRepository.findById(id);
         if (demandDefinition.isEmpty())
-            throw new InvalidNonExistingIdException();
+            throw new NotFoundException("No demand definition with id  " + id + " found");
+        
         return DemandDefinitionDAO.create(demandDefinition.get());
     }
 
     public DemandDefinitionDAO saveDefinition(DemandDefinitionDAO demandDefinitionDAO){
+        if (demandScheduleRepository.existsById(demandDefinitionDAO.getId()))
+            throw new InvalidCreationIdAlreadyDefinedException();
+        
         return DemandDefinitionDAO.create(demandDefinitionRepository.save(demandDefinitionDAO.mapToEntity()));
     }
 
@@ -122,6 +137,10 @@ public class DemandRequestService {
     }
 
     public List<DemandDefinitionDAO> listDefinitions(long offset, int limit){
-        return demandDefinitionRepository.findAll(new OffSetPaging(offset, limit)).stream().map(DemandDefinitionDAO::create).collect(Collectors.toList());
+    	 List<DemandDefinitionDAO> list = demandDefinitionRepository.findAll(new OffSetPaging(offset, limit)).stream().map(DemandDefinitionDAO::create).collect(Collectors.toList());
+
+     	if (list != null && list.size() > 0)
+     		return list;
+     	else throw new NotFoundException("No demand schedules exists");
     }
 }

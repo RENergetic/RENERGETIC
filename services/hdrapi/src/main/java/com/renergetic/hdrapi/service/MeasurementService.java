@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
 
 import com.renergetic.hdrapi.dao.MeasurementDAORequest;
 import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
+import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.Direction;
 import com.renergetic.hdrapi.model.Measurement;
 import com.renergetic.hdrapi.model.MeasurementType;
 import com.renergetic.hdrapi.model.UUID;
-import com.renergetic.hdrapi.model.Unit;
 import com.renergetic.hdrapi.model.details.MeasurementDetails;
 import com.renergetic.hdrapi.model.details.MeasurementTags;
 import com.renergetic.hdrapi.repository.MeasurementRepository;
@@ -56,14 +58,14 @@ public class MeasurementService {
 		if (id != null && measurementRepository.existsById(id)) {
 			measurementRepository.deleteById(id);
 			return true;
-		} else return false;
+		} else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
 	}
 
 	public MeasurementDAOResponse update(MeasurementDAORequest measurement, Long id) {
 		if ( measurementRepository.existsById(id) ) {
 			measurement.setId(id);
 			return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null);
-		} else return null;
+		} else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
 	}
 
 	public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {
@@ -88,18 +90,24 @@ public class MeasurementService {
 				
 				return equals;
 			});
-		return stream
+		List<MeasurementDAOResponse> list = stream
 				.map(measurement -> MeasurementDAOResponse.create(measurement, measurementDetailsRepository.findByMeasurementId(measurement.getId())))
 				.collect(Collectors.toList());
+		
+		if (list != null && list.size() > 0)
+			return list;
+		else throw new NotFoundException("No measurements found");
 	}
 
 	public Measurement getById(Long id) {
-		return measurementRepository.findById(id).orElse(null);
+		return measurementRepository.findById(id).orElseThrow(() -> new NotFoundException("No measurements with id " + id + " found"));
 	}
 	
 	// MEASUREMENTTYPE CRUD OPERATIONS
 	public MeasurementType saveType(MeasurementType type) {
-		//type.setId(null);
+    	if (type.getId() != null && measurementTypeRepository.existsById(type.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a measurement type with ID " + type.getId());
+    	
 		return measurementTypeRepository.save(type);
 	}
 	
@@ -107,14 +115,14 @@ public class MeasurementService {
 		if ( measurementTypeRepository.existsById(id)) {
 			detail.setId(id);
 			return measurementTypeRepository.save(detail);
-		} else return null;
+		} else throw new InvalidNonExistingIdException("No measurement type with id " + id + "found");
 	}
 
 	public boolean deleteTypeById(Long id) {
 		if (id != null && measurementTypeRepository.existsById(id)) {
 			measurementTypeRepository.deleteById(id);
 			return true;
-		} else return false;
+		} else throw new InvalidNonExistingIdException("No measurement type with id " + id + "found");
 	}
 	
 	public List<MeasurementType> getTypes(Map<String, String> filters, long offset, int limit) {
@@ -128,15 +136,19 @@ public class MeasurementService {
 				if (filters.containsKey("name"))
 					equals = type.getName().equalsIgnoreCase(filters.get("name"));
 				if (equals && filters.containsKey("unit"))
-					equals = type.getUnit().equals(Unit.valueOf(filters.get("unit")));
+					equals = type.getUnit().equals(filters.get("unit"));
 				
 				return equals;
 			});
-		return stream.collect(Collectors.toList());
+		List<MeasurementType> list = stream.collect(Collectors.toList());
+
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No measurement types found");		
 	}
 
 	public MeasurementType getTypeById(Long id) {
-		return measurementTypeRepository.findById(id).orElse(null);
+		return measurementTypeRepository.findById(id).orElseThrow(() -> new NotFoundException("No measurement types with id " + id + " found"));
 	}
 	
 	// MEASUREMENTTAGS CRUD OPERATIONS
@@ -149,14 +161,14 @@ public class MeasurementService {
 		if ( measurementTagsRepository.existsById(id)) {
 			tag.setId(id);
 			return measurementTagsRepository.save(tag);
-		} else return null;
+		} else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
 	}
 
 	public boolean deleteTagById(Long id) {
 		if (id != null && measurementTagsRepository.existsById(id)) {
 			measurementTagsRepository.deleteById(id);
 			return true;
-		} else return false;
+		} else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
 	}
 	
 	public List<MeasurementTags> getTags(Map<String, String> filters, long offset, int limit) {
@@ -172,11 +184,15 @@ public class MeasurementService {
 				
 				return equals;
 			});
-		return stream.collect(Collectors.toList());
+		List<MeasurementTags> list = stream.collect(Collectors.toList());
+
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No tags found");
 	}
 
 	public MeasurementTags getTagById(Long id) {
-		return measurementTagsRepository.findById(id).orElse(null);
+		return measurementTagsRepository.findById(id).orElseThrow(() -> new NotFoundException("No tags with id " + id + " found"));
 	}
 	
 	// MEASUREMENTDETAILS CRUD OPERATIONS
@@ -189,14 +205,14 @@ public class MeasurementService {
 		if ( measurementDetailsRepository.existsById(id)) {
 			detail.setId(id);
 			return measurementDetailsRepository.save(detail);
-		} else return null;
+		} else throw new InvalidNonExistingIdException("No measurement details with id " + id + "found");
 	}
 
 	public boolean deleteDetailById(Long id) {
 		if (id != null && measurementDetailsRepository.existsById(id)) {
 			measurementDetailsRepository.deleteById(id);
 			return true;
-		} else return false;
+		} else throw new InvalidNonExistingIdException("No measurement details with id " + id + "found");
 	}
 	
 	public List<MeasurementDetails> getDetails(Map<String, String> filters, long offset, int limit) {
@@ -212,14 +228,22 @@ public class MeasurementService {
 				
 				return equals;
 			});
-		return stream.collect(Collectors.toList());
+		List<MeasurementDetails> list = stream.collect(Collectors.toList());
+
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No tags found");
 	}
 
 	public MeasurementDetails getDetailById(Long id) {
-		return measurementDetailsRepository.findById(id).orElse(null);
+		return measurementDetailsRepository.findById(id).orElseThrow(() -> new NotFoundException("No measurement details with id " + id + " found"));
 	}
 
 	public List<MeasurementDetails> getDetailsByMeasurementId(Long id) {
-		return measurementDetailsRepository.findByMeasurementId(id);
+		List<MeasurementDetails> list = measurementDetailsRepository.findByMeasurementId(id);
+
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No tags found");
 	}
 }

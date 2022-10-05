@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.service;
 
 import com.renergetic.hdrapi.dao.AssetCategoryDAO;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.AssetCategory;
@@ -17,6 +18,9 @@ public class AssetCategoryService {
     AssetCategoryRepository assetCategoryRepository;
 
     public AssetCategoryDAO save(AssetCategoryDAO assetCategoryDAO){
+    	if (assetCategoryDAO.getId() != null && assetCategoryRepository.existsById(assetCategoryDAO.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a asset category with ID " + assetCategoryDAO.getId());
+    	
         return AssetCategoryDAO.create(assetCategoryRepository.save(assetCategoryDAO.mapToEntity()));
     }
 
@@ -29,7 +33,11 @@ public class AssetCategoryService {
     }
 
     public List<AssetCategoryDAO> list(){
-        return assetCategoryRepository.findAll().stream().map(AssetCategoryDAO::create).collect(Collectors.toList());
+    	List<AssetCategoryDAO> list = assetCategoryRepository.findAll().stream()
+    			.map(AssetCategoryDAO::create).collect(Collectors.toList());
+    	
+    	if (list != null && list.size() > 0) return list;
+    	else throw new NotFoundException("No asset categories found");
     }
 
     public AssetCategoryDAO getById(Long id){
@@ -45,11 +53,14 @@ public class AssetCategoryService {
             assetCategoryRepository.deleteById(id);
             return true;
         }
-        else
-            return false;
+        else throw new InvalidNonExistingIdException("The asset category to delete doesn't exists");
     }
 
     public List<AssetCategoryDAO> search(String term){
-        return assetCategoryRepository.findByNameContaining(term).stream().map(AssetCategoryDAO::create).collect(Collectors.toList());
+    	List<AssetCategoryDAO> list = assetCategoryRepository.findByNameContaining(term).stream()
+    			.map(AssetCategoryDAO::create).collect(Collectors.toList());
+    	
+    	if (list != null && list.size() > 0) return list;
+    	else throw new NotFoundException("No asset categories that contains " + term + " exists");
     }
 }
