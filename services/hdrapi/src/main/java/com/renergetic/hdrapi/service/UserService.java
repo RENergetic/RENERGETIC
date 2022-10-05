@@ -19,6 +19,7 @@ import com.renergetic.hdrapi.dao.UserDAORequest;
 import com.renergetic.hdrapi.dao.UserDAOResponse;
 import com.renergetic.hdrapi.dao.UserRolesDAO;
 import com.renergetic.hdrapi.dao.UserSettingsDAO;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.Asset;
@@ -52,7 +53,9 @@ public class UserService {
 
 	// USER CRUD OPERATIONS
 	public UserDAOResponse save(UserDAORequest user) {
-		user.setId(null);
+		if(user.getId() !=  null && userRepository.existsById(user.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
+		
 		User userEntity = user.mapToEntity();
 		userEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
 		return UserDAOResponse.create(userRepository.save(userEntity), null, null);
@@ -60,14 +63,18 @@ public class UserService {
 
 	public UserRolesDAO saveRole(UserRolesDAO role) {
 		if ( userRepository.existsById(role.getUserId()) ) {
-			role.setId(null);
+			if(role.getId() !=  null && userRolesRepository.existsById(role.getId()))
+	    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a user role with ID " + role.getId());
+			
 			return UserRolesDAO.create(userRolesRepository.save(role.mapToEntity()));
 		} else throw new NotFoundException("The user with id " + role.getUserId() + " don't exists, the role can't be created");
 	}
 
 	public UserSettingsDAO saveSetting(UserSettingsDAO settings) {
 		if ( userRepository.existsById(settings.getUserId()) ) {
-			settings.setId(null);
+			if(settings.getId() !=  null && userSettingsRepository.existsById(settings.getId()))
+	    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a user settings with ID " + settings.getId());
+			
 			return UserSettingsDAO.create(userSettingsRepository.save(settings.mapToEntity()));
 		} else throw new NotFoundException("The user with id " + settings.getUserId() + " don't exists, the role can't be created");
 	}

@@ -105,23 +105,19 @@ public class MeasurementController {
 	})
 	@GetMapping(path = "/{measurement_id}/values", produces = "application/json")
 	public ResponseEntity<String> getMeasurementsValues(@PathVariable Long measurement_id, @RequestParam Map<String, String> tags){
-		try {
-			String url = "http://backinflux-sv:8082/api/";
-			url += measurementSv.getById(measurement_id).getName();
-			
-			if (tags != null && tags.size() > 0)
-				url += "?" + String.join("&", 
-						tags.keySet().stream()
-						.map(key -> key+"="+tags.get(key))
-						.collect(Collectors.toList()));
-			
-			RestTemplate apiInflux = new RestTemplate();		
-			String data = apiInflux.getForObject(url, String.class);
-			
-			return new ResponseEntity<>(data, data != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch(Exception e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+		String url = "http://backinflux-sv:8082/api/";
+		url += measurementSv.getById(measurement_id).getName();
+		
+		if (tags != null && tags.size() > 0)
+			url += "?" + String.join("&", 
+					tags.keySet().stream()
+					.map(key -> key+"="+tags.get(key))
+					.collect(Collectors.toList()));
+		
+		RestTemplate apiInflux = new RestTemplate();		
+		String data = apiInflux.getForObject(url, String.class);
+		
+		return new ResponseEntity<>(data, data != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //=== INFO REQUESTS ===================================================================================
@@ -149,15 +145,11 @@ public class MeasurementController {
 	})
 	@PostMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementDetails> insertInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id){
-		try {
-			Measurement measurement = new Measurement();
-			measurement.setId(measurement_id);
-			detail.setMeasurement(measurement);
-			MeasurementDetails _detail = measurementSv.saveDetail(detail);
-			return new ResponseEntity<>(_detail, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		Measurement measurement = new Measurement();
+		measurement.setId(measurement_id);
+		detail.setMeasurement(measurement);
+		MeasurementDetails _detail = measurementSv.saveDetail(detail);
+		return new ResponseEntity<>(_detail, HttpStatus.CREATED);
 	}
 	
 	@Operation(summary = "Update Information from its id")
@@ -169,15 +161,11 @@ public class MeasurementController {
 	})
 	@PutMapping(path = "{measurement_id}/info/{info_id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementDetails> updateInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id, @PathVariable Long info_id){
-		try {
-			Measurement measurement = new Measurement();
-			measurement.setId(measurement_id);
-			detail.setMeasurement(measurement);
-			MeasurementDetails _detail = measurementSv.updateDetail(detail, info_id);
-			return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		Measurement measurement = new Measurement();
+		measurement.setId(measurement_id);
+		detail.setMeasurement(measurement);
+		MeasurementDetails _detail = measurementSv.updateDetail(detail, info_id);
+		return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Delete Information from its id")
@@ -187,13 +175,9 @@ public class MeasurementController {
 	})
 	@DeleteMapping(path = "{measurement_id}/info/{info_id}")
 	public ResponseEntity<MeasurementDetails> deleteInformation (@PathVariable Long measurement_id, @PathVariable Long info_id){
-		try {
-			measurementSv.deleteDetailById(info_id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		measurementSv.deleteDetailById(info_id);
+		
+		return ResponseEntity.noContent().build();
 	}
 
 	//=== TAGS REQUESTS ===================================================================================	
@@ -216,12 +200,8 @@ public class MeasurementController {
 	})
 	@PostMapping(path = "tags", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementTags> insertTag (@RequestBody MeasurementTags tag){
-		try {
-			MeasurementTags _tag = measurementSv.saveTag(tag);
-			return new ResponseEntity<>(_tag, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		MeasurementTags _tag = measurementSv.saveTag(tag);
+		return new ResponseEntity<>(_tag, HttpStatus.CREATED);
 	}
 	
 	@Operation(summary = "Update tags")
@@ -233,12 +213,8 @@ public class MeasurementController {
 	})
 	@PutMapping(path = "tags/{tag_id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementTags> updateTag (@RequestBody MeasurementTags tag, @PathVariable Long tag_id){
-		try {
-			MeasurementTags _tag = measurementSv.updateTag(tag, tag_id);
-			return new ResponseEntity<>(_tag, _tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		MeasurementTags _tag = measurementSv.updateTag(tag, tag_id);
+		return new ResponseEntity<>(_tag, _tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Delete tags")
@@ -248,13 +224,9 @@ public class MeasurementController {
 	})
 	@DeleteMapping(path = "tags/{tag_id}")
 	public ResponseEntity<MeasurementDetails> deleteInformation (@PathVariable Long tag_id){
-		try {
-			measurementSv.deleteTagById(tag_id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		measurementSv.deleteTagById(tag_id);
+		
+		return ResponseEntity.noContent().build();
 	}
 //=== POST REQUESTS ===================================================================================
 	
@@ -267,13 +239,8 @@ public class MeasurementController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementDAOResponse> createMeasurement(@RequestBody MeasurementDAORequest measurement) {
-		try {
-			MeasurementDAOResponse _measurement = measurementSv.save(measurement);
-			return new ResponseEntity<>(_measurement, HttpStatus.CREATED);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		MeasurementDAOResponse _measurement = measurementSv.save(measurement);
+		return new ResponseEntity<>(_measurement, HttpStatus.CREATED);
 	}
 	
 	@Operation(summary = "Create a new Measurement Type")
@@ -285,13 +252,8 @@ public class MeasurementController {
 	)
 	@PostMapping(path = "/type", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementType> createMeasurementType(@RequestBody MeasurementType type) {
-		try {
-			MeasurementType _type = measurementSv.saveType(type);
-			return new ResponseEntity<>(_type, HttpStatus.CREATED);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		MeasurementType _type = measurementSv.saveType(type);
+		return new ResponseEntity<>(_type, HttpStatus.CREATED);
 	}
 
 //=== PUT REQUESTS====================================================================================
@@ -306,14 +268,9 @@ public class MeasurementController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementDAOResponse> updateMeasurement(@RequestBody MeasurementDAORequest measurement, @PathVariable Long id) {
-		try {
-			measurement.setId(id);	
-			MeasurementDAOResponse _measurement = measurementSv.update(measurement, id);
-			return new ResponseEntity<>(_measurement, _measurement != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		measurement.setId(id);	
+		MeasurementDAOResponse _measurement = measurementSv.update(measurement, id);
+		return new ResponseEntity<>(_measurement, _measurement != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Update a existing Measurement Type")
@@ -326,14 +283,9 @@ public class MeasurementController {
 	)
 	@PutMapping(path = "/type/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<MeasurementType> updateMeasurementType(@RequestBody MeasurementType type, @PathVariable Long id) {
-		try {
-			type.setId(id);	
-			MeasurementType _type = measurementSv.updateType(type, id);
-			return new ResponseEntity<>(_type, _type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		type.setId(id);	
+		MeasurementType _type = measurementSv.updateType(type, id);
+		return new ResponseEntity<>(_type, _type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //=== DELETE REQUESTS ================================================================================
@@ -346,13 +298,9 @@ public class MeasurementController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteMeasurement(@PathVariable Long id) {
-		try {
-			measurementSv.deleteById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		measurementSv.deleteById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 	
 	@Operation(summary = "Delete a existing Measurement", hidden = false)
@@ -363,12 +311,8 @@ public class MeasurementController {
 	)
 	@DeleteMapping(path = "/type/{id}")
 	public ResponseEntity<?> deleteMeasurementType(@PathVariable Long id) {
-		try {
-			measurementSv.deleteTypeById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		measurementSv.deleteTypeById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

@@ -7,6 +7,7 @@ import com.renergetic.hdrapi.dao.InformationPanelDAORequest;
 import com.renergetic.hdrapi.dao.InformationPanelDAOResponse;
 import com.renergetic.hdrapi.dao.InformationTileDAOResponse;
 import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.mapper.InformationPanelMapper;
@@ -71,7 +72,9 @@ public class InformationPanelService {
     }
 
     public InformationPanelDAOResponse save(InformationPanelDAORequest informationPanel) {
-        informationPanel.setId(null);
+		if(informationPanel.getId() !=  null && informationPanelRepository.existsById(informationPanel.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a information panel with ID " + informationPanel.getId());
+		
         InformationPanel infoPanelEntity = informationPanelMapper.toEntity(informationPanel);
         infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
         return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));

@@ -216,13 +216,8 @@ public class AssetController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AssetDAOResponse> createAsset(@RequestBody AssetDAORequest asset) {
-		try {
-			AssetDAOResponse _asset = assetSv.save(asset);
-			return new ResponseEntity<>(_asset, HttpStatus.CREATED);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		AssetDAOResponse _asset = assetSv.save(asset);
+		return new ResponseEntity<>(_asset, HttpStatus.CREATED);
 	}
 	
 	@Operation(summary = "Create a new Asset Type")
@@ -234,14 +229,9 @@ public class AssetController {
 	)
 	@PostMapping(path = "/type", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AssetType> createAssetType(@RequestBody AssetType type) {
-		try {
-			System.err.println(type);
-			AssetType _type = assetSv.saveType(type);
-			return new ResponseEntity<>(_type, HttpStatus.CREATED);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		System.err.println(type);
+		AssetType _type = assetSv.saveType(type);
+		return new ResponseEntity<>(_type, HttpStatus.CREATED);
 	}
 
 //=== PUT REQUESTS====================================================================================
@@ -256,14 +246,9 @@ public class AssetController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AssetDAOResponse> updateAsset(@RequestBody AssetDAORequest asset, @PathVariable Long id) {
-		try {
-			asset.setId(id);
-			AssetDAOResponse _asset = assetSv.update(asset, id);
-			return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		asset.setId(id);
+		AssetDAOResponse _asset = assetSv.update(asset, id);
+		return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Connect two existing Asset")
@@ -275,17 +260,12 @@ public class AssetController {
 	)
 	@PutMapping(path = "/connect", produces = "application/json")
 	public ResponseEntity<AssetDAOResponse> connectAssets(@RequestParam("asset_id") Long id, @RequestParam("connected_asset_id") Long connectId, @RequestParam(value = "type", required = false) Optional<ConnectionType> type) {
-		try {
-			AssetConnectionDAORequest connection = new AssetConnectionDAORequest();
-			connection.setAssetId(id);
-			connection.setAssetConnectedId(connectId);
-			connection.setType(type.orElse(null));
-			AssetDAOResponse _asset = assetSv.connect(connection);
-			return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		AssetConnectionDAORequest connection = new AssetConnectionDAORequest();
+		connection.setAssetId(id);
+		connection.setAssetConnectedId(connectId);
+		connection.setType(type.orElse(null));
+		AssetDAOResponse _asset = assetSv.connect(connection);
+		return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Add existing measurement to existing Asset")
@@ -297,13 +277,8 @@ public class AssetController {
 	)
 	@PutMapping(path = "/measurement", produces = "application/json")
 	public ResponseEntity<MeasurementDAOResponse> addMeasurement(@RequestParam("asset_id") Long assetId, @RequestParam("measurement_id") Long measurementId) {
-		try {
-			MeasurementDAOResponse _measurement = assetSv.addMeasurement(assetId, measurementId);
-			return new ResponseEntity<>(_measurement, _measurement != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		MeasurementDAOResponse _measurement = assetSv.addMeasurement(assetId, measurementId);
+		return new ResponseEntity<>(_measurement, _measurement != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Update a existing Measurement Type")
@@ -316,14 +291,9 @@ public class AssetController {
 	)
 	@PutMapping(path = "/type/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AssetType> updateAssetType(@RequestBody AssetType type, @PathVariable Long id) {
-		try {
-			type.setId(id);	
-			AssetType _type = assetSv.updateType(type, id);
-			return new ResponseEntity<>(_type, _type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		type.setId(id);	
+		AssetType _type = assetSv.updateType(type, id);
+		return new ResponseEntity<>(_type, _type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //=== DELETE REQUESTS ================================================================================
@@ -336,13 +306,9 @@ public class AssetController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteAsset(@PathVariable Long id) {
-		try {
-			assetSv.deleteById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		assetSv.deleteById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 	
 	@Operation(summary = "Delete a existing Measurement", hidden = false)
@@ -353,12 +319,8 @@ public class AssetController {
 	)
 	@DeleteMapping(path = "/type/{id}")
 	public ResponseEntity<?> deleteAssetType(@PathVariable Long id) {
-		try {
-			assetSv.deleteTypeById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		assetSv.deleteTypeById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

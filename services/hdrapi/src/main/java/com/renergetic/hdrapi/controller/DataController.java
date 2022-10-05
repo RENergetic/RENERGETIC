@@ -70,7 +70,7 @@ public class DataController {
 			@RequestParam("to") Optional<Long> to){
 //			@RequestParam Map<String, String> tags){
 
-		Map<String, String> params = new HashMap<>();
+//		Map<String, String> params = new HashMap<>();
 		return new ResponseEntity<>(dataSv.getPanelData(panelId, from.orElse((new Date()).getTime()-3600000),to), HttpStatus.OK);
 	}
 

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.hdrapi.dao.AlertThresholdDAORequest;
 import com.renergetic.hdrapi.dao.AlertThresholdDAOResponse;
-import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.service.AlertThresholdService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,14 +74,9 @@ public class AlertThresholdController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AlertThresholdDAOResponse> createAlertThreshold(@RequestBody AlertThresholdDAORequest alert) {
-		try {
-			AlertThresholdDAOResponse _alert = alertSv.save(alert);
-			
-			return new ResponseEntity<>(_alert, HttpStatus.CREATED);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		AlertThresholdDAOResponse _alert = alertSv.save(alert);
+		
+		return new ResponseEntity<>(_alert, HttpStatus.CREATED);
 	}
 
 //=== PUT REQUESTS ====================================================================================
@@ -96,15 +90,8 @@ public class AlertThresholdController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AlertThresholdDAOResponse> updateAlertThreshold(@RequestBody AlertThresholdDAORequest alert, @PathVariable Long id) {
-		try {
-			alert.setId(id);
-			return new ResponseEntity<>(alertSv.update(alert, id), HttpStatus.OK);
-		} catch (NotFoundException e) { 
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		alert.setId(id);
+		return new ResponseEntity<>(alertSv.update(alert, id), HttpStatus.OK);
 	}
 
 //=== DELETE REQUESTS =================================================================================
@@ -117,12 +104,8 @@ public class AlertThresholdController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteAlertThreshold(@PathVariable Long id) {
-		try {
-			alertSv.deleteById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		alertSv.deleteById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

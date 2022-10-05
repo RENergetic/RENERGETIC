@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.hdrapi.dao.AreaDAO;
-import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.service.AreaService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,13 +73,9 @@ public class AreaController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AreaDAO> createArea(@RequestBody AreaDAO area) {
-		try {
-			AreaDAO _area = areaSv.save(area);
-			
-			return new ResponseEntity<>(_area, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		AreaDAO _area = areaSv.save(area);
+		
+		return new ResponseEntity<>(_area, HttpStatus.CREATED);
 	}
 
 //=== PUT REQUESTS ====================================================================================
@@ -94,15 +89,8 @@ public class AreaController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AreaDAO> updateArea(@RequestBody AreaDAO area, @PathVariable Long id) {
-		try {
-			area.setId(id);
-			return new ResponseEntity<>(areaSv.update(area, id), HttpStatus.OK);
-		} catch (NotFoundException e) { 
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		area.setId(id);
+		return new ResponseEntity<>(areaSv.update(area, id), HttpStatus.OK);
 	}
 
 //=== DELETE REQUESTS =================================================================================
@@ -115,12 +103,8 @@ public class AreaController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteArea(@PathVariable Long id) {
-		try {
-			areaSv.deleteById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		areaSv.deleteById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

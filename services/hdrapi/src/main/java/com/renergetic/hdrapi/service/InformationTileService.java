@@ -2,6 +2,7 @@ package com.renergetic.hdrapi.service;
 
 import com.renergetic.hdrapi.dao.InformationTileDAORequest;
 import com.renergetic.hdrapi.dao.InformationTileDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.mapper.InformationTileMapper;
@@ -52,7 +53,9 @@ public class InformationTileService {
     }
 
     public InformationTileDAOResponse save(Long informationPanelId, InformationTileDAORequest informationTile) {
-        informationTile.setId(null);
+		if(informationTile.getId() !=  null && informationTileRepository.existsById(informationTile.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a information tile with ID " + informationTile.getId());
+		
         InformationTile entity = informationTileMapper.toEntity(informationTile);
         if (informationPanelId != null) {
             InformationPanel informationPanel = informationPanelRepository.findById(informationPanelId).orElseThrow(

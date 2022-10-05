@@ -44,7 +44,9 @@ public class AssetService {
 
 	// ASSET CRUD OPERATIONS
 	public AssetDAOResponse save(AssetDAORequest asset) {
-		asset.setId(null);
+		if(asset.getId() !=  null && assetRepository.existsById(asset.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a asset with ID " + asset.getId());
+		
 		if (asset.getId() != null && assetTypeRepository.existsById(asset.getType())) {
 			Asset assetEntity = asset.mapToEntity();
 			assetEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));

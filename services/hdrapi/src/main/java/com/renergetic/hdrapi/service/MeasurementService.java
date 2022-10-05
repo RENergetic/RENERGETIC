@@ -48,7 +48,9 @@ public class MeasurementService {
 
 	// ASSET CRUD OPERATIONS
 	public MeasurementDAOResponse save(MeasurementDAORequest measurement) {
-		measurement.setId(null);
+		if(measurement.getId() !=  null && measurementRepository.existsById(measurement.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a measurement with ID " + measurement.getId());
+		
 		Measurement measurementEntity = measurement.mapToEntity();
 		measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
 		return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null);
@@ -153,7 +155,9 @@ public class MeasurementService {
 	
 	// MEASUREMENTTAGS CRUD OPERATIONS
 	public MeasurementTags saveTag(MeasurementTags tag) {
-		tag.setId(null);
+		if(tag.getId() !=  null && measurementTagsRepository.existsById(tag.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a tag with ID " + tag.getId());
+		
 		return measurementTagsRepository.save(tag);
 	}
 	
@@ -197,7 +201,9 @@ public class MeasurementService {
 	
 	// MEASUREMENTDETAILS CRUD OPERATIONS
 	public MeasurementDetails saveDetail(MeasurementDetails detail) {
-		detail.setId(null);
+		if(detail.getId() !=  null && measurementDetailsRepository.existsById(detail.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a detail with ID " + detail.getId());
+		
 		return measurementDetailsRepository.save(detail);
 	}
 	

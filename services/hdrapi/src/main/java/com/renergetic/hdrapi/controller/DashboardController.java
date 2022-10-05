@@ -1,7 +1,9 @@
 package com.renergetic.hdrapi.controller;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,9 +77,7 @@ public class DashboardController {
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
 	public ResponseEntity<DashboardDAO> getDashboardsById (@PathVariable Long id){
-		DashboardDAO dashboard = null;
-		
-		dashboard = dashboardSv.getById(id);
+		DashboardDAO dashboard = dashboardSv.getById(id);
 		
 		return new ResponseEntity<>(dashboard, dashboard != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
@@ -86,6 +86,7 @@ public class DashboardController {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
 		@ApiResponse(responseCode = "404", description = "No dashboards found with this id"),
+		@ApiResponse(responseCode = "405", description = "Dashboard server doesn't allow GET method"),
 		@ApiResponse(responseCode = "500", description = "Error to try ping dashboard")
 	})
 	@GetMapping(path = "test/{id}", produces = "application/json")
@@ -102,7 +103,10 @@ public class DashboardController {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			return ResponseEntity.badRequest().build();
-		} catch (Exception e) {
+		} catch (ProtocolException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+		} catch (IOException e) {
 			e.printStackTrace();
 			return ResponseEntity.status(500).build();
 		}
@@ -119,14 +123,9 @@ public class DashboardController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<DashboardDAO> createDashboard(@RequestBody DashboardDAO dashboard) {
-		try {
-			dashboard.setId(null);
-			DashboardDAO _dashboard = dashboardSv.save(dashboard);
-			
-			return new ResponseEntity<>(_dashboard, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		DashboardDAO _dashboard = dashboardSv.save(dashboard);
+		
+		return new ResponseEntity<>(_dashboard, HttpStatus.CREATED);
 	}
 
 //=== PUT REQUESTS ====================================================================================
@@ -140,12 +139,7 @@ public class DashboardController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<DashboardDAO> updateDashboard(@RequestBody DashboardDAO dashboard, @PathVariable Long id) {
-		try {
-			return new ResponseEntity<>(dashboardSv.save(dashboard), HttpStatus.OK);				
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		return new ResponseEntity<>(dashboardSv.save(dashboard), HttpStatus.OK);
 	}
 
 //=== DELETE REQUESTS =================================================================================
@@ -158,12 +152,8 @@ public class DashboardController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteDashboard(@PathVariable Long id) {
-		try {
-			dashboardSv.deleteById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		dashboardSv.deleteById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

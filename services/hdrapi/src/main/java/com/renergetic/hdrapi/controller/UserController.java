@@ -130,13 +130,8 @@ public class UserController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserDAOResponse> createUser(@RequestBody UserDAORequest user) {
-		try {	
-			UserDAOResponse _user = userSv.save(user);
-			return new ResponseEntity<>(_user, HttpStatus.CREATED);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		UserDAOResponse _user = userSv.save(user);
+		return new ResponseEntity<>(_user, HttpStatus.CREATED);
 	}
 	
 	@Operation(summary = "Create a new User Role associated to a User")
@@ -148,13 +143,8 @@ public class UserController {
 	)
 	@PostMapping(path = "/roles", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserRolesDAO> createUserRole(@RequestBody UserRolesDAO role) {
-		try {	
-			UserRolesDAO _role = userSv.saveRole(role);
-			return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		UserRolesDAO _role = userSv.saveRole(role);
+		return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Create a new User Setting associated to a User")
@@ -166,13 +156,8 @@ public class UserController {
 	)
 	@PostMapping(path = "/settings", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserSettingsDAO> createUserSetting(@RequestBody UserSettingsDAO role) {
-		try {	
-			UserSettingsDAO _role = userSv.saveSetting(role);
-			return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		UserSettingsDAO _role = userSv.saveSetting(role);
+		return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
 	}
 
 //=== PUT REQUESTS====================================================================================
@@ -187,14 +172,9 @@ public class UserController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserDAOResponse> updateUser(@RequestBody UserDAORequest user, @PathVariable Long id) {
-		try {
-			user.setId(id);
-			UserDAOResponse _user = userSv.update(user, id);
-			return new ResponseEntity<>(_user, _user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		user.setId(id);
+		UserDAOResponse _user = userSv.update(user, id);
+		return new ResponseEntity<>(_user, _user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Update a existing User Role")
@@ -207,14 +187,9 @@ public class UserController {
 	)
 	@PutMapping(path = "/roles/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserRolesDAO> updateUserRoles(@RequestBody UserRolesDAO role, @PathVariable Long id) {
-		try {
-			role.setId(id);
-			UserRolesDAO _role = userSv.updateRole(role, id);
-			return new ResponseEntity<>(_role, _role != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		role.setId(id);
+		UserRolesDAO _role = userSv.updateRole(role, id);
+		return new ResponseEntity<>(_role, _role != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Update a existing User Setting")
@@ -227,14 +202,9 @@ public class UserController {
 	)
 	@PutMapping(path = "/settings/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserSettingsDAO> updateUserSettings(@RequestBody UserSettingsDAO setting, @PathVariable Long id) {
-		try {
-			setting.setId(id);
-			UserSettingsDAO _setting = userSv.updateSetting(setting, id);
-			return new ResponseEntity<>(_setting, _setting != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		setting.setId(id);
+		UserSettingsDAO _setting = userSv.updateSetting(setting, id);
+		return new ResponseEntity<>(_setting, _setting != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //=== DELETE REQUESTS ================================================================================
@@ -247,13 +217,9 @@ public class UserController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-		try {
-			userSv.deleteById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		userSv.deleteById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 	
 	@Operation(summary = "Delete a existing User Role", hidden = false)
@@ -264,13 +230,9 @@ public class UserController {
 	)
 	@DeleteMapping(path = "/roles/{id}")
 	public ResponseEntity<?> deleteUserRole(@PathVariable Long id) {
-		try {
-			userSv.deleteRoleById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		userSv.deleteRoleById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 	
 	@Operation(summary = "Delete a existing User Setting", hidden = false)
@@ -281,12 +243,8 @@ public class UserController {
 	)
 	@DeleteMapping(path = "/settings/{id}")
 	public ResponseEntity<?> deleteUserSetting(@PathVariable Long id) {
-		try {
-			userSv.deleteSettingById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		userSv.deleteSettingById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.hdrapi.dao.InformationTileMeasurementDAORequest;
 import com.renergetic.hdrapi.dao.InformationTileMeasurementDAOResponse;
-import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.service.InformationTileMeasurementService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,13 +74,9 @@ public class InformationTileMeasurementController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<InformationTileMeasurementDAOResponse> createInformationTileMeasurement(@RequestBody InformationTileMeasurementDAORequest informationTileMeasurement) {
-		try {
-			InformationTileMeasurementDAOResponse _informationTileMeasurement = informationTileMeasurementSv.save(informationTileMeasurement);
-			
-			return new ResponseEntity<>(_informationTileMeasurement, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		InformationTileMeasurementDAOResponse _informationTileMeasurement = informationTileMeasurementSv.save(informationTileMeasurement);
+		
+		return new ResponseEntity<>(_informationTileMeasurement, HttpStatus.CREATED);
 	}
 
 //=== PUT REQUESTS ====================================================================================
@@ -95,15 +90,8 @@ public class InformationTileMeasurementController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<InformationTileMeasurementDAOResponse> updateInformationTileMeasurement(@RequestBody InformationTileMeasurementDAORequest informationTileMeasurement, @PathVariable Long id) {
-		try {
-			informationTileMeasurement.setId(id);
-			return new ResponseEntity<>(informationTileMeasurementSv.update(informationTileMeasurement, id), HttpStatus.OK);
-		} catch (NotFoundException e) { 
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		informationTileMeasurement.setId(id);
+		return new ResponseEntity<>(informationTileMeasurementSv.update(informationTileMeasurement, id), HttpStatus.OK);
 	}
 
 //=== DELETE REQUESTS =================================================================================
@@ -116,12 +104,8 @@ public class InformationTileMeasurementController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteInformationTileMeasurement(@PathVariable Long id) {
-		try {
-			informationTileMeasurementSv.deleteById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		informationTileMeasurementSv.deleteById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.renergetic.hdrapi.dao.InformationPanelDAORequest;
 import com.renergetic.hdrapi.dao.InformationPanelDAOResponse;
-import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.service.InformationPanelService;
 
 import java.util.List;
@@ -47,11 +46,7 @@ public class InformationPanelController {
     })
     @GetMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<InformationPanelDAOResponse> getById (@PathVariable Long id){
-        try{
-            return new ResponseEntity<>(informationPanelService.getById(id), HttpStatus.OK);
-        } catch (NotFoundException e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(informationPanelService.getById(id), HttpStatus.OK);
     }
 
     @Operation(summary = "Get Panel by name")
@@ -61,11 +56,7 @@ public class InformationPanelController {
     })
     @GetMapping(path = "/name/{name}", produces = "application/json")
     public ResponseEntity<InformationPanelDAOResponse> getByName (@PathVariable String name){
-        try{
-            return new ResponseEntity<>(informationPanelService.getByName(name), HttpStatus.OK);
-        } catch (NotFoundException e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(informationPanelService.getByName(name), HttpStatus.OK);
     }
 
     @Operation(summary = "Create a new Information Panel")
@@ -75,12 +66,7 @@ public class InformationPanelController {
     })
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationPanelDAOResponse> createInformationPanel(@RequestBody InformationPanelDAORequest informationPanelDAORequest) {
-        try {
-            return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
-        } catch (Exception e) {
-        	e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Update an existing Information Panel")
@@ -90,11 +76,7 @@ public class InformationPanelController {
     })
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationPanelDAOResponse> updateInformationPanel(@RequestBody InformationPanelDAORequest informationPanelDAORequest) {
-        try {
-            return new ResponseEntity<>(informationPanelService.update(informationPanelDAORequest), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(informationPanelService.update(informationPanelDAORequest), HttpStatus.OK);
     }
     
 	@Operation(summary = "Connect a Panel with a existing Asset")
@@ -106,13 +88,8 @@ public class InformationPanelController {
 	)
 	@PutMapping(path = "/connect", produces = "application/json")
 	public ResponseEntity<InformationPanelDAOResponse> connectPanelAsset(@RequestParam("panel_id") Long id, @RequestParam("asset_id") Long assetId) {
-		try {
-			InformationPanelDAOResponse _panel = informationPanelService.connect(id, assetId);
-			return new ResponseEntity<>(_panel, _panel != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		InformationPanelDAOResponse _panel = informationPanelService.connect(id, assetId);
+		return new ResponseEntity<>(_panel, _panel != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
     @Operation(summary = "Delete Panel by id")
@@ -123,12 +100,6 @@ public class InformationPanelController {
     })
     @DeleteMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<Boolean> getByName (@PathVariable Long id){
-        try {
-            return new ResponseEntity<>(informationPanelService.deleteById(id), HttpStatus.OK);
-        } catch (NotFoundException e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(informationPanelService.deleteById(id), HttpStatus.OK);
     }
 }
