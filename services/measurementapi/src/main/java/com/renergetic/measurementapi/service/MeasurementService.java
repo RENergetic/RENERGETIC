@@ -151,6 +151,70 @@ public class MeasurementService {
 		List<FluxTable> tables = query.query(flux);
 		return MeasurementMapper.fromFlux(tables);
 	}
+
+	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, String> tags, String from, String to, String timeVar, String group) {
+		QueryApi query = influxDB.getQueryApi();
+
+		List<String> fluxQuery = new ArrayList<>();
+
+		if (timeVar.equals("time")) {
+			if (!from.isEmpty() && !from.matches("^\\d+$"))
+				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
+					from = from.replace(" ", "T")+'Z';
+				else from = "-" + InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
+
+			if (!to.isEmpty() && !to.matches("^\\d+$"))
+				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
+					to = to.replace(" ", "T")+'Z';
+				else to = "-" + InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);	
+		}
+		
+		if (group != null && !group.isBlank()) {
+			group = InfluxTimeUnit.convert(group, InfluxTimeUnit.ms);
+		} else group = null;
+		// ADD REQUEST BUCKET AND TIME RANGE
+		fluxQuery.add(String.format("from(bucket: \"%s\")", bucket));
+		fluxQuery.add(String.format("range(start: %s, stop: %s)", !from.isEmpty()? from : "0", !to.isEmpty()? to : "now()"));
+		
+		// FILTER MEASUREMENTS IN MEASUREMENTS LIST IF LIST IS EMPTY SEARCH IN ALL MEASUREMENTS
+		if (measurements != null && !measurements.isEmpty())
+			fluxQuery.add( String.format("filter(fn: (r) => %s)",
+					measurements.stream().map(measurement -> String.format("r[\"_measurement\"] == \"%s\"", measurement)).collect(Collectors.joining(" or "))) );
+
+		// FILTER FIELDS IN FIELDS LIST IF LIST IS EMPTY SEARCH IN ALL FIELDS
+		if (fields != null && !fields.isEmpty())
+			fluxQuery.add( String.format("filter(fn: (r) => %s)",
+					fields.stream().map(field -> String.format("r[\"_field\"] == \"%s\"", field)).collect(Collectors.joining(" or "))) );
+
+		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
+		if (tags != null && !tags.isEmpty())
+			fluxQuery.add( String.format("filter(fn: (r) => %s)",
+					tags.keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, tags.get(key))).collect(Collectors.joining(" and "))) );
+		fluxQuery.add("filter(fn: (r) => types.isType(v: r._value, type: \"float\") or types.isType(v: r._value, type: \"int\"))");
+		
+		// GROUP DATA BY MEASUREMENT
+		fluxQuery.add("toFloat()");
+		fluxQuery.add("group(columns: [\"_measurement\"])");
+		if (group != null)
+			fluxQuery.add(String.format("window(every: %s, startColumn: \"_time\")", group));
+		
+		// OPERATE MEASUREMENTS DATA AND ADD FIELD NAME
+		fluxQuery.add(String.format("%s(column: \"_value\")", function.name().toLowerCase()));
+		fluxQuery.add(String.format("set(key: \"_field\", value: \"%s\")", function.name().toLowerCase()));
+		fluxQuery.add("yield(name: \"measurement\")");
+		
+		// GROUP ALL DATA
+		fluxQuery.add("group(columns: [\"_field\", \"_time\"])");
+		
+		// OPERATE ALL DATA
+		fluxQuery.add(String.format("%s(column: \"_value\")", function.name().toLowerCase()));
+		
+		String flux = "import \"types\"" + fluxQuery.stream().collect(Collectors.joining(" |> "));
+
+		System.err.println(flux);
+		List<FluxTable> tables = query.query(flux);
+		return MeasurementMapper.fromFlux(tables);
+	}
 	
 	/**
      * Group the power data and calculate the indicated operation

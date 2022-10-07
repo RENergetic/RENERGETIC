@@ -33,17 +33,17 @@ public class MeasurementController {
 	@Autowired
 	MeasurementService service;
 
-	@Operation(summary = "Get measurementd names")
+	@Operation(summary = "Get measurement names")
 	@GetMapping("")
 	public ResponseEntity<List<String>> getMeasurement(
 			@RequestParam("bucket") Optional<String> bucket){
 		List<String> ret;
 		
 		ret = service.list(bucket.orElse("renergetic"));
-		
-		if (ret != null)
+
+		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
-		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Get measurement entries")
@@ -66,10 +66,10 @@ public class MeasurementController {
 		tags.remove("to");
 		
 		ret = service.select(measurement, from.orElse(""), to.orElse(""), "time");
-		
-		if (ret != null)
+
+		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
-		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Get entries filter by measurements, tags or fields")
@@ -90,10 +90,37 @@ public class MeasurementController {
 		tags.remove("to");
 		
 		ret = service.data(bucket.orElse("renergetic"), measurements, fields, tags, from.orElse(""), to.orElse(""), "time");
-		
-		if (ret != null)
+
+		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
-		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+
+	@Operation(summary = "Get entries and operate it")
+	@GetMapping("/data/{function}")
+	public ResponseEntity<List<MeasurementDAOResponse>> getProcessedData(
+			@RequestParam("from") Optional<String> from, 
+			@RequestParam("to") Optional<String> to,
+			@RequestParam("bucket") Optional<String> bucket,
+			@RequestParam("group") Optional<String> group,
+			@RequestParam Map<String, String> tags, 
+			@RequestParam(name = "measurements", required = false) List<String> measurements, 
+			@RequestParam(name = "fields", required = false) List<String> fields, 
+			@PathVariable(name = "function") String function){
+
+		List<MeasurementDAOResponse> ret;
+		tags.remove("measurements");
+		tags.remove("fields");
+		tags.remove("bucket");
+		tags.remove("group");
+		tags.remove("from");
+		tags.remove("to");
+
+		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, tags, from.orElse(""), to.orElse(""), "time", group.orElse(""));
+
+		if (ret != null && ret.size() > 0)
+			return ResponseEntity.ok(ret);
+		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Get measurement entries and operate it")
@@ -122,9 +149,9 @@ public class MeasurementController {
 		
 		ret = service.operate(measurement, InfluxFunction.obtain(function), field, from.orElse(""), to.orElse(""), group.orElse(""), "time");
 		
-		if (ret != null)
+		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
-		else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Insert an entry in a measurement")

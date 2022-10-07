@@ -52,6 +52,42 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
     }
    ]
   ```
+ - /api/measurement/data/{operation}
+   - PATH VARIABLES
+     - operation: performs an operation on the data. The allowed operations are "sum", "max", "min", "mean", "median", "distinct" and "count"
+   - QUERY VARIABLES
+     - bucket (optional): Bucket from which to obtain data, "renergetic" by default
+     - from (optional): Since when to obtain the data
+     - to (optional): Until when to obtain the data
+     - group (optional): Groups data into a temporal window
+       - Example: *group=1h*
+     - measurements (optional): A list with measurement names separated with commas. If it's empty search all measurements
+       - Example: *measurements=heat_meter, energy_meter*
+     - fields (optional): A list with fields names separated with commas. If it's empty search all fields
+       - Example: *fields=power, temperature*
+     - tag_key (optional): Filter the result by tag_name and his value. All variables that haven't the names "measurements", "fields", "bucket", "from" or "to" are used to filter
+   - The data returned have the format:
+  ```
+   [
+    {
+        "measurement": "measurement_name",
+        "fields": {
+            "operation": "operation_value1",
+            "time": "yyyy-MM-dd HH:mm:ss",
+            ...
+        } 
+    },
+    ...
+    {
+        "measurement": null,
+        "fields": {
+            "operation": "operation_value1",
+            "time": "yyyy-MM-dd HH:mm:ss",
+            ...
+        } 
+    }
+   ]
+  ```
  - /api/measurement/{measurement_name}/{operation}
    - PATH VARIABLES
      - measurement_name: measurement name to get
