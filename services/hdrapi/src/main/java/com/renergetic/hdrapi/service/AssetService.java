@@ -178,8 +178,8 @@ public class AssetService {
 	public AssetType saveType(AssetType type) {
 		//type.setId(null);
 		if (type.getId() != null && assetTypeRepository.existsById(type.getId()))
-			return assetTypeRepository.save(type);
-		else throw new InvalidCreationIdAlreadyDefinedException("Type with id " + type.getId() + " already exists");
+			 throw new InvalidCreationIdAlreadyDefinedException("Type with id " + type.getId() + " already exists");
+		else return assetTypeRepository.save(type);
 	}
 
 	public AssetType updateType(AssetType detail, Long id) {
