@@ -53,7 +53,7 @@ public class DashboardService {
 	}
 
 	public DashboardDAO update(DashboardDAO dashboard, Long id) {
-		if (dashboardRepository.existsById(id)) {
+		if (id != null && dashboardRepository.existsById(id)) {
 			dashboard.setId(id);
 			return DashboardDAO.create(dashboardRepository.save(dashboard.mapToEntity()));
 		} else throw new InvalidNonExistingIdException("The dashboard to update doesn't exists");

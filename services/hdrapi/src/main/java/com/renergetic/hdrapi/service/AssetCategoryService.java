@@ -25,7 +25,7 @@ public class AssetCategoryService {
     }
 
     public AssetCategoryDAO update(AssetCategoryDAO assetCategoryDAO) {
-        boolean assetExists = assetCategoryRepository.existsById(assetCategoryDAO.getId());
+        boolean assetExists = assetCategoryDAO.getId() != null && assetCategoryRepository.existsById(assetCategoryDAO.getId());
 
         if ( assetExists ) {
             return AssetCategoryDAO.create(assetCategoryRepository.save(assetCategoryDAO.mapToEntity()));

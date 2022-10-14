@@ -64,7 +64,7 @@ public class MeasurementService {
 	}
 
 	public MeasurementDAOResponse update(MeasurementDAORequest measurement, Long id) {
-		if ( measurementRepository.existsById(id) ) {
+		if ( id != null && measurementRepository.existsById(id) ) {
 			measurement.setId(id);
 			return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null);
 		} else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
@@ -114,7 +114,7 @@ public class MeasurementService {
 	}
 	
 	public MeasurementType updateType(MeasurementType detail, Long id) {
-		if ( measurementTypeRepository.existsById(id)) {
+		if ( id != null && measurementTypeRepository.existsById(id)) {
 			detail.setId(id);
 			return measurementTypeRepository.save(detail);
 		} else throw new InvalidNonExistingIdException("No measurement type with id " + id + "found");
@@ -162,7 +162,7 @@ public class MeasurementService {
 	}
 	
 	public MeasurementTags updateTag(MeasurementTags tag, Long id) {
-		if ( measurementTagsRepository.existsById(id)) {
+		if ( id != null && measurementTagsRepository.existsById(id)) {
 			tag.setId(id);
 			return measurementTagsRepository.save(tag);
 		} else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
@@ -208,7 +208,7 @@ public class MeasurementService {
 	}
 	
 	public MeasurementDetails updateDetail(MeasurementDetails detail, Long id) {
-		if ( measurementDetailsRepository.existsById(id)) {
+		if ( id != null && measurementDetailsRepository.existsById(id)) {
 			detail.setId(id);
 			return measurementDetailsRepository.save(detail);
 		} else throw new InvalidNonExistingIdException("No measurement details with id " + id + "found");

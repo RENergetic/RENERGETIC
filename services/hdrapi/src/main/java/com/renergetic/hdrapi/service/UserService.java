@@ -62,7 +62,7 @@ public class UserService {
 	}
 
 	public UserRolesDAO saveRole(UserRolesDAO role) {
-		if ( userRepository.existsById(role.getUserId()) ) {
+		if ( role.getUserId() != null && userRepository.existsById(role.getUserId()) ) {
 			if(role.getId() !=  null && userRolesRepository.existsById(role.getId()))
 	    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a user role with ID " + role.getId());
 			
@@ -71,7 +71,7 @@ public class UserService {
 	}
 
 	public UserSettingsDAO saveSetting(UserSettingsDAO settings) {
-		if ( userRepository.existsById(settings.getUserId()) ) {
+		if ( settings.getUserId() != null && userRepository.existsById(settings.getUserId()) ) {
 			if(settings.getId() !=  null && userSettingsRepository.existsById(settings.getId()))
 	    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a user settings with ID " + settings.getId());
 			
@@ -101,7 +101,7 @@ public class UserService {
 	}
 
 	public UserDAOResponse update(UserDAORequest user, Long id) {
-		if ( userRepository.existsById(id) ) {
+		if ( id != null && userRepository.existsById(id) ) {
 			user.setId(id);
 			return UserDAOResponse.create(userRepository.save(user.mapToEntity()), null, null);
 		} else throw new InvalidNonExistingIdException("No user with id " + id + " found");

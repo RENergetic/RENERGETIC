@@ -51,7 +51,7 @@ public class HeatmapService {
 	}
 
 	public HeatmapDAO update(HeatmapDAO heatmap, Long id) {
-		if (heatmapRepository.existsById(id)) {
+		if (id != null && heatmapRepository.existsById(id)) {
 			heatmap.setId(id);
 			return HeatmapDAO.create(heatmapRepository.save(heatmap.mapToEntity()), null);
 		} else throw new InvalidNonExistingIdException("The heatmap to update doesn't exists");

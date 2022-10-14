@@ -47,10 +47,10 @@ public class AssetService {
 		if(asset.getId() !=  null && assetRepository.existsById(asset.getId()))
     		throw new InvalidCreationIdAlreadyDefinedException("Already exists a asset with ID " + asset.getId());
 		
-		if (asset.getId() != null && assetTypeRepository.existsById(asset.getType())) {
+		if (asset.getType() !=  null && assetTypeRepository.existsById(asset.getType())) {
 			Asset assetEntity = asset.mapToEntity();
 			assetEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-			System.err.println(assetEntity);
+
 			return AssetDAOResponse.create(assetRepository.save(assetEntity), null, null);
 		}
 		else throw new InvalidArgumentException("The asset type doesn't exists");
@@ -64,9 +64,9 @@ public class AssetService {
 	}
 
 	public AssetDAOResponse update(AssetDAORequest asset, Long id) {
-		boolean assetExists = assetRepository.existsById(id);
+		boolean assetExists = id != null && assetRepository.existsById(id);
 
-		if ( assetExists &&
+		if ( assetExists && asset.getType() != null &&
 				assetTypeRepository.existsById(asset.getType())) {
 			asset.setId(id);
 			return AssetDAOResponse.create(assetRepository.save(asset.mapToEntity()), null, null);
@@ -76,7 +76,7 @@ public class AssetService {
 	}
 
 	public AssetDAOResponse connect(AssetConnectionDAORequest connection) {
-		boolean assetExists = assetRepository.existsById(connection.getAssetId());
+		boolean assetExists = connection.getAssetId() != null && assetRepository.existsById(connection.getAssetId());
 
 		if ( assetExists && assetRepository.existsById(connection.getAssetConnectedId())) {
 			assetConnectionRepository.save(connection.mapToEntity());
@@ -84,12 +84,13 @@ public class AssetService {
 		} else throw new InvalidNonExistingIdException("The assets to connect don't exists");
 	}
 
-	public MeasurementDAOResponse addMeasurement(Long assetid, Long measurementId) {
-		if ( assetRepository.existsById(assetid) && measurementRepository.existsById(measurementId)) {
+	public MeasurementDAOResponse addMeasurement(Long assetId, Long measurementId) {
+		if ( assetId != null && assetRepository.existsById(assetId) && 
+				measurementId != null && measurementRepository.existsById(measurementId)) {
 			Measurement measurement = measurementRepository.findById(measurementId).get();
 			return MeasurementDAOResponse.create(measurementRepository.save(measurement), null);
 
-		} else throw new InvalidNonExistingIdException(assetRepository.existsById(assetid) ? "The measurement doesn't exists" : "The asset doesn't exists");
+		} else throw new InvalidNonExistingIdException(assetRepository.existsById(assetId) ? "The measurement doesn't exists" : "The asset doesn't exists");
 	}
 
 	public List<AssetDAOResponse> get(Map<String, String> filters, long offset, int limit) {
@@ -183,7 +184,7 @@ public class AssetService {
 	}
 
 	public AssetType updateType(AssetType detail, Long id) {
-		if ( assetTypeRepository.existsById(id)) {
+		if ( id != null && assetTypeRepository.existsById(id)) {
 			detail.setId(id);
 			return assetTypeRepository.save(detail);
 		} else throw new InvalidNonExistingIdException("No asset type found with id " + id);
@@ -261,7 +262,7 @@ public class AssetService {
 	}
 
 	public AssetDetails updateDetail(AssetDetails detail, Long id) {
-		if ( assetDetailsRepository.existsById(id)) {
+		if ( id != null && assetDetailsRepository.existsById(id)) {
 			detail.setId(id);
 			return assetDetailsRepository.save(detail);
 		} else  throw new InvalidNonExistingIdException("No asset detail with id" + id + "found");

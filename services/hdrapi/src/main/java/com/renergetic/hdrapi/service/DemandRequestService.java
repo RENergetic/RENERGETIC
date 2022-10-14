@@ -47,7 +47,7 @@ public class DemandRequestService {
 
     public DemandScheduleDAO save(DemandScheduleDAO demandScheduleDAO) throws InvalidCreationIdAlreadyDefinedException {
         demandScheduleDAO.setUpdate(DateConverter.toEpoch(LocalDateTime.now()));
-        if (demandScheduleRepository.existsById(demandScheduleDAO.getId()))
+        if (demandScheduleDAO.getId() != null && demandScheduleRepository.existsById(demandScheduleDAO.getId()))
             throw new InvalidCreationIdAlreadyDefinedException();
 
         return DemandScheduleDAO.create(demandScheduleRepository.save(demandScheduleDAO.mapToEntity()));
@@ -115,7 +115,7 @@ public class DemandRequestService {
     }
 
     public DemandDefinitionDAO saveDefinition(DemandDefinitionDAO demandDefinitionDAO){
-        if (demandScheduleRepository.existsById(demandDefinitionDAO.getId()))
+        if (demandDefinitionDAO.getId() !=  null && demandScheduleRepository.existsById(demandDefinitionDAO.getId()))
             throw new InvalidCreationIdAlreadyDefinedException();
         
         return DemandDefinitionDAO.create(demandDefinitionRepository.save(demandDefinitionDAO.mapToEntity()));

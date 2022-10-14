@@ -53,7 +53,7 @@ public class AreaService {
 	}
 
 	public AreaDAO update(AreaDAO area, Long id) {
-		if (areaRepository.existsById(id)) {
+		if (id != null && areaRepository.existsById(id)) {
 			area.setId(id);
 			Area areaEntity = area.mapToEntity();
 			areaEntity.setUuid(new UUID());

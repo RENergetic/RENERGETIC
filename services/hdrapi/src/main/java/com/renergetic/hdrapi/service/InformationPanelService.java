@@ -134,7 +134,7 @@ public class InformationPanelService {
     }
     
 	public InformationPanelDAOResponse connect(Long id, Long assetId) {
-		boolean panelExists = informationPanelRepository.existsById(id);
+		boolean panelExists = id != null && informationPanelRepository.existsById(id);
 
 		if ( panelExists && assetRepository.existsById(assetId)) {
 			InformationPanel asset = informationPanelRepository.findById(id).get();

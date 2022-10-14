@@ -50,7 +50,7 @@ public class InformationTileMeasurementService {
 	}
 
 	public InformationTileMeasurementDAOResponse update(InformationTileMeasurementDAORequest tile, Long id) {
-		if (tileRepository.existsById(id)) {
+		if (id != null && tileRepository.existsById(id)) {
 			tile.setId(id);
 			return InformationTileMeasurementDAOResponse.create(tileRepository.save(tile.mapToEntity()));
 		} else throw new InvalidNonExistingIdException("The tile to update doesn't exists");
