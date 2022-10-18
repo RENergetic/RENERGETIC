@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.Domain;
 import com.renergetic.hdrapi.service.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -145,23 +147,43 @@ public class UIAggregatorController {
     }
 
     private List<AssetDAOResponse> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
-        return assetService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+    	try {
+    		return assetService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+    	} catch (NotFoundException ex) {
+    		return new ArrayList<>();
+    	}
     }
 
     private List<SimpleAssetDAO> getSimpleAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
-        return assetService.findSimpleByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+    	try {
+	        return assetService.findSimpleByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+		} catch (NotFoundException ex) {
+			return new ArrayList<>();
+		}
     }
 
     private List<DemandScheduleDAO> getDemandSchedules(String userId, Optional<Long> offset, Optional<Integer> limit) {
-        return demandRequestService.getByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+    	try {
+	        return demandRequestService.getByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+		} catch (NotFoundException ex) {
+			return new ArrayList<>();
+		}
     }
 
     private List<InformationPanelDAOResponse> getPanels(String userId, Optional<Long> offset, Optional<Integer> limit) {
-        return informationPanelService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+    	try {
+	        return informationPanelService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+		} catch (NotFoundException ex) {
+			return new ArrayList<>();
+		}
     }
 
     private List<AssetPanelDAO> getAssetPanels(String userId, Optional<Long> offset, Optional<Integer> limit) {
-        return assetService.findAssetsPanelsByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+    	try {
+    		return assetService.findAssetsPanelsByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+		} catch (NotFoundException ex) {
+			return new ArrayList<>();
+		}
     }
 
     private DataDAO getData(String userId, Map<String, String> params) {
@@ -169,7 +191,11 @@ public class UIAggregatorController {
     }
 
     private List<DashboardDAO> getDashboards(String userId, Optional<Long> offset, Optional<Integer> limit) {
-        return dashboardService.getAvailableToUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+    	try {
+    		return dashboardService.getAvailableToUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+		} catch (NotFoundException ex) {
+			return new ArrayList<>();
+		}
     }
 
 }

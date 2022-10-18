@@ -234,7 +234,7 @@ public class AssetService {
 
 		if (list != null && list.size() > 0)
 			return list;
-		else throw new NotFoundException("No assets found relamted with user " + id + " found");
+		else throw new NotFoundException("No assets found related with user " + id + " found");
 	}
 	public List<SimpleAssetDAO> findSimpleByUserId(Long id, long offset, int limit){
 		List<SimpleAssetDAO> list = assetRepository.findByUserId(id, offset, limit).stream()
