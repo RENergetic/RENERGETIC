@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: postgresql-db
-          image: docker-registry.default.svc:5000/ren-prototype/postgresql-db:latest
+          image: docker-registry.default.svc:5000/${PROJECT}/postgresql-db:latest
           imagePullPolicy: Always
           volumeMounts:
             - name: postgresql-db-disk

@@ -10,6 +10,7 @@ serverUrl=$(grep -ioP "(server\s*=\s*)\K.+" _credentials.properties)
 
 # Project name
 project=$(grep -ioP "(project\s*=\s*)\K.+" _installers.properties)
+export PROJECT=$project
 
 # Credentials
 user=$(grep -ioP "(user\s*=\s*)\K.+" _credentials.properties)
@@ -54,7 +55,7 @@ then
         docker push registry.apps.paas-dev.psnc.pl/$project/postgresql-db:latest
         
         kubectl apply -f postgresql-configmap.yaml
-        kubectl apply -f postgresql-statefulset.yaml
+        envsubst '$PROJECT' < postgresql-statefulset.yaml | kubectl apply -f -
         kubectl apply -f postgresql-service.yaml
         
         while [[ $(kubectl -n ${project} get pods -l app=postgresql-db -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; 
@@ -79,7 +80,7 @@ then
         
         kubectl apply -f influxdb-volume.yaml
         kubectl apply -f influxdb-secrets.yaml
-        kubectl apply -f influxdb-deployment.yaml
+        envsubst '$PROJECT' < influxdb-deployment.yaml | kubectl apply -f -
         kubectl apply -f influxdb-service.yaml
     fi
 # DEPLOY APIs
@@ -104,7 +105,7 @@ then
         docker push registry.apps.paas-dev.psnc.pl/$project/hdr-api:latest
 
         # create kubernetes resources
-        kubectl apply -f hdr-api-deployment.yaml --force=true
+        envsubst '$PROJECT' < hdr-api-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f hdr-api-service.yaml
     fi
 
@@ -128,7 +129,7 @@ then
         docker push registry.apps.paas-dev.psnc.pl/$project/influx-api:latest
 
         # create kubernetes resources
-        kubectl apply -f influx-api-deployment.yaml --force=true
+        envsubst '$PROJECT' < influx-api-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f influx-api-service.yaml
     fi
 
@@ -152,7 +153,7 @@ then
         docker push registry.apps.paas-dev.psnc.pl/$project/ingestion-api:latest
 
         # create kubernetes resources
-        kubectl apply -f ingestion-api-deployment.yaml --force=true
+        envsubst '$PROJECT' < ingestion-api-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f ingestion-api-service.yaml
     fi
 # DEPLOY WSO2 API MANAGER
@@ -173,7 +174,7 @@ then
         docker push registry.apps.paas-dev.psnc.pl/$project/wso:latest
 
         # create kubernetes resources
-        kubectl apply -f wso2-deployment.yaml --force=true
+        envsubst '$PROJECT' < wso2-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f wso2-service.yaml
     fi
 # DEPLOY GRAFANA
@@ -196,16 +197,16 @@ then
         # create kubernetes resources
         kubectl apply -f grafana-config.yaml
         kubectl apply -f grafana-volume.yaml
-        kubectl apply -f grafana-deployment.yaml --force=true
+        envsubst '$PROJECT' < grafana-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f grafana-service.yaml
     fi
 # DEPLOY UI AND KEYCLOAK
 
     if [[ $keycloak = 'true' ]]
     then
-        rm -f -r "${current}/docker_config/Others/Keycloak/themes"
+        rm -f -r "${current}/docker_config/Others/keycloak/themes"
         mkdir -p "${current}/docker_config/Others/keycloak/themes"
-        cp -f -r "${current}/keycloak_themes/" "${current}/docker_config/Others/keycloak/themes"
+        cp -f -rT "${current}/keycloak_themes/" "${current}/docker_config/Others/keycloak/themes"
 
         cd "${current}/docker_config/Others/keycloak"
         # KEYCLOAK INSTALLATION
@@ -221,7 +222,7 @@ then
         docker push registry.apps.paas-dev.psnc.pl/$project/keycloak:latest
 
         # create kubernetes resources
-        kubectl apply -f keycloak-deployment.yaml --force=true
+        envsubst '$PROJECT' < keycloak-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f keycloak-service.yaml
     fi
 
@@ -249,7 +250,7 @@ then
         docker push registry.apps.paas-dev.psnc.pl/$project/renergetic-ui:latest
 
         # create kubernetes resources
-        kubectl apply -f ui-deployment.yaml --force=true
+        envsubst '$PROJECT' < ui-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f ui-service.yaml
     fi
 

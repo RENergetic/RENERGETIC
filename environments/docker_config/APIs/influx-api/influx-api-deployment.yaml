@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: influx-api
-          image: docker-registry.default.svc:5000/ren-prototype/influx-api:latest
+          image: docker-registry.default.svc:5000/${PROJECT}/influx-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8082

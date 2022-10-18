@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: keycloak
-        image: docker-registry.default.svc:5000/ren-prototype/keycloak:latest
+        image: docker-registry.default.svc:5000/${PROJECT}/keycloak:latest
         imagePullPolicy: Always
         env:
         - name: KEYCLOAK_USER

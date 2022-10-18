@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: docker-registry.default.svc:5000/ren-prototype/grafana:latest
+          image: docker-registry.default.svc:5000/${PROJECT}/grafana:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000

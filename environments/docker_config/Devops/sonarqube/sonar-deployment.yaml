@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sonarqube
-          image: docker-registry.default.svc:5000/ren-prototype-devops/sonarqube:latest
+          image: docker-registry.default.svc:5000/${PROJECT}/sonarqube:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 9000

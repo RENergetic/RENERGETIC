@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ingestion-api
-          image: docker-registry.default.svc:5000/ren-prototype/ingestion-api:latest
+          image: docker-registry.default.svc:5000/${PROJECT}/ingestion-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8082

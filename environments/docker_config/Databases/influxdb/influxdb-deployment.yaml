@@ -15,7 +15,7 @@ spec:
         app: influx-db
     spec:
       containers:
-        - image: docker-registry.default.svc:5000/ren-prototype/influx:latest
+        - image: docker-registry.default.svc:5000/${PROJECT}/influx:latest
           name: influx-db
           imagePullPolicy: Always
           ports:
