@@ -16,7 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @ToString
 public class WrapperRequestDAO {
-    private static SimpleDateFormat influxdbDateFormat = new SimpleDateFormat("aaaa-MM-dd hh:mm:ss");
+    private static SimpleDateFormat influxdbDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     @JsonProperty(required = true)
     private CallsWrapperRequestDAO calls;
 
