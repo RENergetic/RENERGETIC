@@ -22,9 +22,9 @@ driver="org.postgresql.Driver"
 pool_options.maxActive=300
 pool_options.maxWait = 60000
 pool_options.testOnBorrow = true
-pool_options.validationQuery="SELECT 1; COMMIT"
+pool_options.validationQuery="SELECT 1"
 pool_options.validationInterval="30000"
-pool_options.defaultAutoCommit = false
+pool_options.defaultAutoCommit = true
 
 [database.shared_db]
 type = "postgresql"
