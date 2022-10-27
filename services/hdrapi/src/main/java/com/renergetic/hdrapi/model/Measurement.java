@@ -66,7 +66,10 @@ public class Measurement {
 	@Column(name = "domain", nullable = true, insertable = true, updatable = true)
 	@Enumerated(EnumType.STRING)
 	private Domain domain;
-	
+
+	@Column(name = "sensor_id", nullable = true) //todo unique key sensor_id and measurement type
+	private String sensorId;
+
 	// FOREIGN KEY FROM ASSETS TABLE
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
