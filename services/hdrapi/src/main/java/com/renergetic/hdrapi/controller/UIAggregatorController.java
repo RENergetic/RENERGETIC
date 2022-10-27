@@ -58,7 +58,13 @@ public class UIAggregatorController {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssetPanels();
             wrapperResponseDAO.setAssetPanels(getAssetPanels(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
+            //TODO: Tomek featured panels
         }
+//        if (wrapperRequestBodyDAO.getCalls().getPanels() != null) {
+//            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssetPanels();
+//            wrapperResponseDAO.setAssetPanels(getAssetPanels(userId, Optional.ofNullable(data.getOffset()),
+//                    Optional.ofNullable(data.getLimit())));
+//        }
         if (wrapperRequestBodyDAO.getCalls().getData() != null) {
             WrapperRequestDAO.InfluxArgsWrapperRequestDAO args = wrapperRequestBodyDAO.getCalls().getData();
             Map<String, String> params = new HashMap<>();
@@ -69,7 +75,15 @@ public class UIAggregatorController {
 //            if (args.getField() != null) params.put("field", args.getField());
             if (args.getTags() != null) params.putAll(args.getTags());
 
-            wrapperResponseDAO.appendData(getData(userId, params));
+
+
+            if(generateDummy) {
+
+               //TODO: dummy data
+            }
+            else{
+                wrapperResponseDAO.appendData(getData(userId, params));
+            }
         }
         if (wrapperRequestBodyDAO.getCalls().getDemands() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDemands();
@@ -85,6 +99,9 @@ public class UIAggregatorController {
             if(generateDummy) {
             	DataDAO demandData = DummyDataGenerator.getDemandData(wrapperResponseDAO.getDemands());
             	wrapperResponseDAO.appendData(demandData);
+            }
+            else {
+//                todo: get data from influx
             }
         }
         if (wrapperRequestBodyDAO.getCalls().getPanels() != null) {

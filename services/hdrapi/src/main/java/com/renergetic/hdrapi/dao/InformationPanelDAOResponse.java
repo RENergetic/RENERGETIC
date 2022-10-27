@@ -24,6 +24,8 @@ public class InformationPanelDAOResponse {
 
     @JsonProperty()
     private String label;
+    @JsonProperty(value = "is_template")
+    private Boolean isTemplate;
 
     @JsonProperty()
     private List<InformationTileDAOResponse> tiles;
@@ -44,6 +46,7 @@ public class InformationPanelDAOResponse {
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
         dao.setTiles(informationTileDAOResponses);
+        dao.setIsTemplate(entity.getIsTemplate());
         return dao;
     }
 }

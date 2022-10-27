@@ -48,7 +48,11 @@ public class Measurement {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true)
 	private Asset asset;
-	
+
+	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "asset_category_id", nullable = true, insertable = true, updatable = true)
+	private AssetCategory assetCategory;
 
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)

@@ -1,7 +1,6 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.dao.DataDAO;
-import com.renergetic.hdrapi.dao.DataWrapperDAO;
+import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.Asset;
 import com.renergetic.hdrapi.model.Domain;
@@ -29,18 +28,17 @@ import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class DataService {
     @Value("${influx.api.url}")
     String influxURL;
-
+    @Value("${api.generate.dummy-data}")
+    private Boolean generateDummy;
     @PersistenceContext
     EntityManager entityManager;
 
@@ -57,7 +55,8 @@ public class DataService {
 
     @Autowired
     InformationTileMeasurementRepository tileMeasurementRepository;
-
+    @Autowired
+    private InformationPanelService informationPanelService;
     public DataDAO getByUserId(Long userId, Map<String, String> params) {
         List<Measurement> measurements = measurementRepository.findByUserId(userId);
 
@@ -107,6 +106,7 @@ public class DataService {
                                 ret.setSensorName(obj.getSensorName());
                                 ret.setDomain(obj.getDomain());
                                 ret.setDirection(obj.getDirection());
+
 
                                 return ret;
                             }
@@ -201,15 +201,42 @@ public class DataService {
         return this.getPanelData(id,null,from,to );
     }
 
-    public DataWrapperDAO getPanelData(Long id, Long assetId, Long from, Optional<Long> to) {
+    public DataWrapperDAO getPanelData(Long panelId, Long assetId, Long from, Optional<Long> to) {
         //TODO: get measurements for assetId
-        List<Measurement> measurements = this.getPanelMeasurements(id);
 
-        // GET MEASUREMENTS RELATED TO THE PANEL
+        if(generateDummy) {
+            // GET MEASUREMENTS RELATED TO THE PANEL
+            if(assetId!=null){
+                InformationPanelDAOResponse assetTemplate = informationPanelService.getAssetTemplate(panelId, assetId);
+                Stream<MeasurementDAOResponse> measurementDAOResponseStream = assetTemplate.getTiles().stream().map(
+                        InformationTileDAOResponse::getMeasurements
+                ).flatMap(List::stream);
+                Collection<MeasurementDAOResponse> values =
+                        measurementDAOResponseStream.collect(
+                                Collectors.toMap(MeasurementDAOResponse::getId, Function.identity(),(m1, m2) -> m1)).values();
+                DataDAO res = DummyDataGenerator.getData(values );
+                return new DataWrapperDAO(res,assetTemplate);
+            }
+            else {
+                List<Measurement> measurements = this.getPanelMeasurements(panelId);
 
-    	//TODO: build influxDB query
-        DataDAO res = DummyDataGenerator.getData(measurements);
-        return new DataWrapperDAO(res);
+                DataDAO res = DummyDataGenerator.getData(measurements);
+                return new DataWrapperDAO(res);
+            }
+
+
+        }
+        else {
+//                todo: get data from influx
+
+//
+//    	//TODO: build influxDB query from panel details
+            return null;
+        }
+
+
+
+
 
     }
     

@@ -206,9 +206,9 @@ public class UserService {
 			if(userAssets != null && userAssets.size() > 0) {
 				for (Asset userAsset : userAssets)
 					assets.addAll(userAsset.getAssets().stream()
-						.filter(obj -> obj.getType().getTypeCategory().equals(AssetTypeCategory.structural))
-						.map(obj -> AssetDAOResponse.create(obj, assetDetailsRepository.findByAssetId(obj.getId())))
-						.collect(Collectors.toList()));
+//							.filter(obj -> obj.getAssetCategory().getName().equals(AssetTypeCategory.structural))
+							.map(obj -> AssetDAOResponse.create(obj, assetDetailsRepository.findByAssetId(obj.getId())))
+							.collect(Collectors.toList()));
 				return assets;
 			}
 			else throw new NotFoundException("User " + id + " hasn't related asset");

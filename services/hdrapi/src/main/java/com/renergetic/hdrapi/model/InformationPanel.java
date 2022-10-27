@@ -29,6 +29,8 @@ public class InformationPanel {
 
     @Column(name = "is_template")
     private Boolean isTemplate;
+    @Column(name = "featured",nullable = false )
+    private Boolean featured=false;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
     @NotFound(action = NotFoundAction.IGNORE)

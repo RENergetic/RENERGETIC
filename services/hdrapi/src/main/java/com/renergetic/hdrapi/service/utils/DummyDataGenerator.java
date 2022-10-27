@@ -8,10 +8,7 @@ import com.renergetic.hdrapi.model.DemandDefinition;
 import com.renergetic.hdrapi.model.DemandSchedule;
 import com.renergetic.hdrapi.model.Measurement;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DummyDataGenerator {
@@ -48,6 +45,13 @@ public class DummyDataGenerator {
         data.getCurrent().setLast(measurementValues);
         return data;
     }
+    public static DataDAO getData(Collection<MeasurementDAOResponse> measurements) {
+        DataDAO data = new DataDAO();
+        Map<String, Double> measurementValues = measurements.stream().collect(
+                Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
+        data.getCurrent().setLast(measurementValues);
+        return data;
+    }
 
     public static List<DemandScheduleDAO> getDemand(List<DemandDefinition> demands, List<Asset> assets) {
         long current = (new Date()).getTime();
@@ -75,6 +79,7 @@ public class DummyDataGenerator {
                 }
         ).collect(Collectors.toList());
     }
+
 
 }
 //    function generatePanelData(informationPanel, predictionWindow) {
