@@ -15,14 +15,14 @@ public interface InformationPanelRepository extends JpaRepository<InformationPan
     public Optional<InformationPanel> findByName(String name);
 
     @Query(value = "SELECT DISTINCT information_panel.* " +
-            "FROM (information_panel " +
-            "LEFT JOIN asset_panel ON  information_panel.id = asset_panel.panel_id and not information_panel.featured" +
-            "LEFT JOIN asset asset_conn ON asset_conn.id = asset_panel.asset_id" +
-            "LEFT JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id" +
-            "LEFT JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId" +
-            "WHERE asset_user.user_id = :userId or featured" +
-            ") " +
-            "LIMIT :limit OFFSET :offset ;", nativeQuery = true)
+            " FROM (information_panel " +
+            " LEFT JOIN asset_panel ON  information_panel.id = asset_panel.panel_id and not information_panel.featured" +
+            " LEFT JOIN asset asset_conn ON asset_conn.id = asset_panel.asset_id" +
+            " LEFT JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id" +
+            " LEFT JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId" +
+            " ) " +
+            " WHERE asset_user.user_id = :userId or featured" +
+            " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<InformationPanel> findByUserId(Long userId, long offset, int limit);
 
 
