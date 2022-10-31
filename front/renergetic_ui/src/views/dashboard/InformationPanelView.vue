@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="panel-box">
     <div v-if="panel">
       <DotMenu :model="menuModel" />
       <Dialog
@@ -12,7 +12,9 @@
         <PanelSettings @update="reloadSettings()"></PanelSettings>
       </Dialog>
       <InformationPanel
+        v-if="panel"
         ref="panel"
+        :asset-id="$route.params.asset_id"
         :locked="locked"
         :panel="panel"
         :edit-mode="editMode"
@@ -22,9 +24,9 @@
   </div>
 </template>
 <script>
-import InformationPanel from "../../components/dashboard/InformationPanel.vue";
-import DotMenu from "../../components/miscellaneous/DotMenu.vue";
-import PanelSettings from "../../components/miscellaneous/settings/PanelSettings.vue";
+import InformationPanel from "@/components/dashboard/informationpanel/InformationPanel.vue";
+import DotMenu from "@/components/miscellaneous/DotMenu.vue";
+import PanelSettings from "@/components/miscellaneous/settings/PanelSettings.vue";
 export default {
   name: "InformationPanelView",
   components: {
@@ -91,14 +93,41 @@ export default {
     },
   },
   watch: {},
-  async created() {
-    this.$ren.dashboardApi.getInformationPanel(this.$route.params.id).then((panel) => {
-      this.panel = panel;
-    });
-    //todo: catch
+  async mounted() {
+    await this.loadStructure();
+  },
+  async updated() {
+    await this.loadStructure();
   },
 
   methods: {
+    localPanel(id, assetId) {
+      console.error("asset panels templates not supported: " + assetId);
+      // if (assetId != null) {
+      //   let index = this.$store.getters("view/assetPanelsMap")[id + "_" + assetId];
+      //   if (index != null) {
+      //     return   let index = this.$store.getters("view/assetPanels")[index];
+      //   }
+      //   return null;
+      // }
+      // console.info(this.$store.getters["view/informationPanelsMap"][id]);
+      let index = this.$store.getters["view/informationPanelsMap"][id];
+      if (index != null) {
+        return this.$store.getters["view/informationPanels"][index];
+      }
+      return null;
+    },
+    async loadStructure() {
+      let informationPanel = this.localPanel(this.$route.params.id, this.$route.params.asset_id);
+      // console.info(informationPanel);
+      if (informationPanel == null) {
+        this.$ren.dashboardApi.getInformationPanel(this.$route.params.id, this.$route.params.asset_id).then((panel) => {
+          this.panel = panel;
+        });
+      } else {
+        this.panel = informationPanel;
+      }
+    },
     reloadSettings() {
       this.settings = this.$store.getters["settings/panel"];
     },
@@ -113,7 +142,7 @@ export default {
       this.panel.tiles.push({
         // layout: { x: 0, y: 0, h: 3, w: 3 },
         id: this.$ren.utils.uuid(),
-        title: null,
+        label: null,
         props: { items: [] },
       });
     },
@@ -125,4 +154,14 @@ export default {
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+#panel-box {
+  background: #232526; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #232526, #414345); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to right,
+    #232526,
+    #414345
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+</style>

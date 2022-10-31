@@ -3,27 +3,41 @@
   <div>
     <div style="height: 100%" class="flex flex-column align-items-start align-content-start">
       <template v-for="d in demands" :key="d">
-        <HeatDemand v-if="d != null && d.type == 'heat'" :demand="d"></HeatDemand>
+        <UserDemand :demand="d" :pdata="pdata"></UserDemand>
       </template>
     </div>
   </div>
   <!-- </Card> -->
 </template>
 <script>
-import HeatDemand from "./HeatDemand.vue";
+import UserDemand from "./UserDemand.vue";
 export default {
   name: "DemandList",
-  components: { HeatDemand },
-  props: {},
+  components: { UserDemand },
+  props: {
+    userId: {
+      type: Number,
+      default: null,
+    },
+  },
   data() {
-    return { demands: [] };
+    return { demands: [], pdata: {} };
   },
   computed: {},
   watch: {},
   async mounted() {
-    //TODO: userId
-    let userID = 0;
-    this.demands = await this.$ren.dashboardApi.getDemand(userID);
+    let demands = this.$store.getters["view/demands"];
+    if (demands) {
+      this.demands = demands;
+    } else {
+      this.demands = await this.$ren.userApi.getDemand();
+    }
+    let pdata = this.$store.getters["view/data"];
+    if (pdata) {
+      this.pdata = pdata;
+    } else {
+      this.pdata = await this.$ren.dataApi.getDemandData(this.demands);
+    }
   },
 
   methods: {},

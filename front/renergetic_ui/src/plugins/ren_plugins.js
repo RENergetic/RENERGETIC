@@ -9,6 +9,7 @@ plugin.install = function (Vue /*, options*/) {
     utils: new RenUtils(Vue),
     ...new RestClient(Vue),
   };
+  // Vue.config.globalProperties.$pluginLoaded = true;
 };
 
 export default plugin;

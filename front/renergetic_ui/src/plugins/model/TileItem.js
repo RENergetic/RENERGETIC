@@ -1,12 +1,5 @@
 export class TileItem {
-  constructor(
-    id,
-    value,
-    unit = null,
-    description = null,
-    icon = null,
-    state = "ok"
-  ) {
+  constructor(id, value, unit = null, description = null, icon = null, state = "ok") {
     this.id = id;
     this.value = value;
     this.unit = unit;

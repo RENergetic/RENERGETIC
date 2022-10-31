@@ -3,7 +3,7 @@ import axios from "axios";
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.headers.delete["Content-Type"] = "application/json";
-
+//TODO: translate to english
 // https://www.keycloak.org/docs/11.0/securing_apps/#usage-2
 //https://stackoverflow.com/questions/65398657/keycloak-and-node-js-how-to-keep-user-logged-in-after-keycloak-access-token-get
 // var session = require("express-session");
@@ -16,8 +16,8 @@ let initOptions = {
 
 // const appName = "vue-test";
 // let keycloak = Keycloak({ store: memoryStore }, initOptions);
-let keycloak = Keycloak(initOptions);
-var initialized = false;
+
+// var initialized = false;
 let info = {
   app: process.env.VUE_APP_KEY_CLOAK_CLIENT_ID,
   realm: process.env.VUE_APP_KEY_CLOAK_REALM,
@@ -25,6 +25,7 @@ let info = {
   clientId: undefined,
 };
 export default function (Vue) {
+  let keycloak = Keycloak(initOptions);
   keycloak
     .init({
       // onLoad: "login-required",
@@ -34,8 +35,8 @@ export default function (Vue) {
     .then(async (_authenticated) => {
       // Vue.config.globalProperties.authenticated = _authenticated;
       keycloak.authenticated = _authenticated ? true : false;
-      console.info(keycloak.authenticated);
-      initialized = true;
+      console.info(`keycloak authenticated: ${keycloak.authenticated}`);
+      // initialized = true;
       if (_authenticated) {
         var accountRoles = null;
         var realmRoles = null;
@@ -59,8 +60,14 @@ export default function (Vue) {
         await axios
           .get(`${info.url}/admin/realms/${info.realm}/clients?clientId=${info.app}`, config)
           .then((response) => (info.clientId = response.data[0].id))
-          .catch((error) => console.warn(error));
+          .catch((error) => {
+            console.warn(error);
+          });
+      } else {
+        //clear stored data
+        Vue.config.globalProperties.$store.commit("auth/reset");
       }
+      keycloak.initialized = true;
     })
     .catch((e) => {
       console.log("failed to initialize ", e);
@@ -75,10 +82,9 @@ export default function (Vue) {
     // instance: keycloak,
     // initialized: initialized,
     isInitialized() {
-      console.info("test: " + initialized);
-      return initialized;
+      return keycloak.initialized;
     },
-    get() {
+    async get() {
       return this.executeAfterInitialized(keycloak);
     },
     async getClientRoles() {
@@ -208,14 +214,14 @@ export default function (Vue) {
       };
       return axios.delete(`${info.url}/admin/realms/${info.realm}/users/${userId}`, config);
     },
-    hasAccess(assignedRoles, allowedRoles) {
-      if (!allowedRoles || allowedRoles.length == 0) return true;
-      else if (!assignedRoles || assignedRoles.length == 0) return false;
-      for (var i = 0; i < allowedRoles.length; i++) {
-        if (assignedRoles.indexOf(allowedRoles[i]) !== -1) return true;
-      }
-      return false;
-    },
+    // hasAccess(assignedRoles, allowedRoles) {
+    //   if (!allowedRoles || allowedRoles.length == 0) return true;
+    //   else if (!assignedRoles || assignedRoles.length == 0) return false;
+    //   for (var i = 0; i < allowedRoles.length; i++) {
+    //     if (assignedRoles.indexOf(allowedRoles[i]) !== -1) return true;
+    //   }
+    //   return false;
+    // },
     async executeAfterInitialized(method) {
       const TRIES = 4;
       const TIME = 150;

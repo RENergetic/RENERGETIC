@@ -16,9 +16,9 @@
   </div>
 </template>
 <script>
-import InformationPanel from "@/components/dashboard/InformationPanel.vue";
+import InformationPanel from "@/components/dashboard/informationpanel/InformationPanel.vue";
 import DotMenu from "@/components/miscellaneous/DotMenu.vue";
-import InformationPanelForm from "@/components/dashboard/InformationPanelForm.vue";
+import InformationPanelForm from "@/components/dashboard/informationpanel/InformationPanelForm.vue";
 // import DotMenu from "../../components/miscellaneous/DotMenu.vue";
 
 export default {

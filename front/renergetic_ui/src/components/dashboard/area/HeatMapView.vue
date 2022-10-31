@@ -10,15 +10,24 @@
         <template #title> {{ heatmap.label }} </template>
         <template #content>
           <div id="heatmapContainer">
-            <v-stage id="heatmap" ref="stage" :config="stageSize" @click="onClick">
-              <v-layer v-show="bgImage != null">
-                <v-image
-                  :config="{
-                    image: bgImage,
-                  }"
-                />
-              </v-layer>
-            </v-stage>
+            <heat-map-default
+              v-if="heatmap.type == HeatMapType.DEFAULT"
+              :heatmap="heatmap"
+              :selected="selectedAreas"
+              :heatmap-state="heatmapState"
+              @update:selected="onAreasSelect"
+              @click="onAreaClick"
+            />
+
+            <HeatMapOSM
+              v-else-if="heatmap.type == HeatMapType.OSM"
+              :heatmap="heatmap"
+              :selected="selectedAreas"
+              :heatmap-state="heatmapState"
+              @update:selected="onAreasSelect"
+              @click="onAreaClick"
+            />
+            <div v-else :heatmap="heatmap">UNKNOW_HEATMAP_TYPE</div>
           </div>
         </template>
       </Card>
@@ -27,17 +36,12 @@
         :objects="Object.keys(selectedAreas)"
       ></MeasurementChart>
     </div>
-    <div v-if="bgImage" class="col-3 ren">
+    <div v-if="heatmap" class="col-3 ren">
       <Accordion class="tile" :active-index="selectedArea == null ? -1 : 0">
         <AccordionTab :disabled="selectedArea == null">
           <template #header> {{ $t("view.selected_area") }}</template>
 
-          <AreaDetails
-            class="tile"
-            :model-value="selectedArea"
-            @update:model-value="onAreaSelect($event)"
-            @delete="areaDelete(selectedArea)"
-          ></AreaDetails>
+          <AreaDetails class="tile" :model-value="selectedArea" @delete="areaDelete(selectedArea)"></AreaDetails>
         </AccordionTab>
       </Accordion>
       <Accordion class="tile" :active-index="0">
@@ -92,19 +96,19 @@
 import DotMenu from "@/components/miscellaneous/DotMenu.vue";
 import AreaDetails from "./AreaDetails.vue";
 import RecommendationView from "@/components/management/RecommendationView.vue";
-import Konva from "konva";
 import NotificationList from "../../management/notification/NotificationList.vue";
-import { Colors, NotificationContext } from "../../../plugins/model/Enums";
+import { NotificationContext, HeatMapType } from "../../../plugins/model/Enums";
 import HeatMapSettings from "../../miscellaneous/settings/HeatmapSettings.vue";
 import MeasurementChart from "../measurements/MeasurementChart.vue";
 import MeasurementsView from "../measurements/MeasurementsView.vue";
-//todo: config
-const TRANSPARENCY = "77";
-const sceneWidth = 0.7 * window.innerWidth;
-const sceneHeight = (sceneWidth * 9) / 16;
+import HeatMapDefault from "./HeatMapDefault.vue";
+import HeatMapOSM from "./HeatMapOSM.vue";
+
 export default {
   name: "HeatMapView",
   components: {
+    HeatMapDefault,
+    HeatMapOSM,
     AreaDetails,
     HeatMapSettings,
     RecommendationView,
@@ -125,12 +129,8 @@ export default {
   },
   data() {
     return {
-      stageSize: {
-        width: sceneWidth,
-        height: sceneHeight,
-      },
+      HeatMapType: HeatMapType,
       selectedArea: null,
-      scale: 1,
       bgImage: null,
       // areaState: [],
       selectedAreas: {},
@@ -158,34 +158,11 @@ export default {
       if (this.heatmap != null) {
         // this.areaState = Array(this.heatmap.areas.length).fill(false);
         // console.info(this.heatmap.areas.length);
-        const image = new window.Image();
-        image.src = this.heatmap.imgUrl;
-        image.onload = () => {
-          // set image only when it is loaded
-          this.bgImage = image;
-          let stage = this.$refs.stage.getStage();
-          this.scaleHeatMap(stage, image);
-          this.heatmap.areas.forEach((area, idx) => this.drawArea(area, idx));
-        };
       } else console.info("todo: null");
     },
   },
 
-  mounted() {
-    if (this.heatmap != null) {
-      const image = new window.Image();
-      image.src = this.heatmap.imgUrl;
-      image.onload = () => {
-        // set image only when it is loaded
-        this.bgImage = image;
-        let stage = this.$refs.stage.getStage();
-        this.scaleHeatMap(stage, image);
-
-        this.heatmap.areas.forEach((it, idx) => this.drawArea(it, idx));
-      };
-      // this.areaState = Array(this.heatmap.areas.length).fill(false);
-    }
-  },
+  mounted() {},
   methods: {
     reloadSettings() {
       this.settings = this.$store.getters["settings/heatmap"];
@@ -193,119 +170,8 @@ export default {
     toggle(key) {
       this.$store.commit("settings/toggle", { section: "heatmap", key: key });
     },
-    onAreaSelect(area) {
-      if (this.selectedArea != null) {
-        let oldId = this.selectedArea.id;
-        this.toggleArea(oldId, false);
-      }
-      if (area != null) {
-        Object.keys(this.selectedAreas).forEach((id) => {
-          this.toggleArea(id, false);
-        });
-        let selectedAreas = {};
-        selectedAreas[area.id] = area.label;
-        this.selectedAreas = selectedAreas;
-        let newId = area.id;
-        this.toggleArea(newId, true);
-      }
-    },
-    getColor(id, selected = false) {
-      let state = this.heatmapState != null ? this.heatmapState[id] : null;
-      let transparency = TRANSPARENCY;
-      if (selected) {
-        transparency = "CC";
-        // return Colors.SELECTED + transparency;
-      }
-      switch (Colors[state]) {
-        case Colors.OK:
-          return Colors.OK + transparency;
-        case Colors.WARNING:
-          return Colors.WARNING + transparency;
-        case Colors.ERROR:
-          return Colors.ERROR + transparency;
-        default:
-          return Colors.DEFAULT + transparency;
-      }
-    },
-    toggleArea(id, selected) {
-      let shape = this.$refs.stage.getStage().findOne(`#${id}`);
-      if (shape != null) {
-        shape.fill(this.getColor(id, selected));
-      }
-    },
-    onClick(evt) {
-      // console.info(evt.target.nodeName);
-      if (evt.target.nodeName == "CANVAS" && this.addMode) {
-        let stage = this.$refs.stage.getStage();
-        var shape = stage.findOne(`#${this.current.id}`);
-        if (shape != null) {
-          this.current.roi.push([evt.layerX / this.scale, evt.layerY / this.scale]);
-          let pnts = this.current.roi;
-          let f = (context, shape) => {
-            context.beginPath();
-            pnts.forEach((pnt) => {
-              context.lineTo(pnt[0], pnt[1]);
-            });
-            context.closePath();
-            // special Konva.js method
-            context.fillStrokeShape(shape);
-          };
-          shape.setSceneFunc(f);
-        }
-      }
-    },
-
-    drawArea(area, idx) {
-      let layer = new Konva.Layer();
-      let stage = this.$refs.stage.getStage();
-      let item = new Konva.Shape(this.getConfig(area));
-      let areaId = area.id;
-      item.on("click", () => {
-        this.selectedArea = this.heatmap.areas[idx];
-        if (this.selectedAreas[areaId]) {
-          if (this.selectedAreas.length == 1) {
-            this.selectedAreas = {};
-          } else delete this.selectedAreas[areaId];
-          this.toggleArea(area.id, false);
-        } else {
-          this.selectedAreas[areaId] = area.label;
-          this.toggleArea(area.id, true);
-        }
-
-        let keys = Object.keys(this.selectedAreas);
-        if (keys.length != 1) {
-          this.selectedArea = null;
-        } else {
-          let k = Object.keys(this.selectedAreas);
-          this.heatmap.areas.forEach((area) => {
-            if (area.id == k[0]) this.selectedArea = area;
-          });
-        }
-      });
-      layer.add(item);
-      stage.add(layer);
-      stage.draw();
-    },
-
-    getConfig(area) {
-      return {
-        sceneFunc: function (context, shape) {
-          context.beginPath();
-          // console.info(area);
-          area.roi.forEach((pnt) => {
-            context.lineTo(pnt[0], pnt[1]);
-          });
-          context.closePath();
-          // special Konva.js method
-          context.fillStrokeShape(shape);
-        },
-        fill: this.getColor(area.id),
-        stroke: "black",
-        strokeWidth: 1,
-        opacity: 0.75,
-        listening: true,
-        id: area.id,
-      };
+    onAreasSelect(areas) {
+      this.selectedAreas = areas;
     },
 
     async loadAttributes() {
@@ -313,16 +179,7 @@ export default {
         this.attributes = attributes;
       });
     },
-    scaleHeatMap(stage, bgImage) {
-      if (bgImage != null) {
-        var scale = sceneWidth / bgImage.width;
-        this.scale = scale;
-        console.info(scale);
-        stage.width(bgImage.width * scale);
-        stage.height(bgImage.height * scale);
-        stage.scale({ x: scale, y: scale });
-      }
-    },
+
     menuModel() {
       return [
         {

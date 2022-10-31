@@ -2,6 +2,8 @@
 ## Source path
 ```src/plugins/model```
 
+todo:
+
 JSON - text fields:
 
 InformationTile.layout
@@ -19,9 +21,7 @@ Information tile.state ->  calculated state
 
 
 
-## Object hierarchy
 
 
 
 
-Island -> Area -> InformationTile 

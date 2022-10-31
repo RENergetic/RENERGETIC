@@ -17,10 +17,15 @@ export default {
   data() {
     return {
       heatmap: null,
+      state: false,
     };
   },
 
   async created() {
+    if (!this.state) {
+      this.$router.push(`/`);
+      return;
+    }
     this.$ren.dashboardApi
       .getHeatMap(this.$route.params.id)
       .then((heatmap) => {

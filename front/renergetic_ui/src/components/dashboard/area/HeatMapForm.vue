@@ -33,6 +33,20 @@
           <InputText id="heatmapLabel" v-model="mHeatmap.label" />
         </div>
       </div>
+      <div class="field grid">
+        <label for="heatmapLabel" class="col-12 mb-2 md:col-2 md:mb-0"> {{ $t("model.heatmap.label") }} </label>
+
+        <div class="col-12 md:col-10">
+          <Dropdown
+            v-model="mHeatmap.type"
+            :placeholder="$t('model.heatmap.select_type')"
+            :options="typeList"
+            option-label="label"
+            option-value="value"
+            class="col-12"
+          />
+        </div>
+      </div>
 
       <div class="field grid">
         <div class="col-6 md:col-6"><Button :label="$t('view.button.submit')" @click="submit" /></div>
@@ -46,6 +60,7 @@
 <script>
 //TODO: validate
 import { HeatMap } from "@/plugins/model/HeatMap.js";
+import { HeatMapType } from "../../../plugins/model/Enums";
 export default {
   name: "HeatMapForm",
   props: {
@@ -56,7 +71,13 @@ export default {
   },
   emits: ["update:modelValue", "save", "cancel"],
   data() {
-    return { mHeatmap: this.modelValue };
+    return {
+      mHeatmap: this.modelValue,
+      typeList: [
+        { value: HeatMapType.DEFAULT, label: this.$t(`enums.heatmap_type.${HeatMapType.DEFAULT}`) },
+        { value: HeatMapType.OSM, label: this.$t(`enums.heatmap_type.${HeatMapType.OSM}`) },
+      ],
+    };
   },
   watch: {
     mHeatmapName: {

@@ -22,7 +22,7 @@
 <script>
 import Dialog from "primevue/dialog";
 import NotificationList from "../management/notification/NotificationList.vue";
-import DashboardForm from "../../components/dashboard/DashboardForm.vue";
+import DashboardForm from "../dashboard/grafana/DashboardForm.vue";
 export default {
   name: "Dialogs",
   components: {

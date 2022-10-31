@@ -1,7 +1,6 @@
-/* eslint-disable vue/v-on-event-hyphenation */ /* eslint-disable vue/first-attribute-linebreak */ /* eslint-disable
-vue/attribute-hyphenation */
 <template>
   <div>
+    TODO: view roles
     <DataTable v-model:expandedRows="users.roles" :value="users" data-key="id" responsive-layout="scroll">
       <Column :expander="true" header-style="width: 3rem" />
       <Column field="username" header="Username" sortable></Column>

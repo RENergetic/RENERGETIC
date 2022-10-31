@@ -25,7 +25,7 @@ module.exports = {
       2,
       {
         singleline: {
-          max: 4,
+          max: 5,
         },
         multiline: {
           max: 3,

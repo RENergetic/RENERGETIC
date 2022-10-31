@@ -26,12 +26,11 @@
 </template>
 <script>
 // import Carousel from "primevue/carousel";
-import Grafana from "../../components/dashboard/Grafana.vue";
-import DeleteDashboard from "../../components/dashboard/DeleteDashboard.vue";
-import DashboardForm from "../../components/dashboard/DashboardForm.vue";
+import Grafana from "@/components/dashboard/grafana/Grafana.vue";
+import DeleteDashboard from "@/components/dashboard/grafana/DeleteDashboard.vue";
+import DashboardForm from "@/components/dashboard/grafana/DashboardForm.vue";
 import Dock from "primevue/dock";
-import DotMenu from "../../components/miscellaneous/DotMenu.vue";
-
+import DotMenu from "@/components/miscellaneous/DotMenu.vue";
 export default {
   name: "Dashboard",
   components: { Dock, DotMenu, Grafana, DeleteDashboard, DashboardForm /* Carousel */ },

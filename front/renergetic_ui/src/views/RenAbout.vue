@@ -1,5 +1,3 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
+  <div class="about">some description: present here list of licences contact? link to git? TODO:</div>
 </template>

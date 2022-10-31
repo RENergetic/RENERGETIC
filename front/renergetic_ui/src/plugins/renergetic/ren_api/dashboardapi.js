@@ -80,7 +80,9 @@ export default class DashboardApi extends RestComponent {
 
   //TODO:
   // listInformationPanel(userId=null,offset=0,limit=10) {} =>  src/assets/dummy/samples/information_panel.js
-  // async getInformationPanel(panelId) {}
+  // async getInformationPanel(panelId,assetId) {
+  //TODO:
+  // }
   // async addInformationPanel(panel) {}
   // async updateInformationPanel(panel) {}
   // async deleteInformationPanel(id) {}

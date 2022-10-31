@@ -18,6 +18,9 @@ public class AssetCategoryDAO {
     @JsonProperty(required = true)
     private String name;
 
+    @JsonProperty(required = false)
+    private String label;
+
     @JsonProperty(required = true)
     private String description;
 
@@ -25,6 +28,7 @@ public class AssetCategoryDAO {
         AssetCategoryDAO assetCategoryDAO = new AssetCategoryDAO();
         assetCategoryDAO.setId(assetCategory.getId());
         assetCategoryDAO.setName(assetCategory.getName());
+        assetCategoryDAO.setLabel(assetCategory.getLabel());
         assetCategoryDAO.setDescription(assetCategory.getDescription());
 
         return assetCategoryDAO;
@@ -34,6 +38,7 @@ public class AssetCategoryDAO {
         AssetCategory assetCategory = new AssetCategory();
         assetCategory.setId(id);
         assetCategory.setName(name);
+        assetCategory.setLabel(label);
         assetCategory.setDescription(description);
         return assetCategory;
     }

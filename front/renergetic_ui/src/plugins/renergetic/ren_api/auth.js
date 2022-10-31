@@ -1,4 +1,3 @@
-// import router from '../../../router';
 import RestComponent from "./restcomponent";
 export default class AuthApi extends RestComponent {
   constructor(axiosInstance, vueInstance) {

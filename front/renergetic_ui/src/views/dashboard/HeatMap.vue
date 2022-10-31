@@ -14,9 +14,13 @@ export default {
   name: "HeatMap",
   components: { HeatMapView },
   data() {
-    return { heatmap: null, heatmapState: null };
+    return { heatmap: null, heatmapState: null, state: false };
   },
   async created() {
+    if (!this.state) {
+      this.$router.push(`/`);
+      return;
+    }
     this.$ren.dashboardApi
       .getHeatMap(this.$route.params.id)
       .then((heatmap) => {

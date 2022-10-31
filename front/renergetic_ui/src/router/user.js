@@ -3,7 +3,9 @@ var userRoutes = [
   {
     path: "/signup",
     name: "SignUp",
-    meta: { isAuthenticated: false },
+    meta: {
+      isAuthenticated: false,
+    },
     component: () => import("../views/user/SignUp.vue"),
   },
 ];
