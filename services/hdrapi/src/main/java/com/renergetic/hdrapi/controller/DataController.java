@@ -35,7 +35,7 @@ public class DataController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
     })
-    @GetMapping(path = "panel/{panelId}", produces = "application/json")
+    @GetMapping(path = "/panel/{panelId}", produces = "application/json")
     public ResponseEntity<DataWrapperDAO> getPanelData(
             @PathVariable Long panelId,
             @RequestParam("from") Optional<Long> from,
@@ -49,7 +49,7 @@ public class DataController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
     })
-    @GetMapping(path = "panel/{panelId}/asset/{assetId}", produces = "application/json")
+    @GetMapping(path = "/panel/{panelId}/asset/{assetId}", produces = "application/json")
     public ResponseEntity<DataWrapperDAO> getAssetPanelData(
             @PathVariable Long panelId,
             @PathVariable Long assetId,
@@ -65,7 +65,7 @@ public class DataController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
     })
-    @GetMapping(path = "tile/{tile_id}", produces = "application/json")
+    @GetMapping(path = "/tile/{tile_id}", produces = "application/json")
     @Deprecated
     public ResponseEntity<DataDAO> getDataByTile(
             @PathVariable Long tile_id, @RequestParam("from") Optional<String> from,
@@ -87,7 +87,7 @@ public class DataController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
     })
-    @GetMapping(path = "influxdb/panel/{panel_id}", produces = "application/json")
+    @GetMapping(path = "/influxdb/panel/{panel_id}", produces = "application/json")
     @Deprecated //there is     "panel/{panelId}" getPanelData method
     public ResponseEntity<DataDAO> getDataByPanel(
             @PathVariable Long panel_id, @RequestParam("from") Optional<String> from,

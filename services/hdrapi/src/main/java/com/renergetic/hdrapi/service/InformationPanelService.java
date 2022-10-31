@@ -194,7 +194,7 @@ public class InformationPanelService {
                 .stream().map(x -> MeasurementDAOResponse.create(x,
                         measurementDetailsRepository.findByMeasurementId(x.getId())))
                 .collect(Collectors.toList());
-
+//TODO: throw some exception code to the UI - so the users know that not all measurements are not available for this asset
         if (list.size() > 0)
             return list;
         else throw new NotFoundException(

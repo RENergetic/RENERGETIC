@@ -40,15 +40,16 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
 	@Query(value = "SELECT measurement.* " +
 			"FROM (measurement " +
 			"INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
-			"INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
-			"WHERE measurement.sensor_name = :sensorName " +
-			"AND COALESCE(measurement.domain = :domain,TRUE) " +
-			"AND COALESCE(measurement.name = :measurementName,TRUE) " +
-			"AND measurement.asset_id = :assetId " +
-			"AND COALESCE(measurement.direction = :direction,TRUE) " +
-			"AND  measurement.measurement_type_id = :type  ", nativeQuery = true)
+			"INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id )" +
+			" WHERE measurement.sensor_name = :sensorName " +
+			" AND COALESCE(measurement.domain = :domain,TRUE) " +
+			" AND COALESCE(measurement.name = :measurementName,TRUE) " +
+			" AND measurement.asset_id = :assetId " +
+			" AND COALESCE(measurement.direction = :direction,TRUE) " +
+			" AND  measurement.measurement_type_id = :type  ", nativeQuery = true)
 	//some fields aren't optional because there would be no sense to mix them -> can be discussed
-	public List<Measurement> findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(Long assetId,String measurementName, String sensorName, String domain, String direction, Long type);
+	public List<Measurement> findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(
+			Long assetId,String measurementName, String sensorName, String domain, String direction, Long type);
 
 	@Query(value = "SELECT measurement.* " +
 			"FROM (asset asset_conn " +
