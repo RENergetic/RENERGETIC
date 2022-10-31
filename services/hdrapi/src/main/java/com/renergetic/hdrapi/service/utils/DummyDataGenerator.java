@@ -8,10 +8,7 @@ import com.renergetic.hdrapi.model.DemandDefinition;
 import com.renergetic.hdrapi.model.DemandSchedule;
 import com.renergetic.hdrapi.model.Measurement;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DummyDataGenerator {
@@ -27,21 +24,34 @@ public class DummyDataGenerator {
         return (random.nextInt(300 * 100)) / 100.0 + 200.0;
     }
 
-    public static DataDAO getDemandData(List<DemandScheduleDAO> demands) {
-        DataDAO data = new DataDAO();
-        Map<String, Double> measurementValues = demands.stream().filter(
-                it-> it.getDemandDefinition().getTile()!=null
-        )
-                .flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
-                .collect(Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue,
-                        (a1, a2) -> a1));
+//    public static DataDAO getDemandData(List<DemandScheduleDAO> demands) {
+//        DataDAO data = new DataDAO();
+//        List<MeasurementDAOResponse> measurementDAOResponseStream = demands.stream().filter(
+//                it -> it.getDemandDefinition().getTile() != null
+//        )
+//                .flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream()).collect(
+//                        Collectors.toList());
+//        Map<String, Double> measurementValues = demands.stream().filter(
+//                it -> it.getDemandDefinition().getTile() != null
+//        )
+//                .flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
+//                .collect(Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue,
+//                        (a1, a2) -> a1));
+//
+//        data.getCurrent().setLast(measurementValues);
+//
+//        return data;
+//    }
 
-        data.getCurrent().setLast(measurementValues);
+//    public static DataDAO getData(List<Measurement> measurements) {
+//        DataDAO data = new DataDAO();
+//        Map<String, Double> measurementValues = measurements.stream().collect(
+//                Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
+//        data.getCurrent().setLast(measurementValues);
+//        return data;
+//    }
 
-        return data;
-    }
-
-    public static DataDAO getData(List<Measurement> measurements) {
+    public static DataDAO getData(Collection<MeasurementDAOResponse> measurements) {
         DataDAO data = new DataDAO();
         Map<String, Double> measurementValues = measurements.stream().collect(
                 Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
@@ -75,6 +85,7 @@ public class DummyDataGenerator {
                 }
         ).collect(Collectors.toList());
     }
+
 
 }
 //    function generatePanelData(informationPanel, predictionWindow) {

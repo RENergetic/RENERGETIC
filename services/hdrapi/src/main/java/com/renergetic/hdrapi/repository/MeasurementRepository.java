@@ -21,16 +21,35 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
 			"INNER JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId) ", nativeQuery = true)
 	public List<Measurement> findByUserId(Long userId);
 
+
 	@Query(value = "SELECT measurement.* " +
 			"FROM (measurement " +
 			"INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
 			"INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
 			"INNER JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId) " +
 			"WHERE measurement.sensor_name = :sensorName " +
-			"AND measurement.domain = :domain " +
-			"AND measurement.direction = :direction " +
-			"AND measurement.measurement_type_id = :type ", nativeQuery = true)
-	public List<Measurement> findByUserIdAndBySensorNameAndDomainAndDirectionAndType(Long userId, String sensorName, String domain, String direction, Long type);
+			"AND COALESCE(measurement.domain = :domain,TRUE) " +
+			"AND COALESCE(measurement.name = :measurementName,TRUE) " +
+			"AND measurement.asset_id = :assetId " +
+			"AND COALESCE(measurement.direction = :direction,TRUE) " +
+			"AND  measurement.measurement_type_id = :type  ", nativeQuery = true)
+	//some fields aren't optional because there would be no sense to mix them -> can be discussed
+    //TODO: not sure if user id and connection is required here - unless we want to check here if the user can view the data/strcuture of the panel
+	public List<Measurement> findByUserIdAndAssetIdAndBySensorNameAndDomainAndDirectionAndType(Long userId,Long assetId,String measurementName, String sensorName, String domain, String direction, Long type);
+
+	@Query(value = "SELECT measurement.* " +
+			"FROM (measurement " +
+			"INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
+			"INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id )" +
+			" WHERE measurement.sensor_name = :sensorName " +
+			" AND COALESCE(measurement.domain = :domain,TRUE) " +
+			" AND COALESCE(measurement.name = :measurementName,TRUE) " +
+			" AND measurement.asset_id = :assetId " +
+			" AND COALESCE(measurement.direction = :direction,TRUE) " +
+			" AND  measurement.measurement_type_id = :type  ", nativeQuery = true)
+	//some fields aren't optional because there would be no sense to mix them -> can be discussed
+	public List<Measurement> findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(
+			Long assetId,String measurementName, String sensorName, String domain, String direction, Long type);
 
 	@Query(value = "SELECT measurement.* " +
 			"FROM (asset asset_conn " +

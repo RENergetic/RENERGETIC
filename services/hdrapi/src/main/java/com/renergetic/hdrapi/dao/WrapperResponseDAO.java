@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -23,7 +24,7 @@ public class WrapperResponseDAO {
     private DataDAO data;
 
     @JsonProperty(required = false)
-    private List<DemandScheduleDAO> demands;
+    private List<DemandScheduleDAO> demands = Collections.emptyList();
 
     @JsonProperty(required = false)
     private List<InformationPanelDAOResponse> panels;

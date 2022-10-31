@@ -88,6 +88,7 @@ public class AssetService {
 		if ( assetId != null && assetRepository.existsById(assetId) && 
 				measurementId != null && measurementRepository.existsById(measurementId)) {
 			Measurement measurement = measurementRepository.findById(measurementId).get();
+
 			return MeasurementDAOResponse.create(measurementRepository.save(measurement), null);
 
 		} else throw new InvalidNonExistingIdException(assetRepository.existsById(assetId) ? "The measurement doesn't exists" : "The asset doesn't exists");
@@ -107,7 +108,7 @@ public class AssetService {
 					equals = asset.getType().getName().equalsIgnoreCase(filters.get("type")) ||
 							asset.getType().getLabel().equalsIgnoreCase(filters.get("type"));
 				if (equals && filters.containsKey("category") && asset.getType() != null) {
-					equals = asset.getType().getTypeCategory().equals(AssetTypeCategory.valueOf(filters.get("category")));
+					equals = asset.getAssetCategory().getName().equals(filters.get("category"));
 				}
 				if (equals && filters.containsKey("location"))
 					equals = asset.getLocation().equalsIgnoreCase(filters.get("location"));
@@ -207,8 +208,8 @@ public class AssetService {
 				if (filters.containsKey("name"))
 					equals = type.getName().equalsIgnoreCase(filters.get("name")) ||
 							type.getLabel().equalsIgnoreCase(filters.get("name"));
-				if (equals && filters.containsKey("category"))
-					equals = type.getTypeCategory().equals(AssetTypeCategory.valueOf(filters.get("category")));
+//				if (equals && filters.containsKey("category"))
+//					equals = type.getTypeCategory().equals(AssetTypeCategory.valueOf(filters.get("category")));
 
 				return equals;
 			}).collect(Collectors.toList());
