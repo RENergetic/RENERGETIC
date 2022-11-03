@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Subselect;
 
 import lombok.Getter;
@@ -29,6 +30,9 @@ public class Tags {
 	
 	@Column(name = "value", nullable = false, insertable = true, updatable = true)
 	private String value;
+	
+	@Formula("(select m.measurement_id from measurement_tags m where m.tag_id = id)")
+	private Long measurementId;
 
 	public Tags(String key, String value) {
 		super();
