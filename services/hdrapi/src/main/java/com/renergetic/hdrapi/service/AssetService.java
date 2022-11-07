@@ -139,7 +139,7 @@ public class AssetService {
 	}
 
 	public List<AssetDAOResponse> getByCategory(Long categoryId, long offset, int limit) {
-		List<AssetDAOResponse> list = assetRepository.findByAssetCategory(categoryId, new OffSetPaging(offset, limit))
+		List<AssetDAOResponse> list = assetRepository.findByAssetCategoryId(categoryId, new OffSetPaging(offset, limit))
 				.stream().map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAsset(asset)))
 				.collect(Collectors.toList());
 		

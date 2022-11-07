@@ -33,12 +33,6 @@ public class MeasurementDAOResponse {
     private String label;
 
     @JsonProperty(required = false)
-    private String description;
-
-    @JsonProperty(required = false)
-    private String icon;
-
-    @JsonProperty(required = false)
     private MeasurementType type;
 
     @JsonProperty(required = false)
@@ -66,8 +60,6 @@ public class MeasurementDAOResponse {
             if (measurement.getType() != null)
                 dao.setType(measurement.getType());
             dao.setLabel(measurement.getLabel());
-            //dao.setDescription(measurement.getDescription());
-            //dao.setIcon(measurement.getIcon());
             dao.setDomain(measurement.getDomain());
             dao.setDirection(measurement.getDirection());
             if (measurement.getAssetCategory() != null)
@@ -85,20 +77,18 @@ public class MeasurementDAOResponse {
     }
 
 
-//	public Measurement mapToEntity() {
-//		Measurement measurement = new Measurement();
-//
-//		measurement.setId(id);
-//		measurement.setName(name);
-//		measurement.setSensorName(sensorName);
-//		if (type != null)
-//			measurement.setType(type);
-//		measurement.setLabel(label);
-//		//measurement.setDescription(description);
-//		//measurement.setIcon(icon);
-//		measurement.setDomain(domain);
-//		measurement.setDirection(direction);
-//
-//		return measurement;
-//	}
+	public Measurement mapToEntity() {
+		Measurement measurement = new Measurement();
+
+		measurement.setId(id);
+		measurement.setName(name);
+		measurement.setSensorName(sensorName);
+		if (type != null)
+			measurement.setType(type);
+		measurement.setLabel(label);
+		measurement.setDomain(domain);
+		measurement.setDirection(direction);
+
+		return measurement;
+	}
 }

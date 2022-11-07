@@ -3,6 +3,7 @@ package com.renergetic.hdrapi.service;
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.*;
+import com.renergetic.hdrapi.model.details.MeasurementTags;
 import com.renergetic.hdrapi.repository.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import com.renergetic.hdrapi.service.utils.HttpAPIs;
@@ -40,6 +41,8 @@ public class DataService {
     private MeasurementRepository measurementRepository;
     @Autowired
     private MeasurementTypeRepository measurementTypeRepository;
+    @Autowired
+    private MeasurementTagsRepository measurementTagsRepository;
     @Autowired
     private InformationTileMeasurementRepository tileMeasurementRepository;
     @Autowired
@@ -101,26 +104,84 @@ public class DataService {
                     measurementDAOResponseStream.collect(
                             Collectors.toMap(MeasurementDAOResponse::getId, Function.identity(),
                                     (m1, m2) -> m1)).values();
-            DataDAO res = this.getData(values, from, to);
+            DataDAO res = this.getData(values.stream().map(v -> v.mapToEntity()).collect(Collectors.toList()), from, to);
             //we need to return template with filled measurements for the given assetId
             return new DataWrapperDAO(res, assetTemplate);
         } else {
             //TODO: TOMEK/or someone else - check : if asset is null and panel is an template - raise exception  - bad request
-            List<MeasurementDAOResponse> measurements =
-                    informationPanelService.getPanelMeasurements(panelId).stream().map(
-                            it -> MeasurementDAOResponse.create(it, null)).collect(Collectors.toList());
+            List<Measurement> measurements =
+                    informationPanelService.getPanelMeasurements(panelId);
             DataDAO res = this.getData(measurements, from, to);
             return new DataWrapperDAO(res);
         }
 
     }
 
-    public DataDAO getData(Collection<MeasurementDAOResponse> measurements, Long from, Optional<Long> to) {
+    public DataDAO getData(Collection<Measurement> measurements, Long from, Optional<Long> to) {
         if (generateDummy) {
-            return DummyDataGenerator.getData(measurements);
+            return DummyDataGenerator.getData(measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).toList());
         } else {
-            // todo: get data from influx
-            // make flux query from measurements?
+        	DataDAO ret = new DataDAO();
+    		Map<String, String> params = new HashMap<>();
+        	
+        	for (Measurement measurement : measurements) {
+            	List<String> assetNames = new LinkedList<>();
+
+        		// GET ASSETS RELATED WITH THE MEASUREMENT
+        		if (measurement.getAsset() != null)
+        			assetNames.add(measurement.getAsset().getName());
+        		if (measurement.getAssetCategory() != null)
+        			assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
+        					.stream().map(asset -> asset.getName()).toList());
+        		
+        		// GET MEASUREMENT TAGS
+        		List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
+        		
+        		// PREPARE INFLUX FILTERS
+        		if (measurement.getSensorName() != null)
+        			params.put("measurements", measurement.getSensorName());
+        		if (measurement.getSensorName() != null)
+        			params.put("fields", measurement.getType().getName());
+        		if (measurement.getDirection() != null)
+        			params.put("direction", measurement.getDirection().name());
+        		if (measurement.getDomain() != null)
+        			params.put("domain", measurement.getDomain().name());
+        		if (measurement.getSensorName() != null)
+        			params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
+        		if (tags != null && !tags.isEmpty())
+        			params.putAll(tags.stream()
+        					.filter(tag -> !params.containsKey(tag.getValue()))
+        					.collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+        		
+        		// INFLUX API REQUEST
+        		HttpResponse<String> responseLast = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/last", "GET", params, null, null);
+        		HttpResponse<String> responseMax = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/max", "GET", params, null, null);
+        		
+                if (responseLast.statusCode() < 300) {
+                    JSONArray array = new JSONArray(responseLast.body());
+                    if (array.length() > 0)
+                    	array.forEach( obj -> {
+                    		if (obj instanceof JSONObject) {
+                    			JSONObject json = (JSONObject) obj;
+                    			if (json.has("measurement") && json.getString("measurement") == null)
+	                        	ret.getCurrent().getLast().put(measurement.getId().toString(),
+	                                Double.parseDouble(json.getJSONObject("fields").getString("last")));
+                    		}
+                    	});
+                }
+                if (responseMax.statusCode() < 300) {
+                    JSONArray array = new JSONArray(responseMax.body());
+                    if (array.length() > 0)
+                    	array.forEach( obj -> {
+                    		if (obj instanceof JSONObject) {
+                    			JSONObject json = (JSONObject) obj;
+                    			if (json.has("measurement") && json.getString("measurement") == null)
+	                        	ret.getCurrent().getLast().put(measurement.getId().toString(),
+	                                Double.parseDouble(json.getJSONObject("fields").getString("max")));
+                    		}
+                    	});
+                }
+        	}
             return null;
         }
     }

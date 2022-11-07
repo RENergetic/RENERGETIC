@@ -35,5 +35,6 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 
 	List<Asset> findByUser(User userId);
 
-	List<Asset> findByAssetCategory(Long categoryId, Pageable pageable);
+	List<Asset> findByAssetCategoryId(Long categoryId, Pageable pageable);
+	List<Asset> findByAssetCategoryId(Long categoryId);
 }
