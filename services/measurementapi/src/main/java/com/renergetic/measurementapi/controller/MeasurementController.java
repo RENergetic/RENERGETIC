@@ -1,8 +1,10 @@
 package com.renergetic.measurementapi.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,6 +48,7 @@ public class MeasurementController {
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
+	@Deprecated
 	@Operation(summary = "Get measurement entries")
 	@GetMapping("/{measurement_name}")
 	public ResponseEntity<List<MeasurementDAOResponse>> getMeasurement(
@@ -89,7 +92,15 @@ public class MeasurementController {
 		tags.remove("from");
 		tags.remove("to");
 		
-		ret = service.data(bucket.orElse("renergetic"), measurements, fields, tags, from.orElse(""), to.orElse(""), "time");
+		Map<String, List<String>> parsedTags = tags.entrySet().stream()
+				.collect(
+						Collectors.toMap(
+								entry -> entry.getKey(), 
+								entry -> Arrays.stream(entry.getValue().split(",")).map(value -> value.trim()).collect(Collectors.toList())
+								)
+						); 
+		
+		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time");
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
@@ -115,14 +126,23 @@ public class MeasurementController {
 		tags.remove("group");
 		tags.remove("from");
 		tags.remove("to");
+		
+		Map<String, List<String>> parsedTags = tags.entrySet().stream()
+				.collect(
+						Collectors.toMap(
+								entry -> entry.getKey(), 
+								entry -> Arrays.stream(entry.getValue().split(",")).map(value -> value.trim()).collect(Collectors.toList())
+								)
+						); 
 
-		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, tags, from.orElse(""), to.orElse(""), "time", group.orElse(""));
+		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""));
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
+	@Deprecated
 	@Operation(summary = "Get measurement entries and operate it")
 	@GetMapping("/{measurement_name}/{function}")
 	public ResponseEntity<List<MeasurementDAOResponse>> getProcessedMeasurement(

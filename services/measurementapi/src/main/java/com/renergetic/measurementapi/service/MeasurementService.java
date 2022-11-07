@@ -109,7 +109,7 @@ public class MeasurementService {
         //return MeasurementMapper.fromSeries(queryResult.getResults().get(0).getSeries().get(0));
 	}
 
-	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, String> tags, String from, String to, String timeVar) {
+	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -142,7 +142,9 @@ public class MeasurementService {
 		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
 		if (tags != null && !tags.isEmpty())
 			fluxQuery.add( String.format("filter(fn: (r) => %s)",
-					tags.keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, tags.get(key))).collect(Collectors.joining(" and "))) );
+					tags.keySet().stream()
+					.map(key -> '(' + tags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
+					.collect(Collectors.joining(" and "))) );
 		
 		
 		String flux = fluxQuery.stream().collect(Collectors.joining(" |> "));
@@ -152,7 +154,7 @@ public class MeasurementService {
 		return MeasurementMapper.fromFlux(tables);
 	}
 
-	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, String> tags, String from, String to, String timeVar, String group) {
+	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -189,7 +191,9 @@ public class MeasurementService {
 		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
 		if (tags != null && !tags.isEmpty())
 			fluxQuery.add( String.format("filter(fn: (r) => %s)",
-					tags.keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, tags.get(key))).collect(Collectors.joining(" and "))) );
+					tags.keySet().stream()
+					.map(key -> '(' + tags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
+					.collect(Collectors.joining(" and "))) );
 		fluxQuery.add("filter(fn: (r) => types.isType(v: r._value, type: \"float\") or types.isType(v: r._value, type: \"int\"))");
 		
 		// GROUP DATA BY MEASUREMENT
