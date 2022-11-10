@@ -3,8 +3,14 @@ package com.renergetic.hdrapi.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.repository.NotificationRepository;
+import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,11 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.hdrapi.dao.AssetDAOResponse;
-import com.renergetic.hdrapi.dao.UserDAORequest;
-import com.renergetic.hdrapi.dao.UserDAOResponse;
-import com.renergetic.hdrapi.dao.UserRolesDAO;
-import com.renergetic.hdrapi.dao.UserSettingsDAO;
 import com.renergetic.hdrapi.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,10 @@ public class UserController {
 	
 	@Autowired
 	UserService userSv;
+	@Value("${api.generate.dummy-data}")
+	private Boolean generateDummy;
+	@Autowired
+	NotificationRepository notificationRepository;
 	
 //=== GET REQUESTS====================================================================================
 	
@@ -100,6 +105,20 @@ public class UserController {
 		settings = userSv.getSettings(null, offset.orElse(0L), limit.orElse(20));
 		
 		return new ResponseEntity<>(settings, HttpStatus.OK);
+	}
+	@Operation(summary = "Get All Notifications for the user")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "/notifications", produces = "application/json")
+	public ResponseEntity<List<NotificationDAO>> getUserNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<NotificationDAO> notifications;
+		//TODO: filter by user id
+		if (generateDummy) {
+			notifications= DummyDataGenerator.getNotifications();
+		} else {
+			notifications = notificationRepository.findAll(new OffSetPaging(offset.orElse(0L), limit.orElse(60)))
+					.stream().map(NotificationDAO::create).collect(Collectors.toList());
+		}
+		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
 
 	@Operation (summary="Get Assets from User with specific id")

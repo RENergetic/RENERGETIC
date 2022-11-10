@@ -75,7 +75,7 @@ public class InformationTileDAOResponse {
             dao.setProps(Json.parse(entity.getProps()).toMap());
         } catch (ParseException e) {
             //tODO: verify catch
-            dao.setLayout(null);
+                dao.setProps(new HashMap());
         }
 
         dao.setMeasurements(measurements);

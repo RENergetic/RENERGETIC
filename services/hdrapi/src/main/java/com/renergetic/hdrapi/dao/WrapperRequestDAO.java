@@ -38,8 +38,20 @@ public class WrapperRequestDAO {
         //TODO: handle dashboards
         @JsonProperty(required = false)
         private PaginationArgsWrapperRequestDAO dashboards;
-    }
+        @JsonProperty(required = false, value = "measurement_types")
+        private EmptyArgsWrapperRequestDAO measurementTypes;
 
+
+
+    }
+    @Getter
+    @Setter
+    @RequiredArgsConstructor
+    @ToString
+    public static class EmptyArgsWrapperRequestDAO {
+
+
+    }
     @Getter
     @Setter
     @RequiredArgsConstructor

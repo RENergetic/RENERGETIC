@@ -36,7 +36,8 @@ public class UIAggregatorController {
     private DataService dataService;
     @Autowired
     private DashboardService dashboardService;
-
+    @Autowired
+    MeasurementService measurementSv;
     @Operation(summary = "API wrapper for front-end")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = {"/wrapper", "/wrapper/{userId}"}, produces = "application/json")
@@ -55,6 +56,10 @@ public class UIAggregatorController {
             wrapperResponseDAO.setAssetPanels(getAssetPanels(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
 
+        }
+        if (wrapperRequestBodyDAO.getCalls().getMeasurementTypes() != null) {
+
+            wrapperResponseDAO.setMeasurementTypes(measurementSv.getTypes(null, 0, 1000));
         }
         if (wrapperRequestBodyDAO.getCalls().getData() != null) {
             //get data related to panelId -> TODO: something to consider later

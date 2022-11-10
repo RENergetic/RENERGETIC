@@ -42,13 +42,13 @@ public class NotificationController {
 	@Operation(summary = "Get All Notifications")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<NotificationDAO>> getAllNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){		
+	public ResponseEntity<List<NotificationDAO>> getAllNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
 		 List<NotificationDAO> notifications = notificationRepository.findAll(new OffSetPaging(offset.orElse(0L), limit.orElse(60)))
 				 .stream().map(NotificationDAO::create).collect(Collectors.toList());
-		
+
 		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
-	
+
 	@Operation(summary = "Get Notifications by asset id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
