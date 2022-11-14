@@ -16,12 +16,13 @@ INSERT INTO measurement
 ( 1000, 'cooling_circuits', 3 , 'cooling_circuits', 1 ),
 ( 1001, 'chiller', 4 , 'chiller', 1 ),
 ( 1002, 'heat_meter', 4 , 'heat_meter', 1 ),
-( 1003, 'dh_temperature', 4 , 'dh_temperature', 1 ),
-( 1004, 'dhw_temperature', 4 , 'dhw_temperature', 1 ),
-( 1005, 'tapping_water', 3 , 'tapping_water', 1 ),
-( 1006, 'thermostate', 4 , 'thermostate', 1 ),
-( 1007, 'temperature', 4 , 'temperature', 1 ),
-( 1008, 'cpu', 4 , 'cpu', 1 );
+( 1003, 'electricity_meter', 4 , 'electricity_meter', 1 ),
+( 1004, 'dh_temperature', 4 , 'dh_temperature', 1 ),
+( 1005, 'dhw_temperature', 4 , 'dhw_temperature', 1 ),
+( 1006, 'tapping_water', 3 , 'tapping_water', 1 ),
+( 1007, 'thermostate', 4 , 'thermostate', 1 ),
+( 1008, 'temperature', 4 , 'temperature', 1 ),
+( 1009, 'cpu', 4 , 'cpu', 1 );
 
 /* CREATE TAGS TO CHECK INFLUXDB TAGS */
 INSERT INTO tags ( id, key, value ) VALUES
