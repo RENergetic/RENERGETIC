@@ -76,7 +76,7 @@ public class UIAggregatorController {
                             it -> it.getDemandDefinition().getTile() != null
                     ).flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
                             .collect(Collectors.toList());
-            DataDAO demandData = dataService.getData(measurements.stream().map(dao -> dao.mapToEntity()).toList(), null, null);
+            DataDAO demandData = dataService.getData(measurements.stream().map(dao -> dao.mapToEntity()).collect(Collectors.toList()), null, null);
             //TODO: here there might be issue with presenting the data and choosing appropriate time interval - this should be discused
             //probably data required for the demand demand should be stored as static  DataDAO JSON in RDBMS
             //if the user chooses interval it wouldnt make sense from the demand/request perspective

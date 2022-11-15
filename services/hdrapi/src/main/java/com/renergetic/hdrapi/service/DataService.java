@@ -119,7 +119,7 @@ public class DataService {
 
     public DataDAO getData(Collection<Measurement> measurements, Long from, Optional<Long> to) {
         if (generateDummy) {
-            return DummyDataGenerator.getData(measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).toList());
+            return DummyDataGenerator.getData(measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(Collectors.toList()));
         } else {
         	DataDAO ret = new DataDAO();
     		Map<String, String> params = new HashMap<>();
@@ -132,7 +132,7 @@ public class DataService {
         			assetNames.add(measurement.getAsset().getName());
         		if (measurement.getAssetCategory() != null)
         			assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
-        					.stream().map(asset -> asset.getName()).toList());
+        					.stream().map(asset -> asset.getName()).collect(Collectors.toList()));
         		
         		// GET MEASUREMENT TAGS
         		List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
