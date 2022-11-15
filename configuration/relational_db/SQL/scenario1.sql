@@ -146,7 +146,7 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 
 /* TILES AND PANELS */
 INSERT INTO information_panel ( id, name, label, is_template, featured, uuid ) VALUES
-( 1, 'energy_flow', 'Energy flow', false, true, '2' ),
+( 1, 'energy_flow', 'Energy flow', false, false, '2' ),
 ( 2, 'renewability_panel_template', 'Renewability panel for {asset}', true, true, '2' );
 
 INSERT INTO information_tile ( id, name, label, layout, props, type, information_panel_id ) VALUES

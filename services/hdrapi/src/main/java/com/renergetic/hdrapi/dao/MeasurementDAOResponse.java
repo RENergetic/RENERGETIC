@@ -1,7 +1,6 @@
 package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.hdrapi.dao.details.MeasurementDetailsDAO;
 import com.renergetic.hdrapi.model.Direction;
 import com.renergetic.hdrapi.model.Domain;
 import com.renergetic.hdrapi.model.Measurement;
@@ -12,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -45,7 +46,7 @@ public class MeasurementDAOResponse {
     private String category;
 
     @JsonProperty(value = "measurement_details", required = false)
-    private List<MeasurementDetailsDAO> measurementDetails;
+    private HashMap<String, ?> measurementDetails;
 
 //	private transient InformationTileMeasurement categoryQuery;
 
@@ -66,11 +67,18 @@ public class MeasurementDAOResponse {
                 dao.setCategory(measurement.getAssetCategory().getName());
 
             if (details != null) {
-                List<MeasurementDetailsDAO> detailsDao = details.stream().map(
-                        it -> new MeasurementDetailsDAO(it.getKey(), it.getValue(),
-                                it.getMeasurement().getId())).collect(
-                        Collectors.toList());
+//                List<MeasurementDetailsDAO> detailsDao = details.stream().map(
+//                        it ->  new MeasurementDetailsDAO(it.getKey(), it.getValue(),
+//                                it.getMeasurement().getId())).collect(
+//                        Collectors.toList());
+                HashMap<String, String> detailsDao = details.stream()
+                        .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
+                                (prev, next) -> next, HashMap::new));
+
                 dao.setMeasurementDetails(detailsDao);
+            }
+            else {
+                dao.setMeasurementDetails(new HashMap<>());
             }
         }
         return dao;
