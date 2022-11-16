@@ -146,8 +146,8 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 
 /* TILES AND PANELS */
 INSERT INTO information_panel ( id, name, label, is_template, featured, uuid ) VALUES
-( 1, 'energy_flow', 'Energy flow', false, true, '2' ),
-( 2, 'renewability_panel_template', 'Renewability panel for {asset}', false, true, '2' );
+( 1, 'consumption_screen', 'Consumption', false, true, '2' ),
+( 2, 'production_screen', 'Production', false, true, '2' );
 
 INSERT INTO information_tile ( id, name, label, layout, props, type, information_panel_id ) VALUES
 /* PRODUCTION SCREEN */
@@ -159,10 +159,10 @@ INSERT INTO information_tile ( id, name, label, layout, props, type, information
 ( 6, 'non_renewables', 'Non Renewables', '{"x":5,"y":5,"w":2,"h":3}', '{"icon":"electricity"}', 'single', 2 ),
 /* CONSUMPTION SCREEN */
 ( 10, 'overview', 'Electricity and heat are used by', '{"x":0,"y":0,"w":12,"h":1}', '{"icon_visibility":false, "background":"none", "template":true}', 'single', 1 ),
-( 11, 'office', 'Office', '{"x":3,"y":1,"w":3,"h":9}', '{"icon":"office","mask":"#26262680"}', 'multi_knob', 1 ),
-( 12, 'supercomputer', 'Supercomputers', '{"x":6,"y":1,"w":3,"h":9}', '{"icon":"supercomputer","mask":"#26262680"}', 'multi_knob', 1 ),
-( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac","mask":"#26262680"}', 'multi_knob', 1 ),
-( 14, 'heat_exhanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat","mask":"#26262680"}', 'multi_knob', 1 ),
+( 11, 'office', 'Office', '{"x":3,"y":1,"w":3,"h":9}', '{"icon":"office","background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
+( 12, 'supercomputer', 'Supercomputers', '{"x":6,"y":1,"w":3,"h":9}', '{"icon":"supercomputer","background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
+( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac","background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
+( 14, 'heat_exhanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat","background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
 /* TODO: where are this tiles shown? */
 ( 20, 'heat', 'Heat', null, '{"icon":"heat"}', 'single', null ),
 ( 21, 'heat', 'Heat', null, '{"icon":"heat"}', 'multi_knob', null );
