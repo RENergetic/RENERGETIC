@@ -126,9 +126,13 @@ public class DataService {
         	
         	for (Measurement measurement : measurements) {
             	List<String> assetNames = new LinkedList<>();
+            	
+            	// SET DEFAULT VALUES TO THE MEASUREMENT
+            	ret.getCurrent().getLast().put(measurement.getId().toString(), null);
+            	ret.getCurrent().getMax().put(measurement.getId().toString(), null);
 
-        		// GET ASSETS RELATED WITH THE MEASUREMENT
-        		if (measurement.getAsset() != null)
+        		// GET ASSETS RELATED WITH THE MEASUREMENT (If the assets is a energy island and there isn't category it doesn't filter by asset)
+        		if (measurement.getAsset() != null && !measurement.getAsset().getType().getName().equalsIgnoreCase("energy_island"))
         			assetNames.add(measurement.getAsset().getName());
         		if (measurement.getAssetCategory() != null)
         			assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
@@ -140,13 +144,13 @@ public class DataService {
         		// PREPARE INFLUX FILTERS
         		if (measurement.getSensorName() != null)
         			params.put("measurements", measurement.getSensorName());
-        		if (measurement.getSensorName() != null)
+        		if (measurement.getType() != null)
         			params.put("fields", measurement.getType().getName());
         		if (measurement.getDirection() != null)
         			params.put("direction", measurement.getDirection().name());
         		if (measurement.getDomain() != null)
         			params.put("domain", measurement.getDomain().name());
-        		if (measurement.getSensorName() != null)
+        		if (assetNames != null && !assetNames.isEmpty())
         			params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
         		if (tags != null && !tags.isEmpty())
         			params.putAll(tags.stream()
@@ -155,7 +159,7 @@ public class DataService {
         		
         		// INFLUX API REQUEST
         		HttpResponse<String> responseLast = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/last", "GET", params, null, null);
-        		HttpResponse<String> responseMax = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/max", "GET", params, null, null);
+        		HttpResponse<String> responseMax = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/sum", "GET", params, null, null);
         		
                 if (responseLast.statusCode() < 300) {
                     JSONArray array = new JSONArray(responseLast.body());
@@ -163,9 +167,9 @@ public class DataService {
                     	array.forEach( obj -> {
                     		if (obj instanceof JSONObject) {
                     			JSONObject json = (JSONObject) obj;
-                    			if (json.has("measurement") && json.getString("measurement") == null)
-	                        	ret.getCurrent().getLast().put(measurement.getId().toString(),
-	                                Double.parseDouble(json.getJSONObject("fields").getString("last")));
+                    			if (json.has("measurement"))
+		                        	ret.getCurrent().getLast().put(measurement.getId().toString(),
+		                                Double.parseDouble(json.getJSONObject("fields").getString("last")));
                     		}
                     	});
                 }
@@ -175,14 +179,14 @@ public class DataService {
                     	array.forEach( obj -> {
                     		if (obj instanceof JSONObject) {
                     			JSONObject json = (JSONObject) obj;
-                    			if (json.has("measurement") && json.getString("measurement") == null)
-	                        	ret.getCurrent().getLast().put(measurement.getId().toString(),
-	                                Double.parseDouble(json.getJSONObject("fields").getString("max")));
+                    			if (json.has("measurement"))
+		                        	ret.getCurrent().getMax().put(measurement.getId().toString(),
+		                                Double.parseDouble(json.getJSONObject("fields").getString("max")));
                     		}
                     	});
                 }
         	}
-            return null;
+            return ret;
         }
     }
 

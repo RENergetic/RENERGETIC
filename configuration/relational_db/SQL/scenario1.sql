@@ -112,42 +112,42 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 ( 62, 'non_renewability', 'Non Renewability', 2, 'electricity', 'in', 'energy_meter', NULL, 7, NULL, '2' ),
 ( 63, 'non_renewability', 'Non Renewability', 5, 'electricity', 'in', 'energy_meter', NULL, 7, NULL, '2' ),
 /* MEASUREMENTS TO ASSET CATEGORY 1 */
-( 64, 'current_power', 'Current power', 1, 'electricity', 'in', 'electricity_meter', NULL, NULL, 1, '2' ),
-( 65, 'energy_consumed', 'Current energy', 2, 'electricity', 'in', 'electricity_meter', NULL, NULL, 1, '2' ),
-( 66, 'current_power', 'Current power', 1, 'heat', 'in', 'heat_meter', NULL, NULL, 1, '2' ),
-( 67, 'energy_consumed', 'Current energy', 2, 'heat', 'in', 'heat_meter', NULL, NULL, 1, '2' ),
+( 64, 'current_power', 'Electricity', 7, 'electricity', 'in', 'electricity_meter', NULL, NULL, 1, '2' ),
+( 65, 'energy_consumed', 'Electricity', 9, 'electricity', 'in', 'electricity_meter', NULL, NULL, 1, '2' ),
+( 66, 'current_power', 'Heat', 7, 'heat', 'in', 'heat_meter', NULL, NULL, 1, '2' ),
+( 67, 'energy_consumed', 'Heat', 9, 'heat', 'in', 'heat_meter', NULL, NULL, 1, '2' ),
 /* MEASUREMENTS TO ASSET CATEGORY 2 */
-( 68, 'current_power', 'Current power', 1, 'electricity', 'in', 'electricity_meter', NULL, NULL, 2, '2' ),
-( 69, 'energy_consumed', 'Current energy', 2, 'electricity', 'in', 'electricity_meter', NULL, NULL, 2, '2' ),
-( 70, 'current_power', 'Current power', 1, 'heat', 'in', 'heat_meter', NULL, NULL, 2, '2' ),
-( 71, 'energy_consumed', 'Current energy', 2, 'heat', 'in', 'heat_meter', NULL, NULL, 2, '2' ),
+( 68, 'current_power', 'Electricity', 7, 'electricity', 'in', 'electricity_meter', NULL, NULL, 2, '2' ),
+( 69, 'energy_consumed', 'Electricity', 9, 'electricity', 'in', 'electricity_meter', NULL, NULL, 2, '2' ),
+( 70, 'current_power', 'Heat', 7, 'heat', 'in', 'heat_meter', NULL, NULL, 2, '2' ),
+( 71, 'energy_consumed', 'Heat', 9, 'heat', 'in', 'heat_meter', NULL, NULL, 2, '2' ),
 /* MEASUREMENTS TO ASSET CATEGORY 3 */		  
-( 72, 'current_power', 'Current power', 1, 'electricity', 'in', 'electricity_meter', NULL, NULL, 3, '2' ),
-( 73, 'energy_consumed', 'Current energy', 2, 'electricity', 'in', 'electricity_meter', NULL, NULL, 3, '2' ),
-( 74, 'current_power', 'Current power', 1, 'heat', 'in', 'heat_meter', NULL, NULL, 3, '2' ),
-( 75, 'energy_consumed', 'Current energy', 2, 'heat', 'in', 'heat_meter', NULL, NULL, 3, '2' ),
+( 72, 'current_power', 'Electricity', 7, 'electricity', 'in', 'electricity_meter', NULL, NULL, 3, '2' ),
+( 73, 'energy_consumed', 'Electricity', 9, 'electricity', 'in', 'electricity_meter', NULL, NULL, 3, '2' ),
+( 74, 'current_power', 'Heat', 7, 'heat', 'in', 'heat_meter', NULL, NULL, 3, '2' ),
+( 75, 'energy_consumed', 'Heat', 9, 'heat', 'in', 'heat_meter', NULL, NULL, 3, '2' ),
 /* MEASUREMENTS TO ASSET CATEGORY 4 */
-( 76, 'current_power', 'Current power', 1, 'electricity', 'in', 'electricity_meter', NULL, NULL, 4, '2' ),
-( 77, 'energy_consumed', 'Current energy', 2, 'electricity', 'in', 'electricity_meter', NULL, NULL, 4, '2' ),
-( 78, 'current_power', 'Current power', 1, 'heat', 'in', 'heat_meter', NULL, NULL, 4, '2' ),
-( 79, 'energy_consumed', 'Current energy', 2, 'heat', 'in', 'heat_meter', NULL, NULL, 4, '2' ),
+( 76, 'current_power', 'Electricity', 7, 'electricity', 'in', 'electricity_meter', NULL, NULL, 4, '2' ),
+( 77, 'energy_consumed', 'Electricity', 9, 'electricity', 'in', 'electricity_meter', NULL, NULL, 4, '2' ),
+( 78, 'current_power', ' Heat', 7, 'heat', 'in', 'heat_meter', NULL, NULL, 4, '2' ),
+( 79, 'energy_consumed', 'Heat', 9, 'heat', 'in', 'heat_meter', NULL, NULL, 4, '2' ),
 /* MEASUREMENTS TO ASSET CATEGORY 5 */
-( 80, 'current_power', 'Current power', 1, 'heat', 'out', 'energy_meter', NULL, NULL, 5, '2' ),
-( 81, 'energy_consumed', 'Current energy', 2, 'heat', 'out', 'energy_meter', NULL, NULL, 5, '2' ),
-( 82, 'heat_exhanged', 'Heat exhanged', 1, 'heat', 'out', 'heat_exhanger', NULL, NULL, 5, '2' ),
-( 83, 'heat_wasted', 'Heat wasted', 1, 'heat', 'out', 'heat_exhanger', NULL, NULL, 5, '2' ),
+( 80, 'current_power', 'Current power', 7, 'heat', 'out', 'energy_meter', NULL, NULL, 5, '2' ),
+( 81, 'energy_consumed', 'Current energy', 9, 'heat', 'out', 'energy_meter', NULL, NULL, 5, '2' ),
+( 82, 'heat_exhanged', 'Heat exhanged', 7, 'heat', 'out', 'heat_exhanger', NULL, NULL, 5, '2' ),
+( 83, 'heat_wasted', 'Heat wasted', 7, 'heat', 'out', 'heat_exhanger', NULL, NULL, 5, '2' ),
 /* RENEWABILITY MEASUREMENTS FOR ENTIRE ISLAND */
-( 84, 'renewability', 'Renewable', 2, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 85, 'non_renewability', 'Fosil Fuels', 2, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 86, 'external', 'External', 2, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 87, 'renewability', 'Renewable', 2, 'heat', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 88, 'non_renewability', 'Fosil Fuels', 2, 'heat', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 89, 'external', 'External', 2, 'heat', 'out', 'energy_meter', NULL, 3, NULL, '2' );
+( 84, 'renewability', 'Renewable', 9, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
+( 85, 'non_renewability', 'Fosil Fuels', 9, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
+( 86, 'external', 'External', 9, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
+( 87, 'renewability', 'Renewable', 9, 'heat', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
+( 88, 'non_renewability', 'Fosil Fuels', 9, 'heat', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
+( 89, 'external', 'External', 9, 'heat', 'out', 'energy_meter', NULL, 3, NULL, '2' );
 
 /* TILES AND PANELS */
 INSERT INTO information_panel ( id, name, label, is_template, featured, uuid ) VALUES
-( 1, 'energy_flow', 'Energy flow', false, false, '2' ),
-( 2, 'renewability_panel_template', 'Renewability panel for {asset}', true, true, '2' );
+( 1, 'energy_flow', 'Energy flow', false, true, '2' ),
+( 2, 'renewability_panel_template', 'Renewability panel for {asset}', false, true, '2' );
 
 INSERT INTO information_tile ( id, name, label, layout, props, type, information_panel_id ) VALUES
 /* PRODUCTION SCREEN */
@@ -158,11 +158,11 @@ INSERT INTO information_tile ( id, name, label, layout, props, type, information
 ( 5, 'waste', 'Waste', '{"x":5,"y":3,"w":2,"h":3}', '{"icon":"electricity"}', 'single', 2 ),
 ( 6, 'non_renewables', 'Non Renewables', '{"x":5,"y":5,"w":2,"h":3}', '{"icon":"electricity"}', 'single', 2 ),
 /* CONSUMPTION SCREEN */
-( 10, 'overview', 'PSNC overview', '{"x":0,"y":0,"w":12,"h":1}', '{"icon_visibility":false}', 'single', 1 ),
-( 11, 'office', 'Office', '{"x":3,"y":1,"w":3,"h":9}', '{"icon":"office"}', 'multi_knob', 1 ),
-( 12, 'supercomputer', 'Supercomputers', '{"x":6,"y":1,"w":3,"h":9}', '{"icon":"supercomputer"}', 'multi_knob', 1 ),
-( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac"}', 'multi_knob', 1 ),
-( 14, 'heat_exhanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat"}', 'multi_knob', 1 ),
+( 10, 'overview', 'Electricity and heat are used by', '{"x":0,"y":0,"w":12,"h":1}', '{"icon_visibility":false, "background":"none", "template":true}', 'single', 1 ),
+( 11, 'office', 'Office', '{"x":3,"y":1,"w":3,"h":9}', '{"icon":"office","mask":"#26262680"}', 'multi_knob', 1 ),
+( 12, 'supercomputer', 'Supercomputers', '{"x":6,"y":1,"w":3,"h":9}', '{"icon":"supercomputer","mask":"#26262680"}', 'multi_knob', 1 ),
+( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac","mask":"#26262680"}', 'multi_knob', 1 ),
+( 14, 'heat_exhanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat","mask":"#26262680"}', 'multi_knob', 1 ),
 /* TODO: where are this tiles shown? */
 ( 20, 'heat', 'Heat', null, '{"icon":"heat"}', 'single', null ),
 ( 21, 'heat', 'Heat', null, '{"icon":"heat"}', 'multi_knob', null );
@@ -177,14 +177,14 @@ INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id
 ( 7, 57, NULL, NULL, NULL, NULL, NULL, NULL, 4 ),
 ( 8, 45, NULL, NULL, NULL, NULL, NULL, NULL, 5 ),
 ( 9, 59, NULL, NULL, NULL, NULL, NULL, NULL, 6 ),
-( 10, 64, NULL, NULL, NULL, NULL, NULL, NULL, 11 ),
-( 11, 66, NULL, NULL, NULL, NULL, NULL, NULL, 11 ),
-( 12, 68,NULL, NULL, NULL, NULL, NULL, NULL, 12 ),
-( 13, 70, NULL, NULL, NULL, NULL, NULL, NULL, 12 ),
-( 14, 72, NULL, NULL, NULL, NULL, NULL, NULL, 13 ),
-( 15, 74, NULL, NULL, NULL, NULL, NULL, NULL, 13 ),
-( 16, 76, NULL, NULL, NULL, NULL, NULL, NULL, 14 ),
-( 17, 78, NULL, NULL, NULL, NULL, NULL, NULL, 14 );
+( 10, 65, NULL, NULL, NULL, NULL, NULL, NULL, 11 ),
+( 11, 67, NULL, NULL, NULL, NULL, NULL, NULL, 11 ),
+( 12, 69,NULL, NULL, NULL, NULL, NULL, NULL, 12 ),
+( 13, 71, NULL, NULL, NULL, NULL, NULL, NULL, 12 ),
+( 14, 73, NULL, NULL, NULL, NULL, NULL, NULL, 13 ),
+( 15, 75, NULL, NULL, NULL, NULL, NULL, NULL, 13 ),
+( 16, 77, NULL, NULL, NULL, NULL, NULL, NULL, 14 ),
+( 17, 79, NULL, NULL, NULL, NULL, NULL, NULL, 14 );
 
 /* CONNECT ASSETS WITH PANELS */
 INSERT INTO asset_panel ( panel_id, asset_id ) VALUES
@@ -202,3 +202,19 @@ INSERT INTO user_demand_schedule ( id, asset_id, demand_id, demand_start, demand
 ( 1, 5, 1, now(), now() + interval '48 hour', now() ),
 ( 2, 6, 2, now(), now() + interval '48 hour', now() ),
 ( 3, 6, 2, now() - interval '96 hour', now() - interval '24 hour', now() );
+
+/* SET COLORS */
+INSERT INTO public.measurement_details(
+  id, key, value, measurement_id)
+	SELECT  m.id, 'color', mt.color, m.id
+	FROM measurement m JOIN measurement_type mt on m.measurement_type_id = mt.id;
+
+UPDATE measurement_details
+    SET value =
+    CASE
+    WHEN   measurement.domain = 'electricity'  THEN '#0BA6DF' 
+    WHEN   measurement.domain = 'heat'  THEN '#A855F3' 
+    ELSE '9B59B6'
+ END 
+ FROM measurement WHERE  measurement.id = measurement_details.measurement_id 
+AND measurement_details."key" = 'color';
