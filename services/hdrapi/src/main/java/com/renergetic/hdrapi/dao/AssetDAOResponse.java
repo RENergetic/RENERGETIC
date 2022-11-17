@@ -110,8 +110,9 @@ public class AssetDAOResponse {
 //					mapMeasurements.add(SimpleMeasurementDAO.create(measurement));
 //				dao.setMeasurements(mapMeasurements);
 //			}
-			if (asset.getUser() != null) 
+			if (asset.getUser() != null) {
 				dao.setUser(asset.getUser().getId());
+			}
 			if(asset.getAssetCategory() != null)
 				dao.setAsset_category(AssetCategoryDAO.create(asset.getAssetCategory()));
 		}
