@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -42,4 +43,9 @@ public class Asset {
 
 	@Column(name = "geo_location", nullable = true, insertable = true, updatable = true)
 	private String location;
+
+	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "asset_category_id", nullable = true, insertable = true, updatable = true)
+	private AssetCategory assetCategory;
 }

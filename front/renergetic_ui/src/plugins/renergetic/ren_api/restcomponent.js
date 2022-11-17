@@ -1,4 +1,6 @@
 export default class RestComponent {
+  //TODO: remove temmporary user id
+  USER_ID = 2;
   constructor(axiosInstance, vueInstance) {
     this.vueInstance = vueInstance;
     this.axios = axiosInstance;

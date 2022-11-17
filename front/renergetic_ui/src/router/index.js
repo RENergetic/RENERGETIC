@@ -37,6 +37,12 @@ const routes = [
     meta: { isAuthenticated: false },
     component: () => import("../views/RenAbout.vue"),
   },
+  {
+    path: "/login",
+    name: "Login",
+    meta: { isAuthenticated: true },
+    component: () => import("../views/RenAbout.vue"),
+  },
   ...dashboardRoutes,
   ...adminRoutes,
   ...managementRoutes,
@@ -44,6 +50,13 @@ const routes = [
 ];
 function timeout(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+function hasAccess(assignedRoles, allowedRoles) {
+  if (!allowedRoles || allowedRoles.length == 0) return true;
+  for (var i = 0; i < allowedRoles.length; i++) {
+    if (assignedRoles.indexOf(allowedRoles[i]) !== -1) return true;
+  }
+  return false;
 }
 
 export default function (Vue) {
@@ -54,6 +67,8 @@ export default function (Vue) {
 
   router.beforeEach(async (to, from, next) => {
     to.meta.from = from;
+    // console.info(to);
+    // console.info(from);
     if (to.meta.isAuthenticated) {
       let keycloak = Vue.config.globalProperties.$keycloak;
       if (!keycloak.isInitialized()) {
@@ -65,27 +80,28 @@ export default function (Vue) {
       } else {
         console.info("no timeout");
       }
-      let user = await keycloak.get();
-      console.info(user.authenticated);
+      keycloak = await keycloak.get();
+      console.info(keycloak.authenticated);
       // Get the actual url of the app, it's needed for Keycloak
       // const basePath = window.location.toString();
-      if (!user.authenticated) {
+      if (!keycloak.authenticated) {
         const basePath = window.location.origin.toString();
         var path = `${basePath}/${to.path}`;
         // The page is protected and the user is not authenticated. Force a login.
         //"http://localhost:8080" + to.path
-        user.login({ redirectUri: path });
+        keycloak.login({ redirectUri: path });
         next({ name: "Unauthorized" });
         //} else if (keycloak.hasResourceRole("vue-test") || 1 == 1) {
       } else if (
-        user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID] != undefined &&
-        keycloak.hasAccess(user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles, to.meta.roles)
+        (keycloak.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID] != undefined &&
+          hasAccess(keycloak.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles, to.meta.roles)) ||
+        to.meta.roles == undefined
       ) {
         //TODO: clear or
         // The user was authenticated, and have the necessary roles
         //console.log(Vue.config.globalProperties.$keycloak.getUsers()); //Test plugin methods
 
-        await user
+        await keycloak
           .updateToken(70)
           .then(() => {
             next();
@@ -99,7 +115,11 @@ export default function (Vue) {
       }
     } else {
       // This page did not require authentication
-      next();
+      if (to.hash.match("^#error=login_required&state=.*$")) {
+        next({ path: to.path });
+      } else {
+        next();
+      }
     }
   });
   return router;

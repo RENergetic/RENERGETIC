@@ -109,7 +109,7 @@
 import MeasurementChart from "../measurements/MeasurementChart.vue";
 import AssetSelect from "../../management/infrastructure/AssetSelect.vue";
 import HeatMapSelect from "./HeatMapSelect.vue";
-import DashboardSelect from "../DashboardSelect.vue";
+import DashboardSelect from "../grafana/DashboardSelect.vue";
 import AssetView from "@/components/management/infrastructure/AssetView.vue";
 export default {
   name: "AreaDetails",
@@ -152,8 +152,12 @@ export default {
       deep: true,
       immediate: true,
     },
-    modelValue: function (newVal) {
-      this.mArea = newVal;
+    modelValue: {
+      handler(newVal) {
+        this.mArea = newVal;
+      },
+      deep: true,
+      immediate: true,
     },
   },
   methods: {

@@ -53,9 +53,14 @@ spec:
 #        - name: keycloak-diskc
 #          mountPath: /opt/jboss/keycloak/standalone/configuration/
         readinessProbe:
+          failureThreshold: 3
           httpGet:
             path: /auth/realms/master
             port: 8080
+          initialDelaySeconds: 70
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 1
       restartPolicy: Always
 #      volumes:
 #        - name: keycloak-diskc

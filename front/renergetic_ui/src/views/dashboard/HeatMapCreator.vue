@@ -31,7 +31,10 @@ export default {
       heatmapDialog: false,
     };
   },
-  created() {},
+  created() {
+    this.$router.push(`/`);
+    return;
+  },
   mounted() {
     this.heatmap = new HeatMap();
     this.heatmapDialog = true;
@@ -43,6 +46,7 @@ export default {
         // dashoard.id = id;
         // this.$store.commit("view/dashboardsAdd", dashoard);
         // TODO: router back?
+        console.info("heatmapsave");
         this.$router.push(this.$route.meta.from);
       });
     },

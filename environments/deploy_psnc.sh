@@ -59,7 +59,7 @@ then
         kubectl apply -f postgresql-service.yaml
         
         while [[ $(kubectl -n ${project} get pods -l app=postgresql-db -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; 
-            do echo "Waiting to PostgreSQL pod to create databases" && sleep 1; 
+            do echo "Waiting to PostgreSQL pod to create databases" && sleep 5; 
         done
         kubectl exec statefulset/postgresql-db --namespace=$project -- bin/bash -c "psql -U postgres < ./scripts/init.sql"
     fi

@@ -1,20 +1,24 @@
 <template>
   <div>
     <Button id="sideMenuButton" icon="pi pi-arrow-right" @click="visible = true" />
+
     <Sidebar v-model:visible="visible" class="ren-sidebar">
-      <Logo style="position: relative; display: block; margin: 1rem; left: 1rem; bottom: initial" />
+      <div id="sideMenuLogo">
+        <Logo />
+      </div>
       <PanelMenu :model="menuModel" />
     </Sidebar>
     <Dialogs
       :notifications="notifications"
       :add-dashboard="dashboardDialog"
       @update:notifications="notifications = $event"
-      @UpdateMenu="reload"
+      @update-menu="reload"
     ></Dialogs>
   </div>
 </template>
 
 <script>
+import { RenRoles } from "../../plugins/model/Enums";
 import PanelMenu from "primevue/panelmenu";
 import Sidebar from "primevue/sidebar";
 import Dialogs from "./Dialogs.vue";
@@ -31,35 +35,39 @@ export default {
   emits: ["notification"],
   data() {
     return {
+      role: this.$store.getters["auth/renRole"],
       visible: false,
       menuModel: [],
       dashboards: [],
-      //tODO: dialog state hashmap
       notifications: false,
       dashboardDialog: false,
       informationPanels: [],
       isAdmin: false, //this.$store.getters["user/isAdmin"],
-      user: false,
+      isLogin: false,
     };
   },
-  watch: {
-    isAdmin: function () {
-      this.menuModel = this.initMenu();
+  computed: {
+    pluginLoaded() {
+      return this.$pluginLoaded;
     },
   },
-
-  async created() {
-    this.user = await this.$keycloak.get();
+  watch: {
+    // isAdmin: function () {
+    //   this.menuModel = this.initMenu();
+    // },
+  },
+  mounted() {
     this.menuModel = this.initMenu();
     this.reload();
   },
+  async created() {},
   methods: {
     async reload() {
       this.$ren.utils
         .reloadStore()
         .then(async () => {
-          //this.dashboards = this.$store.getters["view/dashboards"];
-          this.dashboards = await this.$ren.dashboardApi.list();
+          this.dashboards = this.$store.getters["view/dashboards"];
+          // this.dashboards = await this.$ren.dashboardApi.list();
           this.informationPanels = this.$store.getters["view/informationPanels"];
           let menu = this.initMenu();
           this.menuModel = menu;
@@ -78,18 +86,7 @@ export default {
           icon: "pi pi-fw pi-th-large",
           to: to,
           command: () => {
-            this.$router.push(to);
-          },
-          visible: () => {
-            let route =
-              this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "InformationPanelView")];
-            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-            else {
-              return this.$keycloak.hasAccess(
-                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-                route.meta.roles,
-              );
-            }
+            this.$router.push({ to: to, params: { id: panel.id } });
           },
         };
       });
@@ -100,19 +97,6 @@ export default {
         command: () => {
           this.$router.push({ name: "InformationPanelList" });
         },
-        visible: () => {
-          let route =
-            this.$router.getRoutes()[
-              this.$router.getRoutes().findIndex((obj) => obj.name == "InformationPanelListView")
-            ];
-          if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-          else {
-            return this.$keycloak.hasAccess(
-              this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-              route.meta.roles,
-            );
-          }
-        },
       });
       items.push({
         //tODO:
@@ -122,23 +106,46 @@ export default {
         command: () => {
           this.$router.push({ name: "InformationPanelCreator" });
         },
-        visible: () => {
-          let route =
-            this.$router.getRoutes()[
-              this.$router.getRoutes().findIndex((obj) => obj.name == "InformationPanelCreator")
-            ];
-          if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-          else {
-            return this.$keycloak.hasAccess(
-              this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-              route.meta.roles,
-            );
-          }
-        },
       });
       return items;
     },
+    assetsItems() {
+      let flags = RenRoles.REN_VISITOR | RenRoles.REN_USER;
+      if ((flags & this.role) == 0) return [];
+      let assetPanels = this.$store.getters["view/assetPanels"];
+      if (assetPanels.length == 0) return [];
+      let items = assetPanels.map((assetPanel) => {
+        // let to = `/asset/${assetPanel.asset.id}/panel/${assetPanel.panel.id}`;
+
+        return {
+          // label: this.$t("menu.group_list"),
+          label: assetPanel.panel.label.replace("{asset}", assetPanel.asset.label),
+          icon: "pi pi-fw pi-align-left",
+          // to: to,
+          command: () => {
+            this.$router.push({
+              name: "AssetPanelView",
+              params: {
+                asset_id: assetPanel.asset.id,
+                id: assetPanel.panel.id,
+              },
+            });
+          },
+        };
+      });
+      return [
+        {
+          label: this.$t("menu.assets"),
+          icon: "pi pi-fw pi-chart-line",
+          items: items,
+        },
+      ];
+    },
     dashboardItems() {
+      let flags = RenRoles.REN_ADMIN | RenRoles.REN_MANAGER | RenRoles.REN_TECHNICAL_MANAGER;
+      if ((flags & this.role) == 0) {
+        return [];
+      }
       var items = [];
       if (this.dashboards && this.dashboards.length != 0) {
         items = this.dashboards.map((dashboardItem) => {
@@ -154,65 +161,55 @@ export default {
           };
         });
       }
-      items.push({
-        // label: this.$t("menu.group_list"),
-        label: this.$t("menu.add_dashboard"),
-        icon: "pi pi-fw pi-plus",
-        // to: "/dashboard/add",
-        command: () => {
-          this.dashboardDialog = !this.dashboardDialog;
-          // this.$router.push({ name: "DashboadAdd" });
-        },
-      });
-      return items;
-    },
-
-    heatMapItems() {
+      flags = RenRoles.REN_ADMIN | RenRoles.REN_TECHNICAL_MANAGER;
+      if ((flags & this.role) > 0)
+        items.push({
+          // label: this.$t("menu.group_list"),
+          label: this.$t("menu.add_dashboard"),
+          icon: "pi pi-fw pi-plus",
+          // to: "/dashboard/add",
+          command: () => {
+            this.dashboardDialog = !this.dashboardDialog;
+            // this.$router.push({ name: "DashboadAdd" });
+          },
+        });
       return [
         {
-          // label: this.$t("menu.group_list"),
-          label: this.$t("menu.list_heatmap"),
-          icon: "pi pi-fw pi-align-left",
-          to: "/dashboard/heatmap/list",
-          command: () => {
-            this.$router.push({ name: "HeatMapListView" });
-          },
-          visible: () => {
-            let route =
-              this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "HeatMapListView")];
-            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-            else {
-              return this.$keycloak.hasAccess(
-                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-                route.meta.roles,
-              );
-            }
-          },
-        },
-        {
-          // label: this.$t("menu.group_list"),
-          label: this.$t("menu.add_heatmap"),
-          icon: "pi pi-fw pi-plus",
-          to: "/dashboard/heatmap/add",
-          command: () => {
-            this.$router.push({ name: "DashboadAdd" });
-          },
-          visible: () => {
-            let route =
-              this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "HeatMapCreator")];
-            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-            else {
-              return this.$keycloak.hasAccess(
-                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-                route.meta.roles,
-              );
-            }
-          },
+          label: this.$t("menu.dashboards"),
+          icon: "pi pi-fw pi-chart-line",
+          items: items,
         },
       ];
     },
+
+    // heatMapItems() {
+    //   return [
+    //     {
+    //       // label: this.$t("menu.group_list"),
+    //       label: this.$t("menu.list_heatmap"),
+    //       icon: "pi pi-fw pi-align-left",
+    //       to: "/dashboard/heatmap/list",
+    //       command: () => {
+    //         this.$router.push({ name: "HeatMapListView" });
+    //       },
+    //     },
+    //     {
+    //       // label: this.$t("menu.group_list"),
+    //       label: this.$t("menu.add_heatmap"),
+    //       icon: "pi pi-fw pi-plus",
+    //       to: "/dashboard/heatmap/add",
+    //       command: () => {
+    //         this.$router.push({ name: "DashboadAdd" });
+    //       },
+    //     },
+    //   ];
+    // },
     administrationItems() {
-      return [
+      let flags = RenRoles.REN_ADMIN;
+      if ((flags & this.role) == 0) {
+        return [];
+      }
+      let items = [
         {
           // label: this.$t("menu.group_list"),
           label: this.$t("menu.users"),
@@ -221,22 +218,23 @@ export default {
           command: () => {
             this.$router.push({ name: "Users" });
           },
-          visible: () => {
-            let route = this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "Users")];
-            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-            else {
-              return this.$keycloak.hasAccess(
-                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-                route.meta.roles,
-              );
-            }
-          },
+        },
+      ];
+      return [
+        {
+          label: this.$t("menu.administration"),
+          icon: "pi pi-fw pi-lock",
+          items: items,
         },
       ];
     },
 
     infrastructureItems() {
-      return [
+      let flags = RenRoles.REN_ADMIN | RenRoles.REN_TECHNICAL_MANAGER;
+      if ((flags & this.role) == 0) {
+        return [];
+      }
+      let items = [
         {
           // label: this.$t("menu.group_list"),
           label: this.$t("menu.assets"),
@@ -250,17 +248,6 @@ export default {
               command: () => {
                 this.$router.push({ name: "AssetList" });
               },
-              visible: () => {
-                let route =
-                  this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "AssetList")];
-                if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-                else {
-                  return this.$keycloak.hasAccess(
-                    this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-                    route.meta.roles,
-                  );
-                }
-              },
             },
             {
               // label: this.$t("menu.group_list"),
@@ -271,17 +258,8 @@ export default {
                 alert("todo:");
                 // this.$router.push({ name: "Users" });
               },
-              visible: () => {
-                // NOT IMPLEMENTED YET
-              },
             },
           ],
-          visible: function () {
-            return this.items.some(function (item) {
-              console.log(item.visible);
-              return item.visible == undefined || item.visible();
-            });
-          },
         },
         {
           label: this.$t("menu.measurements"),
@@ -294,17 +272,6 @@ export default {
               command: () => {
                 this.$router.push({ name: "MeasurementList" });
               },
-              visible: () => {
-                let route =
-                  this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "MeasurementList")];
-                if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-                else {
-                  return this.$keycloak.hasAccess(
-                    this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-                    route.meta.roles,
-                  );
-                }
-              },
             },
             {
               label: this.$t("menu.view"),
@@ -314,17 +281,8 @@ export default {
                 alert("todo:");
                 // this.$router.push({ name: "Users" });
               },
-              visible: () => {
-                // NOT IMPLEMENTED YET
-              },
             },
           ],
-          visible: function () {
-            return this.items.some(function (item) {
-              console.log(item.visible);
-              return item.visible == undefined || item.visible();
-            });
-          },
         },
         {
           label: this.$t("menu.users"),
@@ -333,86 +291,39 @@ export default {
             alert("todo:");
             // this.$router.push({ name: "Users" });
           },
-          visible: () => {
-            // NOT IMPLEMENTED YET
-          },
+        },
+      ];
+      return [
+        {
+          label: this.$t("menu.infrastructure"),
+          icon: "pi pi-fw pi-lock",
+          items: items,
         },
       ];
     },
     initMenu() {
       return [
-        {
-          label: this.$t("menu.dashboards"),
-          icon: "pi pi-fw pi-chart-line",
-          items: this.dashboardItems(),
-          visible: () => {
-            let to = this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "Dashboard")];
-            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-            else {
-              return this.$keycloak.hasAccess(
-                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-                to.meta.roles,
-              );
-            }
-          },
-        },
+        ...this.dashboardItems(),
+        ...this.assetsItems(),
         {
           label: this.$t("menu.information_panel"),
           icon: "pi pi-fw pi-chart-line",
           items: this.panelItems(),
-          visible: function () {
-            return this.items.some(function (item) {
-              return item.visible == undefined || item.visible();
-            });
-          },
         },
-        {
-          label: this.$t("menu.heatmaps"),
-          icon: "pi pi-fw pi-chart-line",
-          items: this.heatMapItems(),
-          visible: function () {
-            return this.items.some(function (item) {
-              return item.visible == undefined || item.visible();
-            });
-          },
-        },
-        {
-          label: this.$t("menu.infrastructure"),
-          icon: "pi pi-fw pi-lock",
-          items: this.infrastructureItems(),
-          visible: function () {
-            return this.items.some(function (item) {
-              return item.visible == undefined || item.visible();
-            });
-          },
-        },
-        {
-          label: this.$t("menu.administration"),
-          icon: "pi pi-fw pi-lock",
-          items: this.administrationItems(),
-          visible: function () {
-            return this.items.some(function (item) {
-              console.log(item.visible);
-              return item.visible == undefined || item.visible();
-            });
-          },
-        },
+        // {
+        //   label: this.$t("menu.heatmaps"),
+        //   icon: "pi pi-fw pi-chart-line",
+        //   items: this.heatMapItems(),
+        // },
+        ...this.infrastructureItems(),
+
+        ...this.administrationItems(),
         {
           label: this.$t("menu.profile"),
           icon: "pi pi-fw pi-user",
           to: "/profile",
           command: () => {
             this.$router.push("/profile");
-          },
-          visible: () => {
-            let to = this.$router.getRoutes()[this.$router.getRoutes().findIndex((obj) => obj.name == "Profile")];
-            if (this.user == undefined || this.user.resourceAccess == undefined) return false;
-            else {
-              return this.$keycloak.hasAccess(
-                this.user.resourceAccess[process.env.VUE_APP_KEY_CLOAK_CLIENT_ID].roles,
-                to.meta.roles,
-              );
-            }
           },
         },
         {
@@ -433,18 +344,10 @@ export default {
           },
         },
         {
-          label: this.$t("menu.login"),
-          icon: "pi pi-sign-in",
-          visible: () => !this.user.authenticated,
-          command: async () => {
-            this.user.login();
-          },
-        },
-        {
           label: this.$t("menu.signup"),
           icon: "pi pi-sign-in",
           to: "/signup",
-          visible: () => !this.user.authenticated,
+          visible: () => !this.isLogin,
           command: () => {
             this.$router.push({ name: "SignUp" });
           },
@@ -453,11 +356,22 @@ export default {
           label: this.$t("menu.logout"),
           icon: "pi pi-sign-out",
           to: "/",
-          visible: () => this.user.authenticated,
+          visible: () => this.isLogin,
           command: () => {
             this.$keycloak.logout();
             this.$router.push("/");
           },
+        },
+
+        {
+          label: this.$t("menu.login"),
+          icon: "pi pi-sign-in",
+          to: "/login",
+          visible: () => this.role == 0,
+          // command: () => {
+          //   this.$router.push("/login");
+          //   // this.$keycloak.login({ redirectUri: "/login" });
+          // },
         },
       ];
     },
@@ -474,6 +388,14 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+#sideMenuLogo {
+  position: relative;
+  display: block;
+  margin: 5%;
+  bottom: initial;
+  width: 90%;
+}
+
 #sideMenuButton {
   width: $sidemenu-button-width;
   height: $sidemenu-button-width;

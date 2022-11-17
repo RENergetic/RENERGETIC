@@ -4,7 +4,7 @@
 <script>
 // import { MapArea } from "../../plugins/model/Area";
 
-import InformationPanelList from "@/components/dashboard/InformationPanelList.vue";
+import InformationPanelList from "@/components/dashboard/informationpanel/InformationPanelList.vue";
 
 //initial canvas size
 // const sceneWidth = 900;

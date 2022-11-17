@@ -1,10 +1,5 @@
 // import { is } from "core-js/core/object";
 import RestComponent from "./restcomponent";
-
-// TEMPORAL CHANGES TO CONNECT WITH BACKEND
-import { NotificationContext } from "@/plugins/model/Enums.js";
-import notificationList from "../../../assets/dummy/samples/notifications.js";
-
 export default class ManagementApi extends RestComponent {
   constructor(axiosInstance, vueInstance) {
     super(axiosInstance, vueInstance);
@@ -34,6 +29,11 @@ export default class ManagementApi extends RestComponent {
   async searchAsset(query, params = undefined, offset = 0, limit = 20) {
     // Params: category, type, name, owner_id, parent_id
     // PREPARE FILTERS
+    //
+    // IMPORTANT NOTE FROM TOMEK:
+    // this method really surprised me - usually filtering is made on
+    // the database site not on the UI. Retrieving all results to the UI
+    // and then filtering is really, really bad idea...
     let normalizedQuery = query.trim().toLowerCase();
     let f = function (s) {
       return (
@@ -163,7 +163,6 @@ export default class ManagementApi extends RestComponent {
         params: { offset: offset, limit: limit },
       })
       .then((response) => {
-        console.log(response.data);
         return response.data;
       })
       .catch(function (error) {
@@ -229,10 +228,5 @@ export default class ManagementApi extends RestComponent {
         if (error.response.status == 404) console.error("measurement not found" + error.message);
       });
   }
-  // TODO: Ask to Tomek about NotificationContext
-  async getNotifications(assetId, context = NotificationContext.USER) {
-    //TODO:
-    console.info(assetId + " " + context);
-    return notificationList;
-  }
+  //
 }

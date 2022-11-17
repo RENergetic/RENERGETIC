@@ -2,7 +2,6 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import createRouter from "./router";
 import store from "./store";
-
 import i18n from "./plugins/locale";
 import PrimeVue from "primevue/config";
 //import renergetic plugins
@@ -16,7 +15,7 @@ import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 //https://www.primefaces.org/primevue/showcase/#/primeflex
 import "primeflex/primeflex.css";
-import "./assets/style/ren.scss";
+import "./assets/styles/ren.scss";
 import VueKonva from "vue-konva";
 
 import Tooltip from "primevue/tooltip";
@@ -44,6 +43,5 @@ app.use(ConfirmationService);
 
 app.use(store);
 app.use(plugin);
-
 app.use(createRouter(app));
 app.mount("#app");

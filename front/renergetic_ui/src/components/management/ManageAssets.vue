@@ -1,5 +1,5 @@
 <template>
-  todo
+  todo: remove this component?
   <InfoIcon :show-icon="false">
     <template #content>
       <!-- some info -->

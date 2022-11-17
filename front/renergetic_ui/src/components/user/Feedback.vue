@@ -1,5 +1,5 @@
 <template>
-  <div style="display: block">todo view list of actions</div>
+  <div style="display: block">some user feed back component - questionnaires or user reports action.</div>
 </template>
 <script>
 // THEN to get HTML5 drag&drop
@@ -15,8 +15,10 @@ export default {
   data() {
     return {};
   },
-  computed: {},
   watch: {},
+  created() {
+    this.$router.push("/");
+  },
 
   methods: {},
 };

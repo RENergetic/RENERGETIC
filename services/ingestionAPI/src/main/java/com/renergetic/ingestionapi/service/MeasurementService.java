@@ -115,7 +115,7 @@ public class MeasurementService {
 	}
 	
 	public List<String> getMeasurementNames(){
-		return repository.findByAssetIsNull().stream().map(measurement -> measurement.getName()).collect(Collectors.toList());
+		return repository.findByAssetIsNullAndAssetCategoryIsNull().stream().map(measurement -> measurement.getName()).collect(Collectors.toList());
 //				Arrays.asList(new String[]{"heat_pump", "energy_meter", "pv", "battery", "hot_water", "cold_water",
 //				"weather", "heat_exchange", "cooling_circuits", "chiller", "heat_meter", "dh_temperature",
 //				"dhw_temperature", "tapping_water", "thermostate", "temperature", "cpu", "renewability"});
@@ -143,8 +143,8 @@ public class MeasurementService {
 //		tags.put("predictive_model", null);
 //		tags.put("direction", "(?i)((in)|(out)|(none))");
 //		tags.put("domain", "(?i)((heat)|(electricity))");
-		tagsRepository.findAll().forEach(System.err::println);
+		tagsRepository.findByMeasurementIdIsNull().forEach(System.err::println);
 		
-		return tagsRepository.findAll().stream().collect(HashMap<String, String>::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
+		return tagsRepository.findByMeasurementIdIsNull().stream().collect(HashMap<String, String>::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
 	}
 }

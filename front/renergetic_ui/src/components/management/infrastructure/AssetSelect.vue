@@ -49,7 +49,7 @@
 </template>
 <script>
 export default {
-  name: "MeasurementSelect",
+  name: "AssetSelect",
   components: {},
   props: {
     current: { type: Object, default: () => null },

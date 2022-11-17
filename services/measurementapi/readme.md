@@ -8,6 +8,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
  ## GET Requests
  The GET requests allow to get measurement registries
  - /api/measurement/{measurement_name}
+   - `Get Influx entries related with a measurement name and allow filter them`
    - PATH VARIABLES
      - measurement_name: measurement name to get
    - QUERY VARIABLES
@@ -30,6 +31,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
    ]
   ```
  - /api/measurement/data
+   - `Get all Influx entries, allow filter by many measurements names, fiels and tags`
    - QUERY VARIABLES
      - bucket (optional): Bucket from which to obtain data, "renergetic" by default
      - from (optional): Since when to obtain the data
@@ -53,6 +55,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
    ]
   ```
  - /api/measurement/data/{operation}
+   - `Get all Influx entries and performs an operation on them, also it returns the operation results group by measurement name `
    - PATH VARIABLES
      - operation: performs an operation on the data. The allowed operations are "sum", "max", "min", "mean", "median", "distinct" and "count"
    - QUERY VARIABLES
@@ -89,6 +92,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
    ]
   ```
  - /api/measurement/{measurement_name}/{operation}
+   - `Get Influx entries related with a measurement name and performs an operation on them, is necesary send the name of the field to perform the operation`
    - PATH VARIABLES
      - measurement_name: measurement name to get
      - operation: performs an operation on the data. The allowed operations are "sum", "max", "min", "mean", "median", "distinct" and "count"
@@ -114,6 +118,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
   ```
  ## POST Requests
  The POST requests allow to insert new registries
+   - `Create a new measurement. It doesn't validate the data`
  - /api/measurement/
    - Only needs a body
    - The body have a optional field:

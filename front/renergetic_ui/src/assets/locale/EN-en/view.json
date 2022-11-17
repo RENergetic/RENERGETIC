@@ -52,6 +52,7 @@
     "clear": "Clear",
     "choose": "Choose",
     "manage_measurement": "Set measurements",
+    "show_details":"Show details",
     "submit": "Submit"
   },
   "settings": {

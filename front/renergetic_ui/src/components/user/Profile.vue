@@ -14,7 +14,11 @@ export default {
   },
   watch: {},
   async mounted() {
-    this.user = await this.$ren.userApi.getByUsername((await this.$keycloak.get()).tokenParsed.preferred_username);
+    try {
+      this.user = await this.$ren.userApi.getByUsername((await this.$keycloak.get()).tokenParsed.preferred_username);
+    } catch (err) {
+      alert(err);
+    }
   },
   methods: {},
 };

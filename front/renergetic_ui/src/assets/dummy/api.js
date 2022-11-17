@@ -7,9 +7,13 @@ import demandList from "./samples/demand.js";
 // import { measurementsGenerator, currentMeasurementsGenerator, dataGenerator } from "./dashboard.js";
 import * as generator from "./samples/data_generator.js";
 import assetList from "./samples/assets.js";
+import assetPanelList from "./samples/asset_panels.js";
 import measurementList from "./samples/measurement";
 import storage from "./storage.js";
 import measurement_types from "./samples/measurement_types.js";
+// import measurementAttributes from "./samples/measurement_attributes.js";
+import { AssetTypes } from "../../plugins/model/Enums.js";
+
 const DASHBOARD_API_KEY = "dashboard_api";
 const MANAGEMENT_API_KEY = "management_api";
 const USER_API_KEY = "user_api";
@@ -20,174 +24,21 @@ const PANEL_KEY = "panel";
 const MEASUREMENT_KEY = "measurement";
 const ASSET_KEY = "asset";
 const SETTINGS_KEY = "settings";
-var measurementTypes = Object.assign({}, ...measurement_types.map((x) => ({ [x.id]: x })));
 
 //init default
-measurementList.map((it) => (it.type = measurementTypes[it.metric_type_id]));
+async function initDummy() {
+  console.info("Init dummy data");
+  var measurementTypes = Object.assign({}, ...measurement_types.map((x) => ({ [x.id]: x })));
+  measurementList.map((it) => (it.type = measurementTypes[it.metric_type_id]));
 
-console.info(measurementList);
-await storage.setDefault(`${DASHBOARD_API_KEY}.${DASHBOARD_KEY}`, dashboardList);
-await storage.setDefault(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, informationPanelList);
-await storage.setDefault(`${DASHBOARD_API_KEY}.${HEATMAP_KEY}`, heatmapList);
-await storage.setDefault(`${MANAGEMENT_API_KEY}.${MEASUREMENT_KEY}`, measurementList);
-await storage.setDefault(`${MANAGEMENT_API_KEY}.${ASSET_KEY}`, assetList);
-
-//TODO: temporaty example objectc
-var measurementAttributes = [
-  {
-    key: "id4",
-    label: "Predictors",
-    name: "predictors",
-    type: "group",
-    children: [
-      {
-        key: "id5",
-        name: "electrical",
-        label: "Electrical",
-        type: "measurement",
-        children: [],
-      },
-      {
-        key: "id6",
-        name: "thermic",
-        label: "Thermic",
-        type: "measurement",
-        children: [],
-      },
-    ],
-  },
-  {
-    key: "id1",
-    label: "Target",
-    name: "target",
-    type: "group",
-    children: [
-      {
-        key: "id2",
-        name: "electrical",
-        label: "Electrical",
-        type: "measurement",
-        children: [],
-      },
-      {
-        key: "id3",
-        name: "thermic",
-        label: "Thermic",
-        type: "measurement",
-        children: [],
-      },
-    ],
-  },
-  {
-    key: "id7",
-    label: "Prediction Interval",
-    name: "prediction_interval",
-    type: "group",
-    children: [
-      {
-        key: "id8",
-        name: "3h",
-        label: "3 H",
-        type: "measurement",
-        children: [],
-      },
-      {
-        key: "id9",
-        name: "6h",
-        label: "6 H",
-        type: "measurement",
-        children: [],
-      },
-    ],
-  },
-];
-
-class DashboardApi {
-  async list() {
-    return storage.get(`${DASHBOARD_API_KEY}.${DASHBOARD_KEY}`, dashboardList);
-  }
-  async add(dashboard) {
-    dashboard.id = Math.floor(Math.random() * 150);
-    storage.push(`${DASHBOARD_API_KEY}.${DASHBOARD_KEY}`, dashboard);
-    return new Promise((resolve) => {
-      resolve(dashboard.id);
-    });
-  }
-  async update(dashboard) {
-    storage.updateList(`${DASHBOARD_API_KEY}.${DASHBOARD_KEY}`, dashboard);
-    return new Promise((resolve) => {
-      resolve(dashboard.id);
-    });
-  }
-  delete(id) {
-    return new Promise((resolve) => {
-      resolve(id);
-    });
-  }
-
-  listInformationPanel(userId = null) {
-    console.info(`listInformationPanel for ${userId}`);
-    return storage.get(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, informationPanelList);
-  }
-
-  async getInformationPanel(panelId) {
-    let panels = await storage.get(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, informationPanelList);
-    return panels.find((it) => it.id == panelId);
-  }
-  async addInformationPanel(panel) {
-    panel.id = Math.floor(Math.random() * 1500);
-    storage.push(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, panel);
-    return new Promise((resolve) => {
-      resolve(panel.id);
-    });
-  }
-  async updateInformationPanel(panel) {
-    // console.info(panel);
-    // console.info(JSON.stringify(panel));
-    storage.updateList(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, panel);
-    return new Promise((resolve) => {
-      resolve(panel.id);
-    });
-  }
-  async deleteInformationPanel(id) {
-    return new Promise((resolve) => {
-      resolve(id);
-    });
-  }
-
-  async listHeatMap(userId = null) {
-    console.info(`listHeatMap for ${userId}`);
-    return storage.get(`${DASHBOARD_API_KEY}.${HEATMAP_KEY}`, heatmapList);
-  }
-  async getHeatMap(id) {
-    let maps = await this.listHeatMap();
-    return maps.find((it) => it.id == id);
-  }
-
-  async addHeatMap(heatmap) {
-    heatmap.id = Math.floor(Math.random() * 150);
-    storage.push(`${DASHBOARD_API_KEY}.${HEATMAP_KEY}`, heatmap);
-    return new Promise((resolve) => {
-      resolve(heatmap.id);
-    });
-  }
-  async updateHeatMap(heatmap) {
-    storage.updateList(`${DASHBOARD_API_KEY}.${HEATMAP_KEY}`, heatmap);
-    return new Promise((resolve) => {
-      resolve(heatmap.id);
-    });
-  }
-  async deleteHeatMap(id) {
-    return new Promise((resolve) => {
-      resolve(id);
-    });
-  }
-  getDemand(heatmapId) {
-    //TODO:
-    console.info(heatmapId);
-    return demandList;
-  }
+  // console.info(measurementList);
+  await storage.setDefault(`${DASHBOARD_API_KEY}.${DASHBOARD_KEY}`, dashboardList);
+  await storage.setDefault(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, informationPanelList);
+  await storage.setDefault(`${DASHBOARD_API_KEY}.${HEATMAP_KEY}`, heatmapList);
+  await storage.setDefault(`${MANAGEMENT_API_KEY}.${MEASUREMENT_KEY}`, measurementList);
+  await storage.setDefault(`${MANAGEMENT_API_KEY}.${ASSET_KEY}`, assetList);
 }
+//TODO: temporaty example objectc
 
 class ManagementApi {
   //Infrastructure  REQUESTS
@@ -283,16 +134,118 @@ class ManagementApi {
     return measurements.filter((it) => f(it));
   }
 }
+class DashboardApi {
+  managementApi = new ManagementApi();
+
+  async list() {
+    return storage.get(`${DASHBOARD_API_KEY}.${DASHBOARD_KEY}`, dashboardList);
+  }
+  async add(dashboard) {
+    dashboard.id = Math.floor(Math.random() * 150);
+    storage.push(`${DASHBOARD_API_KEY}.${DASHBOARD_KEY}`, dashboard);
+    return new Promise((resolve) => {
+      resolve(dashboard.id);
+    });
+  }
+  async update(dashboard) {
+    storage.updateList(`${DASHBOARD_API_KEY}.${DASHBOARD_KEY}`, dashboard);
+    return new Promise((resolve) => {
+      resolve(dashboard.id);
+    });
+  }
+  delete(id) {
+    return new Promise((resolve) => {
+      resolve(id);
+    });
+  }
+
+  listInformationPanel(userId = null) {
+    console.info(`listInformationPanel for ${userId}`);
+    return storage.get(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, informationPanelList);
+  }
+
+  async getInformationPanel(panelId, assetId) {
+    let panels = await storage.get(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, informationPanelList);
+    if (assetId) {
+      let panel = panels.find((it) => it.id == panelId);
+      // let panel = await panels.find((it) => it.id == -1);
+      let asset = await this.managementApi.getAsset(assetId);
+      let assetLabel = asset.label ? asset.label : asset.name;
+      if (panel.label != null) {
+        panel.label = panel.label.replace("{asset}", assetLabel);
+      } else {
+        panel.label = assetLabel;
+      }
+      return panel;
+    }
+    return panels.find((it) => it.id == panelId);
+  }
+
+  async addInformationPanel(panel) {
+    panel.id = Math.floor(Math.random() * 1500);
+    storage.push(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, panel);
+    return new Promise((resolve) => {
+      resolve(panel.id);
+    });
+  }
+  async updateInformationPanel(panel) {
+    // console.info(panel);
+    // console.info(JSON.stringify(panel));
+    storage.updateList(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, panel);
+    return new Promise((resolve) => {
+      resolve(panel.id);
+    });
+  }
+  async deleteInformationPanel(id) {
+    return new Promise((resolve) => {
+      resolve(id);
+    });
+  }
+
+  async listHeatMap(userId = null) {
+    console.info(`listHeatMap for ${userId}`);
+    return storage.get(`${DASHBOARD_API_KEY}.${HEATMAP_KEY}`, heatmapList);
+  }
+  async getHeatMap(id) {
+    let maps = await this.listHeatMap();
+    return maps.find((it) => it.id == id);
+  }
+
+  async addHeatMap(heatmap) {
+    heatmap.id = Math.floor(Math.random() * 150);
+    storage.push(`${DASHBOARD_API_KEY}.${HEATMAP_KEY}`, heatmap);
+    return new Promise((resolve) => {
+      resolve(heatmap.id);
+    });
+  }
+  async updateHeatMap(heatmap) {
+    storage.updateList(`${DASHBOARD_API_KEY}.${HEATMAP_KEY}`, heatmap);
+    return new Promise((resolve) => {
+      resolve(heatmap.id);
+    });
+  }
+  async deleteHeatMap(id) {
+    return new Promise((resolve) => {
+      resolve(id);
+    });
+  }
+  getDemand(userId) {
+    //TODO:
+    console.info(userId);
+    return demandList;
+  }
+}
+
 class DataApi {
   dashboardApi = new DashboardApi();
   managementApi = new ManagementApi();
 
-  //TODO: discuss with Raul
-  async attributes(/*area, areaId*/) {
-    console.info(JSON.stringify(measurementAttributes));
-    return measurementAttributes;
-    // return storage.get(`${MANAGEMENT_KEY}.panel_list`, measurementAttributes);
-  }
+  // //TODO: discuss with Raul
+  // async attributes(/*area, areaId*/) {
+  //   console.info(JSON.stringify(measurementAttributes));
+  //   return measurementAttributes;
+  //   // return storage.get(`${MANAGEMENT_KEY}.panel_list`, measurementAttributes);
+  // }
 
   async getTimeseries(measurementIds, attributes = {}) {
     console.info(attributes);
@@ -300,7 +253,10 @@ class DataApi {
     console.info(JSON.stringify(timeseries));
     return timeseries;
   }
-
+  async getPanelData(panelId) {
+    let panel = await this.dashboardApi.getInformationPanel(panelId);
+    return { data: generator.generatePanelData(panel), state: generator.generatePanelState(panel) };
+  }
   // async getCurrentData(measurementIds) {
   //   return generator.
   // }
@@ -311,12 +267,16 @@ class DataApi {
     console.info(JSON.stringify(state));
     return state;
   }
-  async getPanelData(panelId) {
-    let panel = await this.dashboardApi.getInformationPanel(panelId);
-    let data = { data: generator.generatePanelData(panel), state: generator.generatePanelState(panel) };
+  async getDemandData(demands, assetId, predictionWindow) {
+    console.info(assetId);
+    // let data = {
+    //   data: generator.generateTileData(demand.tile, predictionWindow),
+    // };
+    let data = generator.generateDemandData(demands, predictionWindow);
     console.info(JSON.stringify(data));
     return data;
   }
+
   async getAssetData(assetId) {
     let asset = await this.managementApi.getAsset(assetId);
     return generator.getAssetData(asset);
@@ -346,8 +306,9 @@ class DataApi {
 }
 
 class UserApi {
-  async getDemad(userId) {
-    console.info(userId);
+  managementApi = new ManagementApi();
+
+  async getDemand() {
     return demandList;
   }
   async setSettings(settings) {
@@ -356,5 +317,71 @@ class UserApi {
   async getSettings() {
     return storage.get(`${USER_API_KEY}.${SETTINGS_KEY}`, null);
   }
+
+  async getAssets() {
+    let assets = await this.managementApi.listAsset();
+    return assets.filter((asset) => asset.type.name == AssetTypes.BUILDING);
+  }
+
+  async listAssetPanels(userId) {
+    console.info(`assetPanelList for ${userId}`);
+    let panels = await storage.get(`${USER_API_KEY}.${PANEL_KEY}`, assetPanelList);
+
+    console.info(panels);
+    return panels;
+  }
+  async listInformationPanel(userId = null) {
+    console.info(`listInformationPanel for ${userId}`);
+    return storage.get(`${DASHBOARD_API_KEY}.${PANEL_KEY}`, informationPanelList);
+  }
 }
-export { DashboardApi, ManagementApi, DataApi, UserApi };
+
+class WrapperApi {
+  dashboardApi = new DashboardApi();
+  managementApi = new ManagementApi();
+  userApi = new UserApi();
+  dataApi = new DataApi();
+  async get(query) {
+    //tODO: merge data fields
+    console.info("query: " + JSON.stringify(query));
+    let calls = query["calls"];
+    let res = {};
+    if (calls["assets"]) {
+      res["assets"] = await this.managementApi.listAsset();
+    }
+    if (calls["dashboards"]) {
+      res["dashboards"] = await this.dashboardApi.list();
+    }
+    if (calls["data"]) {
+      //do nothing
+    }
+    if (calls["demands"]) {
+      res["demands"] = await this.userApi.getDemand();
+
+      res["data"] = await this.dataApi.getDemandData(res["demands"]);
+    }
+    if (calls["panels"]) {
+      let ap = await this.userApi.listAssetPanels();
+      if (calls["assets"]) {
+        res["asset_panels"] = ap;
+      }
+      let panelIds = ap.map((it) => it.panel.id);
+      // console.info(panelIds);
+      if (calls["panels"]["id"]) {
+        res["data"] = await this.dataApi.getPanelData(calls["panels"]["id"]).then((resp) => {
+          if (resp) return resp["data"];
+          return null;
+        });
+        res["panels"] = [await this.managementApi.getInformationPanel(calls["panels"]["id"])];
+      } else {
+        res["panels"] = await this.userApi.listInformationPanel();
+        res["panels"] = res["panels"].filter((it) => panelIds.includes(it.id));
+        console.info(res["panels"]);
+      }
+    }
+    console.info(JSON.stringify(res));
+    return res;
+  }
+}
+
+export { DashboardApi, ManagementApi, DataApi, UserApi, WrapperApi, initDummy };

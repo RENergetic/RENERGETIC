@@ -19,6 +19,9 @@ public class AssetCategory {
     @Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)
     private String name;
 
+    @Column(name = "label", nullable = true, insertable = true, updatable = true)
+    private String label;
+
     @Column(name = "description", nullable = true, insertable = true, updatable = true)
     private String description;
 }
