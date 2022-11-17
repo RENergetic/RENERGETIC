@@ -85,30 +85,114 @@ public class DataService {
         return ret;
     }
 
-    //TODO: move panelservice?
-    private List<Measurement> getPanelMeasurements(long id) {
-        InformationPanel panel = panelRepository.findById(id).orElse(null);
 
-        if (panel != null) {
-            List<Measurement> measurements = new ArrayList<>();
-            for (InformationTile tile : panel.getTiles()) {
-                measurements.addAll(
-                        tileMeasurementRepository.findByInformationTileId(tile.getId()).stream().map(obj -> {
-                            if (obj.getMeasurement() != null)
-                                return obj.getMeasurement();
-                            else {
-                                Measurement ret = new Measurement();
-                                ret.setName(obj.getMeasurementName());
-                                ret.setType(obj.getType());
-                                ret.setSensorName(obj.getSensorName());
-                                ret.setDomain(obj.getDomain());
-                                ret.setDirection(obj.getDirection());
+    public DataWrapperDAO getPanelData(Long panelId, Long from, Optional<Long> to) {
+        return this.getPanelData(panelId, null, from, to);
+    }
+    /**
+     * get data for the panel template
+     *
+     * @param panelId
+     * @param assetId
+     * @param from
+     * @param to
+     * @return
+     */
+    public DataWrapperDAO getPanelData(Long panelId, Long assetId, Long from, Optional<Long> to) {
+        if (assetId != null) {
+            InformationPanelDAOResponse assetTemplate =
+                    informationPanelService.getAssetTemplate(panelId, assetId);
 
-                                return ret;
-                            }
-                        }).collect(Collectors.toList()));
-            }
-            return measurements;
+            Stream<MeasurementDAOResponse> measurementDAOResponseStream = assetTemplate.getTiles().stream().map(
+                    InformationTileDAOResponse::getMeasurements
+            ).flatMap(List::stream);
+            Collection<MeasurementDAOResponse> values =
+                    measurementDAOResponseStream.collect(
+                            Collectors.toMap(MeasurementDAOResponse::getId, Function.identity(),
+                                    (m1, m2) -> m1)).values();
+            DataDAO res = this.getData(values.stream().map(v -> v.mapToEntity()).collect(Collectors.toList()), from, to);
+            //we need to return template with filled measurements for the given assetId
+            return new DataWrapperDAO(res, assetTemplate);
+        } else {
+            //TODO: TOMEK/or someone else - check : if asset is null and panel is an template - raise exception  - bad request
+            List<Measurement> measurements =
+                    informationPanelService.getPanelMeasurements(panelId);
+            DataDAO res = this.getData(measurements, from, to);
+            return new DataWrapperDAO(res);
+        }
+
+    }
+
+    public DataDAO getData(Collection<Measurement> measurements, Long from, Optional<Long> to) {
+        if (generateDummy) {
+            return DummyDataGenerator.getData(measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(Collectors.toList()));
+        } else {
+        	DataDAO ret = new DataDAO();
+    		Map<String, String> params = new HashMap<>();
+        	
+        	for (Measurement measurement : measurements) {
+            	List<String> assetNames = new LinkedList<>();
+            	
+            	// SET DEFAULT VALUES TO THE MEASUREMENT
+            	ret.getCurrent().getLast().put(measurement.getId().toString(), null);
+            	ret.getCurrent().getMax().put(measurement.getId().toString(), null);
+
+        		// GET ASSETS RELATED WITH THE MEASUREMENT (If the assets is a energy island and there isn't category it doesn't filter by asset)
+        		if (measurement.getAsset() != null && !measurement.getAsset().getType().getName().equalsIgnoreCase("energy_island"))
+        			assetNames.add(measurement.getAsset().getName());
+        		if (measurement.getAssetCategory() != null)
+        			assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
+        					.stream().map(asset -> asset.getName()).collect(Collectors.toList()));
+        		
+        		// GET MEASUREMENT TAGS
+        		List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
+        		
+        		// PREPARE INFLUX FILTERS
+        		if (measurement.getSensorName() != null)
+        			params.put("measurements", measurement.getSensorName());
+        		if (measurement.getType() != null)
+        			params.put("fields", measurement.getType().getName());
+        		if (measurement.getDirection() != null)
+        			params.put("direction", measurement.getDirection().name());
+        		if (measurement.getDomain() != null)
+        			params.put("domain", measurement.getDomain().name());
+        		if (assetNames != null && !assetNames.isEmpty())
+        			params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
+        		if (tags != null && !tags.isEmpty())
+        			params.putAll(tags.stream()
+        					.filter(tag -> !params.containsKey(tag.getValue()))
+        					.collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+        		
+        		// INFLUX API REQUEST
+        		HttpResponse<String> responseLast = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/last", "GET", params, null, null);
+        		HttpResponse<String> responseMax = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/sum", "GET", params, null, null);
+        		
+                if (responseLast.statusCode() < 300) {
+                    JSONArray array = new JSONArray(responseLast.body());
+                    if (array.length() > 0)
+                    	array.forEach( obj -> {
+                    		if (obj instanceof JSONObject) {
+                    			JSONObject json = (JSONObject) obj;
+                    			if (json.has("measurement"))
+		                        	ret.getCurrent().getLast().put(measurement.getId().toString(),
+		                                Double.parseDouble(json.getJSONObject("fields").getString("last")));
+                    		}
+                    	});
+                }
+                if (responseMax.statusCode() < 300) {
+                    JSONArray array = new JSONArray(responseMax.body());
+                    if (array.length() > 0)
+                    	array.forEach( obj -> {
+                    		if (obj instanceof JSONObject) {
+                    			JSONObject json = (JSONObject) obj;
+                    			if (json.has("measurement"))
+		                        	ret.getCurrent().getMax().put(measurement.getId().toString(),
+		                                Double.parseDouble(json.getJSONObject("fields").getString("max")));
+                    		}
+                    	});
+                }
+        	}
+            return ret;
         }
         throw new NotFoundException("No panel found related with id " + id);
 
