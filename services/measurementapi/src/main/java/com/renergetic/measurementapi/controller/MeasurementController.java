@@ -146,9 +146,10 @@ public class MeasurementController {
 			@RequestParam("bucket") Optional<String> bucket,
 			@RequestParam("group") Optional<String> group,
 			@RequestParam("by_measurement") Optional<Boolean> byMeasurement,
-			@RequestParam Map<String, String> tags, 
+			@RequestParam("to_float") Optional<Boolean> toFloat,
 			@RequestParam(name = "measurements", required = false) List<String> measurements, 
-			@RequestParam(name = "fields", required = false) List<String> fields, 
+			@RequestParam(name = "fields", required = false) List<String> fields,
+			@RequestParam Map<String, String> tags,
 			@PathVariable(name = "function") String function){
 
 		List<MeasurementDAOResponse> ret;
@@ -157,6 +158,7 @@ public class MeasurementController {
 		tags.remove("bucket");
 		tags.remove("group");
 		tags.remove("by_measurement");
+		tags.remove("to_float");
 		tags.remove("from");
 		tags.remove("to");
 		
@@ -168,7 +170,7 @@ public class MeasurementController {
 								)
 						); 
 
-		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""), byMeasurement.orElse(false));
+		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""), byMeasurement.orElse(false), toFloat.orElse(false));
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);

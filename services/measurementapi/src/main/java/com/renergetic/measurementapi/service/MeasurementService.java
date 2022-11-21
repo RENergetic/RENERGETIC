@@ -31,6 +31,7 @@ import com.renergetic.measurementapi.model.InfluxTimeUnit;
 import com.renergetic.measurementapi.service.utils.FieldsFormat;
 
 @Service
+@SuppressWarnings("null")
 public class MeasurementService {
 	@Autowired
     private InfluxDBClient influxDB;
@@ -123,7 +124,7 @@ public class MeasurementService {
 		return MeasurementMapper.fromFlux(tables);
 	}
 
-	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement) {
+	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement, Boolean toFloat) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -173,7 +174,7 @@ public class MeasurementService {
 		else fluxQuery.add("group()");
 		if (group != null)
 			fluxQuery.add(String.format("window(every: %1$s, period: %1$s, startColumn: \"_time\", stopColumn: \"_stop\", timeColumn: \"_time\")", group));
-		fluxQuery.add("toFloat()");
+		if (toFloat) fluxQuery.add("toFloat()");
 		
 		// OPERATE DATA AND ADD FIELD NAME
 		fluxQuery.add(String.format("%s(column: \"_value\")", function.name().toLowerCase()));
