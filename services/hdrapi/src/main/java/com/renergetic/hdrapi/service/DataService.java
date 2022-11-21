@@ -122,70 +122,86 @@ public class DataService {
             return DummyDataGenerator.getData(measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(Collectors.toList()));
         } else {
         	DataDAO ret = new DataDAO();
-    		Map<String, String> params = new HashMap<>();
+        	Set<Thread> threads = new HashSet<>();
         	
-        	for (Measurement measurement : measurements) {
-            	List<String> assetNames = new LinkedList<>();
-            	
-            	// SET DEFAULT VALUES TO THE MEASUREMENT
-            	ret.getCurrent().getLast().put(measurement.getId().toString(), null);
-            	ret.getCurrent().getMax().put(measurement.getId().toString(), null);
-
-        		// GET ASSETS RELATED WITH THE MEASUREMENT (If the assets is a energy island and there isn't category it doesn't filter by asset)
-        		if (measurement.getAsset() != null && !measurement.getAsset().getType().getName().equalsIgnoreCase("energy_island"))
-        			assetNames.add(measurement.getAsset().getName());
-        		if (measurement.getAssetCategory() != null)
-        			assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
-        					.stream().map(asset -> asset.getName()).collect(Collectors.toList()));
-        		
-        		// GET MEASUREMENT TAGS
-        		List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
-        		
-        		// PREPARE INFLUX FILTERS
-        		if (measurement.getSensorName() != null)
-        			params.put("measurements", measurement.getSensorName());
-        		if (measurement.getType() != null)
-        			params.put("fields", measurement.getType().getName());
-        		if (measurement.getDirection() != null)
-        			params.put("direction", measurement.getDirection().name());
-        		if (measurement.getDomain() != null)
-        			params.put("domain", measurement.getDomain().name());
-        		if (assetNames != null && !assetNames.isEmpty())
-        			params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
-        		if (tags != null && !tags.isEmpty())
-        			params.putAll(tags.stream()
-        					.filter(tag -> !params.containsKey(tag.getValue()))
-        					.collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
-        		
-        		// INFLUX API REQUEST
-        		HttpResponse<String> responseLast = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/last", "GET", params, null, null);
-        		HttpResponse<String> responseMax = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/sum", "GET", params, null, null);
-        		
-                if (responseLast.statusCode() < 300) {
-                    JSONArray array = new JSONArray(responseLast.body());
-                    if (array.length() > 0)
-                    	array.forEach( obj -> {
-                    		if (obj instanceof JSONObject) {
-                    			JSONObject json = (JSONObject) obj;
-                    			if (json.has("measurement"))
-		                        	ret.getCurrent().getLast().put(measurement.getId().toString(),
-		                                Double.parseDouble(json.getJSONObject("fields").getString("last")));
-                    		}
-                    	});
-                }
-                if (responseMax.statusCode() < 300) {
-                    JSONArray array = new JSONArray(responseMax.body());
-                    if (array.length() > 0)
-                    	array.forEach( obj -> {
-                    		if (obj instanceof JSONObject) {
-                    			JSONObject json = (JSONObject) obj;
-                    			if (json.has("measurement"))
-		                        	ret.getCurrent().getMax().put(measurement.getId().toString(),
-		                                Double.parseDouble(json.getJSONObject("fields").getString("max")));
-                    		}
-                    	});
-                }
+        	for (final Measurement measurement : measurements) {
+        		Thread thread = new Thread(() ->{
+            		Map<String, String> params = new HashMap<>();
+	            	List<String> assetNames = new LinkedList<>();
+	            	
+	            	// SET DEFAULT VALUES TO THE MEASUREMENT
+	            	ret.getCurrent().getLast().put(measurement.getId().toString(), null);
+	            	ret.getCurrent().getMax().put(measurement.getId().toString(), null);
+	
+	        		// GET ASSETS RELATED WITH THE MEASUREMENT (If the assets is a energy island and there isn't category it doesn't filter by asset)
+	        		if (measurement.getAsset() != null && !measurement.getAsset().getType().getName().equalsIgnoreCase("energy_island"))
+	        			assetNames.add(measurement.getAsset().getName());
+	        		if (measurement.getAssetCategory() != null)
+	        			assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
+	        					.stream().map(asset -> asset.getName()).collect(Collectors.toList()));
+	        		
+	        		// GET MEASUREMENT TAGS
+	        		List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
+	        		
+	        		// PREPARE INFLUX FILTERS
+	        		if (from != null)
+	        			params.put("from", from.toString());
+	        		if (to != null && to.isPresent())
+	        			params.put("to", to.get().toString());
+	        		if (measurement.getSensorName() != null)
+	        			params.put("measurements", measurement.getSensorName());
+	        		if (measurement.getType() != null)
+	        			params.put("fields", measurement.getType().getName());
+	        		if (measurement.getDirection() != null)
+	        			params.put("direction", measurement.getDirection().name());
+	        		if (measurement.getDomain() != null)
+	        			params.put("domain", measurement.getDomain().name());
+	        		if (assetNames != null && !assetNames.isEmpty())
+	        			params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
+	        		if (tags != null && !tags.isEmpty())
+	        			params.putAll(tags.stream()
+	        					.filter(tag -> !params.containsKey(tag.getValue()))
+	        					.collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+	        		
+	        		// INFLUX API REQUEST
+	        		HttpResponse<String> responseLast = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/last", "GET", params, null, null);
+	        		HttpResponse<String> responseMax = HttpAPIs.sendRequest(influxURL + "/api/measurement/data/sum", "GET", params, null, null);
+	        		
+	                if (responseLast.statusCode() < 300) {
+	                    JSONArray array = new JSONArray(responseLast.body());
+	                    if (array.length() > 0)
+	                    	array.forEach( obj -> {
+	                    		if (obj instanceof JSONObject) {
+	                    			JSONObject json = (JSONObject) obj;
+	                    			if (json.has("measurement"))
+			                        	ret.getCurrent().getLast().put(measurement.getId().toString(),
+			                                Double.parseDouble(json.getJSONObject("fields").getString("last")));
+	                    		}
+	                    	});
+	                }
+	                if (responseMax.statusCode() < 300) {
+	                    JSONArray array = new JSONArray(responseMax.body());
+	                    if (array.length() > 0)
+	                    	array.forEach( obj -> {
+	                    		if (obj instanceof JSONObject) {
+	                    			JSONObject json = (JSONObject) obj;
+	                    			if (json.has("measurement"))
+			                        	ret.getCurrent().getMax().put(measurement.getId().toString(),
+			                                Double.parseDouble(json.getJSONObject("fields").getString("sum")));
+	                    		}
+	                    	});
+	                }
+        		});
+        		thread.start();
+        		threads.add(thread);
         	}
+        	threads.forEach(thread -> {
+				try {
+					thread.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			});
             return ret;
         }
     }

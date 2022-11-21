@@ -3,7 +3,6 @@ package com.renergetic.hdrapi.controller;
 import com.renergetic.hdrapi.dao.DataDAO;
 import com.renergetic.hdrapi.dao.DataWrapperDAO;
 import com.renergetic.hdrapi.service.DataService;
-import com.renergetic.hdrapi.service.InformationPanelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -13,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +26,6 @@ public class DataController {
 
     @Autowired
     DataService dataSv;
-    @Autowired
-    private InformationPanelService informationPanelService;
 
     //=== GET REQUESTS ====================================================================================
     @Operation(summary = "Get Data related with a panel id")
@@ -40,7 +38,21 @@ public class DataController {
             @PathVariable Long panelId,
             @RequestParam("from") Optional<Long> from,
             @RequestParam("to") Optional<Long> to) {
-        return new ResponseEntity<>(dataSv.getPanelData(panelId, from.orElse((new Date()).getTime() - 3600000), to),
+    	// GET INSTANT TO FIRST DAY OF THE CURRENT 
+
+		Long fromInstant = null;
+    	
+        if (from.isEmpty()) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.MILLISECOND, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.DATE, 1);
+            calendar.set(Calendar.MONTH, 0);
+            fromInstant = calendar.toInstant().toEpochMilli();
+        }
+        return new ResponseEntity<>(dataSv.getPanelData(panelId, from.orElse(fromInstant), to),
                 HttpStatus.OK);
     }
 
