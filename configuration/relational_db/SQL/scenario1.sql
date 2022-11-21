@@ -66,9 +66,9 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 ( 22, 'renewability', 'Renewability', 5, 'heat', NULL, 'renewability', 6, '2' );
 
 INSERT INTO measurement ( id, name, label, measurement_type_id, domain, direction, sensor_name, asset_id, uuid ) VALUES
-( 23, 'heat_consumed', 'Heat Consumed', 7, 'heat', 'in', 'thermostat', 5, '2' ),
-( 24, 'heat_consumed', 'Heat Consumed', 7, 'heat', 'in', 'thermostat', 6, '2' ),
-( 25, 'heat_consumed', 'Heat Consumed', 7, 'heat', 'in', 'thermostat', 4, '2' );
+( 23, 'heat_consumed', 'Heat Consumed', 7, 'heat', 'in', 'heat_meter', 5, '2' ),
+( 24, 'heat_consumed', 'Heat Consumed', 7, 'heat', 'in', 'heat_meter', 6, '2' ),
+( 25, 'heat_consumed', 'Heat Consumed', 7, 'heat', 'in', 'heat_meter', 4, '2' );
 
 INSERT INTO measurement ( id, name, label, measurement_type_id, domain, direction, sensor_name, asset_id, uuid ) VALUES
 ( 26, 'heat_supply', 'Heat Supply', 7, 'heat', 'out', 'gas_boiler', 7, '2' ),
@@ -97,16 +97,6 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 ( 47, 'heat_exhanged', 'Heat exhanged', 2, 'heat', 'out', 'heat_exhanger', NULL, 13, NULL, '2' ),
 ( 48, 'heat_wasted', 'Heat wasted', 2, 'heat', 'out', 'heat_exhanger', NULL, 13, NULL, '2' ),
 ( 49, 'heat_used', 'Heat used', 2, 'heat', 'out', 'heat_exhanger', NULL, 13, NULL, '2' ),
-( 50, 'current_power', 'Current power', 1, 'electricity', 'in', 'energy_meter', NULL, 3, NULL, '2' ),
-( 51, 'energy_consumed', 'Current energy', 2, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 52, 'renewability', 'Renewability', 5, 'electricity', 'in', 'energy_meter', NULL, 3, NULL, '2' ),
-( 53, 'renewability', 'Renewability', 2, 'electricity', 'in', 'energy_meter', NULL, 3, NULL, '2' ),
-( 54, 'non_renewability', 'Non Renewability', 2, 'electricity', 'in', 'energy_meter', NULL, 3, NULL, '2' ),
-( 55, 'non_renewability', 'Non Renewability', 5, 'electricity', 'in', 'energy_meter', NULL, 3, NULL, '2' ),
-( 56, 'renewability', 'Renewability', 2, 'none', 'in', 'report', NULL, 3, NULL, '2' ),
-( 57, 'renewability', 'Renewability', 5, 'none', 'in', 'report', NULL, 3, NULL, '2' ),
-( 58, 'non_renewability', 'Non Renewability', 2, 'none', 'in', 'report', NULL, 3, NULL, '2' ),
-( 59, 'non_renewability', 'Non Renewability', 5, 'none', 'in', 'report', NULL, 3, NULL, '2' ),
 ( 60, 'renewability', 'Renewability', 5, 'electricity', 'in', 'energy_meter', NULL, 7, NULL, '2' ),
 ( 61, 'renewability', 'Renewability', 2, 'electricity', 'in', 'energy_meter', NULL, 7, NULL, '2' ),
 ( 62, 'non_renewability', 'Non Renewability', 2, 'electricity', 'in', 'energy_meter', NULL, 7, NULL, '2' ),
@@ -137,46 +127,68 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 ( 82, 'heat_exhanged', 'Heat exhanged', 7, 'heat', 'out', 'heat_exhanger', NULL, NULL, 5, '2' ),
 ( 83, 'heat_wasted', 'Heat wasted', 7, 'heat', 'out', 'heat_exhanger', NULL, NULL, 5, '2' ),
 /* RENEWABILITY MEASUREMENTS FOR ENTIRE ISLAND */
-( 84, 'renewability', 'Renewable', 9, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 85, 'non_renewability', 'Fosil Fuels', 9, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 86, 'external', 'External', 9, 'electricity', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 87, 'renewability', 'Renewable', 9, 'heat', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 88, 'non_renewability', 'Fosil Fuels', 9, 'heat', 'out', 'energy_meter', NULL, 3, NULL, '2' ),
-( 89, 'external', 'External', 9, 'heat', 'out', 'energy_meter', NULL, 3, NULL, '2' );
+( 84, 'renewable', 'Renewable', 9, 'electricity', 'out', 'electricity_meter', NULL, 3, NULL, '2' ),
+( 85, 'non_renewable', 'Fosil Fuels', 9, 'electricity', 'out', 'electricity_meter', NULL, 3, NULL, '2' ),
+( 86, 'external', 'External', 9, 'electricity', 'out', 'electricity_meter', NULL, 3, NULL, '2' ),
+( 87, 'renewable', 'Renewable', 9, 'heat', 'out', 'heat_meter', NULL, 3, NULL, '2' ),
+( 88, 'non_renewable', 'Fosil Fuels', 9, 'heat', 'out', 'heat_meter', NULL, 3, NULL, '2' ),
+( 89, 'external', 'External', 9, 'heat', 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
+( 90, 'renewable', 'Renewable', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
+( 91, 'non_renewable', 'Fosil Fuels', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
+( 92, 'external', 'External', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
+( 100, 'total_produced', 'Produced energy', 9, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
+( 101, 'total_imported', 'Imported energy', 9, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' );
+
+INSERT INTO tags ( id, key, value ) VALUES
+( 50, 'measurement_type', 'renewable' ),
+( 51, 'measurement_type', 'non_renewable' ),
+( 52, 'measurement_type', 'external' ),
+( 53, 'measurement_type', 'renewable,non_renewable' );
+
+INSERT INTO measurement_tags (measurement_id, tag_id) VALUES
+(84, 50),
+(85, 51),
+(86, 52),
+(87, 50),
+(88, 51),
+(89, 52),
+(90, 50),
+(91, 51),
+(92, 52),
+(100, 53),
+(101, 52);
 
 /* TILES AND PANELS */
 INSERT INTO information_panel ( id, name, label, is_template, featured, uuid ) VALUES
-( 1, 'consumption_screen', 'Consumption', false, true, '2' ),
-( 2, 'production_screen', 'Production', false, true, '2' );
+( 1, 'consumption_screen', 'Energy Consumption', false, true, '2' ),
+( 2, 'production_screen', 'Energy Production', false, true, '2' );
 
 INSERT INTO information_tile ( id, name, label, layout, props, type, information_panel_id ) VALUES
 /* PRODUCTION SCREEN */
-( 1, 'energy_share', 'Energy share', '{"x":5,"y":0,"w":2,"h":1}', '{"icon_visibility":false}', 'single', 2 ),
-( 2, 'electricity', 'Electricity', '{"x":0,"y":0,"w":5,"h":10}', '{"icon":"electricity"}', 'doughnut', 2 ),
-( 3, 'heat', 'Heat', '{"x":7,"y":0,"w":5,"h":10}', '{"icon":"heat"}', 'doughnut', 2 ),
-( 4, 'renewables', 'Renewables', '{"x":5,"y":1,"w":2,"h":3}', '{"icon":"electricity"}','single', 2 ),
-( 5, 'waste', 'Waste', '{"x":5,"y":3,"w":2,"h":3}', '{"icon":"electricity"}', 'single', 2 ),
-( 6, 'non_renewables', 'Non Renewables', '{"x":5,"y":5,"w":2,"h":3}', '{"icon":"electricity"}', 'single', 2 ),
+( 1, 'energy_island_production', 'Energy Production', '{"x":0,"y":0,"w":12,"h":1}', '{"icon_visibility":false, "background":"none", "template":true}', 'single', 2 ),
+( 2, 'energy_share', 'Energy share', '{"x":5,"y":1,"w":2,"h":1}', '{"icon_visibility":false, "background": "none"}', 'single', 2 ),
+( 3, 'electricity', 'Electricity', '{"x":0,"y":1,"w":5,"h":10}', '{"icon":"electricity", "background":"linear-gradient(to right, #343638, #4ea5c5a0, #343638)"}', 'doughnut', 2 ),
+( 4, 'heat', 'Heat', '{"x":7,"y":1,"w":5,"h":10}', '{"icon":"heat", "background":"linear-gradient(to right, #343638, #8e6faaa0, #343638)"}', 'doughnut', 2 ),
+( 5, 'renewables', 'Renewables', '{"x":5,"y":2,"w":2,"h":3}', '{"icon":"renewables", "background":"radial-gradient #7ece9b80, #343638)"}','single', 2 ),
+( 6, 'non_renewables', 'Fosil Fuels', '{"x":5,"y":4,"w":2,"h":3}', '{"icon":"fossil_fuels", "background":"radial-gradient(#c9595980, #343638)"}', 'single', 2 ),
+( 7, 'external', 'External', '{"x":5,"y":6,"w":2,"h":3}', '{"icon":"import", "background":"radial-gradient(#d4bc6b80, #343638)"}', 'single', 2 ),
 /* CONSUMPTION SCREEN */
-( 10, 'overview', 'Electricity and heat are used by', '{"x":0,"y":0,"w":12,"h":1}', '{"icon_visibility":false, "background":"none", "template":true}', 'single', 1 ),
-( 11, 'office', 'Office', '{"x":3,"y":1,"w":3,"h":9}', '{"icon":"office","background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
-( 12, 'supercomputer', 'Supercomputers', '{"x":6,"y":1,"w":3,"h":9}', '{"icon":"supercomputer","background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
-( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac","background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
-( 14, 'heat_exhanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat","background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
-/* TODO: where are this tiles shown? */
-( 20, 'heat', 'Heat', null, '{"icon":"heat"}', 'single', null ),
-( 21, 'heat', 'Heat', null, '{"icon":"heat"}', 'multi_knob', null );
+( 10, 'energy_island_import', 'Energy import', '{"x":0,"y":0,"w":12,"h":1}', '{"icon_visibility":false, "background":"none", "template":true}', 'single', 1 ),
+( 11, 'office', 'Office', '{"x":3,"y":1,"w":3,"h":9}', '{"icon":"office", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
+( 12, 'supercomputer', 'Supercomputers', '{"x":6,"y":1,"w":3,"h":9}', '{"icon":"supercomputer", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
+( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
+( 14, 'heat_exhanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 );
 
 INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id, domain, direction, measurement_type_id, sensor_name, measurement_name, information_tile_id ) VALUES
-( 1, 84, NULL, NULL, NULL, NULL, NULL, NULL, 2 ),
-( 2, 85, NULL, NULL, NULL, NULL, NULL, NULL, 2 ),
-( 3, 86, NULL, NULL, NULL, NULL, NULL, NULL, 2 ),
-( 4, 87, NULL, NULL, NULL, NULL, NULL, NULL, 3 ),
-( 5, 88, NULL, NULL, NULL, NULL, NULL, NULL, 3 ),
-( 6, 89, NULL, NULL, NULL, NULL, NULL, NULL, 3 ),
-( 7, 57, NULL, NULL, NULL, NULL, NULL, NULL, 4 ),
-( 8, 45, NULL, NULL, NULL, NULL, NULL, NULL, 5 ),
-( 9, 59, NULL, NULL, NULL, NULL, NULL, NULL, 6 ),
+( 1, 84, NULL, NULL, NULL, NULL, NULL, NULL, 3 ),
+( 2, 85, NULL, NULL, NULL, NULL, NULL, NULL, 3 ),
+( 3, 86, NULL, NULL, NULL, NULL, NULL, NULL, 3 ),
+( 4, 87, NULL, NULL, NULL, NULL, NULL, NULL, 4 ),
+( 5, 88, NULL, NULL, NULL, NULL, NULL, NULL, 4 ),
+( 6, 89, NULL, NULL, NULL, NULL, NULL, NULL, 4 ),
+( 7, 90, NULL, NULL, NULL, NULL, NULL, NULL, 5 ),
+( 8, 91, NULL, NULL, NULL, NULL, NULL, NULL, 6 ),
+( 9, 92, NULL, NULL, NULL, NULL, NULL, NULL, 7 ),
 ( 10, 65, NULL, NULL, NULL, NULL, NULL, NULL, 11 ),
 ( 11, 67, NULL, NULL, NULL, NULL, NULL, NULL, 11 ),
 ( 12, 69,NULL, NULL, NULL, NULL, NULL, NULL, 12 ),
@@ -184,18 +196,19 @@ INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id
 ( 14, 73, NULL, NULL, NULL, NULL, NULL, NULL, 13 ),
 ( 15, 75, NULL, NULL, NULL, NULL, NULL, NULL, 13 ),
 ( 16, 77, NULL, NULL, NULL, NULL, NULL, NULL, 14 ),
-( 17, 79, NULL, NULL, NULL, NULL, NULL, NULL, 14 );
+( 17, 79, NULL, NULL, NULL, NULL, NULL, NULL, 14 ),
+( 18, 100, NULL, NULL, NULL, NULL, NULL, NULL, 1 ),
+( 19, 101, NULL, NULL, NULL, NULL, NULL, NULL, 10 );
 
 /* CONNECT ASSETS WITH PANELS */
 INSERT INTO asset_panel ( panel_id, asset_id ) VALUES
 ( 1, 3 ),
-( 2, 3 ),
-( 2, 7 );
+( 2, 3 );
 
 /* USER DEMANDS DEFINITIONS */
 INSERT INTO user_demand_definition ( id, action, message, action_type, information_tile_id ) VALUES
-( 1, 'INCREASE_TEMPERATURE', 'Please, increase the temperature', 'INCREASE', 20 ),
-( 2, 'DECREASE_TEMPERATURE', 'Please, decrease the temperature', 'DECREASE', 21 );
+( 1, 'INCREASE_TEMPERATURE', 'Please, increase the temperature', 'INCREASE', NULL ),
+( 2, 'DECREASE_TEMPERATURE', 'Please, decrease the temperature', 'DECREASE', NULL );
 
 /* USER DEMAND SCHEDULES */
 INSERT INTO user_demand_schedule ( id, asset_id, demand_id, demand_start, demand_stop, update_date ) VALUES
@@ -212,8 +225,11 @@ INSERT INTO public.measurement_details(
 UPDATE measurement_details
     SET value =
     CASE
-    WHEN   measurement.domain = 'electricity'  THEN '#0BA6DF' 
-    WHEN   measurement.domain = 'heat'  THEN '#A855F3' 
+    WHEN measurement.name = 'renewable' THEN '#4ADE80'
+    WHEN measurement.name = 'non_renewable' THEN '#E52122'
+    WHEN measurement.name = 'external' THEN '#EAB403'
+    WHEN measurement.domain = 'electricity'  THEN '#0BA6DF'
+    WHEN measurement.domain = 'heat'  THEN '#A855F3'
     ELSE '9B59B6'
  END 
  FROM measurement WHERE  measurement.id = measurement_details.measurement_id 
