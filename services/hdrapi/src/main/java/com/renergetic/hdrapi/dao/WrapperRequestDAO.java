@@ -16,6 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @ToString
 public class WrapperRequestDAO {
+    //TODO verify user roles
     private static SimpleDateFormat influxdbDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     @JsonProperty(required = true)
     private CallsWrapperRequestDAO calls;
@@ -40,6 +41,11 @@ public class WrapperRequestDAO {
         private PaginationArgsWrapperRequestDAO dashboards;
         @JsonProperty(required = false, value = "measurement_types")
         private EmptyArgsWrapperRequestDAO measurementTypes;
+        /**
+         * asset types, asset categories, asset property keys
+         */
+        @JsonProperty(required = false, value = "asset_metakeys")
+        private EmptyArgsWrapperRequestDAO assetMetaKeys;
 
 
 

@@ -36,6 +36,9 @@ public class WrapperResponseDAO {
     @JsonProperty(required = false, value = "measurement_types")
     private List<MeasurementType> measurementTypes;
 
+    @JsonProperty(required = false, value = "asset_metakeys")
+    private AssetMetaKeys assetMetaKeys;
+
     public void appendData(DataDAO data) {
         if(this.data==null){
             this.data = data;

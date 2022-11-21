@@ -38,6 +38,7 @@ public class UIAggregatorController {
     private DashboardService dashboardService;
     @Autowired
     MeasurementService measurementSv;
+
     @Operation(summary = "API wrapper for front-end")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = {"/wrapper", "/wrapper/{userId}"}, produces = "application/json")
@@ -46,25 +47,39 @@ public class UIAggregatorController {
         //TODO: infer userId from auth headers
         WrapperResponseDAO wrapperResponseDAO = new WrapperResponseDAO();
         //
-        if (wrapperRequestBodyDAO.getCalls().getAssets() != null && userId!=null) {
+        if (wrapperRequestBodyDAO.getCalls().getAssets() != null && userId != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssets();
             wrapperResponseDAO.setAssets(getSimpleAssets(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
         }
-        if (wrapperRequestBodyDAO.getCalls().getAssetPanels() != null && userId!=null) {
+        if (wrapperRequestBodyDAO.getCalls().getAssetPanels() != null && userId != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssetPanels();
             wrapperResponseDAO.setAssetPanels(getAssetPanels(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
-
         }
         if (wrapperRequestBodyDAO.getCalls().getMeasurementTypes() != null) {
-
             wrapperResponseDAO.setMeasurementTypes(measurementSv.getTypes(null, 0, 1000));
         }
         if (wrapperRequestBodyDAO.getCalls().getData() != null) {
             //get data related to panelId -> TODO: something to consider later
         }
-        if (wrapperRequestBodyDAO.getCalls().getDemands() != null && userId!=null) {
+        if (wrapperRequestBodyDAO.getCalls().getAssetMetaKeys() != null) {
+            wrapperResponseDAO.setAssetMetaKeys(
+                    new AssetMetaKeys(assetService.listTypes(), assetService.listCategories()));
+            //get data related to panelId -> TODO: something to consider later
+        }
+
+        if (wrapperRequestBodyDAO.getCalls().getPanels() != null) {
+            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getPanels();
+            wrapperResponseDAO.setPanels(
+                    getPanels(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
+        }
+        if (wrapperRequestBodyDAO.getCalls().getDashboards() != null) {
+            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDashboards();
+            wrapperResponseDAO.setDashboards(
+                    getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
+        }
+        if (wrapperRequestBodyDAO.getCalls().getDemands() != null && userId != null) {
             //TODO: ask someone about public demands ?
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDemands();
             wrapperResponseDAO.setDemands(getDemandSchedules(userId, Optional.ofNullable(data.getOffset()),
@@ -88,17 +103,6 @@ public class UIAggregatorController {
             wrapperResponseDAO.appendData(demandData);
 
         }
-        if (wrapperRequestBodyDAO.getCalls().getPanels() != null) {
-            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getPanels();
-            wrapperResponseDAO.setPanels(
-                    getPanels(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
-        }
-        if (wrapperRequestBodyDAO.getCalls().getDashboards() != null) {
-            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDashboards();
-            wrapperResponseDAO.setDashboards(
-                    getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
-        }
-
         return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
     }
 
