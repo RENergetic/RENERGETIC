@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.renergetic.hdrapi.dao.InformationTileDAORequest;
 import com.renergetic.hdrapi.dao.InformationTileDAOResponse;
-import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.service.InformationTileService;
 
 import java.util.List;
@@ -41,11 +40,7 @@ public class InformationTileController {
     })
     @GetMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<InformationTileDAOResponse> getById (@PathVariable Long id){
-        try{
-            return new ResponseEntity<>(informationTileService.getById(id), HttpStatus.OK);
-        } catch (NotFoundException e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(informationTileService.getById(id), HttpStatus.OK);
     }
 
     @Operation(summary = "Get Tile by name")
@@ -55,11 +50,7 @@ public class InformationTileController {
     })
     @GetMapping(path = "/name/{name}", produces = "application/json")
     public ResponseEntity<InformationTileDAOResponse> getByName (@PathVariable String name){
-        try{
-            return new ResponseEntity<>(informationTileService.getByName(name), HttpStatus.OK);
-        } catch (NotFoundException e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(informationTileService.getByName(name), HttpStatus.OK);
     }
 
     @Operation(summary = "Create a new Information Tile to an existing Information Panel")
@@ -69,12 +60,8 @@ public class InformationTileController {
     })
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationTileDAOResponse> createInformationTile(@RequestBody InformationTileDAORequest informationTileDAORequest) {
-        try {
-            return new ResponseEntity<>(informationTileService.save(informationTileDAORequest.getPanelId(), informationTileDAORequest),
-                    HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(informationTileService.save(informationTileDAORequest.getPanelId(), informationTileDAORequest),
+                HttpStatus.CREATED);
     }
 
     @Operation(summary = "Update an existing Information Tile")
@@ -85,11 +72,7 @@ public class InformationTileController {
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
 //    @PostMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationTileDAOResponse> updateInformationPanel(@RequestBody InformationTileDAORequest informationTileDAORequest) {
-        try {
-            return new ResponseEntity<>(informationTileService.update(informationTileDAORequest), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(informationTileService.update(informationTileDAORequest), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete tile by id")
@@ -100,12 +83,6 @@ public class InformationTileController {
     })
     @DeleteMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<Boolean> getByName (@PathVariable Long id){
-        try {
-            return new ResponseEntity<>(informationTileService.delete(id), HttpStatus.OK);
-        } catch (NotFoundException e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(informationTileService.delete(id), HttpStatus.OK);
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.exception.InvalidArgumentException;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.*;
@@ -43,11 +44,13 @@ public class AssetService {
 
 	// ASSET CRUD OPERATIONS
 	public AssetDAOResponse save(AssetDAORequest asset) {
-		asset.setId(null);
-		if (assetTypeRepository.existsById(asset.getType())) {
+		if(asset.getId() !=  null && assetRepository.existsById(asset.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a asset with ID " + asset.getId());
+		
+		if (asset.getType() !=  null && assetTypeRepository.existsById(asset.getType())) {
 			Asset assetEntity = asset.mapToEntity();
 			assetEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-			System.err.println(assetEntity);
+
 			return AssetDAOResponse.create(assetRepository.save(assetEntity), null, null);
 		}
 		else throw new InvalidArgumentException("The asset type doesn't exists");
@@ -61,9 +64,9 @@ public class AssetService {
 	}
 
 	public AssetDAOResponse update(AssetDAORequest asset, Long id) {
-		boolean assetExists = assetRepository.existsById(id);
+		boolean assetExists = id != null && assetRepository.existsById(id);
 
-		if ( assetExists &&
+		if ( assetExists && asset.getType() != null &&
 				assetTypeRepository.existsById(asset.getType())) {
 			asset.setId(id);
 			return AssetDAOResponse.create(assetRepository.save(asset.mapToEntity()), null, null);
@@ -73,7 +76,7 @@ public class AssetService {
 	}
 
 	public AssetDAOResponse connect(AssetConnectionDAORequest connection) {
-		boolean assetExists = assetRepository.existsById(connection.getAssetId());
+		boolean assetExists = connection.getAssetId() != null && assetRepository.existsById(connection.getAssetId());
 
 		if ( assetExists && assetRepository.existsById(connection.getAssetConnectedId())) {
 			assetConnectionRepository.save(connection.mapToEntity());
@@ -81,12 +84,14 @@ public class AssetService {
 		} else throw new InvalidNonExistingIdException("The assets to connect don't exists");
 	}
 
-	public MeasurementDAOResponse addMeasurement(Long assetid, Long measurementId) {
-		if ( assetRepository.existsById(assetid) && measurementRepository.existsById(measurementId)) {
+	public MeasurementDAOResponse addMeasurement(Long assetId, Long measurementId) {
+		if ( assetId != null && assetRepository.existsById(assetId) && 
+				measurementId != null && measurementRepository.existsById(measurementId)) {
 			Measurement measurement = measurementRepository.findById(measurementId).get();
+
 			return MeasurementDAOResponse.create(measurementRepository.save(measurement), null);
 
-		} else throw new InvalidNonExistingIdException(assetRepository.existsById(assetid) ? "The measurement doesn't exists" : "The asset doesn't exists");
+		} else throw new InvalidNonExistingIdException(assetRepository.existsById(assetId) ? "The measurement doesn't exists" : "The asset doesn't exists");
 	}
 
 	public List<AssetDAOResponse> get(Map<String, String> filters, long offset, int limit) {
@@ -103,7 +108,7 @@ public class AssetService {
 					equals = asset.getType().getName().equalsIgnoreCase(filters.get("type")) ||
 							asset.getType().getLabel().equalsIgnoreCase(filters.get("type"));
 				if (equals && filters.containsKey("category") && asset.getType() != null) {
-					equals = asset.getType().getCategory().equals(AssetCategory.valueOf(filters.get("category")));
+					equals = asset.getAssetCategory().getName().equals(filters.get("category"));
 				}
 				if (equals && filters.containsKey("location"))
 					equals = asset.getLocation().equalsIgnoreCase(filters.get("location"));
@@ -131,6 +136,16 @@ public class AssetService {
 		if (asset != null)
 			return AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAsset(asset));
 		else throw new NotFoundException("No asset found related with id " + id);
+	}
+
+	public List<AssetDAOResponse> getByCategory(Long categoryId, long offset, int limit) {
+		List<AssetDAOResponse> list = assetRepository.findByAssetCategoryId(categoryId, new OffSetPaging(offset, limit))
+				.stream().map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset), measurementRepository.findByAsset(asset)))
+				.collect(Collectors.toList());
+		
+		if (list != null && list.size() > 0)
+			return list;
+		else throw new NotFoundException("No asset found with asset category " + categoryId);
 	}
 
 	public List<AssetDAOResponse> getConnectedTo(Long id) {
@@ -164,62 +179,81 @@ public class AssetService {
 	// ASSETTYPE CRUD OPERATIONS
 	public AssetType saveType(AssetType type) {
 		//type.setId(null);
-		return assetTypeRepository.save(type);
+		if (type.getId() != null && assetTypeRepository.existsById(type.getId()))
+			 throw new InvalidCreationIdAlreadyDefinedException("Type with id " + type.getId() + " already exists");
+		else return assetTypeRepository.save(type);
 	}
 
 	public AssetType updateType(AssetType detail, Long id) {
-		if ( assetTypeRepository.existsById(id)) {
+		if ( id != null && assetTypeRepository.existsById(id)) {
 			detail.setId(id);
 			return assetTypeRepository.save(detail);
-		} else return null;
+		} else throw new InvalidNonExistingIdException("No asset type found with id " + id);
 	}
 
 	public boolean deleteTypeById(Long id) {
 		if (id != null && assetTypeRepository.existsById(id)) {
 			assetTypeRepository.deleteById(id);
 			return true;
-		} else return false;
+		} else throw new InvalidNonExistingIdException("No asset type found with id " + id);
 	}
 
 	public List<AssetType> getTypes(Map<String, String> filters, long offset, int limit) {
 		Stream<AssetType> stream = assetTypeRepository.findAll(new OffSetPaging(offset, limit)).stream();
-
+		List<AssetType> list;
 		if (filters != null)
-			return stream.filter(type -> {
+			list = stream.filter(type -> {
 				boolean equals = true;
 
 				if (filters.containsKey("name"))
 					equals = type.getName().equalsIgnoreCase(filters.get("name")) ||
 							type.getLabel().equalsIgnoreCase(filters.get("name"));
-				if (equals && filters.containsKey("category"))
-					equals = type.getCategory().equals(AssetCategory.valueOf(filters.get("category")));
+//				if (equals && filters.containsKey("category"))
+//					equals = type.getTypeCategory().equals(AssetTypeCategory.valueOf(filters.get("category")));
 
 				return equals;
 			}).collect(Collectors.toList());
-		else return stream.collect(Collectors.toList());
+		else list = stream.collect(Collectors.toList());
+
+		if (list != null && list.size() > 0)
+			return list;
+		else throw new NotFoundException("No assets found with asset category");		
 	}
 
 	public AssetType getTypeById(Long id) {
-		return assetTypeRepository.findById(id).orElse(null);
+		return assetTypeRepository.findById(id).orElseThrow(() -> new NotFoundException("No asset type with id " + id + " found"));
 	}
 
 	public AssetType getTypeByName(String name) {
-		return assetTypeRepository.findByName(name).orElse(null);
+		return assetTypeRepository.findByName(name).orElseThrow(() -> new NotFoundException("No asset type with name " + name + " found"));
 	}
 
 	public List<AssetDAOResponse> findByUserId(Long id, long offset, int limit){
-		return assetRepository.findByUserId(id, offset, limit).stream()
-				.map(x -> AssetDAOResponse.create(x, assetRepository.findByParentAsset(x), measurementRepository.findByAsset(x))).collect(Collectors.toList());
+		List<AssetDAOResponse> list = assetRepository.findByUserId(id, offset, limit).stream()
+				.map(x -> AssetDAOResponse.create(x, assetRepository.findByParentAsset(x), measurementRepository.findByAsset(x)))
+				.collect(Collectors.toList());
+
+		if (list != null && list.size() > 0)
+			return list;
+		else throw new NotFoundException("No assets found related with user " + id + " found");
 	}
 	public List<SimpleAssetDAO> findSimpleByUserId(Long id, long offset, int limit){
-		return assetRepository.findByUserId(id, offset, limit).stream()
+		List<SimpleAssetDAO> list = assetRepository.findByUserId(id, offset, limit).stream()
 				.map(x -> SimpleAssetDAO.create(x)).collect(Collectors.toList());
+
+		if (list != null && list.size() > 0)
+			return list;
+		else throw new NotFoundException("No assets found related with user " + id + " found");
 	}
 
 	public List<AssetPanelDAO> findAssetsPanelsByUserId(Long id, long offset, int limit){
-		return assetRepository.findByUserId(id, offset, limit).stream()
+		List<AssetPanelDAO> list = assetRepository.findByUserId(id, offset, limit).stream()
 				.map(x -> x.getInformationPanels().stream().map(y -> AssetPanelDAO.fromEntities(x, y)).collect(Collectors.toList()))
 				.flatMap(List::stream).collect(Collectors.toList());
+
+		if (list != null && list.size() > 0)
+			return list;
+		else throw new NotFoundException("No asset panels related with user " + id + " found");
 	}
 
 	// ASSETDETAILS CRUD OPERATIONS
@@ -229,10 +263,10 @@ public class AssetService {
 	}
 
 	public AssetDetails updateDetail(AssetDetails detail, Long id) {
-		if ( assetDetailsRepository.existsById(id)) {
+		if ( id != null && assetDetailsRepository.existsById(id)) {
 			detail.setId(id);
 			return assetDetailsRepository.save(detail);
-		} else return null;
+		} else  throw new InvalidNonExistingIdException("No asset detail with id" + id + "found");
 	}
 
 	public boolean deleteDetailById(Long id) {

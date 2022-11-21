@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: wso
-          image: docker-registry.default.svc:5000/ren-prototype/wso:latest
+          image: docker-registry.default.svc:5000/${PROJECT}/wso:latest
           imagePullPolicy: Always
           ports:
           - name: api-https

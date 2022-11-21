@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.tomcat.util.json.ParseException;
-import org.json.JSONObject;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,8 +22,9 @@ public class InformationTileDAOResponse {
     @JsonProperty()
     private Long id;
 
-    @JsonProperty(value = "panel")
-    private InformationPanelDAOResponse panel;
+
+//    @JsonProperty(value = "panel") -> in case we wont to have panel inside tile
+//    private InformationPanelDAOResponse subPanel;
 
     @JsonProperty(required = true)
     private String name;
@@ -58,7 +58,7 @@ public class InformationTileDAOResponse {
             return null;
         InformationTileDAOResponse dao = new InformationTileDAOResponse();
         dao.setId(entity.getId());
-        dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel(), null));
+//        dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel(), null));
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
         if(entity.getType() != null)
@@ -76,7 +76,7 @@ public class InformationTileDAOResponse {
             dao.setProps(Json.parse(entity.getProps()).toMap());
         } catch (ParseException e) {
             //tODO: verify catch
-            dao.setLayout(null);
+                dao.setProps(new HashMap());
         }
 
         dao.setMeasurements(measurements);

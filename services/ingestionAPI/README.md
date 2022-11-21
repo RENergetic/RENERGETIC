@@ -16,9 +16,11 @@ You can see a list of measurements, fields and tags allowed in our [Confluence p
 
 ## Data insertion
 
-The data insertion should be done wit a `POST` request at path `api/ingest/[bucket]`
+The data insertion should be done wit a `POST` request at path `api/ingest?bucket=[bucket_name]`
 
 The *bucket* represents the InfluxDB bucket where you want to save the data, ask to Renergetic team to know what bucket have to you
+
+Also you can ommit this variable, and the default bucket will be used
 
 The body of request should look like this:
 ```

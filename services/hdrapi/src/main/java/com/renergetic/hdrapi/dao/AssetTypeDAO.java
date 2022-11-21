@@ -1,7 +1,7 @@
 package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.hdrapi.model.AssetCategory;
+import com.renergetic.hdrapi.model.AssetTypeCategory;
 import com.renergetic.hdrapi.model.AssetType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -28,15 +28,15 @@ public class AssetTypeDAO {
 
     @JsonProperty(required = false, access = JsonProperty.Access.READ_ONLY)
     private String label;
-    @JsonProperty(value = "category", required = false)
-    private String category;
+//    @JsonProperty(value = "category", required = false)
+//    private String category;
 
-    public AssetTypeDAO(long id, String name, String label, String category) {
+    public AssetTypeDAO(long id, String name, String label ) {
         super();
         this.id = id;
         this.name = name;
         this.label = label;
-        this.category = category;
+//        this.category = category;
     }
 
 
@@ -49,8 +49,8 @@ public class AssetTypeDAO {
             dao.setId(assetType.getId());
             dao.setName(assetType.getName());
             dao.setLabel(assetType.getLabel());
-            if (dao.getCategory() != null)
-                dao.setCategory(assetType.getCategory().name());
+//            if (dao.getCategory() != null)
+//                dao.setCategory(assetType.getTypeCategory().name());
         }
         return dao;
     }
@@ -62,9 +62,9 @@ public class AssetTypeDAO {
         assetType.setId(id);
         assetType.setName(name);
         assetType.setLabel(label);
-        if (category != null) {
-            assetType.setCategory(AssetCategory.valueOf(category));
-        }
+//        if (category != null) {
+//            assetType.setTypeCategory(AssetTypeCategory.valueOf(category));
+//        }
         return assetType;
     }
 }

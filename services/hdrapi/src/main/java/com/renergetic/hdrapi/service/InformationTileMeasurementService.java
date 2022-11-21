@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.renergetic.hdrapi.dao.InformationTileMeasurementDAORequest;
 import com.renergetic.hdrapi.dao.InformationTileMeasurementDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.InformationTileMeasurement;
@@ -35,6 +36,9 @@ public class InformationTileMeasurementService {
 
 	// AREA CRUD OPERATIONS
 	public InformationTileMeasurementDAOResponse save(InformationTileMeasurementDAORequest tile) {
+		if (tile.getId() != null && tileRepository.existsById(tile.getId()))
+			throw new InvalidCreationIdAlreadyDefinedException("Information tile measurement with id " + tile.getId() + " already exists");
+		
 		return InformationTileMeasurementDAOResponse.create(tileRepository.save(tile.mapToEntity()));
 	}
 	
@@ -46,7 +50,7 @@ public class InformationTileMeasurementService {
 	}
 
 	public InformationTileMeasurementDAOResponse update(InformationTileMeasurementDAORequest tile, Long id) {
-		if (tileRepository.existsById(id)) {
+		if (id != null && tileRepository.existsById(id)) {
 			tile.setId(id);
 			return InformationTileMeasurementDAOResponse.create(tileRepository.save(tile.mapToEntity()));
 		} else throw new InvalidNonExistingIdException("The tile to update doesn't exists");
@@ -75,7 +79,7 @@ public class InformationTileMeasurementService {
 		
 		if (tiles.size() > 0)
 			return tiles;
-		else throw new NotFoundException("No tiles are found");
+		else throw new NotFoundException("No tiles found");
 	}
 
 	public InformationTileMeasurementDAOResponse getById(Long id) {

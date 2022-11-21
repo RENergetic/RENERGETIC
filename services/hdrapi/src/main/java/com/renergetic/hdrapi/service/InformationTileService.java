@@ -2,6 +2,7 @@ package com.renergetic.hdrapi.service;
 
 import com.renergetic.hdrapi.dao.InformationTileDAORequest;
 import com.renergetic.hdrapi.dao.InformationTileDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.mapper.InformationTileMapper;
@@ -26,8 +27,12 @@ public class InformationTileService {
     private InformationPanelRepository informationPanelRepository;
 
     public List<InformationTileDAOResponse> getAllByPanelId(Long panelId, long offset, int limit) {
-        return informationTileRepository.findAllByInformationPanelId(new OffSetPaging(offset, limit),
+    	List<InformationTileDAOResponse> list = informationTileRepository.findAllByInformationPanelId(new OffSetPaging(offset, limit),
                 panelId).stream().map(x -> informationTileMapper.toDTO(x)).collect(Collectors.toList());
+
+    	if (list != null && list.size() > 0)
+    		return list;
+		else throw new NotFoundException("No tiles related with the panel " + panelId + " found");
     }
 
     public InformationTileDAOResponse getById(Long id) {
@@ -48,7 +53,9 @@ public class InformationTileService {
     }
 
     public InformationTileDAOResponse save(Long informationPanelId, InformationTileDAORequest informationTile) {
-        informationTile.setId(null);
+		if(informationTile.getId() !=  null && informationTileRepository.existsById(informationTile.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a information tile with ID " + informationTile.getId());
+		
         InformationTile entity = informationTileMapper.toEntity(informationTile);
         if (informationPanelId != null) {
             InformationPanel informationPanel = informationPanelRepository.findById(informationPanelId).orElseThrow(

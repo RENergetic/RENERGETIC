@@ -16,7 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @ToString
 public class WrapperRequestDAO {
-    private static SimpleDateFormat influxdbDateFormat = new SimpleDateFormat("aaaa-MM-dd hh:mm:ss");
+    private static SimpleDateFormat influxdbDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     @JsonProperty(required = true)
     private CallsWrapperRequestDAO calls;
 
@@ -38,8 +38,20 @@ public class WrapperRequestDAO {
         //TODO: handle dashboards
         @JsonProperty(required = false)
         private PaginationArgsWrapperRequestDAO dashboards;
-    }
+        @JsonProperty(required = false, value = "measurement_types")
+        private EmptyArgsWrapperRequestDAO measurementTypes;
 
+
+
+    }
+    @Getter
+    @Setter
+    @RequiredArgsConstructor
+    @ToString
+    public static class EmptyArgsWrapperRequestDAO {
+
+
+    }
     @Getter
     @Setter
     @RequiredArgsConstructor

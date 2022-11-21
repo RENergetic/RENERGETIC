@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.renergetic.hdrapi.dao.AlertThresholdDAORequest;
 import com.renergetic.hdrapi.dao.AlertThresholdDAOResponse;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.AlertThreshold;
@@ -29,7 +30,9 @@ public class AlertThresholdService {
 
 	// ALERTTHRESHOLD CRUD OPERATIONS
 	public AlertThresholdDAOResponse save(AlertThresholdDAORequest alertThreshold) {
-		alertThreshold.setId(null);
+		if(alertThreshold.getId() !=  null && alertThresholdRepository.existsById(alertThreshold.getId()))
+	    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a alert threshold with ID " + alertThreshold.getId());
+				
 		AlertThreshold alertThresholdEntity = alertThreshold.mapToEntity();
 		return AlertThresholdDAOResponse.create(alertThresholdRepository.save(alertThresholdEntity));
 	}
@@ -77,7 +80,7 @@ public class AlertThresholdService {
 		
 		if (alertThresholds.size() > 0)
 			return alertThresholds;
-		else throw new NotFoundException("No alert thresholds are found");
+		else throw new NotFoundException("No alert thresholds found");
 	}
 
 	public AlertThresholdDAOResponse getById(Long id) {

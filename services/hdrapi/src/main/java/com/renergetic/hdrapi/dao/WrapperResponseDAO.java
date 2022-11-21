@@ -1,11 +1,13 @@
 package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.hdrapi.model.MeasurementType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -23,7 +25,7 @@ public class WrapperResponseDAO {
     private DataDAO data;
 
     @JsonProperty(required = false)
-    private List<DemandScheduleDAO> demands;
+    private List<DemandScheduleDAO> demands = Collections.emptyList();
 
     @JsonProperty(required = false)
     private List<InformationPanelDAOResponse> panels;
@@ -31,6 +33,8 @@ public class WrapperResponseDAO {
     //TODO: dashboards
     @JsonProperty(required = false)
     private List<DashboardDAO> dashboards;
+    @JsonProperty(required = false, value = "measurement_types")
+    private List<MeasurementType> measurementTypes;
 
     public void appendData(DataDAO data) {
         if(this.data==null){

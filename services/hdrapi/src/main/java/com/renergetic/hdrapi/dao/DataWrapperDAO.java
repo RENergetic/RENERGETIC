@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Getter
 @Setter
 public class DataWrapperDAO {
@@ -15,8 +12,15 @@ public class DataWrapperDAO {
 	@JsonProperty(value = "data" )
 	private DataDAO data;
 
+	@JsonProperty(value = "panel" )
+	private InformationPanelDAOResponse panel=null;
+
 
 	public DataWrapperDAO(DataDAO dataDAO) {
 		this.data=dataDAO;
+	}
+	public DataWrapperDAO(DataDAO dataDAO,InformationPanelDAOResponse panel) {
+		this.data=dataDAO;
+		this.panel=panel;
 	}
 }

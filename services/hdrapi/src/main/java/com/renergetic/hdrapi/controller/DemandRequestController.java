@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.renergetic.hdrapi.dao.DemandDefinitionDAO;
 import com.renergetic.hdrapi.dao.DemandScheduleDAO;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.service.DemandRequestService;
 
 import java.util.List;
@@ -34,14 +32,7 @@ public class DemandRequestController {
     })
     @PostMapping(path = "/batch", produces = "application/json", consumes = "application/json")
     public ResponseEntity<List<DemandScheduleDAO>> createBatch(@RequestBody List<DemandScheduleDAO> demandScheduleDAOS){
-        try{
-            return new ResponseEntity<>(demandRequestService.save(demandScheduleDAOS), HttpStatus.OK);
-        } catch (InvalidCreationIdAlreadyDefinedException invalidCreationIdAlreadyDefinedException) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.save(demandScheduleDAOS), HttpStatus.OK);
     }
 
     @Operation(summary = "Create one demand requests")
@@ -52,14 +43,7 @@ public class DemandRequestController {
     })
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<DemandScheduleDAO> create(@RequestBody DemandScheduleDAO demandScheduleDAO){
-        try{
-            return new ResponseEntity<>(demandRequestService.save(demandScheduleDAO), HttpStatus.OK);
-        } catch (InvalidCreationIdAlreadyDefinedException invalidCreationIdAlreadyDefinedException) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.save(demandScheduleDAO), HttpStatus.OK);
     }
 
     @Operation(summary = "Update one demand requests")
@@ -70,14 +54,7 @@ public class DemandRequestController {
     })
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<DemandScheduleDAO> update(@RequestBody DemandScheduleDAO demandScheduleDAO){
-        try{
-            return new ResponseEntity<>(demandRequestService.update(demandScheduleDAO), HttpStatus.OK);
-        } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.update(demandScheduleDAO), HttpStatus.OK);
     }
 
     @Operation(summary = "Get all demand requests")
@@ -88,12 +65,7 @@ public class DemandRequestController {
     @GetMapping(path = "", produces = "application/json")
     public ResponseEntity<List<DemandScheduleDAO>> getAll(@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
         //TODO: Usage of a offset + limit
-        try{
-            return new ResponseEntity<>(demandRequestService.getAll(offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.getAll(offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
     }
 
     @Operation(summary = "Get one demand requests by its id")
@@ -103,14 +75,7 @@ public class DemandRequestController {
     })
     @GetMapping(path = "/id/{id}", produces = "application/json")
     public ResponseEntity<DemandScheduleDAO> getById(@PathVariable Long id){
-        try{
-            return new ResponseEntity<>(demandRequestService.getById(id), HttpStatus.OK);
-        } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.getById(id), HttpStatus.OK);
     }
 
     @Operation(summary = "Get list of demand requests by user id")
@@ -122,15 +87,8 @@ public class DemandRequestController {
     public ResponseEntity<List<DemandScheduleDAO>> getByUserId(@PathVariable String userId,
                                                               @RequestParam(required = false) Optional<Long> offset,
                                                               @RequestParam(required = false) Optional<Integer> limit){
-        try{
-            return new ResponseEntity<>(demandRequestService.getByUserId(Long.parseLong(userId),
-                    offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
-        } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.getByUserId(Long.parseLong(userId),
+                offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
     }
 
     @Operation(summary = "Get one demand requests by its asset id that is still valid (current time in between start and end time)")
@@ -140,12 +98,7 @@ public class DemandRequestController {
     })
     @GetMapping(path = "/assetId/{assetId}", produces = "application/json")
     public ResponseEntity<DemandScheduleDAO> getByUuid(@PathVariable Long assetId){
-        try{
-            return new ResponseEntity<>(demandRequestService.getByAssetIdAndActual(assetId), HttpStatus.OK);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.getByAssetIdAndActual(assetId), HttpStatus.OK);
     }
 
     /* Basic requests for schedule definition */
@@ -157,14 +110,7 @@ public class DemandRequestController {
     })
     @GetMapping(path = "/definition/{id}", produces = "application/json")
     public ResponseEntity<DemandDefinitionDAO> getDefinitionById(@PathVariable Long id){
-        try{
-            return new ResponseEntity<>(demandRequestService.getDefinitionById(id), HttpStatus.OK);
-        } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.getDefinitionById(id), HttpStatus.OK);
     }
 
     @Operation(summary = "Create one demand definition")
@@ -175,14 +121,7 @@ public class DemandRequestController {
     })
     @PostMapping(path = "/definition", produces = "application/json", consumes = "application/json")
     public ResponseEntity<DemandDefinitionDAO> createDefinition(@RequestBody DemandDefinitionDAO demandDefinitionDAO){
-        try{
-            return new ResponseEntity<>(demandRequestService.saveDefinition(demandDefinitionDAO), HttpStatus.OK);
-        } catch (InvalidCreationIdAlreadyDefinedException invalidCreationIdAlreadyDefinedException) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.saveDefinition(demandDefinitionDAO), HttpStatus.OK);
     }
 
     @Operation(summary = "Update one demand definition")
@@ -193,14 +132,7 @@ public class DemandRequestController {
     })
     @PutMapping(path = "/definition", produces = "application/json", consumes = "application/json")
     public ResponseEntity<DemandDefinitionDAO> updateDefinition(@RequestBody DemandDefinitionDAO demandDefinitionDAO){
-        try{
-            return new ResponseEntity<>(demandRequestService.updateDefinition(demandDefinitionDAO), HttpStatus.OK);
-        } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.updateDefinition(demandDefinitionDAO), HttpStatus.OK);
     }
 
     @Operation(summary = "Get all demand definition")
@@ -210,12 +142,7 @@ public class DemandRequestController {
     })
     @GetMapping(path = "/definition", produces = "application/json")
     public ResponseEntity<List<DemandDefinitionDAO>> getAllDefinition(@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-        try{
-            return new ResponseEntity<>(demandRequestService.listDefinitions(offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.listDefinitions(offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete one demand definition by its id")
@@ -225,13 +152,6 @@ public class DemandRequestController {
     })
     @DeleteMapping(path = "/definition/{id}", produces = "application/json")
     public ResponseEntity<Boolean> deleteDefinitionById(@PathVariable Long id){
-        try{
-            return new ResponseEntity<>(demandRequestService.deleteDefinition(id), HttpStatus.OK);
-        } catch (InvalidNonExistingIdException invalidNonExistingIdException) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(demandRequestService.deleteDefinition(id), HttpStatus.OK);
     }
 }

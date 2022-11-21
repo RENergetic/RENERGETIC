@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: renergetic-ui
-          image: docker-registry.default.svc:5000/ren-prototype/renergetic-ui:latest
+          image: docker-registry.default.svc:5000/${PROJECT}/renergetic-ui:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

@@ -3,8 +3,14 @@ package com.renergetic.hdrapi.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.repository.NotificationRepository;
+import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
+import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,11 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.hdrapi.dao.AssetDAOResponse;
-import com.renergetic.hdrapi.dao.UserDAORequest;
-import com.renergetic.hdrapi.dao.UserDAOResponse;
-import com.renergetic.hdrapi.dao.UserRolesDAO;
-import com.renergetic.hdrapi.dao.UserSettingsDAO;
 import com.renergetic.hdrapi.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,10 @@ public class UserController {
 	
 	@Autowired
 	UserService userSv;
+	@Value("${api.generate.dummy-data}")
+	private Boolean generateDummy;
+	@Autowired
+	NotificationRepository notificationRepository;
 	
 //=== GET REQUESTS====================================================================================
 	
@@ -101,13 +106,36 @@ public class UserController {
 		
 		return new ResponseEntity<>(settings, HttpStatus.OK);
 	}
-	
-	@Operation (summary="Get Assets from User with specific id")
+	@Operation(summary = "Get All Notifications for the user")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "/notifications", produces = "application/json")
+	public ResponseEntity<List<NotificationDAO>> getUserNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<NotificationDAO> notifications;
+		//TODO: filter by user id
+		if (generateDummy) {
+			notifications= DummyDataGenerator.getNotifications();
+		} else {
+			notifications = notificationRepository.findAll(new OffSetPaging(offset.orElse(0L), limit.orElse(60)))
+					.stream().map(NotificationDAO::create).collect(Collectors.toList());
+		}
+		return new ResponseEntity<>(notifications, HttpStatus.OK);
+	}
 
+	@Operation (summary="Get Assets from User with specific id")
 	@GetMapping(path ="/assets/{id}", produces="application/json")
 	public ResponseEntity<List<AssetDAOResponse>> getAssets (@PathVariable Long id){
 		List<AssetDAOResponse> assets = null;
 		assets= userSv.getAssets(id);
+		return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+
+	@Operation (summary="Get Assets from User with specific id and specific category id")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path ="/assets/{id}/{categoryId}", produces="application/json")
+	public ResponseEntity<List<AssetDAOResponse>> getAssets (@PathVariable Long id, @PathVariable Long categoryId,
+															 @RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<AssetDAOResponse> assets = null;
+		assets= userSv.getAssetsByCategory(id, categoryId, offset.orElse(0L), limit.orElse(20));
 		return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
@@ -121,13 +149,8 @@ public class UserController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserDAOResponse> createUser(@RequestBody UserDAORequest user) {
-		try {	
-			UserDAOResponse _user = userSv.save(user);
-			return new ResponseEntity<>(_user, HttpStatus.CREATED);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		UserDAOResponse _user = userSv.save(user);
+		return new ResponseEntity<>(_user, HttpStatus.CREATED);
 	}
 	
 	@Operation(summary = "Create a new User Role associated to a User")
@@ -139,13 +162,8 @@ public class UserController {
 	)
 	@PostMapping(path = "/roles", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserRolesDAO> createUserRole(@RequestBody UserRolesDAO role) {
-		try {	
-			UserRolesDAO _role = userSv.saveRole(role);
-			return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		UserRolesDAO _role = userSv.saveRole(role);
+		return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
 	}
 	
 	@Operation(summary = "Create a new User Setting associated to a User")
@@ -157,13 +175,8 @@ public class UserController {
 	)
 	@PostMapping(path = "/settings", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserSettingsDAO> createUserSetting(@RequestBody UserSettingsDAO role) {
-		try {	
-			UserSettingsDAO _role = userSv.saveSetting(role);
-			return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		UserSettingsDAO _role = userSv.saveSetting(role);
+		return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
 	}
 
 //=== PUT REQUESTS====================================================================================
@@ -178,14 +191,9 @@ public class UserController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserDAOResponse> updateUser(@RequestBody UserDAORequest user, @PathVariable Long id) {
-		try {
-			user.setId(id);
-			UserDAOResponse _user = userSv.update(user, id);
-			return new ResponseEntity<>(_user, _user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		user.setId(id);
+		UserDAOResponse _user = userSv.update(user, id);
+		return new ResponseEntity<>(_user, _user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Update a existing User Role")
@@ -198,14 +206,9 @@ public class UserController {
 	)
 	@PutMapping(path = "/roles/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserRolesDAO> updateUserRoles(@RequestBody UserRolesDAO role, @PathVariable Long id) {
-		try {
-			role.setId(id);
-			UserRolesDAO _role = userSv.updateRole(role, id);
-			return new ResponseEntity<>(_role, _role != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		role.setId(id);
+		UserRolesDAO _role = userSv.updateRole(role, id);
+		return new ResponseEntity<>(_role, _role != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Update a existing User Setting")
@@ -218,14 +221,9 @@ public class UserController {
 	)
 	@PutMapping(path = "/settings/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<UserSettingsDAO> updateUserSettings(@RequestBody UserSettingsDAO setting, @PathVariable Long id) {
-		try {
-			setting.setId(id);
-			UserSettingsDAO _setting = userSv.updateSetting(setting, id);
-			return new ResponseEntity<>(_setting, _setting != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		setting.setId(id);
+		UserSettingsDAO _setting = userSv.updateSetting(setting, id);
+		return new ResponseEntity<>(_setting, _setting != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 //=== DELETE REQUESTS ================================================================================
@@ -238,13 +236,9 @@ public class UserController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-		try {
-			userSv.deleteById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		userSv.deleteById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 	
 	@Operation(summary = "Delete a existing User Role", hidden = false)
@@ -255,13 +249,9 @@ public class UserController {
 	)
 	@DeleteMapping(path = "/roles/{id}")
 	public ResponseEntity<?> deleteUserRole(@PathVariable Long id) {
-		try {
-			userSv.deleteRoleById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		userSv.deleteRoleById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 	
 	@Operation(summary = "Delete a existing User Setting", hidden = false)
@@ -272,12 +262,8 @@ public class UserController {
 	)
 	@DeleteMapping(path = "/settings/{id}")
 	public ResponseEntity<?> deleteUserSetting(@PathVariable Long id) {
-		try {
-			userSv.deleteSettingById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		userSv.deleteSettingById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

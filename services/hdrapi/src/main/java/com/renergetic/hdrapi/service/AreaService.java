@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.renergetic.hdrapi.dao.AreaDAO;
+import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.Area;
@@ -36,7 +37,9 @@ public class AreaService {
 
 	// AREA CRUD OPERATIONS
 	public AreaDAO save(AreaDAO area) {
-		area.setId(null);
+		if(area.getId() !=  null && areaRepository.existsById(area.getId()))
+    		throw new InvalidCreationIdAlreadyDefinedException("Already exists a area with ID " + area.getId());
+		
 		Area areaEntity = area.mapToEntity();
 		areaEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
 		return AreaDAO.create(areaRepository.save(areaEntity));
@@ -50,7 +53,7 @@ public class AreaService {
 	}
 
 	public AreaDAO update(AreaDAO area, Long id) {
-		if (areaRepository.existsById(id)) {
+		if (id != null && areaRepository.existsById(id)) {
 			area.setId(id);
 			Area areaEntity = area.mapToEntity();
 			areaEntity.setUuid(new UUID());

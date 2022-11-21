@@ -74,14 +74,10 @@ public class HeatmapController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<HeatmapDAO> createHeatmap(@RequestBody HeatmapDAO heatmap) {
-		try {
-			heatmap.setId(null);
-			HeatmapDAO _heatmap = heatmapSv.save(heatmap);
-			
-			return new ResponseEntity<>(_heatmap, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		heatmap.setId(null);
+		HeatmapDAO _heatmap = heatmapSv.save(heatmap);
+		
+		return new ResponseEntity<>(_heatmap, HttpStatus.CREATED);
 	}
 
 //=== PUT REQUESTS ====================================================================================

@@ -27,6 +27,6 @@ data:
       id_token_attribute_name = access_token
       email_attribute_name = email:primary
       login_attribute_path = preferred_username
-      role_attribute_path = contains(resource_access.grafana.roles, 'grafana-admin') && 'Admin' || contains(resource_access.grafana.roles, 'grafana-editor') && 'Editor' || contains(resource_access."renergetic-app".roles, 'ren-dev') && 'Admin' || contains(resource_access."renergetic-app".roles, 'ren-admin') && 'Admin' || contains(resource_access."renergetic-app".roles, 'ren-manager') && 'Editor' || 'Viewer'
+      role_attribute_path = contains(resource_access.grafana.roles[*] || [""], 'Admin') && 'Admin' || contains(resource_access.grafana.roles[*] || [""], 'Editor') && 'Editor' || contains(resource_access."renergetic-app".roles[*] || [""], 'ren-dev') && 'Admin' || contains(resource_access."renergetic-app".roles[*] || [""], 'ren-admin') && 'Admin' || contains(resource_access."renergetic-app".roles[*] || [""], 'ren-manager') && 'Editor' || 'Viewer'
       org_attribute_path = 1
       use_pkce = false

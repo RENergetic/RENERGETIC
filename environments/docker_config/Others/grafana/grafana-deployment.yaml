@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: docker-registry.default.svc:5000/ren-prototype/grafana:latest
+          image: docker-registry.default.svc:5000/${PROJECT}/grafana:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -27,13 +27,13 @@ spec:
               path: /api/health
               port: 3000
               scheme: HTTP
-            initialDelaySeconds: 10
+            initialDelaySeconds: 60
             periodSeconds: 30
             successThreshold: 1
             timeoutSeconds: 2
           livenessProbe:
             failureThreshold: 3
-            initialDelaySeconds: 30
+            initialDelaySeconds: 40
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:

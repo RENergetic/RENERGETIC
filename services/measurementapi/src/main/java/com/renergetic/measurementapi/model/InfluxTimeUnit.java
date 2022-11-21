@@ -10,7 +10,7 @@ public enum InfluxTimeUnit {
 	d (1, "day"),
 	w (0.142857143, "week"),
 	M (0.0328767, "month"),
-	Y (0.002739728002438356, "year");
+	y (0.002739728002438356, "year");
 	
 	final double VALUE;
 	final String NAME;

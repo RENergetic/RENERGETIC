@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ingestion-api
-          image: docker-registry.default.svc:5000/ren-prototype/ingestion-api:latest
+          image: docker-registry.default.svc:5000/${PROJECT}/ingestion-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8082
@@ -25,4 +25,14 @@ spec:
             limits:
               cpu: 350m
               memory: 350Mi
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/requirements
+              port: 8082
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
       restartPolicy: Always

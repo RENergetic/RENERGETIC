@@ -41,7 +41,7 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
             InformationTileDAOResponse dao = new InformationTileDAOResponse();
             dao.setId(entity.getId());
             if(entity.getInformationPanel()!=null)
-            dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel()));
+//            dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel()));
 
             dao.setName(entity.getName());
             dao.setLabel(entity.getLabel());

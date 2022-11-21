@@ -42,13 +42,13 @@ public class NotificationController {
 	@Operation(summary = "Get All Notifications")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<NotificationDAO>> getAllNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){		
+	public ResponseEntity<List<NotificationDAO>> getAllNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
 		 List<NotificationDAO> notifications = notificationRepository.findAll(new OffSetPaging(offset.orElse(0L), limit.orElse(60)))
 				 .stream().map(NotificationDAO::create).collect(Collectors.toList());
-		
+
 		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
-	
+
 	@Operation(summary = "Get Notifications by asset id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
@@ -90,14 +90,10 @@ public class NotificationController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<NotificationDAO> createNotification(@RequestBody NotificationDAO notification) {
-		try {
-			notification.setId(null);
-			NotificationDAO _notification = NotificationDAO.create(notificationRepository.save(notification.mapToEntity()));
-			
-			return new ResponseEntity<>(_notification, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		notification.setId(null);
+		NotificationDAO _notification = NotificationDAO.create(notificationRepository.save(notification.mapToEntity()));
+		
+		return new ResponseEntity<>(_notification, HttpStatus.CREATED);
 	}
 
 //=== PUT REQUESTS ====================================================================================
@@ -111,16 +107,10 @@ public class NotificationController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<NotificationDAO> updateNotification(@RequestBody NotificationDAO notification, @PathVariable Long id) {
-		try {
-				if (notificationRepository.existsById(id)) {
-					notification.setId(id);
-					return new ResponseEntity<>(NotificationDAO.create(notificationRepository.save(notification.mapToEntity())), HttpStatus.OK);
-				}else return ResponseEntity.notFound().build();
-				
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		if (notificationRepository.existsById(id)) {
+			notification.setId(id);
+			return new ResponseEntity<>(NotificationDAO.create(notificationRepository.save(notification.mapToEntity())), HttpStatus.OK);
+		}else return ResponseEntity.notFound().build();
 	}
 
 //=== DELETE REQUESTS =================================================================================
@@ -133,12 +123,8 @@ public class NotificationController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
-		try {
-			notificationRepository.deleteById(id);
-			
-			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		notificationRepository.deleteById(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

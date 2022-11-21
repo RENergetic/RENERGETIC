@@ -50,6 +50,9 @@ public class HttpAPIs {
             System.err.println("The connection with server has been interrupted");
         } catch (IOException e) {
             System.err.println("Can't get connection with the URL");
+        } catch (Exception e) {
+        	System.err.println("Unknow exception");
+        	e.printStackTrace();
         }
         return null;
     }

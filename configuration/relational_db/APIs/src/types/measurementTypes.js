@@ -35,7 +35,7 @@ const types = [
     },
     {
       id: "2",
-      name: "electricity_energy_wh",
+      name: "energy",
       label: "Energy [Wh]",
       base_unit: "Wh",
       unit: "Wh",
