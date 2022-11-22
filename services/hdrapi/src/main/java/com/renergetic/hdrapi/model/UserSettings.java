@@ -31,7 +31,7 @@ public class UserSettings {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Column(name = "settings_json", nullable = false, insertable = true, updatable = true, unique = false)
+	@Column(name = "settings_json", nullable = false, insertable = true, updatable = true, unique = false,columnDefinition="TEXT")
 	@JsonProperty(required = true)
 	private String settingsJson;
 
