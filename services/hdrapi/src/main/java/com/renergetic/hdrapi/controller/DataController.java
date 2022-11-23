@@ -1,6 +1,5 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.DataDAO;
 import com.renergetic.hdrapi.dao.DataWrapperDAO;
 import com.renergetic.hdrapi.service.DataService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*")
@@ -72,47 +69,4 @@ public class DataController {
         return new ResponseEntity<>(panelData, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get Data related with a tile id")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
-            @ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
-    })
-    @GetMapping(path = "/tile/{tile_id}", produces = "application/json")
-    @Deprecated
-    public ResponseEntity<DataDAO> getDataByTile(
-            @PathVariable Long tile_id, @RequestParam("from") Optional<String> from,
-            @RequestParam("to") Optional<String> to, @RequestParam("bucket") Optional<String> bucket,
-            @RequestParam("field") Optional<String> field, @RequestParam Map<String, String> tags) {
-
-        Map<String, String> params = new HashMap<>();
-        if (from.isPresent()) params.put("from", from.get());
-        if (to.isPresent()) params.put("to", from.get());
-        if (bucket.isPresent()) params.put("bucket", from.get());
-        if (field.isPresent()) params.put("field", from.get());
-        if (tags != null) params.putAll(tags);
-
-        return new ResponseEntity<>(dataSv.getByTile(tile_id, params), HttpStatus.OK);
-    }
-
-    @Operation(summary = "Get Data related with a panel id")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
-            @ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
-    })
-    @GetMapping(path = "/influxdb/panel/{panel_id}", produces = "application/json")
-    @Deprecated //there is     "panel/{panelId}" getPanelData method
-    public ResponseEntity<DataDAO> getDataByPanel(
-            @PathVariable Long panel_id, @RequestParam("from") Optional<String> from,
-            @RequestParam("to") Optional<String> to, @RequestParam("bucket") Optional<String> bucket,
-            @RequestParam("field") Optional<String> field, @RequestParam Map<String, String> tags) {
-
-        Map<String, String> params = new HashMap<>();
-        if (from.isPresent()) params.put("from", from.get());
-        if (to.isPresent()) params.put("to", from.get());
-        if (bucket.isPresent()) params.put("bucket", from.get());
-        if (field.isPresent()) params.put("field", from.get());
-        if (tags != null) params.putAll(tags);
-
-        return new ResponseEntity<>(dataSv.getByPanel(panel_id, params), HttpStatus.OK);
-    }
 }

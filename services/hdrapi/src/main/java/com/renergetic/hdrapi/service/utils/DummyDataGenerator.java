@@ -59,7 +59,7 @@ public class DummyDataGenerator {
         DataDAO data = new DataDAO();
         Map<String, Double> measurementValues = measurements.stream().collect(
                 Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
-        data.getCurrent().setLast(measurementValues);
+        data.getCurrent().put("last", measurementValues);
         return data;
     }
 

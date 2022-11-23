@@ -41,8 +41,8 @@ public class WrapperResponseDAO {
             this.data = data;
         }
         else {
-            this.data.getCurrent().getLast().putAll(data.getCurrent().getLast());
-            this.data.getPrediction().getLast().putAll(data.getPrediction().getLast());
+            this.data.getCurrent().putAll(data.getCurrent());
+            this.data.getPrediction().putAll(data.getCurrent());
         }
     }
 }

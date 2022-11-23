@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.hdrapi.model.Direction;
 import com.renergetic.hdrapi.model.Domain;
+import com.renergetic.hdrapi.model.InfluxFunction;
 import com.renergetic.hdrapi.model.InformationTile;
 import com.renergetic.hdrapi.model.InformationTileMeasurement;
 import com.renergetic.hdrapi.model.Measurement;
@@ -39,6 +40,9 @@ public class InformationTileMeasurementDAORequest {
 
 	@JsonProperty(required = false)
 	private Direction direction;
+	
+	@JsonProperty(required = false)
+	private InfluxFunction function;
 
 	@JsonProperty(value = "information_tile_id", required = false)
 	private Long informationTile;
@@ -55,6 +59,7 @@ public class InformationTileMeasurementDAORequest {
 		dao.setSensorName(tile.getSensorName());
 		dao.setDomain(tile.getDomain());
 		dao.setDirection(tile.getDirection());
+		dao.setFunction(InfluxFunction.obtain(tile.getFunction()));
 		if(tile.getInformationTile() != null) dao.setInformationTile(tile.getInformationTile().getId());
 		
 		return dao;
@@ -85,6 +90,7 @@ public class InformationTileMeasurementDAORequest {
 		tile.setSensorName(sensorName);
 		tile.setDomain(domain);
 		tile.setDirection(direction);
+		tile.setFunction(function != null? function.name().toLowerCase() : null);
 		return tile;
 	}
 }

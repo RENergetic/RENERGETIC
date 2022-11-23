@@ -14,28 +14,27 @@ public class DataDAO {
 
 
 	@JsonProperty(value = "current", required = false)
-	private Data current;
+	private Map<String, Map<String, Double>> current;
 
 	@JsonProperty(value = "prediction", required = false)
-	private Data prediction;
+	private Map<String, Map<String, Double>> prediction;
 
 	public DataDAO() {
-		current = new Data();
-		prediction = new Data();
+		current = new HashMap<>();
+		prediction = new HashMap<>();
 	}
 	
-	@Getter
-	@Setter
-	public class Data {
-		@JsonProperty(value = "last", required = false)
-		private Map<String, Double> last;
-		
-		@JsonProperty(value = "max", required = false)
-		private Map<String, Double> max;
-
-		public Data() {
-			last = new HashMap<>();
-			max = new HashMap<>();
+	public void putCurrent(String function, String id, Double value) {
+		if (!this.current.containsKey(function)) {
+			this.current.put(function, new HashMap<>());
 		}
+		this.current.get(function).put(id, value);
+	}
+		
+	public void putPrediction(String function, String id, Double value) {
+		if (!this.prediction.containsKey(function)) {
+			this.prediction.put(function, new HashMap<>());
+		}
+		this.prediction.get(function).put(id, value);
 	}
 }

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,10 +32,7 @@ public class InformationPanelDAOResponse {
     private List<InformationTileDAOResponse> tiles;
 
     public static InformationPanelDAOResponse create(InformationPanel entity) {
-
-        return create(entity, entity.getTiles() != null ? entity.getTiles()
-                .stream().map(InformationTileDAOResponse::create).collect(Collectors.toList()) : new ArrayList<>());
-
+        return create(entity, null);
     }
 
     public static InformationPanelDAOResponse create(InformationPanel entity,
@@ -47,9 +43,12 @@ public class InformationPanelDAOResponse {
         dao.setId(entity.getId());
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
-        dao.setTiles(informationTileDAOResponses);
         dao.setIsTemplate(entity.getIsTemplate());
         dao.setFeatured(entity.getFeatured());
+        
+        if (informationTileDAOResponses == null && entity.getTiles() != null)
+        	dao.setTiles(entity.getTiles().stream().map(InformationTileDAOResponse::create).collect(Collectors.toList()));
+        else dao.setTiles(informationTileDAOResponses);
         return dao;
     }
 }

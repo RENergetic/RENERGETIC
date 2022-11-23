@@ -1,8 +1,11 @@
 package com.renergetic.hdrapi.dao;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.hdrapi.model.Direction;
 import com.renergetic.hdrapi.model.Domain;
+import com.renergetic.hdrapi.model.InfluxFunction;
 import com.renergetic.hdrapi.model.Measurement;
 import com.renergetic.hdrapi.model.MeasurementType;
 import com.renergetic.hdrapi.model.details.MeasurementDetails;
@@ -13,7 +16,6 @@ import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -48,6 +50,10 @@ public class MeasurementDAOResponse {
     @JsonProperty(value = "measurement_details", required = false)
     private HashMap<String, ?> measurementDetails;
 
+    @JsonInclude(Include.NON_EMPTY)
+	@JsonProperty(value = "aggregation_function", required = false)
+	private InfluxFunction function;
+
 //	private transient InformationTileMeasurement categoryQuery;
 
     public static MeasurementDAOResponse create(Measurement measurement, List<MeasurementDetails> details) {
@@ -63,14 +69,13 @@ public class MeasurementDAOResponse {
             dao.setLabel(measurement.getLabel());
             dao.setDomain(measurement.getDomain());
             dao.setDirection(measurement.getDirection());
+            if (measurement.getFunction() != null)
+            	dao.setFunction(InfluxFunction.obtain(measurement.getFunction()));
+            else dao.setFunction(InfluxFunction.LAST);
             if (measurement.getAssetCategory() != null)
                 dao.setCategory(measurement.getAssetCategory().getName());
 
             if (details != null) {
-//                List<MeasurementDetailsDAO> detailsDao = details.stream().map(
-//                        it ->  new MeasurementDetailsDAO(it.getKey(), it.getValue(),
-//                                it.getMeasurement().getId())).collect(
-//                        Collectors.toList());
                 HashMap<String, String> detailsDao = details.stream()
                         .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
                                 (prev, next) -> next, HashMap::new));
@@ -96,6 +101,8 @@ public class MeasurementDAOResponse {
 		measurement.setLabel(label);
 		measurement.setDomain(domain);
 		measurement.setDirection(direction);
+		if (function != null)
+			measurement.setFunction(function.name().toLowerCase());
 
 		return measurement;
 	}

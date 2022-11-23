@@ -124,15 +124,9 @@ public class InformationPanelService {
         */
         List<InformationPanel> informationPanels = informationPanelRepository.findByUserId(userId, offset, limit);
         List<InformationPanelDAOResponse> list =
-                informationPanels.stream().map(panel ->
-                        InformationPanelDAOResponse.create(panel,
-                                panel.getTiles().stream().map(tile ->
-                                        InformationTileDAOResponse.create(tile,
-                                                tile.getInformationTileMeasurements()
-                                                        .stream().map(this::getMeasurementFromTileMeasurement)
-                                                        .collect(Collectors.toList())
-                                        )).collect(Collectors.toList())
-                        )).collect(Collectors.toList());
+                informationPanels.stream()
+	                .map(panel -> InformationPanelDAOResponse.create(panel, null))
+	                .collect(Collectors.toList());
 
         if (list.size() > 0)
             return list;

@@ -3,7 +3,7 @@ package com.renergetic.hdrapi.dao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.hdrapi.model.InformationTile;
 import com.renergetic.hdrapi.model.InformationTileType;
-
+import com.renergetic.hdrapi.model.Measurement;
 import com.renergetic.hdrapi.service.utils.Json;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +22,6 @@ public class InformationTileDAOResponse {
     @JsonProperty()
     private Long id;
 
-
-//    @JsonProperty(value = "panel") -> in case we wont to have panel inside tile
-//    private InformationPanelDAOResponse subPanel;
-
     @JsonProperty(required = true)
     private String name;
 
@@ -41,16 +37,13 @@ public class InformationTileDAOResponse {
     private List<MeasurementDAOResponse> measurements;
 
     @JsonProperty
-    private Map props;
+    private Map<String, ?> props;
 
     @JsonProperty
-    private Map layout;
+    private Map<String, ?> layout;
 
     public static InformationTileDAOResponse create(InformationTile entity)  {
-        return create(entity, entity.getInformationTileMeasurements() != null ?
-                entity.getInformationTileMeasurements()
-                        .stream().map(x -> MeasurementDAOResponse.create(x.getMeasurement(), Collections.emptyList())).collect(Collectors.toList()) :
-                new ArrayList<>());
+        return create(entity, null);
     }
 
     public static InformationTileDAOResponse create(InformationTile entity, List<MeasurementDAOResponse> measurements)  {
@@ -58,7 +51,6 @@ public class InformationTileDAOResponse {
             return null;
         InformationTileDAOResponse dao = new InformationTileDAOResponse();
         dao.setId(entity.getId());
-//        dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel(), null));
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
         if(entity.getType() != null)
@@ -76,10 +68,21 @@ public class InformationTileDAOResponse {
             dao.setProps(Json.parse(entity.getProps()).toMap());
         } catch (ParseException e) {
             //tODO: verify catch
-                dao.setProps(new HashMap());
+                dao.setProps(new HashMap<>());
         }
 
-        dao.setMeasurements(measurements);
+    	if (measurements == null && entity.getInformationTileMeasurements() != null)
+	        dao.setMeasurements(
+	    		entity.getInformationTileMeasurements()
+	        		.stream()
+	        		.map(tileM -> {
+	        			Measurement measurement = tileM.getMeasurement();
+	        			measurement.setFunction(tileM.getFunction());
+	        			return MeasurementDAOResponse.create(measurement, null);
+	        		})
+	        		.collect(Collectors.toList())
+			);
+    	else dao.setMeasurements(measurements);
         return dao;
     }
 }
