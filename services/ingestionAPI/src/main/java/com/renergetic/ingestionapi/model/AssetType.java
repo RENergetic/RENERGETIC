@@ -2,8 +2,6 @@ package com.renergetic.ingestionapi.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
 import org.hibernate.annotations.Subselect;
@@ -35,21 +33,15 @@ public class AssetType {
 	@JsonProperty(required = false)
 	private String label;
 	
-	@Column(name = "category", nullable = true, insertable = true, updatable = true)
-	@Enumerated(EnumType.STRING)
-	@JsonProperty(required = false)
-	private AssetCategory category;
-	
 	@Column(name = "renovable", nullable = true, insertable = true, updatable = true)
 	@JsonProperty(required = false)
 	private Long renovable;
 
-	public AssetType(long id, String name, String label, AssetCategory category, Long renovable) {
+	public AssetType(long id, String name, String label, Long renovable) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.label = label;
-		this.category = category;
 		this.renovable = renovable;
 	}
 }

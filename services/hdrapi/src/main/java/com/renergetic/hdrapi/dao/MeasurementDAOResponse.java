@@ -71,11 +71,11 @@ public class MeasurementDAOResponse {
             dao.setDirection(measurement.getDirection());
             if (measurement.getFunction() != null)
             	dao.setFunction(InfluxFunction.obtain(measurement.getFunction()));
-            else dao.setFunction(InfluxFunction.LAST);
+            else dao.setFunction(InfluxFunction.last);
             if (measurement.getAssetCategory() != null)
                 dao.setCategory(measurement.getAssetCategory().getName());
 
-            if (details != null) {
+            if (details != null && !details.isEmpty()) {
                 HashMap<String, String> detailsDao = details.stream()
                         .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
                                 (prev, next) -> next, HashMap::new));
@@ -83,7 +83,10 @@ public class MeasurementDAOResponse {
                 dao.setMeasurementDetails(detailsDao);
             }
             else {
-                dao.setMeasurementDetails(new HashMap<>());
+            	HashMap<String, String> detailsDao = measurement.getDetails().stream()
+                		.collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
+                				(prev, next) -> next, HashMap::new));
+                dao.setMeasurementDetails(detailsDao);
             }
         }
         return dao;

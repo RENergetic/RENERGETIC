@@ -1,5 +1,7 @@
 package com.renergetic.hdrapi.model;
 
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,12 +12,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+
+import com.renergetic.hdrapi.model.details.MeasurementDetails;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +86,10 @@ public class Measurement {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
 	private UUID uuid;
+
+	@OneToMany(cascade = CascadeType.REFRESH, mappedBy = "measurement")
+	@NotFound(action = NotFoundAction.IGNORE)
+	private List<MeasurementDetails> details;
 	
 	@Transient
 	String function;

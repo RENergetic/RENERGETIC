@@ -1,19 +1,19 @@
 package com.renergetic.hdrapi.model;
 
 public enum InfluxFunction {
-	COUNT,
-	DISTINCT,
-	MEAN,
-	MEDIAN,
-	SUM,
-	MAX,
-	MIN,
-	FIRST,
-	LAST;
+	count,
+	distinct,
+	mean,
+	median,
+	sum,
+	max,
+	min,
+	first,
+	last;
 	
 	public static InfluxFunction obtain(String function) {
 		try {
-			return InfluxFunction.valueOf(function.toUpperCase());
+			return InfluxFunction.valueOf(function.toLowerCase());
 		}catch (IllegalArgumentException e) {
 			return null;
 		}

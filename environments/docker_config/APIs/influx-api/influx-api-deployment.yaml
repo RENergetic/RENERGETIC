@@ -31,8 +31,8 @@ spec:
               path: /api/measurement
               port: 8082
               scheme: HTTP
-            initialDelaySeconds: 30
-            periodSeconds: 30
+            initialDelaySeconds: 60
+            periodSeconds: 120
             successThreshold: 1
             timeoutSeconds: 1
       restartPolicy: Always
