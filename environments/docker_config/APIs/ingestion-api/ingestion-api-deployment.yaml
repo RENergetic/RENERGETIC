@@ -27,10 +27,8 @@ spec:
               memory: 350Mi
           readinessProbe:
             failureThreshold: 3
-            httpGet:
-              path: /api/requirements
+            tcpSocket:
               port: 8082
-              scheme: HTTP
             initialDelaySeconds: 60
             periodSeconds: 120
             successThreshold: 1
