@@ -29,6 +29,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
        - Example: *fields=power, temperature*
      - tag_key (optional): Filter entries by tag and its values (to filter by many values separate it by commas). All variables that haven't the names "measurements", "fields", "bucket", "from" or "to" are used to filter
        - Example: *tag_key1=value1, value2 & tag_key2=value1*
+     - hideNotFound: Boolean, if it's true this endpoint doesn't return codes 404, in its place returns code 200 with an empty map
    - The data returned have the format:
   ```
   {
@@ -55,6 +56,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
        - Example: *fields=power, temperature*
      - tag_key (optional): Filter entries by tag and its values (to filter by many values separate it by commas). All variables that haven't the names "measurements", "fields", "bucket", "from" or "to" are used to filter
        - Example: *tag_key1=value1, value2 & tag_key2=value1*
+     - hideNotFound: Boolean, if it's true this endpoint doesn't return codes 404, in its place returns code 200 with an empty list
    - The data returned have the format:
   ```
   {
@@ -77,6 +79,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
        - Example: *fields=power, temperature*
      - tag_key (optional): Filter entries by tag and its values (to filter by many values separate it by commas). All variables that haven't the names "measurements", "fields", "bucket", "from" or "to" are used to filter
        - Example: *tag_key1=value1, value2 & tag_key2=value1*
+     - hideNotFound: Boolean, if it's true this endpoint doesn't return codes 404, in its place returns code 200 with an empty list
    - The data returned have the format:
   ```
    [
@@ -112,6 +115,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
        - Example: *fields=power, temperature*
      - tag_key (optional): Filter entries by tag and its values (to filter by many values separate it by commas). All variables that haven't the names "measurements", "fields", "bucket", "group", "by_measurement", "from" or "to" are used to filter
        - Example: *tag_key1=value1, value2 & tag_key2=value1*
+     - hideNotFound: Boolean, if it's true this endpoint doesn't return codes 404, in its place returns code 200 with an empty list
    - The data returned with *by_measurement* to false have the format:
   ```
    [
@@ -156,6 +160,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
      - to (optional): Until when to obtain the data
      - NOT IMPLEMENTED | time_var (optional): field to use as time when set the from and to values, "time" by default
      - tag_key (optional): Filter the result by tag_name and his value. All variables that haven't the names "bucket", "from" or "to" are used to filter
+     - hideNotFound: Boolean, if it's true this endpoint doesn't return codes 404, in its place returns code 200 with an empty list
    - The data returned have the format:
   ```
    [
@@ -186,6 +191,7 @@ Require PSNC VPN connection: [Swagger Docs](http://influx-api-swagger-ren-protot
      - to (optional): Until when to obtain the data
      - NOT IMPLEMENTED | time_var (optional): field to use as time when set the from and to values, "time" by default
      - tag_key (optional): Filter the result by tag_name and his value. All variables that haven't the names "bucket", "from" or "to" are used to filter
+     - hideNotFound: Boolean, if it's true this endpoint doesn't return codes 404, in its place returns code 200 with an empty list
    - The data returned have the format:
   ```
    [

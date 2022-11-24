@@ -36,16 +36,21 @@ public class MeasurementController {
 	@Autowired
 	MeasurementService service;
 
+// GET REQUESTS
+	
 	@Operation(summary = "Get measurement names")
 	@GetMapping("")
 	public ResponseEntity<List<String>> getMeasurement(
-			@RequestParam("bucket") Optional<String> bucket){
+			@RequestParam("bucket") Optional<String> bucket,
+			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
 		List<String> ret;
 		
 		ret = service.list(bucket.orElse("renergetic"));
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
+		else if (hideNotFound.isPresent() && hideNotFound.get())
+			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
@@ -55,12 +60,14 @@ public class MeasurementController {
 			@RequestParam(name = "measurements", required = false) List<String> measurements, 
 			@RequestParam(name = "fields", required = false) List<String> fields, 
 			@RequestParam("bucket") Optional<String> bucket,
-			@RequestParam Map<String, String> tags){
+			@RequestParam Map<String, String> tags,
+			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
 		
 		Map<String, List<String>> ret;
 		tags.remove("measurements");
 		tags.remove("fields");
 		tags.remove("bucket");
+		tags.remove("hideNotFound");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -74,6 +81,8 @@ public class MeasurementController {
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
+		else if (hideNotFound.isPresent() && hideNotFound.get())
+			return ResponseEntity.ok(Map.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
@@ -84,12 +93,14 @@ public class MeasurementController {
 			@RequestParam(name = "measurements", required = false) List<String> measurements, 
 			@RequestParam(name = "fields", required = false) List<String> fields, 
 			@RequestParam("bucket") Optional<String> bucket,
-			@RequestParam Map<String, String> tags){
+			@RequestParam Map<String, String> tags,
+			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
 		
 		Map<String, List<String>> ret = new HashMap<>();
 		tags.remove("measurements");
 		tags.remove("fields");
 		tags.remove("bucket");
+		tags.remove("hideNotFound");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -103,6 +114,8 @@ public class MeasurementController {
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
+		else if (hideNotFound.isPresent() && hideNotFound.get())
+			return ResponseEntity.ok(Map.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
@@ -114,7 +127,8 @@ public class MeasurementController {
 			@RequestParam("from") Optional<String> from,
 			@RequestParam("to") Optional<String> to,
 			@RequestParam("bucket") Optional<String> bucket,
-			@RequestParam Map<String, String> tags){
+			@RequestParam Map<String, String> tags,
+			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
 		
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -122,6 +136,7 @@ public class MeasurementController {
 		tags.remove("bucket");
 		tags.remove("from");
 		tags.remove("to");
+		tags.remove("hideNotFound");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -135,6 +150,8 @@ public class MeasurementController {
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
+		else if (hideNotFound.isPresent() && hideNotFound.get())
+			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
@@ -150,6 +167,7 @@ public class MeasurementController {
 			@RequestParam(name = "measurements", required = false) List<String> measurements, 
 			@RequestParam(name = "fields", required = false) List<String> fields,
 			@RequestParam Map<String, String> tags,
+			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
 			@PathVariable(name = "function") String function){
 
 		List<MeasurementDAOResponse> ret;
@@ -161,6 +179,7 @@ public class MeasurementController {
 		tags.remove("to_float");
 		tags.remove("from");
 		tags.remove("to");
+		tags.remove("hideNotFound");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -174,8 +193,12 @@ public class MeasurementController {
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
+		else if (hideNotFound.isPresent() && hideNotFound.get())
+			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
+	
+// OTHER REQUESTS
 
 	@Operation(summary = "Insert an entry in a measurement")
 	@PostMapping()
@@ -201,6 +224,8 @@ public class MeasurementController {
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+	
+// DEPRECATED REQUESTS
 
 	@Deprecated
 	@Operation(summary = "Get measurement entries")
@@ -210,7 +235,8 @@ public class MeasurementController {
 			@RequestParam("to") Optional<String> to,
 			@RequestParam("bucket") Optional<String> bucket,
 			/*@RequestParam("time_var") Optional<String> timeVar,*/
-			@RequestParam Map<String, String> tags, @PathVariable(name = "measurement_name") String measurementName){
+			@RequestParam Map<String, String> tags, @PathVariable(name = "measurement_name") String measurementName,
+			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
 		
 		MeasurementDAORequest measurement = new MeasurementDAORequest();
 		measurement.setMeasurement(measurementName);
@@ -221,11 +247,14 @@ public class MeasurementController {
 		tags.remove("bucket");
 		tags.remove("from");
 		tags.remove("to");
+		tags.remove("hideNotFound");
 		
 		ret = service.select(measurement, from.orElse(""), to.orElse(""), "time");
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
+		else if (hideNotFound.isPresent() && hideNotFound.get())
+			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
@@ -239,7 +268,8 @@ public class MeasurementController {
 			@RequestParam("group") Optional<String> group,
 			@RequestParam(value = "field", required = true) String field,
 			/*@RequestParam("time_var") Optional<String> timeVar,*/
-			@RequestParam Map<String, String> tags, 
+			@RequestParam Map<String, String> tags,
+			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound, 
 			@PathVariable(name = "measurement_name") String measurementName,
 			@PathVariable(name = "function") String function){
 
@@ -253,11 +283,14 @@ public class MeasurementController {
 		tags.remove("to");
 		tags.remove("group");
 		tags.remove("field");
+		tags.remove("hideNotFound");
 		
 		ret = service.operate(measurement, InfluxFunction.obtain(function), field, from.orElse(""), to.orElse(""), group.orElse(""), "time");
 		
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
+		else if (hideNotFound.isPresent() && hideNotFound.get())
+			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 }

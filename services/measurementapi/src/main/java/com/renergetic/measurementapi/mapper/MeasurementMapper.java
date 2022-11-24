@@ -40,6 +40,7 @@ public abstract class MeasurementMapper {
 				if (measurement.getTags() == null) measurement.setTags(new HashMap<String, String>());
 				for(String key : record.getValues().keySet()) {
 					if (key != null && !(key.startsWith("_") || key.equalsIgnoreCase("table") || key.equalsIgnoreCase("result"))) {
+						@SuppressWarnings("null")
 						String value = record.getValueByKey(key) != null? record.getValueByKey(key).toString() : null;
 						measurement.getTags().put(key, value);
 					}
