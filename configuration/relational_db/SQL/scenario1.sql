@@ -177,28 +177,28 @@ INSERT INTO information_tile ( id, name, label, layout, props, type, information
 ( 11, 'office', 'Office', '{"x":3,"y":1,"w":3,"h":9}', '{"icon":"office", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
 ( 12, 'supercomputer', 'Supercomputers', '{"x":6,"y":1,"w":3,"h":9}', '{"icon":"supercomputer", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
 ( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
-( 14, 'heat_exhanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 );
+( 14, 'heat_exchanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 );
 
-INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id, domain, direction, measurement_type_id, sensor_name, measurement_name, information_tile_id ) VALUES
-( 1, 84, NULL, NULL, NULL, NULL, NULL, NULL, 3 ),
-( 2, 85, NULL, NULL, NULL, NULL, NULL, NULL, 3 ),
-( 3, 86, NULL, NULL, NULL, NULL, NULL, NULL, 3 ),
-( 4, 87, NULL, NULL, NULL, NULL, NULL, NULL, 4 ),
-( 5, 88, NULL, NULL, NULL, NULL, NULL, NULL, 4 ),
-( 6, 89, NULL, NULL, NULL, NULL, NULL, NULL, 4 ),
-( 7, 90, NULL, NULL, NULL, NULL, NULL, NULL, 5 ),
-( 8, 91, NULL, NULL, NULL, NULL, NULL, NULL, 6 ),
-( 9, 92, NULL, NULL, NULL, NULL, NULL, NULL, 7 ),
-( 10, 65, NULL, NULL, NULL, NULL, NULL, NULL, 11 ),
-( 11, 67, NULL, NULL, NULL, NULL, NULL, NULL, 11 ),
-( 12, 69,NULL, NULL, NULL, NULL, NULL, NULL, 12 ),
-( 13, 71, NULL, NULL, NULL, NULL, NULL, NULL, 12 ),
-( 14, 73, NULL, NULL, NULL, NULL, NULL, NULL, 13 ),
-( 15, 75, NULL, NULL, NULL, NULL, NULL, NULL, 13 ),
-( 16, 77, NULL, NULL, NULL, NULL, NULL, NULL, 14 ),
-( 17, 79, NULL, NULL, NULL, NULL, NULL, NULL, 14 ),
-( 18, 100, NULL, NULL, NULL, NULL, NULL, NULL, 1 ),
-( 19, 101, NULL, NULL, NULL, NULL, NULL, NULL, 10 );
+INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id, domain, direction, measurement_type_id, sensor_name, measurement_name, information_tile_id, agreggation_function ) VALUES
+( 1, 84, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'sum' ),
+( 2, 85, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'sum' ),
+( 3, 86, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'sum' ),
+( 4, 87, NULL, NULL, NULL, NULL, NULL, NULL, 4, 'sum' ),
+( 5, 88, NULL, NULL, NULL, NULL, NULL, NULL, 4, 'sum' ),
+( 6, 89, NULL, NULL, NULL, NULL, NULL, NULL, 4, 'sum' ),
+( 7, 90, NULL, NULL, NULL, NULL, NULL, NULL, 5, 'sum' ),
+( 8, 91, NULL, NULL, NULL, NULL, NULL, NULL, 6, 'sum' ),
+( 9, 92, NULL, NULL, NULL, NULL, NULL, NULL, 7, 'sum' ),
+( 10, 65, NULL, NULL, NULL, NULL, NULL, NULL, 11, 'sum' ),
+( 11, 67, NULL, NULL, NULL, NULL, NULL, NULL, 11, 'sum' ),
+( 12, 69,NULL, NULL, NULL, NULL, NULL, NULL, 12, 'sum' ),
+( 13, 71, NULL, NULL, NULL, NULL, NULL, NULL, 12, 'sum' ),
+( 14, 73, NULL, NULL, NULL, NULL, NULL, NULL, 13, 'sum' ),
+( 15, 75, NULL, NULL, NULL, NULL, NULL, NULL, 13, 'sum' ),
+( 16, 77, NULL, NULL, NULL, NULL, NULL, NULL, 14, 'sum' ),
+( 17, 79, NULL, NULL, NULL, NULL, NULL, NULL, 14, 'sum' ),
+( 18, 100, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'sum' ),
+( 19, 101, NULL, NULL, NULL, NULL, NULL, NULL, 10, 'sum' );
 
 /* CONNECT ASSETS WITH PANELS */
 INSERT INTO asset_panel ( panel_id, asset_id ) VALUES
