@@ -270,23 +270,31 @@ public class AssetService {
     }
 
     // ASSETDETAILS CRUD OPERATIONS
-    public AssetDetails saveDetail(AssetDetails detail) {
+    public AssetDetails saveDetail(AssetDetails detail, Long assetId) {
         detail.setId(null);
-        return assetDetailsRepository.save(detail);
+        if (assetId != null && assetRepository.existsById(assetId)) {
+	        Asset asset = new Asset();
+	        asset.setId(assetId);
+	        detail.setAsset(asset);
+	        return assetDetailsRepository.save(detail);
+        } else throw new InvalidNonExistingIdException("No asset with id" + assetId + "found");
     }
 
-    public AssetDetails updateDetail(AssetDetails detail, Long id) {
-        if (id != null && assetDetailsRepository.existsById(id)) {
+    public AssetDetails updateDetail(AssetDetails detail, Long id, Long assetId) {
+        if (id != null && assetDetailsRepository.existsByIdAndAssetId(id, assetId)) {
             detail.setId(id);
+	        Asset asset = new Asset();
+	        asset.setId(assetId);
+	        detail.setAsset(asset);
             return assetDetailsRepository.save(detail);
-        } else throw new InvalidNonExistingIdException("No asset detail with id" + id + "found");
+        } else throw new InvalidNonExistingIdException("No asset detail with id" + id + " related with " + assetId + " found");
     }
 
-    public boolean deleteDetailById(Long id) {
-        if (id != null && assetRepository.existsById(id)) {
+    public boolean deleteDetailById(Long id, Long assetId) {
+        if (id != null && assetDetailsRepository.existsByIdAndAssetId(id, assetId)) {
             assetDetailsRepository.deleteById(id);
             return true;
-        } else throw new InvalidNonExistingIdException("No asset detail with id" + id + "found");
+        } else throw new InvalidNonExistingIdException("No asset detail with id" + id + " related with " + assetId + " found");
     }
 
     public List<AssetDetails> getDetails(Map<String, String> filters, long offset, int limit) {

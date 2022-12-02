@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.renergetic.hdrapi.model.Details;
 import com.renergetic.hdrapi.model.Measurement;
 
@@ -28,6 +29,7 @@ public class MeasurementDetails extends Details{
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "measurement_id", nullable = false, insertable = true, updatable = true)
+	@JsonIgnore()
 	private Measurement measurement;
 
 	public MeasurementDetails(String key, String value, Long measurementId) {

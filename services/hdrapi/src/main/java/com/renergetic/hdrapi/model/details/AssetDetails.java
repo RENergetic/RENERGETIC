@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.renergetic.hdrapi.model.Asset;
 import com.renergetic.hdrapi.model.Details;
 
@@ -28,6 +29,7 @@ public class AssetDetails extends Details{
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "asset_id", nullable = false, insertable = true, updatable = true)
+	@JsonIgnore()
 	private Asset asset;
 
 	public AssetDetails(String key, String value, Asset asset) {

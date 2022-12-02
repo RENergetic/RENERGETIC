@@ -10,6 +10,7 @@ import com.renergetic.hdrapi.model.details.AssetDetails;
 public interface AssetDetailsRepository extends JpaRepository<AssetDetails, Long> {
 	AssetDetails save(AssetDetails information);
 
-	List<AssetDetails> findByAssetId(long resource_id);
+	Boolean existsByIdAndAssetId(long resourceId, long assetId);
+	List<AssetDetails> findByAssetId(long resourceId);
 	
 }

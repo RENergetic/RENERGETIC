@@ -8,9 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -23,12 +20,13 @@ public class SimpleAssetDAO {
 
     @JsonProperty()
     private String name;
-    @JsonProperty()
-    private SimpleAssetDAO parent;
-    @JsonProperty()
+//    @JsonProperty()
+//    private SimpleAssetDAO parent;
+//    @JsonProperty()
     //TODO:? name can be discussed :)
     //assets children , its different than connections
-    private List<SimpleAssetDAO> child = new ArrayList<>();
+    //childs and parent should be shared in this class because infinite loops appears at AssetDAOResponse class
+//    private List<SimpleAssetDAO> child = new ArrayList<>();
     @JsonProperty()
     private AssetTypeDAO type;
 
@@ -46,12 +44,9 @@ public class SimpleAssetDAO {
 
         dao.setId(asset.getId());
         dao.setName(asset.getName());
-        if(asset.getParentAsset()!=null){
-            dao.setParent(SimpleAssetDAO.create(asset.getParentAsset()));
-        }
-        if(asset.getParentAsset()!=null){
-            dao.setParent(SimpleAssetDAO.create(asset.getParentAsset()));
-        }
+//        if(asset.getParentAsset()!=null){
+//            dao.setParent(SimpleAssetDAO.create(asset.getParentAsset()));
+//        }
 
         if (asset.getType() != null) {
             AssetTypeDAO assetTypeDAO = AssetTypeDAO.create(asset.getType());

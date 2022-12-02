@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.hdrapi.model.Details;
@@ -38,6 +39,7 @@ public class MeasurementTags extends Details{
 			name = "measurement_tags",
 			joinColumns = @JoinColumn(name = "tag_id", nullable = true, insertable = true, updatable = true),
 			inverseJoinColumns = @JoinColumn(name = "measurement_id"))
+	@JsonIgnore()
 	private List<Measurement> measurements;
 
 	public MeasurementTags(String key, String value) {

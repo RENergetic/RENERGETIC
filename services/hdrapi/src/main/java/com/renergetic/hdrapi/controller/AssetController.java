@@ -141,11 +141,11 @@ public class AssetController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "Assets havent details or doesn't exists")
     })
-    @GetMapping(path = "{id}/info", produces = "application/json")
-    public ResponseEntity<List<AssetDetails>> getInformationAsset(@PathVariable Long id) {
+    @GetMapping(path = "{asset_id}/info", produces = "application/json")
+    public ResponseEntity<List<AssetDetails>> getInformationAsset(@PathVariable("asset_id") Long assetId) {
         List<AssetDetails> info = null;
 
-        info = assetSv.getDetailsByAssetId(id);
+        info = assetSv.getDetailsByAssetId(assetId);
 
         info = info.isEmpty() ? null : info;
 
@@ -159,14 +159,9 @@ public class AssetController {
     })
     @PostMapping(path = "{asset_id}/info", produces = "application/json", consumes = "application/json")
     public ResponseEntity<AssetDetails> insertInformation(@RequestBody AssetDetails detail,
-                                                          @PathVariable Long asset_id) {
-        try {
-            detail.setId(asset_id);
-            AssetDetails _detail = assetSv.saveDetail(detail);
-            return new ResponseEntity<>(_detail, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+                                                          @PathVariable("asset_id") Long assetId) {
+        AssetDetails _detail = assetSv.saveDetail(detail, assetId);
+        return new ResponseEntity<>(_detail, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Update Information from its id")
@@ -177,15 +172,11 @@ public class AssetController {
             @ApiResponse(responseCode = "500", description = "Error saving information")
     })
     @PutMapping(path = "{asset_id}/info/{info_id}", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<AssetDetails> updateInformation(@RequestBody AssetDetails detail, @PathVariable Long asset_id,
-                                                          @PathVariable Long info_id) {
-        try {
-            detail.setId(asset_id);
-            AssetDetails _detail = assetSv.updateDetail(detail, info_id);
-            return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<AssetDetails> updateInformation(@RequestBody AssetDetails detail, @PathVariable("asset_id") Long assetId,
+                                                          @PathVariable("info_id") Long infoId) {
+        detail.setId(infoId);
+        AssetDetails _detail = assetSv.updateDetail(detail, infoId, assetId);
+        return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
     @Operation(summary = "Delete Information from its id")
@@ -194,14 +185,11 @@ public class AssetController {
             @ApiResponse(responseCode = "500", description = "Error deleting information")
     })
     @DeleteMapping(path = "{asset_id}/info/{info_id}")
-    public ResponseEntity<AssetDetails> deleteInformation(@PathVariable Long asset_id, @PathVariable Long info_id) {
-        try {
-            assetSv.deleteById(info_id);
+    public ResponseEntity<AssetDetails> deleteInformation(@PathVariable("asset_id") Long assetId,
+            @PathVariable("info_id") Long infoId) {
+        assetSv.deleteDetailById(infoId, assetId);
 
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.noContent().build();
     }
 //=== POST REQUESTS ===================================================================================
 
