@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -158,20 +160,20 @@ public class AssetService {
         Asset asset = assetRepository.findById(id).orElse(null);
 
         if (asset == null)
-            throw new InvalidNonExistingIdException("No asset found related with id" + id);
+            throw new NotFoundException("No asset found related with id" + id);
         else if (asset.getAssets() != null && asset.getAssets().size() > 0)
             return asset.getAssets().stream()
                     .map(obj -> AssetDAOResponse.create(obj, assetRepository.findByParentAsset(obj),
                             measurementRepository.findByAsset(obj)))
                     .collect(Collectors.toList());
-        else throw new NotFoundException("No asset found connected with asset " + id);
+        else return new ArrayList<>();
     }
 
     public List<MeasurementDAOResponse> getMeasurements(Long id) {
         Asset asset = assetRepository.findById(id).orElse(null);
 
         if (asset == null)
-            throw new InvalidNonExistingIdException("No asset found related with id" + id);
+            throw new NotFoundException("No asset found related with id" + id);
         else {
             List<Measurement> measurements = measurementRepository.findByAsset(asset);
 
@@ -180,7 +182,7 @@ public class AssetService {
                         .map(obj -> MeasurementDAOResponse.create(obj,
                                 measurementDetailsRepository.findByMeasurementId(obj.getId())))
                         .collect(Collectors.toList());
-            else throw new NotFoundException("Asset " + id + " hasn't related measurements");
+            else return new ArrayList<>();
         }
     }
 
@@ -216,16 +218,13 @@ public class AssetService {
                 if (filters.containsKey("name"))
                     equals = type.getName().equalsIgnoreCase(filters.get("name")) ||
                             type.getLabel().equalsIgnoreCase(filters.get("name"));
-//				if (equals && filters.containsKey("category"))
-//					equals = type.getTypeCategory().equals(AssetTypeCategory.valueOf(filters.get("category")));
-
                 return equals;
             }).collect(Collectors.toList());
         else list = stream.collect(Collectors.toList());
 
         if (list != null && list.size() > 0)
             return list;
-        else throw new NotFoundException("No assets found with asset category");
+        else throw new NotFoundException("No assets types found");
     }
 
     public AssetType getTypeById(Long id) {
@@ -325,7 +324,8 @@ public class AssetService {
 
         if (details != null && details.size() > 0)
             return details;
-        else throw new NotFoundException("No details related with asset " + id + "found");
+        else if (!assetRepository.existsById(id)) throw new NotFoundException("Asset " + id + "  not found");
+        else return new ArrayList<>();
     }
 
     public List<AssetTypeDAO> listTypes() {
