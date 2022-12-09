@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.hdrapi.model.Asset;
 import com.renergetic.hdrapi.model.AssetType;
 import com.renergetic.hdrapi.model.Measurement;
@@ -49,6 +50,9 @@ public class AssetDAOResponse {
 	@JsonProperty(required = false)
 	private AssetCategoryDAO asset_category;
 	
+	@JsonProperty(required=false, access=Access.READ_ONLY)
+	private List<AssetDetails> details;
+	
 	public static AssetDAOResponse create(Asset asset, List<Asset> childs, List<Measurement> measurements) {
 		AssetDAOResponse dao = null;
 		
@@ -80,6 +84,8 @@ public class AssetDAOResponse {
 				dao.setUser(asset.getUser().getId());
 			if(asset.getAssetCategory() != null)
 				dao.setAsset_category(AssetCategoryDAO.create(asset.getAssetCategory()));
+			if(asset.getDetails() != null)
+				dao.setDetails(asset.getDetails());
 		}
 		return dao;
 	}

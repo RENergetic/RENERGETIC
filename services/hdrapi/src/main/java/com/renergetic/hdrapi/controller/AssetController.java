@@ -147,9 +147,7 @@ public class AssetController {
 
         info = assetSv.getDetailsByAssetId(assetId);
 
-        info = info.isEmpty() ? null : info;
-
-        return new ResponseEntity<List<AssetDetails>>(info, info != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+        return new ResponseEntity<List<AssetDetails>>(info, HttpStatus.OK);
     }
 
     @Operation(summary = "Insert Details for a Asset")

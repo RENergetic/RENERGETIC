@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -21,6 +22,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.renergetic.hdrapi.model.details.AssetDetails;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -102,8 +104,10 @@ public class Asset {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "asset_category_id", nullable = true, insertable = true, updatable = true)
 	private AssetCategory assetCategory;
-	
 
+	@OneToMany(cascade = CascadeType.REFRESH, mappedBy = "asset")
+	@NotFound(action = NotFoundAction.IGNORE)
+	private List<AssetDetails> details;
 	
 
 	public Asset(String name, AssetType type, String label, String description, String location, Asset part_of_asset, User owner, User user) {

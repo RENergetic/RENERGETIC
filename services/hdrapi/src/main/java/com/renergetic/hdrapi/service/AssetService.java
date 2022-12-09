@@ -324,8 +324,8 @@ public class AssetService {
 
         if (details != null && details.size() > 0)
             return details;
-        else if (!assetRepository.existsById(id)) throw new NotFoundException("Asset " + id + "  not found");
-        else return new ArrayList<>();
+        else if (assetRepository.existsById(id)) return new ArrayList<>();
+        else throw new NotFoundException("Asset " + id + "  not found");
     }
 
     public List<AssetTypeDAO> listTypes() {
