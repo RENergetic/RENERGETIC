@@ -44,8 +44,10 @@ public class Restrictions {
 					isValid = restrictions.getFields().stream().anyMatch(restriction -> {
 						return restriction.getName().equalsIgnoreCase(field.getKey()) &&
 								(
-									(restriction.getType().equals(PrimitiveType.DOUBLE) && field.getValue().matches("^\\d+.\\d+$")) ||
-									(restriction.getType().equals(PrimitiveType.INTEGER) && field.getValue().matches("^\\d+$")) ||
+									(restriction.getType().equals(PrimitiveType.DOUBLE) && field.getValue().matches("^-?\\d+(.\\d+)?$")) ||
+									(restriction.getType().equals(PrimitiveType.INTEGER) && field.getValue().matches("^-?\\d+$")) ||
+									(restriction.getType().equals(PrimitiveType.UNSIGNED_DOUBLE) && field.getValue().matches("^\\d+(.\\d+)?$")) ||
+									(restriction.getType().equals(PrimitiveType.UNSIGNED_INTEGER) && field.getValue().matches("^\\d+$")) ||
 									(restriction.getType().equals(PrimitiveType.BOOLEAN) && field.getValue().matches("(true) | (false)")) ||
 									(restriction.getType().equals(PrimitiveType.STRING) && (restriction.getFormat() == null || field.getValue().matches(restriction.getFormat())))
 								);
@@ -71,10 +73,15 @@ public class Restrictions {
 		else if (fieldRestrictions.get(key) == PrimitiveType.BOOLEAN && value.matches("(false)"))
 			field = new AbstractMap.SimpleEntry<>(key, false);
 		// CHECK IF IS A INTEGER
-		else if (fieldRestrictions.get(key) == PrimitiveType.INTEGER && value.matches("^\\d+$"))
+		else if (fieldRestrictions.get(key) == PrimitiveType.INTEGER && value.matches("^-?\\d+$"))
 			field = new AbstractMap.SimpleEntry<>(key, Long.parseLong(value));
-		else if (fieldRestrictions.get(key) == PrimitiveType.DOUBLE && value.matches("^\\d+(.\\d+)?$"))
+		else if (fieldRestrictions.get(key) == PrimitiveType.DOUBLE && value.matches("^-?\\d+(.\\d+)?$"))
 			field = new AbstractMap.SimpleEntry<>(key, Double.parseDouble(value));
+		else if (fieldRestrictions.get(key) == PrimitiveType.UNSIGNED_INTEGER && value.matches("^-?\\d+$"))
+			field = new AbstractMap.SimpleEntry<>(key, Math.abs(Long.parseLong(value)));
+		else if (fieldRestrictions.get(key) == PrimitiveType.UNSIGNED_DOUBLE && value.matches("^-?\\d+(.\\d+)?$"))
+			field = new AbstractMap.SimpleEntry<>(key, Math.abs(Double.parseDouble(value)));
+		// IF IS A STRING
 		else field = new AbstractMap.SimpleEntry<>(key, value);;
 		
 		return field;

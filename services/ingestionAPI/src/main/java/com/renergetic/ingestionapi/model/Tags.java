@@ -31,7 +31,7 @@ public class Tags {
 	@Column(name = "value", nullable = false, insertable = true, updatable = true)
 	private String value;
 	
-	@Formula("(select m.measurement_id from measurement_tags m where m.tag_id = id)")
+	@Formula("(select m.measurement_id from measurement_tags m where m.tag_id = id limit 1)")
 	private Long measurementId;
 
 	public Tags(String key, String value) {

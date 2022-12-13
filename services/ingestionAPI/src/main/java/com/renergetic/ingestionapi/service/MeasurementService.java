@@ -24,6 +24,7 @@ import com.renergetic.ingestionapi.exception.ConnectionException;
 import com.renergetic.ingestionapi.model.PrimitiveType;
 import com.renergetic.ingestionapi.model.Request;
 import com.renergetic.ingestionapi.model.RequestError;
+import com.renergetic.ingestionapi.model.Tags;
 import com.renergetic.ingestionapi.repository.MeasurementRepository;
 import com.renergetic.ingestionapi.repository.MeasurementTypeRepository;
 import com.renergetic.ingestionapi.repository.TagsRepository;
@@ -143,8 +144,8 @@ public class MeasurementService {
 //		tags.put("predictive_model", null);
 //		tags.put("direction", "(?i)((in)|(out)|(none))");
 //		tags.put("domain", "(?i)((heat)|(electricity))");
-		tagsRepository.findByMeasurementIdIsNull().forEach(System.err::println);
-		
-		return tagsRepository.findByMeasurementIdIsNull().stream().collect(HashMap<String, String>::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
+		List<Tags> tags = tagsRepository.findByMeasurementIdIsNull();
+
+		return tags.stream().collect(HashMap<String, String>::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
 	}
 }
