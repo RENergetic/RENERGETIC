@@ -40,8 +40,8 @@ public class NotificationDAO {
 	@JsonProperty(value = "asset_id", required = false)
 	private Long assetId;
 
-	@JsonProperty(value = "dashboard_id", required = false)
-	private Long dashboardId;
+	@JsonProperty(value = "dashboard", required = false)
+	private DashboardDAO dashboard;
 
 	@JsonProperty(value = "information_tile_id", required = false)
 	private Long informationTileId;
@@ -62,7 +62,8 @@ public class NotificationDAO {
 			if (notification.getAsset() != null)
 				dao.setAssetId(notification.getAsset().getId());
 			if (notification.getDashboard() != null)
-				dao.setDashboardId(notification.getDashboard().getId());
+
+				dao.setDashboard( DashboardDAO.create(notification.getDashboard()));
 			if (notification.getInformationTile() != null)
 				dao.setInformationTileId(notification.getInformationTile().getId());
 		}
@@ -85,10 +86,10 @@ public class NotificationDAO {
 			asset.setId(assetId);
 			notification.setAsset(asset);
 		}
-		if (dashboardId != null) {
-			Dashboard dashboard = new Dashboard();
-			dashboard.setId(dashboardId);
-			notification.setDashboard(dashboard);
+		if (dashboard != null) {
+			Dashboard mDashboard = new Dashboard();
+			mDashboard.setId(dashboard.getId());
+			notification.setDashboard(mDashboard);
 		}
 		if (informationTileId != null) {
 			InformationTile informationTile = new InformationTile();
