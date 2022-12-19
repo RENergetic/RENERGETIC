@@ -67,7 +67,8 @@ public class InformationTileMeasurement {
     private InformationTile informationTile;
 
 	public Measurement getMeasurement() {
-		measurement.setFunction(function);
+		if(measurement!=null)
+ 			measurement.setFunction(function);
 		return measurement;
 	}
 }
