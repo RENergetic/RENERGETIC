@@ -83,10 +83,16 @@ public class MeasurementDAOResponse {
                 dao.setMeasurementDetails(detailsDao);
             }
             else {
-            	HashMap<String, String> detailsDao = measurement.getDetails().stream()
-                		.collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
-                				(prev, next) -> next, HashMap::new));
-                dao.setMeasurementDetails(detailsDao);
+//                measurement.getDetails() -> sometimes its sometimes it's null...
+                if(measurement.getDetails()!=null) {
+                    HashMap<String, String> detailsDao = measurement.getDetails().stream()
+                            .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
+                                    (prev, next) -> next, HashMap::new));
+                    dao.setMeasurementDetails(detailsDao);
+                }
+                else{
+                    dao.setMeasurementDetails(new HashMap<>());
+                }
             }
         }
         return dao;
