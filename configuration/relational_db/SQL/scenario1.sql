@@ -136,8 +136,8 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 ( 90, 'renewable', 'Renewable', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 ( 91, 'non_renewable', 'Fosil Fuels', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 ( 92, 'external', 'External', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
-( 100, 'total_produced', 'Produced energy', 9, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
-( 101, 'total_imported', 'Imported energy', 9, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' );
+( 100, 'total_produced', 'Produced energy', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
+( 101, 'total_imported', 'Imported energy', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' );
 
 INSERT INTO tags ( id, key, value ) VALUES
 ( 50, 'measurement_type', 'renewable' ),
