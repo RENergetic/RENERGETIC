@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from requests import request, Response
+from requests import get, request, Response
+from lxml.html import fromstring
 from types import MappingProxyType
 from threading import Thread
 from time import sleep
@@ -10,8 +11,8 @@ import maya
 class WeatherAPI:
     country: str
     city: str
-    __URL: str = "https://api.weatherbit.io/v2.0"
-    __KEYS: tuple[str] = ("ff58bcc61d0445199d950a6fa6d15489", "41d8d19e64bc4e0c944ae392644056be")
+    __URL: str = "http://api.weatherbit.io/v2.0"
+    __KEYS: tuple[str] = ("ff58bcc61d0445199d950a6fa6d15489", "41d8d19e64bc4e0c944ae392644056be", "f6d8ac05e90c4b48a7382a39918a8eca")
     __PATHS: MappingProxyType = MappingProxyType({
         "usage": "/subscription/usage",
         "current": "/current"
@@ -25,6 +26,7 @@ class WeatherAPI:
     def getValidKey(self):
         for key in self.__KEYS:
             if (self.keyUssage(key)["calls_count"] == None or int(self.keyUssage(key)["calls_count"]) < self.__REQUEST_LIMIT):
+                print(key)
                 return key
         return None
 
@@ -37,20 +39,23 @@ class WeatherAPI:
     def keyUssage(self, key):
         return request("GET", self.createPath(key, "usage"), headers={}, data={}).json()
 
-    def current(self):
+    def current(self, proxies = []):
         tries = 0
         key = self.getValidKey()
+        if len(proxies) == 0: proxy = None
+        else: proxy = {'http': proxies[tries], 'https': proxies[tries]}
         while key != None:
-            response = request("GET", self.createPath(key, "current"), headers={}, data={})
+            response = request("GET", self.createPath(key, "current"), headers={}, data={}, proxies=proxy)
             if response.status_code < 300:
                 print(' - Weather data obtained')
                 return response.json()
-            elif tries > 5:
-                print(' - Error maximum attempts reached')
+            elif tries >= len(proxies):
+                print(f' - Error maximum attempts reached: {response.url}')
                 return None
             else:
-                print(' - Error getting weather data, retrying')
                 tries += 1
+                proxy = {'http': proxies[tries], 'https': proxies[tries]}
+                print(f' - Error getting weather data ({response.status_code}), retrying with proxy {proxies[tries]}')
         print(' - All Keys limits reached')
 
 def insertInflux(url, payload):
@@ -60,17 +65,17 @@ def insertInflux(url, payload):
         print(payload)
         print(response.content)
     else: 
-        print(f' - Inserted data at {maya.when("now").iso8601()[0:19].replace("T", " ")}')
-        print(payload)
+        print(f' - Inserted data at {maya.when("now").iso8601()[0:19].replace("T", " ")} to asset {payload["tags"]["asset_name"]}')
 
-
-def generateRandomizedInfluxData(influxApiUrl: str, wheatherAPI: WeatherAPI, assetList: list[str]):
-    print(' - Generating data at ' + maya.when("now").iso8601()[0:19].replace("T", " "))
+def generateRandomizedInfluxData(influxApiUrl: str, wheatherAPI: WeatherAPI, assetList: list[str], proxies = []):
     fields = {}
-
-    dataWeather = wheatherAPI.current()["data"][0]
+    data = wheatherAPI.current(proxies)
+    if (data != None):
+        dataWeather = data["data"][0]
+    else:
+        dataWeather = {"temp": 15, "solar_rad": 0, "wind_spd": 5, "wind_dir": 215, "ghi": 0}
     for assetName in assetList:
-        fields['temperature'] = dataWeather["temp"] + round(random.uniform(-1.5, 1.5),1)
+        fields['temperature'] = dataWeather["temp"] + round(random.uniform(-1.5, 1.5), 1)
         fields['sun_radiation'] = int(round(dataWeather["solar_rad"] * random.uniform(0.95, 1.05), 0))
         fields['wind_speed'] = dataWeather["wind_spd"] * random.uniform(0.95, 1.05)
         fields['wind_direction'] = dataWeather["wind_dir"] * random.uniform(0.95, 1.05)
@@ -96,6 +101,17 @@ def generateRandomizedInfluxData(influxApiUrl: str, wheatherAPI: WeatherAPI, ass
             }
             Thread(target=insertInflux, args=[influxApiUrl, payload]).start()
 
+def getProxies():
+    url = 'https://free-proxy-list.net/'
+    response = get(url)
+    parser = fromstring(response.text)
+    proxies = []
+    for i in parser.xpath('//tbody/tr')[:10]:
+        if i.xpath('.//td[7][contains(text(),"yes")]'):
+            proxy = ":".join([i.xpath('.//td[1]/text()')[0], i.xpath('.//td[2]/text()')[0]])
+            proxies.append(proxy)
+    return proxies
+
 api = WeatherAPI('PL', 'Poznan')
 assets = [
     'building1',
@@ -114,11 +130,20 @@ assets = [
     'cogenerator_2'
 ]
 
+print('WEATHER DATA TO INFLUX')
+proxies = []
+searchProxies = True
 while True:
     try:
+        if maya.when("now").minute % 14 == 0 and searchProxies:
+            proxies = getProxies()
+            random.shuffle(proxies)
+            searchProxies = False
         if maya.when("now").minute % 15 == 0:
-            generateRandomizedInfluxData("http://influx-api-sv.ren-prototype.svc.cluster.local:8082/api/measurement", api, assets)
+            print(' - Generating data at ' + maya.when("now").iso8601()[0:19].replace("T", " "))
+            generateRandomizedInfluxData("http://influx-api-sv.ren-prototype.svc.cluster.local:8082/api/measurement", api, assets, proxies)
             sleep(300)
+            searchProxies = True
     except KeyboardInterrupt:
         print(" - The program has been stopped manually")
         break
