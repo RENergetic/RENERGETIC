@@ -41,7 +41,7 @@ public class Restrictions {
 			// Check if fields are valid
 			if (isValid) {
 				for(Entry<String, String> field : measurement.getFields().entrySet()) {
-					isValid = restrictions.getFields().stream().anyMatch(restriction -> {
+					isValid = field.getKey().equalsIgnoreCase("time") || restrictions.getFields().stream().anyMatch(restriction -> {
 						return restriction.getName().equalsIgnoreCase(field.getKey()) &&
 								(
 									(restriction.getType().equals(PrimitiveType.DOUBLE) && field.getValue().matches("^-?\\d+(.\\d+)?$")) ||
@@ -53,7 +53,9 @@ public class Restrictions {
 								);
 					});
 				}
-				if (!isValid) measurement.setErrorMessage("Invalid field name or value");
+				if (!isValid) {
+					measurement.setErrorMessage("Invalid field name or value");
+				}
 			}
 			ret.put(measurement, isValid);
 		}

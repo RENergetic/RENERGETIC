@@ -32,4 +32,5 @@ INSERT INTO tags ( id, key, value ) VALUES
 ( 4, 'prediction_window', '\\d+[Mdhms]' ),
 ( 5, 'asset_name', null ),
 ( 6, 'direction', '(?i)((in)|(out)|(none))' ),
-( 7, 'domain', '(?i)((heat)|(electricity))' );
+( 7, 'domain', '(?i)((heat)|(electricity))' ),
+( 8, 'type_data', '(?i)((simulated)|(real))' );
