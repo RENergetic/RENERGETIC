@@ -44,7 +44,6 @@ then
         cd  "${current}/docker_config/Databases/postgresql"
         # POSTGRESQL INSTALLATION
         # set environment variables
-        eval $(minikube docker-env)
 
         kubectl delete configmaps/postgresql-db-config
         kubectl delete statefulsets/postgresql-db
@@ -69,7 +68,6 @@ then
         cd  "${current}/docker_config/Databases/influxdb"
         # INFLUXDB INSTALLATION
         # set environment variables
-        eval $(minikube docker-env)
 
         kubectl delete deployments/influx-db
         kubectl delete services/influx-db-sv
@@ -94,7 +92,6 @@ then
         cd "${current}/docker_config/APIs/hdr-api"
         # API INSTALLATION
         # set environment variables
-        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/hdr-api
@@ -118,7 +115,6 @@ then
         cd "${current}/docker_config/APIs/influx-api"
         # API INSTALLATION
         # set environment variables
-        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/influx-api
@@ -142,7 +138,6 @@ then
         cd "${current}/docker_config/APIs/ingestion-api"
         # API INSTALLATION
         # set environment variables
-        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/ingestion-api
@@ -163,7 +158,6 @@ then
         cd "${current}/docker_config/Others/wso2"
         # WSO2 INSTALLATION
         # set environment variables
-        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/wso
@@ -184,7 +178,6 @@ then
         cd "${current}/docker_config/Others/grafana"
         # GRAFANA INSTALLATION
         # set environment variables
-        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/grafana
@@ -211,7 +204,6 @@ then
         cd "${current}/docker_config/Others/keycloak"
         # KEYCLOAK INSTALLATION
         # set environment variables
-        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/keycloak
@@ -239,7 +231,6 @@ then
         cd "${current}/docker_config/Others/renergetic-ui"
         # FRONT INSTALLATION
         # set environment variables
-        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/renergetic-ui
