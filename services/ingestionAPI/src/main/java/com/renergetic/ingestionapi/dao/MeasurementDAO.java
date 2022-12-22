@@ -10,10 +10,12 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
+@ToString
 public class MeasurementDAO {
 	String measurement;
 	Map<String, String> fields;
