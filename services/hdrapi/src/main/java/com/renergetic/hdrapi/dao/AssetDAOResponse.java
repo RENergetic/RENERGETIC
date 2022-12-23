@@ -2,6 +2,8 @@ package com.renergetic.hdrapi.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -51,7 +53,7 @@ public class AssetDAOResponse {
 	private AssetCategoryDAO asset_category;
 	
 	@JsonProperty(required=false, access=Access.READ_ONLY)
-	private List<AssetDetails> details;
+	private Map<String, String> details;
 	
 	public static AssetDAOResponse create(Asset asset, List<Asset> childs, List<Measurement> measurements) {
 		AssetDAOResponse dao = null;
@@ -85,7 +87,7 @@ public class AssetDAOResponse {
 			if(asset.getAssetCategory() != null)
 				dao.setAsset_category(AssetCategoryDAO.create(asset.getAssetCategory()));
 			if(asset.getDetails() != null)
-				dao.setDetails(asset.getDetails());
+				dao.setDetails(asset.getDetails().stream().collect(Collectors.toMap(AssetDetails::getKey, AssetDetails::getValue)));
 		}
 		return dao;
 	}
