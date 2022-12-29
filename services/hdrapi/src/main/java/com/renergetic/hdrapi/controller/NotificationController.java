@@ -3,7 +3,6 @@ package com.renergetic.hdrapi.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,8 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.hdrapi.dao.NotificationDAO;
+import com.renergetic.hdrapi.model.NotificationMessages;
 import com.renergetic.hdrapi.repository.NotificationRepository;
-import com.renergetic.hdrapi.service.utils.OffSetPaging;
+import com.renergetic.hdrapi.service.NotificationService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,6 +36,9 @@ public class NotificationController {
 	
 	@Autowired
 	NotificationRepository notificationRepository;
+	
+	@Autowired
+	NotificationService notificationSv;
 
 //=== GET REQUESTS ====================================================================================
 			
@@ -43,8 +46,7 @@ public class NotificationController {
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
 	public ResponseEntity<List<NotificationDAO>> getAllNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-		 List<NotificationDAO> notifications = notificationRepository.findAll(new OffSetPaging(offset.orElse(0L), limit.orElse(60)))
-				 .stream().map(NotificationDAO::create).collect(Collectors.toList());
+		 List<NotificationDAO> notifications = notificationSv.get(offset.orElse(0L), limit.orElse(60));
 
 		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
@@ -52,17 +54,15 @@ public class NotificationController {
 	@Operation(summary = "Get Notifications by asset id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
-		@ApiResponse(responseCode = "404", description = "No notifications found with this name")
+		@ApiResponse(responseCode = "404", description = "No notifications found with related with that asset")
 	})
 	@GetMapping(path = "asset/{asset_id}", produces = "application/json")
-	public ResponseEntity<List<NotificationDAO>> getNotificationsByName (@PathVariable Long asset_id){
+	public ResponseEntity<List<NotificationDAO>> getNotificationsByAssetId (@PathVariable Long asset_id){
 		List<NotificationDAO> notifications = new ArrayList<>();
 		
-		notifications = notificationRepository.findByAssetId(asset_id).stream().map(NotificationDAO::create).collect(Collectors.toList());
+		notifications = notificationSv.getByAssetId(asset_id);
 		
-		notifications = notifications.isEmpty() ? null : notifications;
-		
-		return new ResponseEntity<>(notifications, notifications != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
 	
 	@Operation(summary = "Get Notification by id")
@@ -75,9 +75,22 @@ public class NotificationController {
 	public ResponseEntity<NotificationDAO> getNotificationsById (@PathVariable Long id){
 		NotificationDAO notification = null;
 		
-		notification = NotificationDAO.create(notificationRepository.findById(id).orElse(null));
+		notification = notificationSv.getById(id);
 		
-		return new ResponseEntity<>(notification, notification != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(notification, HttpStatus.OK);
+	}
+	
+	@Operation(summary = "Shown a list of available notification messages")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	})
+	@GetMapping(path = "messages", produces = "application/json")
+	public ResponseEntity<List<String>> getNotificationsById (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		List<String> messages;
+		
+		messages = notificationSv.getMesagges(offset.orElse(0L), limit.orElse(60));
+		
+		return new ResponseEntity<>(messages, HttpStatus.OK);
 	}
 
 //=== POST REQUESTS ===================================================================================
@@ -91,9 +104,20 @@ public class NotificationController {
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<NotificationDAO> createNotification(@RequestBody NotificationDAO notification) {
 		notification.setId(null);
-		NotificationDAO _notification = NotificationDAO.create(notificationRepository.save(notification.mapToEntity()));
+		NotificationDAO _notification = notificationSv.save(notification);
 		
 		return new ResponseEntity<>(_notification, HttpStatus.CREATED);
+	}
+	
+	@Operation(summary = "Create a new allowed notification message")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Request executed correctly, return list of messages")
+	})
+	@PostMapping(path = "message", produces = "application/json")
+	public ResponseEntity<List<String>> createMessage (@RequestBody NotificationMessages message){
+		notificationSv.saveMessage(message.getMessage());
+		
+		return new ResponseEntity<>(notificationSv.getMesagges(0L, 60), HttpStatus.OK);
 	}
 
 //=== PUT REQUESTS ====================================================================================
@@ -107,10 +131,7 @@ public class NotificationController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<NotificationDAO> updateNotification(@RequestBody NotificationDAO notification, @PathVariable Long id) {
-		if (notificationRepository.existsById(id)) {
-			notification.setId(id);
-			return new ResponseEntity<>(NotificationDAO.create(notificationRepository.save(notification.mapToEntity())), HttpStatus.OK);
-		}else return ResponseEntity.notFound().build();
+		return new ResponseEntity<>(notificationSv.update(notification), HttpStatus.OK);
 	}
 
 //=== DELETE REQUESTS =================================================================================
@@ -123,8 +144,21 @@ public class NotificationController {
 	)
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
-		notificationRepository.deleteById(id);
+		notificationSv.deleteById(id);
 		
 		return ResponseEntity.noContent().build();
+	}
+	
+	@Operation(summary = "Delete a existing Notification")
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", description = "Notification deleted correctly"),
+		@ApiResponse(responseCode = "500", description = "Error saving notification")
+	}
+	)
+	@DeleteMapping(path = "message")
+	public ResponseEntity<?> deleteMessage(@RequestBody NotificationMessages message) {
+	notificationSv.deleteMessage(message.getMessage());
+	
+	return ResponseEntity.noContent().build();
 	}
 }
