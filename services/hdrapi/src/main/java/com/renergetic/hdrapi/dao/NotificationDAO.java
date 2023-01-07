@@ -1,5 +1,7 @@
 package com.renergetic.hdrapi.dao;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.hdrapi.model.Asset;
@@ -40,7 +42,10 @@ public class NotificationDAO {
 	@JsonProperty(value = "asset_id", required = false)
 	private Long assetId;
 
-	@JsonProperty(value = "dashboard", required = false)
+//	@JsonProperty(value = "dashboard", required = false)
+//	private DashboardDAO dashboard;
+
+	@JsonProperty(value = "dashboard", required = false, access = Access.READ_ONLY)
 	private DashboardDAO dashboard;
 
 	@JsonProperty(value = "information_tile_id", required = false)
@@ -62,8 +67,8 @@ public class NotificationDAO {
 			if (notification.getAsset() != null)
 				dao.setAssetId(notification.getAsset().getId());
 			if (notification.getDashboard() != null)
-
 				dao.setDashboard( DashboardDAO.create(notification.getDashboard()));
+
 			if (notification.getInformationTile() != null)
 				dao.setInformationTileId(notification.getInformationTile().getId());
 		}
@@ -87,10 +92,17 @@ public class NotificationDAO {
 			notification.setAsset(asset);
 		}
 		if (dashboard != null) {
-			Dashboard mDashboard = new Dashboard();
-			mDashboard.setId(dashboard.getId());
-			notification.setDashboard(mDashboard);
+//			Dashboard mDashboard = new Dashboard();
+//			mDashboard.setId(dashboard.getId());
+//			notification.setDashboard(mDashboard);
+			Dashboard entity = dashboard.mapToEntity();
+			notification.setDashboard(entity);
 		}
+//		else {
+//			Dashboard entity = new Dashboard();
+//			entity.setId(dashboardId);
+//			notification.setDashboard(entity);
+//		}
 		if (informationTileId != null) {
 			InformationTile informationTile = new InformationTile();
 			informationTile.setId(informationTileId);

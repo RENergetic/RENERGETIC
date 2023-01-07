@@ -24,4 +24,6 @@ INSERT INTO asset_type
 ( 21, 'hvac', 'HVAC', NULL ),
 ( 22, 'supercomputer', 'Supercomputer', NULL ),
 ( 23, 'datacenter', 'datacenter', NULL ),
-( 24, 'heat_exchange', 'heat_exchange', NULL ); 
+( 24, 'heat_exchange', 'Heat Exchange', NULL ),
+( 25, 'battery', 'Battery', NULL ),
+( 26, 'wind_farm', 'Wind Farm', 100 ); 

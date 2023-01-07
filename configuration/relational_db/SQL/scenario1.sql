@@ -40,7 +40,26 @@ INSERT INTO asset ( id, name, label, asset_type_id, parent_asset_id, uuid, asset
 INSERT INTO asset ( id, name, label, asset_type_id, uuid, asset_category_id ) VALUES
 ( 14, 'gas_boiler1', 'Gas Boiler 1', 7, '2', NULL ),
 ( 15, 'gas_boiler2', 'Gas Boiler 2', 7, '2', NULL ),
-( 16, 'solar_collector1', 'Solar Collector 1', 13, '2', NULL );
+( 16, 'solar_collector1', 'Solar Collector 1', 13, '2', NULL ),
+( 17, 'pv_panel_1', 'PV Panel 1', 10, '2', NULL ),
+( 18, 'wind_farm_1', 'Wind Farm 1', 26, '2', NULL );
+
+/* ASSET DETAILS */
+INSERT INTO asset_details ( id, key, value, asset_id ) VALUES
+( 1, 'threshold_heat_max', '4.75', 4 ),
+( 2, 'threshold_heat_min', '0', 4 ),
+( 3, 'threshold_electricity_max', '11.5', 4 ),
+( 4, 'threshold_electricity_min', '0', 4 ),
+( 5, 'threshold_heat_max', '4.7', 6 ),
+( 6, 'threshold_heat_min', '0', 6 ),
+( 7, 'threshold_electricity_max', '11.3', 6 ),
+( 8, 'threshold_electricity_min', '0', 6 ),
+( 9, 'threshold_heat_max', '10', 16 ),
+( 10, 'threshold_heat_min', '0', 16 ),
+( 11, 'threshold_electricity_max', '10', 17 ),
+( 12, 'threshold_electricity_min', '0', 17 ),
+( 13, 'threshold_electricity_max', '10', 18 ),
+( 14, 'threshold_electricity_min', '0', 18 );
 
 /* CONNECT ASSETS */
 -- Conecction_type:
@@ -136,8 +155,8 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 ( 90, 'renewable', 'Renewable', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 ( 91, 'non_renewable', 'Fosil Fuels', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 ( 92, 'external', 'External', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
-( 100, 'total_produced', 'Produced energy', 9, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
-( 101, 'total_imported', 'Imported energy', 9, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' );
+( 100, 'total_produced', 'Produced energy', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
+( 101, 'total_imported', 'Imported energy', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' );
 
 INSERT INTO tags ( id, key, value ) VALUES
 ( 50, 'measurement_type', 'renewable' ),

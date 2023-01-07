@@ -1,6 +1,7 @@
 package com.renergetic.ingestionapi.service.utils;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,36 +25,48 @@ public class Restrictions {
 	public static Map<MeasurementDAO, Boolean> check(List<MeasurementDAO> measurements, RestrictionsDAO restrictions) {
 		Map<MeasurementDAO, Boolean> ret = new HashMap<>();
 		boolean isValid = true;
-		
+
+		ArrayList<String> errors = new ArrayList<>();
 		for (MeasurementDAO measurement : measurements) {
 			// Check measurement name
 			isValid = restrictions.getMeasurements().contains(measurement.getMeasurement().toLowerCase());
-			
+
 			// Check if tags are valid
 			if (isValid) {
-				for(Entry<String, String> tag : measurement.getTags().entrySet()) {
-					isValid = restrictions.getTags().containsKey(tag.getKey()) && 
-							(restrictions.getTags().get(tag.getKey()) == null || 
-							tag.getValue().matches(restrictions.getTags().get(tag.getKey())));
+				measurement.getTags().forEach((key, value) -> {
+					if (restrictions.getTags().containsKey(key)) {
+						String valueFilter = restrictions.getTags().get(key);
+						if (valueFilter != null && !value.matches(valueFilter))
+							errors.add(String.format("'%s' isn't a valid value to the tag '%s'", value, key));
+					} else {
+						errors.add(String.format("'%s' isn't a valid tag name", key));
+					}
+				});
+				if (!errors.isEmpty()) {
+					isValid = false;
+					measurement.setErrorMessage("Invalid tag name or value: " + errors.stream().collect(Collectors.joining(", ")));
+					errors.clear();
 				}
-				if (!isValid) measurement.setErrorMessage("Invalid tag name or value");
-			} else measurement.setErrorMessage("Invalid measurement name");
+			} else measurement.setErrorMessage("Invalid measurement name: " + measurement.getMeasurement());
 			// Check if fields are valid
 			if (isValid) {
-				for(Entry<String, String> field : measurement.getFields().entrySet()) {
-					isValid = restrictions.getFields().stream().anyMatch(restriction -> {
-						return restriction.getName().equalsIgnoreCase(field.getKey()) &&
-								(
-									(restriction.getType().equals(PrimitiveType.DOUBLE) && field.getValue().matches("^-?\\d+(.\\d+)?$")) ||
-									(restriction.getType().equals(PrimitiveType.INTEGER) && field.getValue().matches("^-?\\d+$")) ||
-									(restriction.getType().equals(PrimitiveType.UNSIGNED_DOUBLE) && field.getValue().matches("^\\d+(.\\d+)?$")) ||
-									(restriction.getType().equals(PrimitiveType.UNSIGNED_INTEGER) && field.getValue().matches("^\\d+$")) ||
-									(restriction.getType().equals(PrimitiveType.BOOLEAN) && field.getValue().matches("(true) | (false)")) ||
-									(restriction.getType().equals(PrimitiveType.STRING) && (restriction.getFormat() == null || field.getValue().matches(restriction.getFormat())))
-								);
-					});
+				measurement.getFields().forEach((key, value) -> {
+					if (!key.equals("time")) {
+						FieldRestrictionsDAO restriction = restrictions.getFields().stream().filter(fieldRestr -> fieldRestr.getName().equals(key)).findAny().orElse(null);
+						if (restriction != null) {
+							if (!restriction.getType().validate(value) || !(restriction.getFormat() == null || value.matches(restriction.getFormat())))
+								errors.add(String.format("'%s' isn't a valid value to field '%s'", value, key));
+						} else {
+							errors.add(String.format("'%s' isn't a valid field name", key));
+						}
+					}
+				});
+
+				if (!errors.isEmpty()) {
+					isValid = false;
+					measurement.setErrorMessage("Invalid field name or value: " + errors.stream().collect(Collectors.joining(", ")));
+					errors.clear();
 				}
-				if (!isValid) measurement.setErrorMessage("Invalid field name or value");
 			}
 			ret.put(measurement, isValid);
 		}
