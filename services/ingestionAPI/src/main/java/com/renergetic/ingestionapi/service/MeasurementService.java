@@ -46,60 +46,72 @@ public class MeasurementService {
 	
 	@Autowired
 	private LogsService logs;
+	
+	private final int INFLUX_TRIES = 5;
 
 	public Map<MeasurementDAO, Boolean> insert(List<MeasurementDAO> measurements, String bucket, RestrictionsDAO restrictions) {
-		if (influxDB.ping()) {
-			WriteApi api = influxDB.makeWriteApi();
-			List<Point> entries = new ArrayList<>();
-			
-			// Create a list of entries to save
-			Map<MeasurementDAO, Boolean> checkedMeasurements = Restrictions.check(measurements, restrictions);
-			checkedMeasurements.forEach((key, value) -> {
-				if (value) {		
-					Point registry = Point.measurement(key.getMeasurement());	
-					
-					if (key.getFields().containsKey("time")) {
-						try {
-							Instant time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(key.getFields().get("time")).toInstant();
-							registry.time(time.toEpochMilli(), WritePrecision.MS);
-						} catch(ParseException error) {
-							key.setErrorMessage("Invalid value to time field");
-							checkedMeasurements.put(key, false);
-						}
-					} else
-						registry.time(System.currentTimeMillis(), WritePrecision.MS);
-					
-					registry.addTags(key.getTags());
-					key.getFields().forEach((fieldKey, fieldValue)-> {
-						if (!fieldKey.equalsIgnoreCase("time")) {
-							Entry<String, ?> field = Restrictions.parseField(fieldKey, fieldValue, restrictions);
-				    		
-							if (field.getValue() instanceof String)
-				    			registry.addField(field.getKey(), (String) field.getValue());
-				    		else if (field.getValue() instanceof Double)
-				    			registry.addField(field.getKey(), (Double) field.getValue());
-				    		else if (field.getValue() instanceof Long)
-				    			registry.addField(field.getKey(), (Long) field.getValue());
-				    		else if (field.getValue() instanceof Boolean)
-				    			registry.addField(field.getKey(), (Boolean) field.getValue());
-						}
-					});
-					
-					entries.add(registry);
+		int tries = 0;
+		while (tries < INFLUX_TRIES)
+			if (influxDB.ping()) {
+				WriteApi api = influxDB.makeWriteApi();
+				List<Point> entries = new ArrayList<>();
+				
+				// Create a list of entries to save
+				Map<MeasurementDAO, Boolean> checkedMeasurements = Restrictions.check(measurements, restrictions);
+				checkedMeasurements.forEach((key, value) -> {
+					if (value) {		
+						Point registry = Point.measurement(key.getMeasurement());	
+						
+						if (key.getFields().containsKey("time")) {
+							try {
+								Instant time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(key.getFields().get("time")).toInstant();
+								registry.time(time.toEpochMilli(), WritePrecision.MS);
+							} catch(ParseException error) {
+								key.setErrorMessage("Invalid value to time field");
+								checkedMeasurements.put(key, false);
+							}
+						} else
+							registry.time(System.currentTimeMillis(), WritePrecision.MS);
+						
+						registry.addTags(key.getTags());
+						key.getFields().forEach((fieldKey, fieldValue)-> {
+							if (!fieldKey.equalsIgnoreCase("time")) {
+								Entry<String, ?> field = Restrictions.parseField(fieldKey, fieldValue, restrictions);
+					    		
+								if (field.getValue() instanceof String)
+					    			registry.addField(field.getKey(), (String) field.getValue());
+					    		else if (field.getValue() instanceof Double)
+					    			registry.addField(field.getKey(), (Double) field.getValue());
+					    		else if (field.getValue() instanceof Long)
+					    			registry.addField(field.getKey(), (Long) field.getValue());
+					    		else if (field.getValue() instanceof Boolean)
+					    			registry.addField(field.getKey(), (Boolean) field.getValue());
+							}
+						});
+						
+						entries.add(registry);
+					}
+				});
+				
+				// Write all entries at Influx
+		    	api.writePoints(bucket == null || bucket.isBlank()
+		    			? "renergetic" : bucket, 
+		    			"renergetic", 
+		    			entries);
+				
+		    	api.close();
+		    	return checkedMeasurements;
+			}
+			else {
+				try {
+					tries +=1;
+					Thread.sleep(200);
+				} catch(InterruptedException e) {
+					e.printStackTrace();
 				}
-			});
-			
-			// Write all entries at Influx
-	    	api.writePoints(bucket == null || bucket.isBlank()
-	    			? "renergetic" : bucket, 
-	    			"renergetic", 
-	    			entries);
-			
-	    	api.close();
-	    	return checkedMeasurements;
-		} else {
-			throw new ConnectionException("Can't connect with InfluxDB");
-		}
+			}
+		
+		throw new ConnectionException("Can't connect with InfluxDB");
 	}
 	
 	public Map<MeasurementDAO, Boolean> insert(List<MeasurementDAO> measurements, String bucket, RestrictionsDAO restrictions, Request request) {
