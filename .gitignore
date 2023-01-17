@@ -13,6 +13,7 @@ front/**
 configuration/**/node_modules
 docker_config_local/app/front/dist/
 .idea/
+.vscode/
 docker_config_local/app/keycloak/
 docker_config_local/app/hdr-api/hdrapi-0.0.1-SNAPSHOT.jar
 docker_config_local/app/api/backdb-0.0.1-SNAPSHOT.jar
