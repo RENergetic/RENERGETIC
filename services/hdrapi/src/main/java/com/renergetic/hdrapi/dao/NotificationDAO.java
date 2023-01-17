@@ -1,13 +1,8 @@
 package com.renergetic.hdrapi.dao;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.hdrapi.model.Asset;
-import com.renergetic.hdrapi.model.Dashboard;
-import com.renergetic.hdrapi.model.InformationTile;
-import com.renergetic.hdrapi.model.Notification;
+import com.renergetic.hdrapi.model.NotificationSchedule;
 import com.renergetic.hdrapi.model.NotificationType;
 
 import com.renergetic.hdrapi.service.utils.DateConverter;
@@ -30,9 +25,6 @@ public class NotificationDAO {
 	@JsonProperty(required = false)
 	private String message;
 
-	@JsonProperty(required = false)
-	private String icon;
-
 	@JsonProperty(value = "date_from",required = true)
 	private Long dateFrom;
 
@@ -42,25 +34,21 @@ public class NotificationDAO {
 	@JsonProperty(value = "asset_id", required = false)
 	private Long assetId;
 
-//	@JsonProperty(value = "dashboard", required = false)
-//	private DashboardDAO dashboard;
-
 	@JsonProperty(value = "dashboard", required = false, access = Access.READ_ONLY)
 	private DashboardDAO dashboard;
 
 	@JsonProperty(value = "information_tile_id", required = false)
 	private Long informationTileId;
 	
-	public static NotificationDAO create(Notification notification) {
+	public static NotificationDAO create(NotificationSchedule notification) {
 		NotificationDAO dao = null;
 		
 		if (notification != null) {
 			dao = new NotificationDAO();
 			
 			dao.setId(notification.getId());
-			dao.setType(notification.getType());
-			dao.setMessage(notification.getMessage());
-			dao.setIcon(notification.getIcon());
+			dao.setType(notification.getDefinition().getType());
+			dao.setMessage(notification.getDefinition().getMessage());
 
 			dao.setDateFrom(DateConverter.toEpoch(notification.getDateFrom()));
 			dao.setDateTo(DateConverter.toEpoch(notification.getDateTo()));
@@ -75,39 +63,5 @@ public class NotificationDAO {
 		
 		return dao;
 	}
-	
-	public Notification mapToEntity() {
-		Notification notification = new Notification();
-		
-		notification.setId(id);
-		notification.setType(type);
-		notification.setMessage(message);
-		notification.setIcon(icon);
-		notification.setDateFrom(DateConverter.toLocalDateTime(dateFrom));
-		notification.setDateTo(DateConverter.toLocalDateTime(dateTo));
 
-		if (assetId != null) {
-			Asset asset = new Asset();
-			asset.setId(assetId);
-			notification.setAsset(asset);
-		}
-		if (dashboard != null) {
-//			Dashboard mDashboard = new Dashboard();
-//			mDashboard.setId(dashboard.getId());
-//			notification.setDashboard(mDashboard);
-			Dashboard entity = dashboard.mapToEntity();
-			notification.setDashboard(entity);
-		}
-//		else {
-//			Dashboard entity = new Dashboard();
-//			entity.setId(dashboardId);
-//			notification.setDashboard(entity);
-//		}
-		if (informationTileId != null) {
-			InformationTile informationTile = new InformationTile();
-			informationTile.setId(informationTileId);
-			notification.setInformationTile(informationTile);
-		}
-		return notification;
-	}
 }

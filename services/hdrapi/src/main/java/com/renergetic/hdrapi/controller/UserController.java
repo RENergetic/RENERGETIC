@@ -1,7 +1,7 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.repository.NotificationRepository;
+import com.renergetic.hdrapi.repository.NotificationScheduleRepository;
 import com.renergetic.hdrapi.service.UserService;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
@@ -31,7 +31,7 @@ public class UserController {
     @Value("${api.generate.dummy-data}")
     private Boolean generateDummy;
     @Autowired
-    NotificationRepository notificationRepository;
+    NotificationScheduleRepository notificationRepository;
 
 //=== GET REQUESTS====================================================================================
 

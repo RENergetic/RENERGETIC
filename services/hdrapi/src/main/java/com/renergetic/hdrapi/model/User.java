@@ -44,7 +44,7 @@ public class User {
 			name = "user_notification",
 			joinColumns = @JoinColumn(name = "user_id", nullable = true, insertable = true, updatable = true),
 			inverseJoinColumns = @JoinColumn(name = "notification_id"))
-	private List<Notification> userNotification;
+	private List<NotificationSchedule> userNotification;
 	
 
 	public User(String name) {

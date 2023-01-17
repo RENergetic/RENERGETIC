@@ -19,8 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.hdrapi.dao.NotificationDAO;
-import com.renergetic.hdrapi.model.NotificationMessages;
-import com.renergetic.hdrapi.repository.NotificationRepository;
+import com.renergetic.hdrapi.dao.NotificationDefinitionDAO;
+import com.renergetic.hdrapi.dao.NotificationScheduleDAO;
+import com.renergetic.hdrapi.repository.NotificationScheduleRepository;
 import com.renergetic.hdrapi.service.NotificationService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +36,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class NotificationController {
 	
 	@Autowired
-	NotificationRepository notificationRepository;
+	NotificationScheduleRepository notificationRepository;
 	
 	@Autowired
 	NotificationService notificationSv;
@@ -45,8 +46,11 @@ public class NotificationController {
 	@Operation(summary = "Get All Notifications")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<NotificationDAO>> getAllNotifications (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-		 List<NotificationDAO> notifications = notificationSv.get(offset.orElse(0L), limit.orElse(60));
+	public ResponseEntity<List<NotificationDAO>> getAllNotifications (
+			@RequestParam(required = false) Optional<Long> offset,
+			@RequestParam(required = false) Optional<Integer> limit,
+			@RequestParam(name = "show_expired", required = false) Optional<Boolean> showExpired){
+		 List<NotificationDAO> notifications = notificationSv.get(offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
 
 		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
@@ -57,10 +61,14 @@ public class NotificationController {
 		@ApiResponse(responseCode = "404", description = "No notifications found with related with that asset")
 	})
 	@GetMapping(path = "asset/{asset_id}", produces = "application/json")
-	public ResponseEntity<List<NotificationDAO>> getNotificationsByAssetId (@PathVariable Long asset_id){
+	public ResponseEntity<List<NotificationDAO>> getNotificationsByAssetId (
+			@PathVariable Long asset_id,
+			@RequestParam(required = false) Optional<Long> offset,
+			@RequestParam(required = false) Optional<Integer> limit,
+			@RequestParam(name = "show_expired", required = false) Optional<Boolean> showExpired){
 		List<NotificationDAO> notifications = new ArrayList<>();
 		
-		notifications = notificationSv.getByAssetId(asset_id);
+		notifications = notificationSv.getByAssetId(asset_id, offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
 		
 		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
@@ -84,13 +92,15 @@ public class NotificationController {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	})
-	@GetMapping(path = "messages", produces = "application/json")
-	public ResponseEntity<List<String>> getNotificationsById (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-		List<String> messages;
+	@GetMapping(path = "definition", produces = "application/json")
+	public ResponseEntity<List<NotificationDefinitionDAO>> getNotificationsDefinition (
+			@RequestParam(required = false) Optional<Long> offset,
+			@RequestParam(required = false) Optional<Integer> limit){
+		List<NotificationDefinitionDAO> definitions;
 		
-		messages = notificationSv.getMesagges(offset.orElse(0L), limit.orElse(60));
+		definitions = notificationSv.getDefinition(offset.orElse(0L), limit.orElse(60));
 		
-		return new ResponseEntity<>(messages, HttpStatus.OK);
+		return new ResponseEntity<>(definitions, HttpStatus.OK);
 	}
 
 //=== POST REQUESTS ===================================================================================
@@ -102,7 +112,7 @@ public class NotificationController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<NotificationDAO> createNotification(@RequestBody NotificationDAO notification) {
+	public ResponseEntity<NotificationDAO> createNotification(@RequestBody NotificationScheduleDAO notification) {
 		notification.setId(null);
 		NotificationDAO _notification = notificationSv.save(notification);
 		
@@ -113,11 +123,11 @@ public class NotificationController {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly, return list of messages")
 	})
-	@PostMapping(path = "message", produces = "application/json")
-	public ResponseEntity<List<String>> createMessage (@RequestBody NotificationMessages message){
-		notificationSv.saveMessage(message.getMessage());
+	@PostMapping(path = "definition", produces = "application/json")
+	public ResponseEntity<NotificationDefinitionDAO> createDefinition (@RequestBody NotificationDefinitionDAO definition){
+		definition = notificationSv.saveDefinition(definition);
 		
-		return new ResponseEntity<>(notificationSv.getMesagges(0L, 60), HttpStatus.OK);
+		return new ResponseEntity<>(definition, HttpStatus.OK);
 	}
 
 //=== PUT REQUESTS ====================================================================================
@@ -130,7 +140,8 @@ public class NotificationController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<NotificationDAO> updateNotification(@RequestBody NotificationDAO notification, @PathVariable Long id) {
+	public ResponseEntity<NotificationDAO> updateNotification(@RequestBody NotificationScheduleDAO notification, @PathVariable Long id) {
+		notification.setId(id);
 		return new ResponseEntity<>(notificationSv.update(notification), HttpStatus.OK);
 	}
 
@@ -155,9 +166,9 @@ public class NotificationController {
 		@ApiResponse(responseCode = "500", description = "Error saving notification")
 	}
 	)
-	@DeleteMapping(path = "message")
-	public ResponseEntity<?> deleteMessage(@RequestBody NotificationMessages message) {
-	notificationSv.deleteMessage(message.getMessage());
+	@DeleteMapping(path = "definition/{id}")
+	public ResponseEntity<?> deleteDefinition(@PathVariable Long definition) {
+	notificationSv.deleteDefinition(definition);
 	
 	return ResponseEntity.noContent().build();
 	}

@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,31 +21,26 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "notification")
+@Table(name = "notification_schedule")
 @RequiredArgsConstructor
 @Getter
 @Setter
 @ToString
-public class Notification {	
+public class NotificationSchedule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(name = "type", nullable = false, insertable = true, updatable = true, unique = false)
-	private NotificationType type;
-
-	@Column(name = "message", nullable = false, insertable = true, updatable = true, unique = false)
-	private String message;
-
-	@Column(name = "icon", nullable = true, insertable = true, updatable = true, unique = false)
-	private String icon;
 
 	@Column(name = "date_from", nullable = false, insertable = true, updatable = true, unique = false)
 	private LocalDateTime dateFrom;
 	
 	@Column(name = "date_to", nullable = true, insertable = true, updatable = true, unique = false)
 	private LocalDateTime dateTo;
+
+	@ManyToOne(cascade = CascadeType.REFRESH, optional = false)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "notification_id", nullable = false, insertable = true, updatable = true)
+	private NotificationDefinition definition;
 
 	@ManyToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -64,13 +57,4 @@ public class Notification {
 	@JoinColumn(name = "information_tile_id", nullable = true, insertable = true, updatable = true)
 	private InformationTile informationTile;
 
-	
-	public Notification(NotificationType type, String message, LocalDateTime date_from, LocalDateTime date_to) {
-		super();
-		this.type = type;
-		this.message = message;
-		this.dateFrom = date_from;
-		this.dateTo = date_to;
-	}
-	
 }
