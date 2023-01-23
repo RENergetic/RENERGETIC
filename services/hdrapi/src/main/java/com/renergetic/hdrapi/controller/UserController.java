@@ -1,10 +1,9 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.repository.NotificationScheduleRepository;
+import com.renergetic.hdrapi.service.NotificationService;
 import com.renergetic.hdrapi.service.UserService;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
-import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -31,7 +29,7 @@ public class UserController {
     @Value("${api.generate.dummy-data}")
     private Boolean generateDummy;
     @Autowired
-    NotificationScheduleRepository notificationRepository;
+    NotificationService notificationSv;
 
 //=== GET REQUESTS====================================================================================
 
@@ -107,14 +105,14 @@ public class UserController {
     @GetMapping(path = "/notifications", produces = "application/json")
     public ResponseEntity<List<NotificationDAO>> getUserNotifications(
             @RequestParam(required = false) Optional<Long> offset,
-            @RequestParam(required = false) Optional<Integer> limit) {
+            @RequestParam(required = false) Optional<Integer> limit,
+            @RequestParam(value = "show_expired", required = false) Optional<Boolean> showExpired) {
         List<NotificationDAO> notifications;
         //TODO: filter by user id
         if (generateDummy) {
             notifications = DummyDataGenerator.getNotifications();
         } else {
-            notifications = notificationRepository.findAll(new OffSetPaging(offset.orElse(0L), limit.orElse(60)))
-                    .stream().map(NotificationDAO::create).collect(Collectors.toList());
+            notifications = notificationSv.get(offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
         }
         return new ResponseEntity<>(notifications, HttpStatus.OK);
     }

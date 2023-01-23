@@ -62,22 +62,19 @@ INSERT INTO asset_details ( id, key, value, asset_id ) VALUES
 ( 14, 'threshold_electricity_min', '0', 18 );
 
 /* CONNECT ASSETS */
--- Conecction_type:
---   0 owner
---   1 resident
 INSERT INTO asset_connection ( id, asset_id, connected_asset_id, connection_type ) VALUES
-( 1, 1, 3, 0 ),
-( 2, 2, 3, 0 ),
-( 3, 1, 5, 0 ),
-( 4, 2, 5, 1 ),
-( 5, 2, 6, 0 ),
-( 6, 1, 7, 0 ),
-( 7, 2, 7, 0 );
+( 1, 1, 3, 'owner' ),
+( 2, 2, 3, 'owner' ),
+( 3, 1, 5, 'owner' ),
+( 4, 2, 5, 'resident' ),
+( 5, 2, 6, 'owner' ),
+( 6, 1, 7, 'owner' ),
+( 7, 2, 7, 'owner' );
     
 INSERT INTO asset_connection ( id, asset_id, connected_asset_id, connection_type ) VALUES
-( 14, 5, 7, NULL ),
-( 15, 6, 8, NULL ),
-( 16, 6, 9, NULL );
+( 14, 5, 7, 'energy_connection' ),
+( 15, 6, 8, 'energy_connection' ),
+( 16, 6, 9, 'energy_connection' );
 
 /* CREATE MEASUREMENTS */
 INSERT INTO measurement ( id, name, label, measurement_type_id, domain, direction, sensor_name, asset_id, uuid ) VALUES
@@ -155,8 +152,8 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 ( 90, 'renewable', 'Renewable', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 ( 91, 'non_renewable', 'Fosil Fuels', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 ( 92, 'external', 'External', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
-( 100, 'total_produced', 'Produced energy', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
-( 101, 'total_imported', 'Imported energy', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' );
+( 100, 'total_produced', 'Produced energy', 5, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
+( 101, 'total_imported', 'Imported energy', 5, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' );
 
 INSERT INTO tags ( id, key, value ) VALUES
 ( 50, 'measurement_type', 'renewable' ),
@@ -198,7 +195,7 @@ INSERT INTO information_tile ( id, name, label, layout, props, type, information
 ( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
 ( 14, 'heat_exchanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 );
 
-INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id, domain, direction, measurement_type_id, sensor_name, measurement_name, information_tile_id, agreggation_function ) VALUES
+INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id, domain, direction, measurement_type_id, sensor_name, measurement_name, information_tile_id, aggregation_function ) VALUES
 ( 1, 84, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'sum' ),
 ( 2, 85, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'sum' ),
 ( 3, 86, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'sum' ),
@@ -216,8 +213,8 @@ INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id
 ( 15, 75, NULL, NULL, NULL, NULL, NULL, NULL, 13, 'sum' ),
 ( 16, 77, NULL, NULL, NULL, NULL, NULL, NULL, 14, 'sum' ),
 ( 17, 79, NULL, NULL, NULL, NULL, NULL, NULL, 14, 'sum' ),
-( 18, 100, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'sum' ),
-( 19, 101, NULL, NULL, NULL, NULL, NULL, NULL, 10, 'sum' );
+( 18, 100, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'mean' ),
+( 19, 101, NULL, NULL, NULL, NULL, NULL, NULL, 10, 'mean' );
 
 /* CONNECT ASSETS WITH PANELS */
 INSERT INTO asset_panel ( panel_id, asset_id ) VALUES

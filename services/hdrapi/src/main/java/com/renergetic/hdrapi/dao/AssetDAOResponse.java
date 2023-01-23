@@ -5,10 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.hdrapi.model.Asset;
 import com.renergetic.hdrapi.model.AssetType;
+import com.renergetic.hdrapi.model.ConnectionType;
 import com.renergetic.hdrapi.model.Measurement;
 import com.renergetic.hdrapi.model.details.AssetDetails;
 
@@ -52,8 +55,13 @@ public class AssetDAOResponse {
 	@JsonProperty(required = false)
 	private AssetCategoryDAO asset_category;
 	
-	@JsonProperty(required=false, access=Access.READ_ONLY)
+	@JsonProperty(required = false, access = Access.READ_ONLY)
 	private Map<String, String> details;
+	
+	// Only used to asset_connection queries
+	@JsonInclude(value = Include.NON_NULL)
+	@JsonProperty(value = "connection_type", access = Access.READ_ONLY)
+	private ConnectionType connectionType;
 	
 	public static AssetDAOResponse create(Asset asset, List<Asset> childs, List<Measurement> measurements) {
 		AssetDAOResponse dao = null;

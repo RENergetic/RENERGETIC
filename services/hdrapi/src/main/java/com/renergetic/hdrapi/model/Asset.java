@@ -53,13 +53,10 @@ public class Asset {
 	@Column(name = "label", nullable = true, insertable = true, updatable = true)
 	private String label;
 
-	@ManyToMany(cascade = CascadeType.REFRESH)
+	@OneToMany(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinTable(
-			name = "asset_connection",
-			joinColumns = @JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true),
-			inverseJoinColumns = @JoinColumn(name = "connected_asset_id"))
-	private List<Asset> assets;
+	@JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true)
+	private List<AssetConnection> connections;
 	
 	// REFERENCES ASSET_DASHBOARD
 	@ManyToMany(cascade = CascadeType.REFRESH)
@@ -80,21 +77,15 @@ public class Asset {
 	private Asset parentAsset;
 	
 	// FOREIGN KEY FROM USERS TABLE
-	
-	
-	// FOREIGN KEY FROM USERS TABLE
 	@OneToOne(optional = true, cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "user_id", nullable = true, insertable = true, updatable = true)
 	private User user;
-	
-
 
 	@OneToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
 	private UUID uuid;
-	
 	
 	@ManyToMany(cascade = CascadeType.REFRESH, mappedBy= "assets")
 	@NotFound(action = NotFoundAction.IGNORE)

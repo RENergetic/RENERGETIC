@@ -3,5 +3,6 @@ package com.renergetic.hdrapi.model;
 public enum ConnectionType {
 	owner,
 	resident,
-	visitor
+	visitor,
+	energy_connection
 }

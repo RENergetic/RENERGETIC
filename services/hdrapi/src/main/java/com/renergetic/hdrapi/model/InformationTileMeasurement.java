@@ -50,7 +50,7 @@ public class InformationTileMeasurement {
 	@Enumerated(EnumType.STRING)
 	private Domain domain;
 
-	@Column(name = "agreggation_function", nullable = true, insertable = true, updatable = true)
+	@Column(name = "aggregation_function", nullable = true, insertable = true, updatable = true)
 	private String function;
 
 	// FOREIGN KEY FROM MEASUREMENT TABLE

@@ -15,7 +15,6 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 	public Asset save(Asset asset);
 	
 	public List<Asset> findByParentAsset(Asset parentAsset);
-	public List<Asset> findByAssets(Asset asset);
 	public Optional<Asset> findByName(String name);
 
 	@Query(value = "SELECT asset_conn.* " +

@@ -167,7 +167,7 @@ public class NotificationController {
 	}
 	)
 	@DeleteMapping(path = "definition/{id}")
-	public ResponseEntity<?> deleteDefinition(@PathVariable Long definition) {
+	public ResponseEntity<?> deleteDefinition(@PathVariable("id") Long definition) {
 	notificationSv.deleteDefinition(definition);
 	
 	return ResponseEntity.noContent().build();

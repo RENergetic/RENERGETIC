@@ -3,6 +3,8 @@ package com.renergetic.hdrapi.model;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,6 +42,7 @@ public class AssetConnection {
 	@JoinColumn(name = "connected_asset_id", nullable = false, insertable = true, updatable = true)
 	private Asset connectedAsset;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "connection_type", nullable = true, insertable = true, updatable = true)
 	private ConnectionType connectionType;
 }

@@ -156,17 +156,29 @@ public class AssetService {
         else throw new NotFoundException("No asset found with asset category " + categoryId);
     }
 
+    /**
+     * Get the asset connected to the asset with the given id
+     * @param id Asset ID used to search asset connected to it
+     * @return A AssetDAOResponse list with all connected assets and its connection types
+     */
     public List<AssetDAOResponse> getConnectedTo(Long id) {
         Asset asset = assetRepository.findById(id).orElse(null);
 
         if (asset == null)
             throw new NotFoundException("No asset found related with id" + id);
-        else if (asset.getAssets() != null && asset.getAssets().size() > 0)
-            return asset.getAssets().stream()
-                    .map(obj -> AssetDAOResponse.create(obj, assetRepository.findByParentAsset(obj),
-                            measurementRepository.findByAsset(obj)))
+        else if (asset.getConnections() != null && asset.getConnections().size() > 0)
+            return asset.getConnections().stream()
+                    .map(obj -> {
+                    	AssetDAOResponse dao = AssetDAOResponse.create(obj.getConnectedAsset(), assetRepository.findByParentAsset(obj.getConnectedAsset()),
+                                measurementRepository.findByAsset(obj.getConnectedAsset()));
+                    	dao.setConnectionType(obj.getConnectionType());
+        				return dao;
+                    })
                     .collect(Collectors.toList());
-        else return new ArrayList<>();
+        else {
+        	System.err.println("MAL");
+        	return new ArrayList<>();
+        }
     }
 
     public List<MeasurementDAOResponse> getMeasurements(Long id) {
