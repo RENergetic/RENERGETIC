@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
@@ -74,8 +76,16 @@ public class UIAggregatorController {
         }
         if (wrapperRequestBodyDAO.getCalls().getDashboards() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDashboards();
-            wrapperResponseDAO.setDashboards(
-                    getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
+            List<DashboardDAO> dashboards =
+                    getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit()));
+            if (dashboards.isEmpty() && generateDummy) {
+                //generate some random demands
+                 dashboards = DummyDataGenerator.getDashboards(5);
+
+            }
+            wrapperResponseDAO.setDashboards(dashboards);
+
+
         }
         if (wrapperRequestBodyDAO.getCalls().getDemands() != null && userId != null) {
             //TODO: ask someone about public demands ?
@@ -94,7 +104,8 @@ public class UIAggregatorController {
                             it -> it.getDemandDefinition().getTile() != null
                     ).flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
                             .collect(Collectors.toList());
-            DataDAO demandData = dataService.getData(measurements.stream().map(dao -> dao.mapToEntity()).collect(Collectors.toList()), null, null);
+            DataDAO demandData = dataService.getData(
+                    measurements.stream().map(dao -> dao.mapToEntity()).collect(Collectors.toList()), null, null);
             //TODO: here there might be issue with presenting the data and choosing appropriate time interval - this should be discused
             //probably data required for the demand demand should be stored as static  DataDAO JSON in RDBMS
             //if the user chooses interval it wouldnt make sense from the demand/request perspective

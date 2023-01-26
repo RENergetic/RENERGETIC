@@ -1,9 +1,7 @@
 package com.renergetic.hdrapi.service.utils;
 
-import com.renergetic.hdrapi.dao.DataDAO;
-import com.renergetic.hdrapi.dao.DemandScheduleDAO;
-import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
-import com.renergetic.hdrapi.dao.NotificationDAO;
+import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.model.Dashboard;
 import com.renergetic.hdrapi.model.Measurement;
 import com.renergetic.hdrapi.model.NotificationType;
 
@@ -91,7 +89,7 @@ public class DummyDataGenerator {
     }
 
     public static List<NotificationDAO> getNotifications() {
-        float chance = 0.45f;
+        float chance = 0.75f;
         ArrayList<NotificationDAO> l = new ArrayList<>();
         while (random.nextFloat() < chance) {
             var not = new NotificationDAO();
@@ -113,15 +111,32 @@ public class DummyDataGenerator {
 //         not.setIcon();
             not.setDateFrom((new Date()).getTime() - 3600000);
             not.setDateTo((new Date()).getTime() + 3600000);
+            if (random.nextInt()%2==0) {
+                not.setDashboard(initDashboard(l.size()));
+            }
             //        assetId,dashboardId,informationTileId;
             l.add(not);
-            chance*=0.7f;
+            chance *= 0.9f;
         }
         return l;
 
     }
 
+    private static DashboardDAO initDashboard(int n) {
+        Dashboard d = new Dashboard("dashboard_" + n, "www.example.org/" + n, "Sample, test dashboard " + n);
+        d.setId((long) n);
+        d.setGrafanaId("grafanaid_" + n);
+        return DashboardDAO.create(d);
+    }
 
+
+    public static List<DashboardDAO> getDashboards(int n) {
+        List<DashboardDAO> l = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            l.set(i, initDashboard(i));
+        }
+        return l;
+    }
 }
 
 //    function generatePanelData(informationPanel, predictionWindow) {
