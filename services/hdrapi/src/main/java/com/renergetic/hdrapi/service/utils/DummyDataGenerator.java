@@ -5,6 +5,7 @@ import com.renergetic.hdrapi.model.Dashboard;
 import com.renergetic.hdrapi.model.Measurement;
 import com.renergetic.hdrapi.model.NotificationType;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,7 +112,7 @@ public class DummyDataGenerator {
 //         not.setIcon();
             not.setDateFrom((new Date()).getTime() - 3600000);
             not.setDateTo((new Date()).getTime() + 3600000);
-            if (random.nextInt()%2==0) {
+            if (random.nextInt() % 2 == 0) {
                 not.setDashboard(initDashboard(l.size()));
             }
             //        assetId,dashboardId,informationTileId;
@@ -123,9 +124,17 @@ public class DummyDataGenerator {
     }
 
     private static DashboardDAO initDashboard(int n) {
-        Dashboard d = new Dashboard("dashboard_" + n, "www.example.org/" + n, "Sample, test dashboard " + n);
+        Dashboard d = new Dashboard("dashboard_" + n, "http://www.example.org/" + n, "Sample, test dashboard " + n);
         d.setId((long) n);
         d.setGrafanaId("grafanaid_" + n);
+        Map<String, ? extends Serializable> ext = Map.of("model", random.nextBoolean() ? "model_" + n : "",
+                "measurement_type", random.nextBoolean() ? random.nextBoolean() ? "energy" : "power" : "",
+                "unit", random.nextBoolean() ?
+                        DashboardMetaKeys.getInstance().getUnits().get(
+                                random.nextInt(DashboardMetaKeys.getInstance().getUnits().size()))
+                        : "");
+
+        d.setExt(Json.toJson(ext));
         return DashboardDAO.create(d);
     }
 
@@ -133,7 +142,7 @@ public class DummyDataGenerator {
     public static List<DashboardDAO> getDashboards(int n) {
         List<DashboardDAO> l = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            l.set(i, initDashboard(i));
+            l.add(i, initDashboard(i));
         }
         return l;
     }

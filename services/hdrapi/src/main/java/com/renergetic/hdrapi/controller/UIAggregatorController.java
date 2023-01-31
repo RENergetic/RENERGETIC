@@ -83,6 +83,7 @@ public class UIAggregatorController {
                  dashboards = DummyDataGenerator.getDashboards(5);
 
             }
+            wrapperResponseDAO.setDashboardMetaKeys(DashboardMetaKeys.getInstance());
             wrapperResponseDAO.setDashboards(dashboards);
 
 

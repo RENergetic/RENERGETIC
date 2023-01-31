@@ -44,7 +44,7 @@ public class Dashboard {
 	@Column(name = "grafana_id", nullable = true, insertable = true, updatable = true)
 	private String grafanaId;
 
-	@Column(name = "ext", nullable = true, insertable = true, updatable = true)
+	@Column(name = "ext", nullable = true, insertable = true, updatable = true,columnDefinition="TEXT")
 	private String ext;
 
 	@ManyToOne(cascade = CascadeType.REFRESH)
