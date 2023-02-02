@@ -139,7 +139,8 @@ public class DashboardController {
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<DashboardDAO> updateDashboard(@RequestBody DashboardDAO dashboard, @PathVariable Long id) {
-		return new ResponseEntity<>(dashboardSv.save(dashboard), HttpStatus.OK);
+
+		return new ResponseEntity<>(dashboardSv.update(dashboard,id), HttpStatus.OK);
 	}
 
 //=== DELETE REQUESTS =================================================================================
