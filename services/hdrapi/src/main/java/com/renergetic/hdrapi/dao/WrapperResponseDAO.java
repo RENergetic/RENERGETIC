@@ -39,11 +39,13 @@ public class WrapperResponseDAO {
     @JsonProperty(required = false, value = "asset_metakeys")
     private AssetMetaKeys assetMetaKeys;
 
+    @JsonProperty(required = false, value = "dashboard_metakeys")
+    private DashboardMetaKeys dashboardMetaKeys;
+
     public void appendData(DataDAO data) {
-        if(this.data==null){
+        if (this.data == null) {
             this.data = data;
-        }
-        else {
+        } else {
             this.data.getCurrent().putAll(data.getCurrent());
             this.data.getPrediction().putAll(data.getCurrent());
         }

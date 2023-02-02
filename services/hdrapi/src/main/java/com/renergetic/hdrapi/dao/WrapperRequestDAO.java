@@ -70,7 +70,6 @@ public class WrapperRequestDAO {
         //TODO: return data by id
         @JsonProperty(required = false)
         private Integer id;
-
     }
 
     @Getter
