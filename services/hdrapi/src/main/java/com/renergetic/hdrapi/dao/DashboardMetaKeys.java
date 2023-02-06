@@ -34,6 +34,7 @@ public class DashboardMetaKeys {
                 jgen.writeStringField("name", du.NAME);
                 jgen.writeStringField("symbol", du.SYMBOL);
                 jgen.writeStringField("type", du.TYPE);
+                jgen.writeStringField("physical_type", du.PHYSICAL_TYPE);
                 jgen.writeEndObject();
             }
             jgen.writeEndArray();
