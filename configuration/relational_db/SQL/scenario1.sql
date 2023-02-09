@@ -153,7 +153,10 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 ( 91, 'non_renewable', 'Fosil Fuels', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 ( 92, 'external', 'External', 9, NULL, 'out', 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 ( 100, 'total_produced', 'Produced energy', 5, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
-( 101, 'total_imported', 'Imported energy', 5, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' );
+( 101, 'total_imported', 'Imported energy', 5, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
+/* MEASUREMENTS FOR CURRENT RENEWABILITY SCREEN */
+(110, "renewability_heat", "Heat renewability", 5, "heat", null, "renewability", null, 5, null, "2"),
+(111, "renewability_heat", "Heat renewability", 5, "heat", null, "renewability", null, 6, null, "2");
 
 INSERT INTO tags ( id, key, value ) VALUES
 ( 50, 'measurement_type', 'renewable' ),
@@ -193,7 +196,10 @@ INSERT INTO information_tile ( id, name, label, layout, props, type, information
 ( 11, 'office', 'Office', '{"x":3,"y":1,"w":3,"h":9}', '{"icon":"office", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
 ( 12, 'supercomputer', 'Supercomputers', '{"x":6,"y":1,"w":3,"h":9}', '{"icon":"supercomputer", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
 ( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
-( 14, 'heat_exchanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 );
+( 14, 'heat_exchanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
+/* RENEWABILITY SCREEN */
+(20, "heat_renewability", "Heat renewability", null, "{"icon":"renewability"}", "knob", null),
+(21, "heat_renewability", "Heat renewability", null, "{"icon":"renewability"}", "knob", null);
 
 INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id, domain, direction, measurement_type_id, sensor_name, measurement_name, information_tile_id, aggregation_function ) VALUES
 ( 1, 84, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'sum' ),
@@ -214,7 +220,9 @@ INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id
 ( 16, 77, NULL, NULL, NULL, NULL, NULL, NULL, 14, 'sum' ),
 ( 17, 79, NULL, NULL, NULL, NULL, NULL, NULL, 14, 'sum' ),
 ( 18, 100, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'mean' ),
-( 19, 101, NULL, NULL, NULL, NULL, NULL, NULL, 10, 'mean' );
+( 19, 101, NULL, NULL, NULL, NULL, NULL, NULL, 10, 'mean' ),
+( 20, 110, NULL, NULL, NULL, NULL, NULL, NULL, 20, 'last' ),
+( 21, 111, NULL, NULL, NULL, NULL, NULL, NULL, 21, 'last' );
 
 /* CONNECT ASSETS WITH PANELS */
 INSERT INTO asset_panel ( panel_id, asset_id ) VALUES
@@ -223,8 +231,10 @@ INSERT INTO asset_panel ( panel_id, asset_id ) VALUES
 
 /* USER DEMANDS DEFINITIONS */
 INSERT INTO user_demand_definition ( id, action, message, action_type, information_tile_id ) VALUES
-( 1, 'INCREASE_TEMPERATURE', 'Please, increase the temperature', 'INCREASE', NULL ),
-( 2, 'DECREASE_TEMPERATURE', 'Please, decrease the temperature', 'DECREASE', NULL );
+( 1, 'INCREASE_TEMPERATURE', 'Please, increase the temperature', 'INCREASE', 20 ),
+( 2, 'DECREASE_TEMPERATURE', 'Please, decrease the temperature', 'DECREASE', 20 ),
+( 3, 'INCREASE_TEMPERATURE', 'Please, increase the temperature', 'INCREASE', 21 ),
+( 4, 'DECREASE_TEMPERATURE', 'Please, decrease the temperature', 'DECREASE', 21 );
 
 /* USER DEMAND SCHEDULES */
 INSERT INTO user_demand_schedule ( id, asset_id, demand_id, demand_start, demand_stop, update_date ) VALUES
