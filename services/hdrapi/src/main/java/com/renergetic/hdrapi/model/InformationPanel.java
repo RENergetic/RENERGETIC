@@ -55,6 +55,8 @@ public class InformationPanel {
     @NotFound(action = NotFoundAction.IGNORE)
     private List<InformationTile> tiles;
 
+    @Column(name = "props", nullable = true, insertable = true, updatable = true, unique = false,columnDefinition="TEXT")
+    private String props;
 
     public InformationPanel(Long id, String name, String label) {
         super();

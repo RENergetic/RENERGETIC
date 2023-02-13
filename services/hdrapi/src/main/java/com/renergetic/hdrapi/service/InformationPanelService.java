@@ -8,9 +8,7 @@ import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.mapper.InformationPanelMapper;
-import com.renergetic.hdrapi.model.InformationPanel;
-import com.renergetic.hdrapi.model.InformationTileMeasurement;
-import com.renergetic.hdrapi.model.Measurement;
+import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.model.UUID;
 import com.renergetic.hdrapi.repository.AssetRepository;
 import com.renergetic.hdrapi.repository.InformationPanelRepository;
@@ -21,10 +19,9 @@ import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class InformationPanelService {
@@ -125,8 +122,8 @@ public class InformationPanelService {
         List<InformationPanel> informationPanels = informationPanelRepository.findByUserId(userId, offset, limit);
         List<InformationPanelDAOResponse> list =
                 informationPanels.stream()
-	                .map(panel -> InformationPanelDAOResponse.create(panel, null))
-	                .collect(Collectors.toList());
+                        .map(panel -> InformationPanelDAOResponse.create(panel, null))
+                        .collect(Collectors.toList());
 
         if (list.size() > 0)
             return list;
@@ -156,7 +153,7 @@ public class InformationPanelService {
                                             && tileM.getAssetCategory() == null ?
                                             getInferredMeasurements(panelId, tileM, assetId)
                                             : Collections.singletonList(getMeasurementFromTileMeasurement(tileM)))
-                                    .flatMap(List::stream).collect(Collectors.toList())
+                                    .flatMap(List::stream).filter(Objects::nonNull)  .collect(Collectors.toList())
                     )).collect(Collectors.toList())
             );
             return p;
@@ -168,7 +165,7 @@ public class InformationPanelService {
 
         if (panel != null) {
             return panel.getTiles().stream().map(tile -> tile.getInformationTileMeasurements()
-                    .stream().map(InformationTileMeasurement::getMeasurement)
+                    .stream().map(InformationTileMeasurement::getMeasurement).filter(Objects::nonNull)
                     .collect(Collectors.toList())
             ).flatMap(List::stream).collect(Collectors.toList());
         }
@@ -176,9 +173,8 @@ public class InformationPanelService {
     }
 
 
-
     private List<MeasurementDAOResponse> getInferredMeasurements(Long userId, InformationTileMeasurement tileM,
-                                                                    Long assetId) {
+                                                                 Long assetId) {
 
         List<MeasurementDAOResponse> list = measurementRepository
                 .findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(assetId,

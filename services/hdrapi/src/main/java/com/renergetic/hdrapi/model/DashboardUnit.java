@@ -17,30 +17,31 @@ import java.util.Optional;
 @ToString
 public enum DashboardUnit {
 
-    s("s", "seconds", "base", "Time"),
-    m("m", "metre", "base", "Distance"),
-    kg("kg", "kilogram", "base", "Mass"),
-    A("A", "ampere", "base", "Electric Current"),
-    K("K", "kelvin", "base", "Temperature"),
-    mol("mol", "mole", "base", "Amount of Substance"),
-    cd("cd", "candela", "base", "Luminous Intensity"),
+    s("s", "seconds", "base", "Time","time"),
+    m("m", "metre", "base", "Distance","length"),
+    kg("kg", "kilogram", "base", "Mass","mass"),
+    A("A", "ampere", "base", "Electric Current","current"),
+    K("K", "kelvin", "base", "Temperature","temperature"),
+    mol("mol", "mole", "base", "Amount of Substance","substance_amount"),
+    cd("cd", "candela", "base", "Luminous Intensity","luminous"),
 
-    W("W", "watt", "derived", "Power"),
-    Wh("Wh", "watt/hour", "derived", "Energy"),
-    J("J", "joule", "derived", "Energy"),
-    V("V", "volt", "derived", "Voltage"),
-    Ohm("Ohm", "ohm", "derived", "Electrical Resistance"),
-    lx("Lx", "lux", "derived", "Illuminance"),
-    gperkWh("g/kWh", "CO2 equivalent", "derived", "Contribution to the greenhouse effect in CO2"),
-    m3perh("m3/h", "Flow", "derived", "Liquid flow"),
+    W("W", "watt", "derived", "Power","power"),
+    Wh("Wh", "watt/hour", "derived", "Energy","energy"),
+    J("J", "joule", "derived", "Energy","energy"),
+    V("V", "volt", "derived", "Voltage","voltage"),
+    Ohm("Ohm", "ohm", "derived", "Electrical Resistance","electric_resistance"),
+    lx("Lx", "lux", "derived", "Illuminance","luminous"),
+    gperkWh("g/kWh", "CO2 equivalent", "derived", "Contribution to the greenhouse effect in CO2","co2_energy"),
+    m3perh("m3/h", "Flow", "derived", "Liquid flow","flow"),
 
-    percent("%", "Percentage", "other", "Percentage"),
-    C("ºC", "Celsius", "other", "Temperature");
+    percent("%", "Percentage", "other", "Percentage","percentage"),
+    C("ºC", "Celsius", "other", "Temperature","temperature");
 
     public String SYMBOL;
     public String NAME;
     public String TYPE;
     public String DESCRIPTION;
+    public String PHYSICAL_TYPE;
 
     public static Optional<DashboardUnit> valueByName(String name) {
 //    	String n = name.toLowerCase();
@@ -48,11 +49,12 @@ public enum DashboardUnit {
                 dashboardUnit -> dashboardUnit.getNAME().equals(name)).findFirst();
     }
 
-    private DashboardUnit(String symbol, String name, String type, String description) {
+    private DashboardUnit(String symbol, String name, String type, String description,String physicalType) {
         this.SYMBOL = symbol;
         this.NAME = name;
         this.TYPE = type;
         this.DESCRIPTION = description;
+        this.PHYSICAL_TYPE=physicalType;
     }
 
 

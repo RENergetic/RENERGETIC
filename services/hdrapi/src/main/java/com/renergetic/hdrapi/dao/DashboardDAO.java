@@ -92,6 +92,7 @@ public class DashboardDAO {
 
         dashboard.setId(id);
         dashboard.setGrafanaId(grafanaId);
+        if(this.ext!=null)
         dashboard.setExt(Json.toJson(this.ext));
 
         if (userId != null) {
