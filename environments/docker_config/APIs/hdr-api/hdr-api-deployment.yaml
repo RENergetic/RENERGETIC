@@ -21,10 +21,10 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 170Mi
+              memory: 275Mi
             limits:
               cpu: 150m
-              memory: 275Mi
+              memory: 575Mi
           readinessProbe:
             failureThreshold: 3
             tcpSocket:

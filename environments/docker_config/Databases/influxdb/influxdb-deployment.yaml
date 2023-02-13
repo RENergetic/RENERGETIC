@@ -22,8 +22,8 @@ spec:
             - containerPort: 8086
           resources:
             requests:
-              cpu: 400m
-              memory: 600Mi
+              cpu: 850m
+              memory: 900Mi
             limits:
               cpu: 850m
               memory: 1Gi
