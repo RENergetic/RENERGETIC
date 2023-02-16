@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class KeycloakService {
-    @Value("${keycloak.url}")
+    @Value("${keycloak.url:http://10.0.0.9:8080/auth}")
     String serverUrl;
-    @Value("${keycloak.realm}")
+    @Value("${keycloak.realm:master}")
     String realm;
-    @Value("${keycloak.client-id}")
+    @Value(value = "${keycloak.client-id:vue-test}")
     String clientId;
 
     public Keycloak getInstance(String username,String password) {

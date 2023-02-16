@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -141,6 +142,7 @@ public class UserController {
     @GetMapping(path = "/profile/settings", produces = "application/json")
     public ResponseEntity<String> getAllUsersSettings(  ) {
 
+        SecurityContextHolder.getContext().getAuthentication();
         Long userId = 2l;    //TODO: infer from headers
         return new ResponseEntity<>( userSv.getSettings(userId), HttpStatus.OK);
     }
