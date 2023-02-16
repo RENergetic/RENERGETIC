@@ -18,24 +18,24 @@ public class HdrapiApplication {
         SpringApplication.run(HdrapiApplication.class, args);
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-
-                registry.addMapping("/**").allowedOriginPatterns("*")
-                        .allowedOrigins("http://localhost:8080", "https://localhost:8080",
-                        "http://localhost", "https://localhost","http://localhost:3000","https://localhost:3000",
-                        "http://localhost:8082").allowCredentials(true)
-                        .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("Authorization", "content-type", "language", "Set-Cookie", "X-CSRF-TOKEN",
-                                "Access-Control-Allow-Origin", "Origin", "Content-Type", "Accept")
-                        .exposedHeaders("Authorization", "Set-Cookie", "Content-Disposition", "Location", "CSRF-TOKEN",
-                                "Access-Control-Allow-Origin", "Origin", "Content-Type", "Accept")
-                ;
-                ;
-            }
-        };
-    }
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//
+//                registry.addMapping("/**").allowedOriginPatterns("*")
+//                        .allowedOrigins("http://localhost:8080", "https://localhost:8080",
+//                        "http://localhost", "https://localhost","http://localhost:3000","https://localhost:3000",
+//                        "http://localhost:8082").allowCredentials(true)
+//                        .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                        .allowedHeaders("Authorization", "content-type", "language", "Set-Cookie", "X-CSRF-TOKEN",
+//                                "Access-Control-Allow-Origin", "Origin", "Content-Type", "Accept")
+//                        .exposedHeaders("Authorization", "Set-Cookie", "Content-Disposition", "Location", "CSRF-TOKEN",
+//                                "Access-Control-Allow-Origin", "Origin", "Content-Type", "Accept")
+//                ;
+//                ;
+//            }
+//        };
+//    }
 }
