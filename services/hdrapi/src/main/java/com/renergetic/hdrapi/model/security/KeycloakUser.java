@@ -1,4 +1,4 @@
-package com.renergetic.hdrapi.service.security;
+package com.renergetic.hdrapi.model.security;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

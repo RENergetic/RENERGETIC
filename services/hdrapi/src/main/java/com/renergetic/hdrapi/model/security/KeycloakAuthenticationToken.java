@@ -1,4 +1,4 @@
-package com.renergetic.hdrapi.service.security;
+package com.renergetic.hdrapi.model.security;
 
 import org.json.JSONObject;
 import org.keycloak.admin.client.Keycloak;
