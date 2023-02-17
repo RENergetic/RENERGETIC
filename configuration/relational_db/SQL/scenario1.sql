@@ -155,8 +155,8 @@ INSERT INTO measurement ( id, name, label, measurement_type_id, domain, directio
 ( 100, 'total_produced', 'Produced energy', 5, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 ( 101, 'total_imported', 'Imported energy', 5, NULL, NULL, 'heat_meter,electricity_meter', NULL, 3, NULL, '2' ),
 /* MEASUREMENTS FOR CURRENT RENEWABILITY SCREEN */
-(110, "renewability_heat", "Heat renewability", 5, "heat", null, "renewability", null, 5, null, "2"),
-(111, "renewability_heat", "Heat renewability", 5, "heat", null, "renewability", null, 6, null, "2");
+(110, 'renewability_heat', 'Heat renewability', 5, 'heat', null, 'renewability', null, 5, null, '2'),
+(111, 'renewability_heat', 'Heat renewability', 5, 'heat', null, 'renewability', null, 6, null, '2');
 
 INSERT INTO tags ( id, key, value ) VALUES
 ( 50, 'measurement_type', 'renewable' ),
@@ -198,8 +198,8 @@ INSERT INTO information_tile ( id, name, label, layout, props, type, information
 ( 13, 'hvac', 'HVAC', '{"x":9,"y":1,"w":3,"h":9}', '{"icon":"hvac", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
 ( 14, 'heat_exchanged', 'Heat exchanged', '{"x":0,"y":1,"w":3,"h":9}', '{"icon":"heat", "background":"linear-gradient(to bottom, #464646, #1a1a1a)"}', 'multi_knob', 1 ),
 /* RENEWABILITY SCREEN */
-(20, "heat_renewability", "Heat renewability", null, "{"icon":"renewability"}", "knob", null),
-(21, "heat_renewability", "Heat renewability", null, "{"icon":"renewability"}", "knob", null);
+(20, 'heat_renewability', 'Heat renewability', null, '{"icon":"renewability"}', 'knob', null),
+(21, 'heat_renewability', 'Heat renewability', null, '{"icon":"renewability"}', 'knob', null);
 
 INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id, domain, direction, measurement_type_id, sensor_name, measurement_name, information_tile_id, aggregation_function ) VALUES
 ( 1, 84, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'sum' ),
