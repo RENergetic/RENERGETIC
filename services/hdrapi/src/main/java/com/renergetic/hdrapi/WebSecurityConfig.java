@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi;
 
+import com.renergetic.hdrapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

@@ -16,8 +16,6 @@ public class KeycloakAuthenticationToken extends AbstractAuthenticationToken {
         super(keycloakRoles);
         this.principal=user;
 //        this.keycloakRoles=keycloakRoles;
-
-
     }
 
 

@@ -41,7 +41,7 @@ public class KeycloakService {
     }
 
 
-    public KeycloakAuthenticationToken getAuthenticationToken(String keycloakJWTToken) {
+    public KeycloakAuthenticationToken getAuthenticationToken(String keycloakJWTToken ) {
         try {
             String[] split_string = keycloakJWTToken.split("\\.");
             String base64EncodedHeader = split_string[0];

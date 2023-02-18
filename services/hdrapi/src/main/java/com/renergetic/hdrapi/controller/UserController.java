@@ -144,7 +144,7 @@ public class UserController {
     @GetMapping(path = "/profile/settings", produces = "application/json")
     public ResponseEntity<String> getAllUsersSettings(  ) {
 
-
+todo add keycloak id column
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
         Object principal = authentication.getPrincipal();
