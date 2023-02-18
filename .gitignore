@@ -1,9 +1,11 @@
+
 environments/_credentials.properties
 environments/_installers.properties
 environments/**/api.jar
 environments/**/dist
 environments/**/keycloak/themes
 
+services/**/application.properties-prd.properties
 services/**/.metadata
 services/**/target
 

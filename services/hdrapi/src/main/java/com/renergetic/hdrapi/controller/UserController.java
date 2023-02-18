@@ -147,7 +147,8 @@ public class UserController {
 todo add keycloak id column
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
-        Object principal = authentication.getPrincipal();
+        System.err.println(authentication.getPrincipal());
+        System.err.println(authentication.getAuthorities());
         Object authorities = authentication.getAuthorities();
         Long userId = 2l;    //TODO: infer from headers
         return new ResponseEntity<>( userSv.getSettings(userId), HttpStatus.OK);

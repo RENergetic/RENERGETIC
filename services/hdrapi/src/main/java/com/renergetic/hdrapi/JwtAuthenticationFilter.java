@@ -1,8 +1,7 @@
 package com.renergetic.hdrapi;
 
+import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.service.KeycloakService;
-import com.renergetic.hdrapi.service.UserService;
-import com.renergetic.hdrapi.service.security.KeycloakAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,23 +19,20 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-
 //    private final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     KeycloakService keycloakService;
-    @Autowired
-    public UserService userService;
 
-
-
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
             String jwtToken = request.getHeader("Authorization");
             if (StringUtils.hasText(jwtToken)) {
-                KeycloakAuthenticationToken authenticationToken = keycloakService.getAuthenticationToken(jwtToken,userService);
+                KeycloakAuthenticationToken authenticationToken = keycloakService.getAuthenticationToken(jwtToken);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
             }
         } catch (Exception ex) {
             log.error("Could not set user authentication in security context", ex);
