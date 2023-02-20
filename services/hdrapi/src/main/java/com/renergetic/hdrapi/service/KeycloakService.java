@@ -3,12 +3,16 @@ package com.renergetic.hdrapi.service;
 import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.model.security.KeycloakUser;
+import com.renergetic.hdrapi.repository.UserRepository;
 import com.renergetic.hdrapi.service.utils.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.ClientResource;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,19 +23,23 @@ import java.util.stream.Collectors;
 @Slf4j
 public class KeycloakService {
     @Value("${keycloak.url}")
-    String serverUrl;
+    private String serverUrl;
     @Value("${keycloak.realm}")
-    String realm;
+    private String realm;
     @Value(value = "${keycloak.client-id}")
-    String clientId;
+    private String clientId;
+
+    @Autowired
+    private UserRepository userRepository;
+
 
     public Keycloak getInstance(String username, String password) {
         return KeycloakBuilder.builder()
-                .serverUrl(serverUrl)
-                .realm(realm)
+                .serverUrl(this.serverUrl)
+                .realm(this.realm)
                 .username(username)
                 .password(password)
-                .clientId(clientId)
+                .clientId(this.clientId)
                 .build();
     }
 
@@ -39,20 +47,35 @@ public class KeycloakService {
         return Keycloak.getInstance(serverUrl, realm, clientId, authToken);
     }
 
+    public KeycloakWrapper getClient(String authToken) {
+        return new KeycloakWrapper(this.realm, this.clientId,
+                Keycloak.getInstance(serverUrl, realm, clientId, authToken));
+    }
 
-    public KeycloakAuthenticationToken getAuthenticationToken(String keycloakJWTToken ) {
+    public RealmResource getRealmApi(String authToken) {
+        Keycloak instance = this.getInstance(authToken);
+        return instance.realms().realm(this.realm);
+    }
+
+    public ClientResource getClientApi(String authToken) {
+        Keycloak instance = this.getInstance(authToken);
+        return instance.realms().realm(this.realm).clients().get(this.clientId);
+    }
+
+
+    public KeycloakAuthenticationToken getAuthenticationToken(String keycloakJWTToken) {
         try {
-        	// Split JWT Token
+            // Split JWT Token
             String[] split_string = keycloakJWTToken.split("\\.");
             //String base64EncodedHeader = split_string[0];
             String base64EncodedBody = split_string[1];
             //String base64EncodedSignature = split_string[2];
-            
+
             // Decode JWT Token slices
             Base64 base64Url = new Base64(true);
             //String header = new String(base64Url.decode(base64EncodedHeader));
             String body = new String(base64Url.decode(base64EncodedBody));
-            
+
             // Get the necessary data from the Token body
             JSONObject keycloakJSON = Json.parse(body);
             var userId = keycloakJSON.get("sub").toString();
@@ -65,8 +88,8 @@ public class KeycloakService {
             List<KeycloakRole> keycloakRoles =
                     roles.toList().stream().map(it -> KeycloakRole.roleByName(it.toString())).collect(
                             Collectors.toList());
-            KeycloakUser user = new KeycloakUser(userId, username, client);
-            return new KeycloakAuthenticationToken(user, keycloakRoles);
+            KeycloakUser user = new KeycloakUser(userId, username, client, keycloakJWTToken);
+            return new KeycloakAuthenticationToken(user, keycloakRoles, userRepository);
 
         } catch (Exception ex) {
             log.error("Could not set user authentication in security context", ex);

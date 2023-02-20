@@ -16,6 +16,7 @@ public enum KeycloakRole implements GrantedAuthority {
     REN_DEV("ren-dev", 0x11111111);
 
     public static KeycloakRole roleByName(String name) {
+        if (name == null) return null;
         Optional<KeycloakRole> role =
                 Arrays.stream(KeycloakRole.values()).filter(it -> it.name.equals(name)).findFirst();
         return role.orElse(null);

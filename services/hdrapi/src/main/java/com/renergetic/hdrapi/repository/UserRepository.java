@@ -15,8 +15,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 	User save(User user);
-	@Query("SELECT u FROM User u WHERE u.keycloak_id = :keycloak_id")
-	Optional<User> getByKeycloakId(@Param("keycloak_id") String keycloakId );
+
+	@Query("SELECT u FROM User u WHERE u.keycloakId = :keycloakId")
+	User findByKeycloakId(@Param("keycloakId") String keycloakId );
 
 	
 }

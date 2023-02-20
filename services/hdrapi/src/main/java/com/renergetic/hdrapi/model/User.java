@@ -21,6 +21,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     //TODO: change to nonnullable field
     @Column(name = "keycloak_id", nullable = true, insertable = true, updatable = true, unique = true)
     private String keycloakId;

@@ -1,6 +1,10 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
+import com.renergetic.hdrapi.model.security.KeycloakRole;
+import com.renergetic.hdrapi.service.KeycloakService;
+import com.renergetic.hdrapi.service.LoggedInService;
 import com.renergetic.hdrapi.service.NotificationService;
 import com.renergetic.hdrapi.service.UserService;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
@@ -8,18 +12,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -33,18 +40,33 @@ public class UserController {
     private Boolean generateDummy;
     @Autowired
     NotificationService notificationSv;
+    @Autowired
+    LoggedInService loggedInService;
+    @Autowired
+    KeycloakService keycloakService;
 
 //=== GET REQUESTS====================================================================================
+
 
     @Operation(summary = "Get All Users")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "", produces = "application/json")
-    public ResponseEntity<List<UserDAOResponse>> getAllUsers(@RequestParam(required = false) Optional<Long> offset,
-                                                             @RequestParam(required = false) Optional<Integer> limit) {
-        List<UserDAOResponse> users = new ArrayList<UserDAOResponse>();
+    public ResponseEntity<List<UserRepresentation>> getAllUsers(@RequestParam(required = false) Optional<String> role,
+                                                                @RequestParam(required = false) Optional<Long> offset,
+                                                                @RequestParam(required = false) Optional<Integer> limit) {
+        loggedInService.hasRole(
+                KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
+        var token = loggedInService.getKeycloakUser().getToken();
+        List<UserRepresentation> users;
+        if (role.isPresent() && KeycloakRole.roleByName(role.get()) != null) {
+            var roleApi = keycloakService.getClientApi(token).roles();
 
-        users = userSv.get(null, offset.orElse(0L), limit.orElse(20));
-
+            users = new ArrayList<>(roleApi.get(role.get()).getRoleUserMembers());
+        } else {
+            RealmResource instance = keycloakService.getRealmApi(token);
+            UsersResource userApi = instance.users();
+            users = userApi.list();
+        }
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
@@ -77,31 +99,31 @@ public class UserController {
 //
 //		return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
+//
+//    @Operation(summary = "Get All Users Roles")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @GetMapping(path = "/roles", produces = "application/json")
+//    public ResponseEntity<List<UserRolesDAO>> getAllUsersRoles(@RequestParam(required = false) Optional<Long> offset,
+//                                                               @RequestParam(required = false) Optional<Integer> limit) {
+//        List<UserRolesDAO> roles = new ArrayList<>();
+//
+//        roles = userSv.getRoles(null, offset.orElse(0L), limit.orElse(20));
+//
+//        return new ResponseEntity<>(roles, HttpStatus.OK);
+//    }
 
-    @Operation(summary = "Get All Users Roles")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/roles", produces = "application/json")
-    public ResponseEntity<List<UserRolesDAO>> getAllUsersRoles(@RequestParam(required = false) Optional<Long> offset,
-                                                               @RequestParam(required = false) Optional<Integer> limit) {
-        List<UserRolesDAO> roles = new ArrayList<>();
-
-        roles = userSv.getRoles(null, offset.orElse(0L), limit.orElse(20));
-
-        return new ResponseEntity<>(roles, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Get All Users Settings")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/settings", produces = "application/json")
-    public ResponseEntity<List<UserSettingsDAO>> getAllUsersSettings(
-            @RequestParam(required = false) Optional<Long> offset,
-            @RequestParam(required = false) Optional<Integer> limit) {
-        List<UserSettingsDAO> settings = new ArrayList<>();
-
-        settings = userSv.getSettings(null, offset.orElse(0L), limit.orElse(20));
-
-        return new ResponseEntity<>(settings, HttpStatus.OK);
-    }
+//    @Operation(summary = "Get All Users Settings")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @GetMapping(path = "/settings", produces = "application/json")
+//    public ResponseEntity<List<UserSettingsDAO>> getAllUsersSettings(
+//            @RequestParam(required = false) Optional<Long> offset,
+//            @RequestParam(required = false) Optional<Integer> limit) {
+//        List<UserSettingsDAO> settings = new ArrayList<>();
+//
+//        settings = userSv.getSettings(null, offset.orElse(0L), limit.orElse(20));
+//
+//        return new ResponseEntity<>(settings, HttpStatus.OK);
+//    }
 
     @Operation(summary = "Get All Notifications for the user")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -142,16 +164,16 @@ public class UserController {
     @Operation(summary = "Get User Settings")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/profile/settings", produces = "application/json")
-    public ResponseEntity<String> getAllUsersSettings(  ) {
+    public ResponseEntity<String> getAllUsersSettings() {
+        KeycloakAuthenticationToken authentication =
+                (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-todo add keycloak id column
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        System.err.println(authentication.getPrincipal());
-        System.err.println(authentication.getAuthorities());
         Object authorities = authentication.getAuthorities();
+        authentication.getUser();
+
+//        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_STAFF.mask);
         Long userId = 2l;    //TODO: infer from headers
-        return new ResponseEntity<>( userSv.getSettings(userId), HttpStatus.OK);
+        return new ResponseEntity<>(userSv.getSettings(userId), HttpStatus.OK);
     }
 
 //=== POST REQUESTS ===================================================================================
@@ -168,18 +190,18 @@ todo add keycloak id column
         return new ResponseEntity<>(_user, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Create a new User Role associated to a User")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Role saved correctly"),
-            @ApiResponse(responseCode = "404", description = "User to assign role not found"),
-            @ApiResponse(responseCode = "500", description = "Error saving role")
-    }
-    )
-    @PostMapping(path = "/roles", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<UserRolesDAO> createUserRole(@RequestBody UserRolesDAO role) {
-        UserRolesDAO _role = userSv.saveRole(role);
-        return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
-    }
+//    @Operation(summary = "Create a new User Role associated to a User")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "201", description = "Role saved correctly"),
+//            @ApiResponse(responseCode = "404", description = "User to assign role not found"),
+//            @ApiResponse(responseCode = "500", description = "Error saving role")
+//    }
+//    )
+//    @PostMapping(path = "/roles", produces = "application/json", consumes = "application/json")
+//    public ResponseEntity<UserRolesDAO> createUserRole(@RequestBody UserRolesDAO role) {
+//        UserRolesDAO _role = userSv.saveRole(role);
+//        return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
+//    }
 
     @Operation(summary = "Create a new User Setting associated to a User")
     @ApiResponses({
@@ -219,7 +241,7 @@ todo add keycloak id column
         return new ResponseEntity<>(_user, _user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    @Operation(summary = "Update a existing User Role")
+    @Operation(summary = "Add role to the User")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User saved correctly"),
             @ApiResponse(responseCode = "404", description = "Role or User to associate not exist"),
@@ -227,11 +249,14 @@ todo add keycloak id column
             @ApiResponse(responseCode = "500", description = "Error saving user")
     }
     )
-    @PutMapping(path = "/roles/{id}", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<UserRolesDAO> updateUserRoles(@RequestBody UserRolesDAO role, @PathVariable Long id) {
-        role.setId(id);
-        UserRolesDAO _role = userSv.updateRole(role, id);
-        return new ResponseEntity<>(_role, _role != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    @PutMapping(path = "/{userId}/roles/{roleName}", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<List<String>> addRole(@PathVariable String userId, @PathVariable String roleName) {
+        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
+        var token = loggedInService.getKeycloakUser().getToken();
+        var client = keycloakService.getClient(token);
+        List<String> roles = client.assignRole(userId, roleName).stream().map(RoleRepresentation::getName).collect(
+                Collectors.toList());
+        return new ResponseEntity<>(roles, HttpStatus.OK);
     }
 
     @Operation(summary = "Update a existing User Setting")
@@ -258,11 +283,15 @@ todo add keycloak id column
             @ApiResponse(responseCode = "500", description = "Error deleting user")
     }
     )
-    @DeleteMapping(path = "/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        userSv.deleteById(id);
 
-        return ResponseEntity.noContent().build();
+    @DeleteMapping(path = "/{userId}/roles/{roleName}")
+    public ResponseEntity<?> deleteUser(@PathVariable String userId, @PathVariable String roleName) {
+        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
+        var token = loggedInService.getKeycloakUser().getToken();
+        var client = keycloakService.getClient(token);
+        List<String> roles = client.revokeRole(userId, roleName).stream().map(RoleRepresentation::getName).collect(
+                Collectors.toList());
+        return new ResponseEntity<>(roles, HttpStatus.OK);
     }
 
     @Operation(summary = "Delete a existing User Role", hidden = false)
@@ -291,3 +320,15 @@ todo add keycloak id column
         return ResponseEntity.noContent().build();
     }
 }
+
+//    @Operation(summary = "Get All Users")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @GetMapping(path = "", produces = "application/json")
+//    public ResponseEntity<List<UserDAOResponse>> getAllUsers(@RequestParam(required = false) Optional<Long> offset,
+//                                                             @RequestParam(required = false) Optional<Integer> limit) {
+//        List<UserDAOResponse> users = new ArrayList<UserDAOResponse>();
+//
+//        users = userSv.get(null, offset.orElse(0L), limit.orElse(20));
+//
+//        return new ResponseEntity<>(users, HttpStatus.OK);
+//    }
