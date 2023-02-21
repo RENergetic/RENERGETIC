@@ -39,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-//        http.cors().and().csrf().disable();
+        http.cors().and().csrf().disable();
         //for some reason it doesnt work
 //        http.csrf().disable().authorizeRequests().antMatchers("/api/users")
 //                .hasAnyRole(KeycloakRole.REN_ADMIN.getAuthority(),
@@ -130,11 +130,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //    }
 
 
-//
-//    @Bean
-//    public CustomUserDetailsService userDetailsService() {
-//        return new CustomUserDetailsService(userRepository);
-//    }
 
 
 }
