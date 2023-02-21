@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 
 
 public class KeycloakAuthenticationToken extends AbstractAuthenticationToken {
-    private KeycloakUser principal;
+	private static final long serialVersionUID = -3324031070506421715L;
+	
+	private KeycloakUser principal;
     private User user;
     private UserRepository userRepository;
 //    private List<KeycloakRole> keycloakRoles;

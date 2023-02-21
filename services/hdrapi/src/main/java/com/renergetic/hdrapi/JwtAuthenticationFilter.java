@@ -23,6 +23,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     KeycloakService keycloakService;
+    
+    @Override
+    	protected void doFilterNestedErrorDispatch(HttpServletRequest request, HttpServletResponse response,
+    			FilterChain filterChain) throws ServletException, IOException {
+    		System.err.println("FALLA 4");
+    		super.doFilterNestedErrorDispatch(request, response, filterChain);
+    	}
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -31,13 +38,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwtToken = request.getHeader("Authorization");
             if (StringUtils.hasText(jwtToken)) {
                 KeycloakAuthenticationToken authenticationToken = keycloakService.getAuthenticationToken(jwtToken);
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
+            	SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } catch (Exception ex) {
             log.error("Could not set user authentication in security context", ex);
         }
         filterChain.doFilter(request, response);
+    	request.logout();
     }
-
+    
+    @Override
+	protected boolean shouldNotFilterAsyncDispatch() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
