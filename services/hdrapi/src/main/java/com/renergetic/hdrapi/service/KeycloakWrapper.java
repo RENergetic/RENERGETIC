@@ -8,6 +8,7 @@ import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -25,7 +26,7 @@ public class KeycloakWrapper {
         this.keycloak = keycloak;
     }
 
-    synchronized private RealmResource getRealmApi() {
+    private RealmResource getRealmApi() {
         if (this.realmApi == null) {
             this.realmApi = keycloak.realm(realm);
         }
@@ -47,7 +48,7 @@ public class KeycloakWrapper {
 
         RoleScopeResource roleScopeResource = user.roles().clientLevel(this.clientId);
         roleScopeResource.add(List.of(role));
-        return roleScopeResource.listAll();
+        return roleScopeResource.listEffective();
     }
 
     public List<RoleRepresentation> revokeRole(String userId, String roleName) {
@@ -55,6 +56,20 @@ public class KeycloakWrapper {
         UserResource user = this.getUser(userId);
         RoleScopeResource roleScopeResource = user.roles().clientLevel(this.clientId);
         roleScopeResource.remove(List.of(role));
-        return roleScopeResource.listAll();
+        return roleScopeResource.listEffective();
+    }
+
+
+    public List<RoleRepresentation> getRoles(String userId) {
+        UserResource user = this.getUser(userId);
+        try {
+            List<RoleRepresentation> roleScopeResource =
+                    user.roles().getAll().getClientMappings().get(this.clientId).getMappings();
+            return roleScopeResource;
+        }catch (NullPointerException ex){
+            return Collections.emptyList();
+        }
+
+
     }
 }

@@ -69,20 +69,23 @@ public class UserController {
         }
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
-
-    @Operation(summary = "Get User by id")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
-            @ApiResponse(responseCode = "404", description = "No users found with this id")
-    })
-    @GetMapping(path = "id/{id}", produces = "application/json")
-    public ResponseEntity<UserDAOResponse> getUsersById(@PathVariable Long id) {
-        UserDAOResponse user = null;
-
-        user = userSv.getById(id);
-
-        return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    @Operation(summary = "Get user roles")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/{userId}/roles", produces = "application/json" )
+    public ResponseEntity<List<String>> getRoles(@PathVariable String userId ) {
+        loggedInService.hasRole(
+                KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
+        var token = loggedInService.getKeycloakUser().getToken();
+        var client = keycloakService.getClient(token,true);
+        try {
+            List<String> roles = client.getRoles(userId).stream().map(RoleRepresentation::getName).collect(
+                    Collectors.toList());
+            return new ResponseEntity<>(roles, HttpStatus.OK);
+        }catch ( javax.ws.rs.NotAuthorizedException ex){
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
     }
+
 
     @Operation(summary = "Get current user profile")
     @ApiResponses({
@@ -253,7 +256,7 @@ public class UserController {
     public ResponseEntity<List<String>> addRole(@PathVariable String userId, @PathVariable String roleName) {
         loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
         var token = loggedInService.getKeycloakUser().getToken();
-        var client = keycloakService.getClient(token);
+        var client =  keycloakService.getClient(token,true);
         List<String> roles = client.assignRole(userId, roleName).stream().map(RoleRepresentation::getName).collect(
                 Collectors.toList());
         return new ResponseEntity<>(roles, HttpStatus.OK);
@@ -288,7 +291,7 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable String userId, @PathVariable String roleName) {
         loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
         var token = loggedInService.getKeycloakUser().getToken();
-        var client = keycloakService.getClient(token);
+        var client =  keycloakService.getClient(token,true);
         List<String> roles = client.revokeRole(userId, roleName).stream().map(RoleRepresentation::getName).collect(
                 Collectors.toList());
         return new ResponseEntity<>(roles, HttpStatus.OK);
@@ -331,4 +334,16 @@ public class UserController {
 //        users = userSv.get(null, offset.orElse(0L), limit.orElse(20));
 //
 //        return new ResponseEntity<>(users, HttpStatus.OK);
-//    }
+//    }//    @Operation(summary = "Get User by id")
+////    @ApiResponses({
+////            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+////            @ApiResponse(responseCode = "404", description = "No users found with this id")
+////    })
+////    @GetMapping(path = "id/{id}", produces = "application/json")
+////    public ResponseEntity<UserDAOResponse> getUsersById(@PathVariable Long id) {
+////        UserDAOResponse user = null;
+////
+////        user = userSv.getById(id);
+////
+////        return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+////    }
