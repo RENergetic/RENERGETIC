@@ -1,7 +1,6 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.service.KeycloakService;
 import com.renergetic.hdrapi.service.LoggedInService;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -168,13 +166,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/profile/settings", produces = "application/json")
     public ResponseEntity<String> getAllUsersSettings() {
-        KeycloakAuthenticationToken authentication =
-                (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-
-        Object authorities = authentication.getAuthorities();
-        authentication.getUser();
-
-//        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_STAFF.mask);
+    	// TODO: make a request to loggedinService to retrieve the user ID and roles
         Long userId = 2l;    //TODO: infer from headers
         return new ResponseEntity<>(userSv.getSettings(userId), HttpStatus.OK);
     }

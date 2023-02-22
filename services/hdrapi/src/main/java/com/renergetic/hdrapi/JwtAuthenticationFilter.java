@@ -19,17 +19,8 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-//    private final CustomUserDetailsService customUserDetailsService;
-
     @Autowired
     KeycloakService keycloakService;
-    
-    @Override
-    	protected void doFilterNestedErrorDispatch(HttpServletRequest request, HttpServletResponse response,
-    			FilterChain filterChain) throws ServletException, IOException {
-    		System.err.println("FALLA 4");
-    		super.doFilterNestedErrorDispatch(request, response, filterChain);
-    	}
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -50,7 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     @Override
 	protected boolean shouldNotFilterAsyncDispatch() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }
