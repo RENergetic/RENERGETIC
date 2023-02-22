@@ -70,10 +70,10 @@ public class UserService {
 
     public UserDAOResponse delete(UserRepresentation keycloakUser) {
         if (keycloakUser.getId() == null)
-            throw new NotFoundException("Not exists a user with ID " +keycloakUser.getId()+ ":"+keycloakUser.getUsername());
+            throw new NotFoundException("Not exists a user with ID " +keycloakUser.getId() );
         User entityUser = userRepository.findByKeycloakId(keycloakUser.getId());
         if (entityUser == null)
-            throw new NotFoundException("Not exists a user with ID " + entityUser.getId());
+            throw new NotFoundException("Not exists a user with ID " +keycloakUser.getId()+ ":"+keycloakUser.getUsername());
         var uuid = entityUser.getUuid();
         userSettingsRepository.deleteByUserId(entityUser.getId());
         assetRepository.clearUserId(entityUser.getId());
