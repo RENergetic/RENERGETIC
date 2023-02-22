@@ -4,11 +4,13 @@ import com.renergetic.hdrapi.dao.UserDAORequest;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.apache.catalina.CredentialHandler;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
@@ -68,8 +70,17 @@ public class KeycloakWrapper {
         return current;
     }
 
+    public UserRepresentation deleteUser(String id) {
+        UserResource userResource = getRealmApi().users().get(id);
+        UserRepresentation current = userResource.toRepresentation();
+        getRealmApi().users().delete(id);
+        return current;
+    }
+
     public UserRepresentation createUser(UserDAORequest user) {
         UserRepresentation userRepresentation = user.mapToKeycloakEntity();
+        userRepresentation.setEnabled(true);
+
         getRealmApi().users().create(userRepresentation);
         String username = userRepresentation.getUsername();
         Optional<UserRepresentation> first =
@@ -78,7 +89,15 @@ public class KeycloakWrapper {
         if (first.isEmpty()) {
             throw new NotFoundException("user not saved " + user.getUsername());
         }
+
         userRepresentation = first.get();
+        if(user.getPassword()!=null){
+            CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+            credentialRepresentation.setTemporary(false);
+            credentialRepresentation.setType("password");
+            credentialRepresentation.setValue(user.getPassword());
+            getRealmApi().users().get(userRepresentation.getId()).resetPassword(credentialRepresentation);
+        }
         return userRepresentation;
     }
 
