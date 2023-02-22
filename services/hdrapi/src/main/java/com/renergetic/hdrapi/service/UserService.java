@@ -69,18 +69,20 @@ public class UserService {
     }
 
     public UserDAOResponse delete(UserRepresentation keycloakUser) {
-        User user = userRepository.findByKeycloakId(keycloakUser.getId());
-        if (keycloakUser.getId() != null && userRepository.findByKeycloakId(keycloakUser.getId()) != null)
-            throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
-        var uuid = user.getUuid();
-        userSettingsRepository.deleteByUserId(user.getId());
-        assetRepository.clearUserId(user.getId());
-        var asset = assetRepository.findByUserId(user.getId());
+        if (keycloakUser.getId() == null)
+            throw new NotFoundException("Not exists a user with ID " +keycloakUser.getId()+ ":"+keycloakUser.getUsername());
+        User entityUser = userRepository.findByKeycloakId(keycloakUser.getId());
+        if (entityUser == null)
+            throw new NotFoundException("Not exists a user with ID " + entityUser.getId());
+        var uuid = entityUser.getUuid();
+        userSettingsRepository.deleteByUserId(entityUser.getId());
+        assetRepository.clearUserId(entityUser.getId());
+        var asset = assetRepository.findByUserId(entityUser.getId());
         uuidRepository.delete(asset.getUuid());
-        assetRepository.deleteById(user.getId());
-        uuidRepository.delete(user.getUuid());
-        userRepository.delete(user);
-        return UserDAOResponse.create(user, null, null);
+        assetRepository.deleteById(entityUser.getId());
+        uuidRepository.delete(entityUser.getUuid());
+        userRepository.delete(entityUser);
+        return UserDAOResponse.create(entityUser, null, null);
     }
 
     public UserSettingsDAO saveSetting(UserSettingsDAO settings) {
@@ -155,10 +157,13 @@ public class UserService {
 //    }
 
     public UserDAOResponse update(UserDAORequest user, UserRepresentation userRepresentation) {
-        if (userRepresentation == null || userRepository.findByKeycloakId(userRepresentation.getId()) == null)
+        if (userRepresentation == null )
             throw new InvalidNonExistingIdException("Not exists a user with ID " + user.getId());
-
-        User userEntity = userRepository.save(user.mapToEntity());
+        User userEntity = userRepository.findByKeycloakId(userRepresentation.getId());
+        if (userEntity==null)
+            throw new InvalidNonExistingIdException("Not exists a user with ID " + user.getId());
+//        userEntity.set //set something and save
+//        userEntity = userRepository.save(userEntity );
         Asset asset = assetRepository.findByUserId(userEntity.getId());
         if (asset != null) {
             asset.setName(userRepresentation.getUsername());

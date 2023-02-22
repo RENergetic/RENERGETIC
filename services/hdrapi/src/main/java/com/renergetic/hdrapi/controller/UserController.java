@@ -230,14 +230,14 @@ public class UserController {
     }
     )
     @PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-    public ResponseEntity updateUser(@RequestBody UserDAORequest user, @PathVariable String id) {
+    public ResponseEntity<Boolean> updateUser(@RequestBody UserDAORequest user, @PathVariable String id) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
         var client = keycloakService.getClient(true);
         //TODO: synchronized section
         UserRepresentation ur = client.updateUser(user);
-        userSv.update(user, ur);
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        userSv.update(user, ur);//TODO: return respoonse of the user ?
+        return new ResponseEntity<>(true,  HttpStatus.OK);
 //        return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);//todo trow not found
     }
 
@@ -300,7 +300,7 @@ public class UserController {
         var token = loggedInService.getKeycloakUser().getToken();
         var client = keycloakService.getClient(token, true);
         UserRepresentation userRepresentation = client.getUser(userId).toRepresentation();
-        client.deleteUser(userRepresentation.getId());
+        var deleted=client.deleteUser(userRepresentation.getId());
         UserDAOResponse user = userSv.delete(userRepresentation);
         return new ResponseEntity<>(null, HttpStatus.OK);
     }

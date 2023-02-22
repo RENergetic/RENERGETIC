@@ -25,16 +25,16 @@ public class UserDAORequest {
 	@JsonProperty(required = false)
 	private String id;
 	@JsonProperty(required = false)
-	private String firstname;
+	private String firstName;
 	@JsonProperty(required = false)
-	private String lastname;
+	private String lastName;
 	@JsonProperty(required = false)
 	private String password;
 
 
 	public   UserRepresentation update(UserRepresentation user) {
-		user.setFirstName(firstname);
-		user.setLastName(lastname);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
 
 		return user;
 	}
@@ -42,8 +42,8 @@ public class UserDAORequest {
 	public UserRepresentation mapToKeycloakEntity() {
 		UserRepresentation user = new UserRepresentation();
 		user.setEmail(email);
-		user.setFirstName(firstname);
-		user.setLastName(lastname);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
 		user.setUsername(username);
 
 		return user;
