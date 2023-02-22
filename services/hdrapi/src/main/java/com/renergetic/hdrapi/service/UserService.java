@@ -8,6 +8,7 @@ import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.repository.*;
 import com.renergetic.hdrapi.repository.information.AssetDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,8 +30,6 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    UserRolesRepository userRolesRepository;
-    @Autowired
     UserSettingsRepository userSettingsRepository;
     @Autowired
     UuidRepository uuidRepository;
@@ -39,27 +39,33 @@ public class UserService {
     AssetDetailsRepository assetDetailsRepository;
     @Autowired
     MeasurementRepository measurementRepository;
+    @Autowired
+    AssetTypeRepository assetTypeRepository;
 
     // USER CRUD OPERATIONS
     public UserDAOResponse save(UserDAORequest user) {
-        if (user.getId() != null && userRepository.existsById(user.getId()))
+        if (user.getId() != null && userRepository.findByKeycloakId(user.getId())!=null)
             throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
 
         User userEntity = user.mapToEntity();
         userEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        return UserDAOResponse.create(userRepository.save(userEntity), null, null);
+        userEntity=userRepository.save(userEntity);
+        userSettingsRepository.save(new UserSettings(userEntity,"{}"));
+        Optional<AssetType> type = assetTypeRepository.findByName("user");
+        AssetType assetType;
+        if(type.isEmpty()){
+           assetType = new AssetType("user");
+            assetTypeRepository.save(assetType);
+        }
+        else {
+            assetType=type.get();
+        }
+        Asset asset = Asset.initUserAsset(user.getUsername(), userEntity, assetType, null);
+        assetRepository.save(asset);
+        return UserDAOResponse.create(userEntity, null, null);
     }
 
-    public UserRolesDAO saveRole(UserRolesDAO role) {
-        if (role.getUserId() != null && userRepository.existsById(role.getUserId())) {
-            if (role.getId() != null && userRolesRepository.existsById(role.getId()))
-                throw new InvalidCreationIdAlreadyDefinedException(
-                        "Already exists a user role with ID " + role.getId());
 
-            return UserRolesDAO.create(userRolesRepository.save(role.mapToEntity()));
-        } else throw new NotFoundException(
-                "The user with id " + role.getUserId() + " don't exists, the role can't be created");
-    }
 
     public UserSettingsDAO saveSetting(UserSettingsDAO settings) {
         if (settings.getUserId() != null && userRepository.existsById(settings.getUserId())) {
@@ -118,33 +124,38 @@ public class UserService {
         } else throw new InvalidNonExistingIdException("No user with id " + id + " found");
     }
 
-    public boolean deleteRoleById(Long id) {
-        if (id != null && userRolesRepository.existsById(id)) {
-            userRolesRepository.deleteById(id);
-            return true;
-        } else throw new InvalidNonExistingIdException("No user role with id " + id + " found");
+//    public boolean deleteRoleById(Long id) {
+//        if (id != null && userRolesRepository.existsById(id)) {
+//            userRolesRepository.deleteById(id);
+//            return true;
+//        } else throw new InvalidNonExistingIdException("No user role with id " + id + " found");
+//    }
+
+//    public boolean deleteSettingById(Long id) {
+//        if (id != null && userSettingsRepository.existsById(id)) {
+//            userSettingsRepository.deleteById(id);
+//            return true;
+//        } else throw new InvalidNonExistingIdException("No setting with id " + id + " found");
+//    }
+
+    public UserDAOResponse update(UserDAORequest user, UserRepresentation userRepresentation) {
+        if (userRepresentation==null || userRepository.findByKeycloakId(userRepresentation.getId())==null)
+            throw new InvalidNonExistingIdException("Not exists a user with ID " + user.getId());
+
+        User userEntity = userRepository.save(user.mapToEntity());
+        Asset asset = assetRepository.getByUser(userEntity.getId());
+        if(asset!=null){
+            asset.setName(userRepresentation.getUsername());
+            asset.setLabel(userRepresentation.getUsername());
+            assetRepository.save(asset);
+        }
+        else {
+            //else todo:
+        }
+
+        return UserDAOResponse.create(userEntity, null, null);
     }
 
-    public boolean deleteSettingById(Long id) {
-        if (id != null && userSettingsRepository.existsById(id)) {
-            userSettingsRepository.deleteById(id);
-            return true;
-        } else throw new InvalidNonExistingIdException("No setting with id " + id + " found");
-    }
-
-    public UserDAOResponse update(UserDAORequest user, Long id) {
-        if (id != null && userRepository.existsById(id)) {
-            user.setId(id);
-            return UserDAOResponse.create(userRepository.save(user.mapToEntity()), null, null);
-        } else throw new InvalidNonExistingIdException("No user with id " + id + " found");
-    }
-
-    public UserRolesDAO updateRole(UserRolesDAO role, Long id) {
-        if (userRolesRepository.existsById(id) && userRepository.existsById(role.getUserId())) {
-            role.setId(id);
-            return UserRolesDAO.create(userRolesRepository.save(role.mapToEntity()));
-        } else throw new InvalidNonExistingIdException("No role with id " + id + " found");
-    }
 
     public UserSettingsDAO updateSettings(UserSettingsDAO setting, Long id) {
         if (userSettingsRepository.existsById(id) && userRepository.existsById(setting.getUserId())) {
@@ -153,51 +164,7 @@ public class UserService {
         } else throw new InvalidNonExistingIdException("No setting with id " + id + " found");
     }
 
-    public List<UserDAOResponse> get(Map<String, String> filters, long offset, int limit) {
-        Page<User> users = userRepository.findAll(new OffSetPaging(offset, limit));
-        Stream<User> stream = users.stream();
 
-//		if (filters != null)
-//			stream.filter(user -> {
-//				boolean equals = true;
-//				
-////				if (filters.containsKey("name"))
-////					equals = user.getName().equalsIgnoreCase(filters.get("name"));
-////				return equals;
-//			});
-        List<UserDAOResponse> list = stream
-                .map(user -> UserDAOResponse.create(user, userRolesRepository.findByUserId(user.getId()),
-                        userSettingsRepository.findByUserId(user.getId())))
-                .collect(Collectors.toList());
-
-        if (list != null && list.size() > 0)
-            return list;
-        else throw new NotFoundException("No users found");
-    }
-
-    public List<UserRolesDAO> getRoles(Map<String, String> filters, long offset, int limit) {
-        Page<UserRoles> roles = userRolesRepository.findAll(new OffSetPaging(offset, limit));
-        Stream<UserRoles> stream = roles.stream();
-
-        if (filters != null)
-            stream.filter(role -> {
-                boolean equals = true;
-
-                if (filters.containsKey("type"))
-                    equals = role.getType().toString().equalsIgnoreCase(filters.get("type"));
-                if (equals && filters.containsKey("user_id"))
-                    equals = String.valueOf(role.getUser().getId()).equalsIgnoreCase(filters.get("user_id"));
-
-                return equals;
-            });
-        List<UserRolesDAO> list = stream
-                .map(role -> UserRolesDAO.create(role))
-                .collect(Collectors.toList());
-
-        if (list != null && list.size() > 0)
-            return list;
-        else throw new NotFoundException("No roles found");
-    }
 
     public List<UserSettingsDAO> getSettings(Map<String, String> filters, long offset, int limit) {
         Page<UserSettings> settings = userSettingsRepository.findAll(new OffSetPaging(offset, limit));
@@ -221,13 +188,13 @@ public class UserService {
         else throw new NotFoundException("No settings found");
     }
 
-    public UserDAOResponse getById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("No user with id " + id + " found"));
-
-        return UserDAOResponse.create(user, userRolesRepository.findByUserId(user.getId()),
-                userSettingsRepository.findByUserId(user.getId()));
-    }
+//    public UserDAOResponse getById(Long id) {
+//        User user = userRepository.findById(id).orElseThrow(
+//                () -> new NotFoundException("No user with id " + id + " found"));
+//
+//        return UserDAOResponse.create(user, userRolesRepository.findByUserId(user.getId()),
+//                userSettingsRepository.findByUserId(user.getId()));
+//    }
 
     public List<AssetDAOResponse> getAssets(Long id) {
 
@@ -267,3 +234,85 @@ public class UserService {
     }
 
 }
+//    public UserRolesDAO saveRole(UserRolesDAO role) {
+//        if (role.getUserId() != null && userRepository.existsById(role.getUserId())) {
+//            if (role.getId() != null && userRolesRepository.existsById(role.getId()))
+//                throw new InvalidCreationIdAlreadyDefinedException(
+//                        "Already exists a user role with ID " + role.getId());
+//
+//            return UserRolesDAO.create(userRolesRepository.save(role.mapToEntity()));
+//        } else throw new NotFoundException(
+//                "The user with id " + role.getUserId() + " don't exists, the role can't be created");
+//    }//    public UserRolesDAO updateRole(UserRolesDAO role, Long id) {
+////        if (userRolesRepository.existsById(id) && userRepository.existsById(role.getUserId())) {
+////            role.setId(id);
+////            return UserRolesDAO.create(userRolesRepository.save(role.mapToEntity()));
+////        } else throw new InvalidNonExistingIdException("No role with id " + id + " found");
+////    } public List<UserRolesDAO> getRoles(Map<String, String> filters, long offset, int limit) {
+//        Page<UserRoles> roles = userRolesRepository.findAll(new OffSetPaging(offset, limit));
+//        Stream<UserRoles> stream = roles.stream();
+//
+//        if (filters != null)
+//            stream.filter(role -> {
+//                boolean equals = true;
+//
+//                if (filters.containsKey("type"))
+//                    equals = role.getType().toString().equalsIgnoreCase(filters.get("type"));
+//                if (equals && filters.containsKey("user_id"))
+//                    equals = String.valueOf(role.getUser().getId()).equalsIgnoreCase(filters.get("user_id"));
+//
+//                return equals;
+//            });
+//        List<UserRolesDAO> list = stream
+//                .map(role -> UserRolesDAO.create(role))
+//                .collect(Collectors.toList());
+//
+//        if (list != null && list.size() > 0)
+//            return list;
+//        else throw new NotFoundException("No roles found");
+//    }
+
+//    public List<UserRolesDAO> getRoles(Map<String, String> filters, long offset, int limit) {
+//        Page<UserRoles> roles = userRolesRepository.findAll(new OffSetPaging(offset, limit));
+//        Stream<UserRoles> stream = roles.stream();
+//
+//        if (filters != null)
+//            stream.filter(role -> {
+//                boolean equals = true;
+//
+//                if (filters.containsKey("type"))
+//                    equals = role.getType().toString().equalsIgnoreCase(filters.get("type"));
+//                if (equals && filters.containsKey("user_id"))
+//                    equals = String.valueOf(role.getUser().getId()).equalsIgnoreCase(filters.get("user_id"));
+//
+//                return equals;
+//            });
+//        List<UserRolesDAO> list = stream
+//                .map(role -> UserRolesDAO.create(role))
+//                .collect(Collectors.toList());
+//
+//        if (list != null && list.size() > 0)
+//            return list;
+//        else throw new NotFoundException("No roles found");
+//    }
+//public List<UserDAOResponse> get(Map<String, String> filters, long offset, int limit) {
+//    Page<User> users = userRepository.findAll(new OffSetPaging(offset, limit));
+//    Stream<User> stream = users.stream();
+//
+////		if (filters != null)
+////			stream.filter(user -> {
+////				boolean equals = true;
+////
+//////				if (filters.containsKey("name"))
+//////					equals = user.getName().equalsIgnoreCase(filters.get("name"));
+//////				return equals;
+////			});
+//    List<UserDAOResponse> list = stream
+//            .map(user -> UserDAOResponse.create(user, userRolesRepository.findByUserId(user.getId()),
+//                    userSettingsRepository.findByUserId(user.getId())))
+//            .collect(Collectors.toList());
+//
+//    if (list != null && list.size() > 0)
+//        return list;
+//    else throw new NotFoundException("No users found");
+//}

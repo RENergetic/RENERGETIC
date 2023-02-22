@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.renergetic.hdrapi.model.Asset;
 import com.renergetic.hdrapi.model.User;
+import org.springframework.data.repository.query.Param;
 
 @SuppressWarnings("unchecked")
 public interface AssetRepository extends JpaRepository<Asset, Long> {
@@ -33,6 +34,10 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 	public List<Asset> findByUserIdAndCategoryId(Long userId, Long category, long offset, int limit);
 
 	List<Asset> findByUser(User userId);
+	@Query("SELECT a FROM (Asset a INNER JOIN asset_type on asset_type.id=a.asset_type_id ) " +
+			" WHERE a.user_id = :userId and asset_type.name ='user'")
+	Asset getByUser(@Param("userId") Long userId );
+
 
 	List<Asset> findByAssetCategoryId(Long categoryId, Pageable pageable);
 	List<Asset> findByAssetCategoryId(Long categoryId);

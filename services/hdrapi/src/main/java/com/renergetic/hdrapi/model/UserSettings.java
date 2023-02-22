@@ -41,8 +41,9 @@ public class UserSettings {
 	@JsonProperty(required = false)
 	private User user;
 
-	public UserSettings(String settings_json) {
+	public UserSettings(User user,String settings_json) {
 		super();
+		this.user=user;
 		this.settingsJson = settings_json;
 	}
 	

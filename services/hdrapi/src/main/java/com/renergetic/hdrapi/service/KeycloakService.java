@@ -31,6 +31,8 @@ public class KeycloakService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private LoggedInService loggedInService;
 
     public Keycloak getInstance(String username, String password) {
         return KeycloakBuilder.builder()
@@ -65,10 +67,15 @@ public class KeycloakService {
 
     public KeycloakWrapper getClient(String authToken, boolean admin) {
         if (admin)
-            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance(authToken));
+            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance());
+//            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance(authToken));
         return new KeycloakWrapper(this.realm, clientId, this.getInstance(authToken));
     }
 
+    public KeycloakWrapper getClient(boolean admin) {
+        String token = loggedInService.getKeycloakUser().getToken();
+        return this.getClient(token, admin);
+    }
 
 
     public RealmResource getRealmApi(String authToken) {

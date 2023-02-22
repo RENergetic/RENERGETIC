@@ -2,7 +2,6 @@ package com.renergetic.hdrapi.service;
 
 import com.renergetic.hdrapi.dao.UserDAORequest;
 import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.security.KeycloakRole;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.keycloak.admin.client.Keycloak;
@@ -13,7 +12,6 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -61,12 +59,27 @@ public class KeycloakWrapper {
 
         return getRealmApi().users().get(id);
     }
-    public boolean updateUser( UserDAORequest user) {
+
+    public UserRepresentation updateUser(UserDAORequest user) {
         UserResource userResource = getRealmApi().users().get(user.getId());
         UserRepresentation current = userResource.toRepresentation();
-        current= user.update(current);
+        current = user.update(current);
         userResource.update(current);
-        return true;
+        return current;
+    }
+
+    public UserRepresentation createUser(UserDAORequest user) {
+        UserRepresentation userRepresentation = user.mapToKeycloakEntity();
+        getRealmApi().users().create(userRepresentation);
+        String username = userRepresentation.getUsername();
+        Optional<UserRepresentation> first =
+                this.getRealmApi().users().search(userRepresentation.getUsername()).stream().filter(
+                        it -> it.getUsername().equals(username)).findFirst();
+        if (first.isEmpty()) {
+            throw new NotFoundException("user not saved " + user.getUsername());
+        }
+        userRepresentation = first.get();
+        return userRepresentation;
     }
 
     public List<UserRepresentation> listUsers() {
