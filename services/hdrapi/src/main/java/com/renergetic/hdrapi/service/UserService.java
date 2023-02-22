@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ public class UserService {
     AssetTypeRepository assetTypeRepository;
 
     // USER CRUD OPERATIONS
+    @Transactional
     public UserDAOResponse save(UserDAORequest user) {
         if (user.getId() != null && userRepository.findByKeycloakId(user.getId()) != null)
             throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
@@ -68,20 +70,23 @@ public class UserService {
         return UserDAOResponse.create(userEntity, null, null);
     }
 
+    @Transactional
     public UserDAOResponse delete(UserRepresentation keycloakUser) {
         if (keycloakUser.getId() == null)
-            throw new NotFoundException("Not exists a user with ID " +keycloakUser.getId() );
+            throw new NotFoundException("Not exists a user with ID " + keycloakUser.getId());
         User entityUser = userRepository.findByKeycloakId(keycloakUser.getId());
         if (entityUser == null)
-            throw new NotFoundException("Not exists a user with ID " +keycloakUser.getId()+ ":"+keycloakUser.getUsername());
-        var uuid = entityUser.getUuid();
+            throw new NotFoundException(
+                    "Not exists a user with ID " + keycloakUser.getId() + ":" + keycloakUser.getUsername());
+//        var uuid = entityUser.getUuid();
         userSettingsRepository.deleteByUserId(entityUser.getId());
-        assetRepository.clearUserId(entityUser.getId());
+        var userTypeId= assetTypeRepository.findByName("user").get().getId();
+        assetRepository.clearUserId(entityUser.getId(),userTypeId);
         var asset = assetRepository.findByUserId(entityUser.getId());
+        assetRepository.deleteById(asset.getId());
         uuidRepository.delete(asset.getUuid());
-        assetRepository.deleteById(entityUser.getId());
+        userRepository.deleteById(entityUser.getId());
         uuidRepository.delete(entityUser.getUuid());
-        userRepository.delete(entityUser);
         return UserDAOResponse.create(entityUser, null, null);
     }
 
@@ -149,18 +154,18 @@ public class UserService {
 //        } else throw new InvalidNonExistingIdException("No user role with id " + id + " found");
 //    }
 
-//    public boolean deleteSettingById(Long id) {
+    //    public boolean deleteSettingById(Long id) {
 //        if (id != null && userSettingsRepository.existsById(id)) {
 //            userSettingsRepository.deleteById(id);
 //            return true;
 //        } else throw new InvalidNonExistingIdException("No setting with id " + id + " found");
 //    }
-
+    @Transactional
     public UserDAOResponse update(UserDAORequest user, UserRepresentation userRepresentation) {
-        if (userRepresentation == null )
+        if (userRepresentation == null)
             throw new InvalidNonExistingIdException("Not exists a user with ID " + user.getId());
         User userEntity = userRepository.findByKeycloakId(userRepresentation.getId());
-        if (userEntity==null)
+        if (userEntity == null)
             throw new InvalidNonExistingIdException("Not exists a user with ID " + user.getId());
 //        userEntity.set //set something and save
 //        userEntity = userRepository.save(userEntity );

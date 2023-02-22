@@ -41,15 +41,15 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
             " WHERE asset.user.id = :userId and asset.type.name ='user'")
     Asset findByUserId(@Param("userId") Long userId);
 
-    @Modifying
-    @Query("SELECT asset FROM Asset asset " +
-            " WHERE asset.user.id = :userId and asset.type.name ='user'")
-    void deleteUserId(@Param("userId") Long userId);
+//    @Modifying
+//    @Query(value = "DELETE FROM asset " +
+//            " WHERE asset.user_id = :userId and asset.asset_type_id = :userTypeId",nativeQuery = true)
+//    void deleteUserId(@Param("userId") Long userId,@Param("userTypeId") Long userTypeId);
 
     @Modifying
-    @Query("UPDATE  Asset asset SET asset.user.id = NULL " +
-            " WHERE asset.user.id = :userId and asset.type.name <> 'user'")
-    void clearUserId(@Param("userId") Long userId);
+    @Query(value = "UPDATE  asset SET  user_id = NULL " +
+            " WHERE user_id = :userId and asset_type_id <> :userTypeId", nativeQuery = true)
+    void clearUserId(@Param("userId") Long userId,@Param("userTypeId") Long userTypeId);
 
 
     List<Asset> findByAssetCategoryId(Long categoryId, Pageable pageable);
