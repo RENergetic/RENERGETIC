@@ -29,6 +29,14 @@ public class KeycloakService {
     @Value(value = "${keycloak.client-id}")
     private String clientId;
 
+
+    @Value("${keycloak.admin.username}")
+    private String adminUsername;
+    @Value("${keycloak.admin.password}")
+    private String adminPassword;
+    @Value(value = "${keycloak.admin.client-id}")
+    private String adminClient;
+
     @Autowired
     private UserRepository userRepository;
     @Autowired

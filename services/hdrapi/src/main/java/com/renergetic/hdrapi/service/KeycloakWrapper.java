@@ -2,9 +2,9 @@ package com.renergetic.hdrapi.service;
 
 import com.renergetic.hdrapi.dao.UserDAORequest;
 import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.model.security.KeycloakRole;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.apache.catalina.CredentialHandler;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleScopeResource;
@@ -14,6 +14,7 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +44,7 @@ public class KeycloakWrapper {
         Optional<ClientRepresentation> first =
                 this.getRealmApi().clients().findAll().stream().filter(
                         it -> it.getClientId().equals(clientId)).findFirst();
-        if (!first.isPresent()) {
+        if (first.isEmpty()) {
             throw new NotFoundException("client not found " + clientId);
         }
         this.clientKeycloakId = first.get().getId();
@@ -91,13 +92,14 @@ public class KeycloakWrapper {
         }
 
         userRepresentation = first.get();
-        if(user.getPassword()!=null){
+        if (user.getPassword() != null) {
             CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
             credentialRepresentation.setTemporary(false);
             credentialRepresentation.setType("password");
             credentialRepresentation.setValue(user.getPassword());
             getRealmApi().users().get(userRepresentation.getId()).resetPassword(credentialRepresentation);
         }
+        this.assignRole(userRepresentation.getId(), KeycloakRole.REN_GUEST.name);
         return userRepresentation;
     }
 
@@ -106,6 +108,10 @@ public class KeycloakWrapper {
         //TODO: make every user with guest role
 //        return new ArrayList<>(this.getRealmApi().clients().get(this.getClient_Id()).roles().get(
 //                KeycloakRole.REN_GUEST.name).getRoleUserMembers());
+    }
+
+    public List<UserRepresentation> listUsers(String role) {
+        return new ArrayList<UserRepresentation>(getRealmApi().roles().get(role).getRoleUserMembers());
     }
 
     public RoleRepresentation getRole(String role) {

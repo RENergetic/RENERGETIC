@@ -58,14 +58,12 @@ public class UserController {
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
         var token = loggedInService.getKeycloakUser().getToken();
         List<UserRepresentation> users;
-        if (role.isPresent() && KeycloakRole.roleByName(role.get()) != null) {
-            var roleApi = keycloakService.getClientApi(token).roles();
+        var client = keycloakService.getClient(token,true);
 
-            users = new ArrayList<>(roleApi.get(role.get()).getRoleUserMembers());
+        if (role.isPresent() && KeycloakRole.roleByName(role.get()) != null) {
+            users =  client.listUsers(KeycloakRole.roleByName(role.get()).name);
         } else {
-            RealmResource instance = keycloakService.getRealmApi(token);
-            UsersResource userApi = instance.users();
-            users = userApi.list();
+            users = client.listUsers();
         }
         return new ResponseEntity<>(users, HttpStatus.OK);
     }

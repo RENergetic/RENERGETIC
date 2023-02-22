@@ -63,6 +63,7 @@ public class UserService {
             assetType = type.get();
         }
         Asset asset = Asset.initUserAsset(user.getUsername(), userEntity, assetType, null);
+        asset.setUuid(uuidRepository.saveAndFlush(new UUID()));
         assetRepository.save(asset);
         return UserDAOResponse.create(userEntity, null, null);
     }
@@ -74,10 +75,12 @@ public class UserService {
         var uuid = user.getUuid();
         userSettingsRepository.deleteByUserId(user.getId());
         assetRepository.clearUserId(user.getId());
+        var asset = assetRepository.findByUserId(user.getId());
+        uuidRepository.delete(asset.getUuid());
         assetRepository.deleteById(user.getId());
         uuidRepository.delete(user.getUuid());
         userRepository.delete(user);
-        return UserDAOResponse.create(user, null, null); 
+        return UserDAOResponse.create(user, null, null);
     }
 
     public UserSettingsDAO saveSetting(UserSettingsDAO settings) {
