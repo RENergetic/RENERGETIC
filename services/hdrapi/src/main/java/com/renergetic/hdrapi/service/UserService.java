@@ -1,6 +1,9 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.dao.AssetDAOResponse;
+import com.renergetic.hdrapi.dao.UserDAORequest;
+import com.renergetic.hdrapi.dao.UserDAOResponse;
+import com.renergetic.hdrapi.dao.UserSettingsDAO;
 import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
@@ -44,28 +47,38 @@ public class UserService {
 
     // USER CRUD OPERATIONS
     public UserDAOResponse save(UserDAORequest user) {
-        if (user.getId() != null && userRepository.findByKeycloakId(user.getId())!=null)
+        if (user.getId() != null && userRepository.findByKeycloakId(user.getId()) != null)
             throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
 
         User userEntity = user.mapToEntity();
         userEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        userEntity=userRepository.save(userEntity);
-        userSettingsRepository.save(new UserSettings(userEntity,"{}"));
+        userEntity = userRepository.save(userEntity);
+        userSettingsRepository.save(new UserSettings(userEntity, "{}"));
         Optional<AssetType> type = assetTypeRepository.findByName("user");
         AssetType assetType;
-        if(type.isEmpty()){
-           assetType = new AssetType("user");
+        if (type.isEmpty()) {
+            assetType = new AssetType("user");
             assetTypeRepository.save(assetType);
-        }
-        else {
-            assetType=type.get();
+        } else {
+            assetType = type.get();
         }
         Asset asset = Asset.initUserAsset(user.getUsername(), userEntity, assetType, null);
         assetRepository.save(asset);
         return UserDAOResponse.create(userEntity, null, null);
     }
 
-
+    public UserDAOResponse delete(UserRepresentation keycloakUser) {
+        User user = userRepository.findByKeycloakId(keycloakUser.getId());
+        if (keycloakUser.getId() != null && userRepository.findByKeycloakId(keycloakUser.getId()) != null)
+            throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
+        var uuid = user.getUuid();
+        userSettingsRepository.deleteByUserId(user.getId());
+        assetRepository.clearUserId(user.getId());
+        assetRepository.deleteById(user.getId());
+        uuidRepository.delete(user.getUuid());
+        userRepository.delete(user);
+        return UserDAOResponse.create(user, null, null); 
+    }
 
     public UserSettingsDAO saveSetting(UserSettingsDAO settings) {
         if (settings.getUserId() != null && userRepository.existsById(settings.getUserId())) {
@@ -139,17 +152,16 @@ public class UserService {
 //    }
 
     public UserDAOResponse update(UserDAORequest user, UserRepresentation userRepresentation) {
-        if (userRepresentation==null || userRepository.findByKeycloakId(userRepresentation.getId())==null)
+        if (userRepresentation == null || userRepository.findByKeycloakId(userRepresentation.getId()) == null)
             throw new InvalidNonExistingIdException("Not exists a user with ID " + user.getId());
 
         User userEntity = userRepository.save(user.mapToEntity());
-        Asset asset = assetRepository.getByUser(userEntity.getId());
-        if(asset!=null){
+        Asset asset = assetRepository.findByUserId(userEntity.getId());
+        if (asset != null) {
             asset.setName(userRepresentation.getUsername());
             asset.setLabel(userRepresentation.getUsername());
             assetRepository.save(asset);
-        }
-        else {
+        } else {
             //else todo:
         }
 
@@ -163,7 +175,6 @@ public class UserService {
             return UserSettingsDAO.create(userSettingsRepository.save(setting.mapToEntity()));
         } else throw new InvalidNonExistingIdException("No setting with id " + id + " found");
     }
-
 
 
     public List<UserSettingsDAO> getSettings(Map<String, String> filters, long offset, int limit) {
@@ -211,10 +222,10 @@ public class UserService {
                     assets.addAll(userAsset.getConnections().stream()
 //							.filter(obj -> obj.getAssetCategory().getName().equals(AssetTypeCategory.structural))
                             .map(obj -> {
-                            	AssetDAOResponse dao = AssetDAOResponse.create(obj.getConnectedAsset(), 
-                            			assetDetailsRepository.findByAssetId(obj.getConnectedAsset().getId()));
-                            	dao.setConnectionType(obj.getConnectionType());
-                            	return dao;
+                                AssetDAOResponse dao = AssetDAOResponse.create(obj.getConnectedAsset(),
+                                        assetDetailsRepository.findByAssetId(obj.getConnectedAsset().getId()));
+                                dao.setConnectionType(obj.getConnectionType());
+                                return dao;
                             })
                             .collect(Collectors.toList()));
                 return assets;

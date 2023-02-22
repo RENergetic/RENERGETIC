@@ -62,6 +62,7 @@ public class Asset {
     private Asset parentAsset;
 
     // FOREIGN KEY FROM USERS TABLE
+    //TODO: on delete set null
     @OneToOne(optional = true, cascade = CascadeType.REFRESH)
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "user_id", nullable = true, insertable = true, updatable = true)
