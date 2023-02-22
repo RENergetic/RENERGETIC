@@ -292,17 +292,27 @@ public class UserController {
         return new ResponseEntity<>(_setting, _setting != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-//=== DELETE REQUESTS ================================================================================
-
+    //=== DELETE REQUESTS ================================================================================
     @Operation(summary = "Delete a existing User", hidden = false)
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "User deleted correctly"),
-            @ApiResponse(responseCode = "500", description = "Error deleting user")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "User deleted correctly"),
+            @ApiResponse(responseCode = "500", description = "Error deleting user")})
+    @DeleteMapping(path = "/{userId}")
+    public ResponseEntity deleteUser(@PathVariable String userId) {
+        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
+        var token = loggedInService.getKeycloakUser().getToken();
+        var client = keycloakService.getClient(token, true);
+        UserRepresentation userRepresentation = client.getUser(userId).toRepresentation();
+        client.deleteUser(userRepresentation.getId());
+        UserDAOResponse user = userSv.delete(userRepresentation);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
-    )
 
+
+    @Operation(summary = "Revoke role", hidden = false)
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Role deleted correctly"),
+            @ApiResponse(responseCode = "500", description = "Error deleting user")})
     @DeleteMapping(path = "/{userId}/roles/{roleName}")
-    public ResponseEntity<?> deleteUser(@PathVariable String userId, @PathVariable String roleName) {
+    public ResponseEntity<?> deleteRole(@PathVariable String userId, @PathVariable String roleName) {
         loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
         var token = loggedInService.getKeycloakUser().getToken();
         var client = keycloakService.getClient(token, true);
