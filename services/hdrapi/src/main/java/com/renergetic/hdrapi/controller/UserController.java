@@ -235,6 +235,11 @@ public class UserController {
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
         var client = keycloakService.getClient(true);
         //TODO: synchronized section
+        try {
+            client.updateUser(user);
+        } catch (javax.ws.rs.NotAuthorizedException ex) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
         UserRepresentation ur = client.updateUser(user);
         userSv.update(user, ur);//TODO: return respoonse of the user ?
         return new ResponseEntity<>(true,  HttpStatus.OK);

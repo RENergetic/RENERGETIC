@@ -54,7 +54,6 @@ public class KeycloakService {
 //    }
 
     public Keycloak getAdminInstance() {
-        //TO DO: load from config
         return KeycloakBuilder.builder()
                 .serverUrl(this.serverUrl)
                 .realm(this.realm)
@@ -75,9 +74,11 @@ public class KeycloakService {
     }
 
     public KeycloakWrapper getClient(String authToken, boolean admin) {
-        if (admin)
-            return new KeycloakWrapper(this.realm, clientId,this.getInstance(authToken));// this.getAdminInstance());
+        if (admin) {
+            //TODO: verify if there is no better solution then to just use separate account for the backend
+            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance());
 //            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance(authToken));
+        }
         return new KeycloakWrapper(this.realm, clientId, this.getInstance(authToken));
     }
 
@@ -98,7 +99,7 @@ public class KeycloakService {
     }
 
     public KeycloakAuthenticationToken getAuthenticationToken(String keycloakJWTToken) {
-        //TODO: verify token and expiration timeout 
+        //TODO: verify token and expiration timeout
         try {
             // Split JWT Token
             String[] split_string = keycloakJWTToken.split("\\.");

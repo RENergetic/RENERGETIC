@@ -35,7 +35,9 @@ public class UserDAORequest {
 	public   UserRepresentation update(UserRepresentation user) {
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
-
+		if(user.getEmail()==null ||user.getEmail().isEmpty()){
+			user.setEmail(email);
+		}
 		return user;
 	}
 	
