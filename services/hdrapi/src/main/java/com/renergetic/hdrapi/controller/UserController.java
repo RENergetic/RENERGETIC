@@ -162,7 +162,8 @@ public class UserController {
         authentication.getUser();
 
 //        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_STAFF.mask);
-        Long userId = 2l;    //TODO: infer from headers
+        var userId = loggedInService.getLoggedInUser().getId();
+//        Long userId = 2l;
         return new ResponseEntity<>(userSv.getSettings(userId), HttpStatus.OK);
     }
 
@@ -207,7 +208,8 @@ public class UserController {
     )
     @PostMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
     public ResponseEntity<String> saveUserSetting(@RequestBody String settings) {
-        Long userId = 2l;    //TODO: infer from headers
+//        Long userId = 2l;
+        var userId = loggedInService.getLoggedInUser().getId();
         settings = userSv.saveSettings(userId, settings);
 
         return new ResponseEntity<>(settings, HttpStatus.OK);

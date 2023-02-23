@@ -2,6 +2,7 @@ package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.service.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,14 +40,19 @@ public class UIAggregatorController {
     @Autowired
     MeasurementService measurementSv;
 
+    @Autowired
+    LoggedInService loggedInService;
+
     @Operation(summary = "API wrapper for front-end")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = {"/wrapper", "/wrapper/{userId}"}, produces = "application/json")
     public ResponseEntity<WrapperResponseDAO> apiWrapper(@PathVariable(required = false) String userId,
                                                          @RequestBody WrapperRequestDAO wrapperRequestBodyDAO) {
-        //TODO: infer userId from auth headers
+
         WrapperResponseDAO wrapperResponseDAO = new WrapperResponseDAO();
         //
+        var user = loggedInService.getLoggedInUser();
+        userId = userId != null && !userId.isEmpty() ? userId : user.getId().toString();
         if (wrapperRequestBodyDAO.getCalls().getAssets() != null && userId != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssets();
             wrapperResponseDAO.setAssets(getSimpleAssets(userId, Optional.ofNullable(data.getOffset()),
@@ -80,7 +86,7 @@ public class UIAggregatorController {
                     getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit()));
             if (dashboards.isEmpty() && generateDummy) {
                 //generate some random demands
-                 dashboards = DummyDataGenerator.getDashboards(5);
+                dashboards = DummyDataGenerator.getDashboards(5);
 
             }
             wrapperResponseDAO.setDashboardMetaKeys(DashboardMetaKeys.getInstance());

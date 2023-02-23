@@ -7,6 +7,7 @@ import com.renergetic.hdrapi.model.security.KeycloakUser;
 import com.renergetic.hdrapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,8 @@ import java.util.Optional;
 public class LoggedInService {
 
     private final UserRepository userRepository;
+    @Autowired
+    KeycloakService keycloakService;
 
     public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -55,6 +58,15 @@ public class LoggedInService {
 
     public KeycloakUser getKeycloakUser() {
         return getKeyCloakToken().getPrincipal();
+    }
+
+    public KeycloakWrapper getKeycloakClient(boolean admin) {
+        var token = this.getKeycloakUser().getToken();
+        //verify
+        if (admin && !this.hasRole(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask)) {
+            //TODO: raise exception
+        }
+        return keycloakService.getClient(token, true);
     }
 
     public boolean hasRole(List<KeycloakRole> roles) {
