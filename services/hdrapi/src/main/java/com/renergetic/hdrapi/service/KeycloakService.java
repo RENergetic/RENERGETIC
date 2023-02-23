@@ -29,26 +29,36 @@ public class KeycloakService {
     @Value(value = "${keycloak.client-id}")
     private String clientId;
 
+
+    @Value("${keycloak.admin.username}")
+    private String adminUsername;
+    @Value("${keycloak.admin.password}")
+    private String adminPassword;
+    @Value(value = "${keycloak.admin.client-id}")
+    private String adminClient;
+
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private LoggedInService loggedInService;
 
-    public Keycloak getInstance(String username, String password) {
-        return KeycloakBuilder.builder()
-                .serverUrl(this.serverUrl)
-                .realm(this.realm)
-                .username("admin_test")
-                .password("admin_test")
-                .clientId("admin-cli")
-                .build();
-    }
+
+//    public Keycloak getInstance(String token) {
+//        return KeycloakBuilder.builder()
+//                .serverUrl(this.serverUrl)
+//                .realm(this.realm)
+//                .username("admin_test")
+//                .password("admin_test")
+//                .clientId("admin-cli")
+//                .build();
+//    }
 
     public Keycloak getAdminInstance() {
-        //TO DO: load from config
         return KeycloakBuilder.builder()
                 .serverUrl(this.serverUrl)
                 .realm(this.realm)
-                .username("admin_test")
-                .password("admin_test")
+                .username(adminUsername)
+                .password(adminPassword)
                 .clientId("admin-cli")
                 .build();
     }
@@ -59,16 +69,23 @@ public class KeycloakService {
 
 
     public Keycloak getInstance(String authToken) {
-//        var clientId = "admin-cli";
+        var clientId = "admin-cli";
         return Keycloak.getInstance(serverUrl, realm, clientId, authToken);
     }
 
     public KeycloakWrapper getClient(String authToken, boolean admin) {
-        if (admin)
-            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance(authToken));
+        if (admin) {
+            //TODO: verify if there is no better solution then to just use separate account for the backend
+            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance());
+//            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance(authToken));
+        }
         return new KeycloakWrapper(this.realm, clientId, this.getInstance(authToken));
     }
 
+    public KeycloakWrapper getClient(boolean admin) {
+        String token = loggedInService.getKeycloakUser().getToken();
+        return this.getClient(token, admin);
+    }
 
 
     public RealmResource getRealmApi(String authToken) {
@@ -82,6 +99,7 @@ public class KeycloakService {
     }
 
     public KeycloakAuthenticationToken getAuthenticationToken(String keycloakJWTToken) {
+        //TODO: verify token and expiration timeout
         try {
             // Split JWT Token
             String[] split_string = keycloakJWTToken.split("\\.");

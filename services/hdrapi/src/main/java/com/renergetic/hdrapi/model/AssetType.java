@@ -49,6 +49,11 @@ public class AssetType {
 //		this.typeCategory = typeCategory;
 		this.renovable = renovable;
 	}
+	public AssetType( String name  ) {//AssetTypeCategory typeCategory,
+		super();
+		this.name = name;
+		this.label = name;
+	}
 	public AssetType(long id, String name, String label) {//, AssetTypeCategory typeCategory
 		super();
 		this.id = id;

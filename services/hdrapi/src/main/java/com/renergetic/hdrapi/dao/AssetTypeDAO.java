@@ -14,8 +14,8 @@ import javax.persistence.Table;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "asset_type")
+//@Entity
+//@Table(name = "asset_type")
 @RequiredArgsConstructor
 @ToString
 public class AssetTypeDAO {
