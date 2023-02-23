@@ -58,7 +58,7 @@ public class UserController {
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
         var token = loggedInService.getKeycloakUser().getToken();
         List<UserRepresentation> users;
-        var client = keycloakService.getClient(token,true);
+        var client = keycloakService.getClient(token,false);
 
         if (role.isPresent() && KeycloakRole.roleByName(role.get()) != null) {
             users =  client.listUsers(KeycloakRole.roleByName(role.get()).name);

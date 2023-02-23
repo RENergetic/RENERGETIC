@@ -42,23 +42,24 @@ public class KeycloakService {
     @Autowired
     private LoggedInService loggedInService;
 
-    public Keycloak getInstance(String username, String password) {
-        return KeycloakBuilder.builder()
-                .serverUrl(this.serverUrl)
-                .realm(this.realm)
-                .username("admin_test")
-                .password("admin_test")
-                .clientId("admin-cli")
-                .build();
-    }
+
+//    public Keycloak getInstance(String token) {
+//        return KeycloakBuilder.builder()
+//                .serverUrl(this.serverUrl)
+//                .realm(this.realm)
+//                .username("admin_test")
+//                .password("admin_test")
+//                .clientId("admin-cli")
+//                .build();
+//    }
 
     public Keycloak getAdminInstance() {
         //TO DO: load from config
         return KeycloakBuilder.builder()
                 .serverUrl(this.serverUrl)
                 .realm(this.realm)
-                .username("admin_test")
-                .password("admin_test")
+                .username(adminUsername)
+                .password(adminPassword)
                 .clientId("admin-cli")
                 .build();
     }
@@ -69,13 +70,13 @@ public class KeycloakService {
 
 
     public Keycloak getInstance(String authToken) {
-//        var clientId = "admin-cli";
+        var clientId = "admin-cli";
         return Keycloak.getInstance(serverUrl, realm, clientId, authToken);
     }
 
     public KeycloakWrapper getClient(String authToken, boolean admin) {
         if (admin)
-            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance());
+            return new KeycloakWrapper(this.realm, clientId,this.getInstance(authToken));// this.getAdminInstance());
 //            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance(authToken));
         return new KeycloakWrapper(this.realm, clientId, this.getInstance(authToken));
     }
@@ -97,6 +98,7 @@ public class KeycloakService {
     }
 
     public KeycloakAuthenticationToken getAuthenticationToken(String keycloakJWTToken) {
+        //TODO: verify token and expiration timeout 
         try {
             // Split JWT Token
             String[] split_string = keycloakJWTToken.split("\\.");
