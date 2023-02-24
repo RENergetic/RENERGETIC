@@ -38,7 +38,6 @@ public class UIAggregatorController {
     private DashboardService dashboardService;
     @Autowired
     MeasurementService measurementSv;
-
     @Autowired
     LoggedInService loggedInService;
 
@@ -57,12 +56,12 @@ public class UIAggregatorController {
 //            check admin rights TODO:
         } else
             userId = user.getId().toString();
-        if (wrapperRequestBodyDAO.getCalls().getAssets() != null && userId != null) {
+        if (wrapperRequestBodyDAO.getCalls().getAssets() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssets();
             wrapperResponseDAO.setAssets(getSimpleAssets(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
         }
-        if (wrapperRequestBodyDAO.getCalls().getAssetPanels() != null && userId != null) {
+        if (wrapperRequestBodyDAO.getCalls().getAssetPanels() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssetPanels();
             wrapperResponseDAO.setAssetPanels(getAssetPanels(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
@@ -99,7 +98,7 @@ public class UIAggregatorController {
 
 
         }
-        if (wrapperRequestBodyDAO.getCalls().getDemands() != null && userId != null) {
+        if (wrapperRequestBodyDAO.getCalls().getDemands() != null) {
             //TODO: ask someone about public demands ?
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDemands();
             wrapperResponseDAO.setDemands(getDemandSchedules(userId, Optional.ofNullable(data.getOffset()),
@@ -108,6 +107,7 @@ public class UIAggregatorController {
                 //generate some random demands
                 List<DemandScheduleDAO> schedule =
                         demandRequestService.getByUserIdGroup(Long.parseLong(userId), 0, 10);
+
                 schedule = DummyDataGenerator.getDemand(schedule);
                 wrapperResponseDAO.setDemands(schedule);
             }
@@ -117,7 +117,8 @@ public class UIAggregatorController {
                     ).flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
                             .collect(Collectors.toList());
             DataDAO demandData = dataService.getData(
-                    measurements.stream().map(dao -> dao.mapToEntity()).collect(Collectors.toList()), null, null);
+                    measurements.stream().map(MeasurementDAOResponse::mapToEntity).collect(Collectors.toList()), null,
+                    Optional.empty());
             //TODO: here there might be issue with presenting the data and choosing appropriate time interval - this should be discused
             //probably data required for the demand demand should be stored as static  DataDAO JSON in RDBMS
             //if the user chooses interval it wouldnt make sense from the demand/request perspective

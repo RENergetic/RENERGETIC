@@ -100,6 +100,7 @@ public class KeycloakWrapper {
             getRealmApi().users().get(userRepresentation.getId()).resetPassword(credentialRepresentation);
         }
         this.assignRole(userRepresentation.getId(), KeycloakRole.REN_GUEST.name);
+
         return userRepresentation;
     }
 

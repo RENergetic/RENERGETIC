@@ -87,12 +87,11 @@ public class DemandRequestService {
     }
 
     public List<DemandScheduleDAO> getByUserIdGroup(Long userId, long offset, int limit) throws InvalidNonExistingIdException {
-        List<DemandSchedule> demandRequest = demandScheduleRepository.findByUserIdGroup(userId, offset, limit);
+        List<DemandSchedule> demandRequest = demandScheduleRepository.findByUserIdGroup(userId,0,1000);//, offset, limit);
 
         List<DemandScheduleDAO> list = demandRequest.stream().map(DemandScheduleDAO::create).collect(Collectors.toList());
-    	if (list != null && list.size() > 0)
-    		return list;
-    	else throw new NotFoundException("No demand schedules related with user " + userId + " found");
+    	return list;
+//    	else throw new NotFoundException("No demand schedules related with user " + userId + " found");
     }
 
     public DemandScheduleDAO getByAssetIdAndActual(Long assetId){
