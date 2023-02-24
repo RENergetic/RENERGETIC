@@ -30,8 +30,8 @@ public class DashboardController {
 	public ResponseEntity<Map<String, String>> getDashboardUnitAndType (@PathVariable String grafanaId){
 		DashboardUnit dashboardUnit = dashboardSv.getDashboardUnitByGrafanaId(grafanaId);
 		Map<String, String> result = new HashMap<>();
-		result.put("unit", dashboardUnit.getSYMBOL());
-		result.put("type", dashboardUnit.getDESCRIPTION());
+		result.put("unit", dashboardUnit != null ? dashboardUnit.getSYMBOL() : "N/A");
+		result.put("type", dashboardUnit != null ? dashboardUnit.getDESCRIPTION() : "N/A");
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
