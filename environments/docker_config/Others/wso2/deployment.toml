@@ -139,8 +139,8 @@ auth_token = ""
 #enable_user_claims = true
 #claims_extractor_impl = "org.wso2.carbon.apimgt.impl.token.ExtendedDefaultClaimsRetriever"
 
-#[apim.oauth_config]
-#enable_outbound_auth_header = false
+[apim.oauth_config]
+enable_outbound_auth_header = true
 #auth_header = "Authorization"
 #revoke_endpoint = "https://localhost:${https.nio.port}/revoke"
 #enable_token_encryption = false
