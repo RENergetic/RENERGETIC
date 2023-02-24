@@ -2,6 +2,7 @@ package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.model.User;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.service.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
@@ -51,7 +52,8 @@ public class UIAggregatorController {
 
         WrapperResponseDAO wrapperResponseDAO = new WrapperResponseDAO();
         //
-        var user = loggedInService.getLoggedInUser();
+        User user = loggedInService.getLoggedInUser();
+        
         userId = userId != null && !userId.isEmpty() ? userId : user.getId().toString();
         if (wrapperRequestBodyDAO.getCalls().getAssets() != null && userId != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssets();
