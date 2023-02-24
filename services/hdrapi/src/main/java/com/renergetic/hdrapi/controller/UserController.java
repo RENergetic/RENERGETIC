@@ -159,7 +159,6 @@ public class UserController {
 
 //        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_STAFF.mask);
         var userId = loggedInService.getLoggedInUser().getId();
-//        Long userId = 2l;
         return new ResponseEntity<>(userSv.getSettings(userId), HttpStatus.OK);
     }
 

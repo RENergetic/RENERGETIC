@@ -19,8 +19,6 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-//    private final CustomUserDetailsService customUserDetailsService;
-
     @Autowired
     KeycloakService keycloakService;
 
@@ -31,13 +29,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwtToken = request.getHeader("Authorization");
             if (StringUtils.hasText(jwtToken)) {
                 KeycloakAuthenticationToken authenticationToken = keycloakService.getAuthenticationToken(jwtToken);
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
+            	SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } catch (Exception ex) {
             log.error("Could not set user authentication in security context", ex);
         }
         filterChain.doFilter(request, response);
+    	request.logout();
     }
-
+    
+    @Override
+	protected boolean shouldNotFilterAsyncDispatch() {
+		return false;
+	}
 }

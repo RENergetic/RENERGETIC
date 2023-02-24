@@ -1,7 +1,6 @@
 package com.renergetic.hdrapi;
 
 import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
-import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.service.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,10 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        origins.stream().forEach(System.err::println);
-        methods.stream().forEach(System.err::println);
-        System.err.println(maxAge);
-
+    	
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(methods);

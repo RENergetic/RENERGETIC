@@ -5,6 +5,7 @@ import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.model.security.KeycloakUser;
 import com.renergetic.hdrapi.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,8 @@ public class LoggedInService {
 
             KeycloakAuthenticationToken keycloakAuthenticationToken = (KeycloakAuthenticationToken) authentication;
 
-            try {
-                return keycloakAuthenticationToken.getUser();
-            } catch (Exception ex) {
-//                todo: log error?
-                return null;
-            }
+            // If user doesn't exist it must send a not found exception
+            return keycloakAuthenticationToken.getUser();
         } else {
             //TODO:
             throw new NotImplementedException();
