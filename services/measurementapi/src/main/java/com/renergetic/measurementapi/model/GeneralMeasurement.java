@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Entity
+//@Entity
 public class GeneralMeasurement {
 	private String name;
 	private Map<String, ?> fields;
