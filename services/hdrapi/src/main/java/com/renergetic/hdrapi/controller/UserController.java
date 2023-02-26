@@ -3,6 +3,7 @@ package com.renergetic.hdrapi.controller;
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
+import com.renergetic.hdrapi.model.security.KeycloakUser;
 import com.renergetic.hdrapi.service.KeycloakService;
 import com.renergetic.hdrapi.service.LoggedInService;
 import com.renergetic.hdrapi.service.NotificationService;
@@ -177,10 +178,9 @@ public class UserController {
         var client = keycloakService.getClient(true);
         UserRepresentation ur = client.createUser(user);
         user.setId(ur.getId());
-        UserDAOResponse save = userSv.save(ur,user);
+        UserDAOResponse save = userSv.save(ur, user);
         return new ResponseEntity<>(save, HttpStatus.CREATED);
     }
-
 
 
     @Operation(summary = "Create a new User Setting associated to a User")
@@ -231,6 +231,33 @@ public class UserController {
         return new ResponseEntity<>(true, HttpStatus.OK);
 //        return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);//todo trow not found
     }
+
+    @Operation(summary = "Update current User")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User saved correctly"),
+            @ApiResponse(responseCode = "404", description = "User not exist"),
+            @ApiResponse(responseCode = "422", description = "Type isn's valid"),
+            @ApiResponse(responseCode = "500", description = "Error saving user")
+    }
+    )
+    @PutMapping(path = "/profile", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<Boolean> updateProfile(@RequestBody UserDAORequest user, @PathVariable String id) {
+        var client = keycloakService.getClient(true);
+        KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
+        user.setId(keycloakUser.getId());
+        //TODO: synchronized section
+        try {
+
+            client.updateUser(user);
+        } catch (javax.ws.rs.NotAuthorizedException ex) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        if (user.getPassword() != null) {
+            client.updatePassword(keycloakUser.getId(), user.getPassword());
+        }
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
+
 
 //    @Operation(summary = "Update a existing User")
 //    @ApiResponses({

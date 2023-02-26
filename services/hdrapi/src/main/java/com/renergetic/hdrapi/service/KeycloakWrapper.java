@@ -103,6 +103,15 @@ public class KeycloakWrapper {
 
         return userRepresentation;
     }
+    public void updatePassword(String userId,String password){
+
+            CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+            credentialRepresentation.setTemporary(false);
+            credentialRepresentation.setType("password");
+            credentialRepresentation.setValue(password);
+            getRealmApi().users().get(userId).resetPassword(credentialRepresentation);
+
+    }
 
     public List<UserRepresentation> listUsers() {
         return getRealmApi().users().list();
