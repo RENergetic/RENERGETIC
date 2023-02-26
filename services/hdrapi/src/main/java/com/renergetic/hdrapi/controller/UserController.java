@@ -241,7 +241,7 @@ public class UserController {
     }
     )
     @PutMapping(path = "/profile", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<Boolean> updateProfile(@RequestBody UserDAORequest user, @PathVariable String id) {
+    public ResponseEntity<Boolean> updateProfile(@RequestBody UserDAORequest user) {
         var client = keycloakService.getClient(true);
         KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
         user.setId(keycloakUser.getId());
