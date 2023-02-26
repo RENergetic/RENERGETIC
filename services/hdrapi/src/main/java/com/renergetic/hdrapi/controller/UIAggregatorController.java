@@ -2,6 +2,7 @@ package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.model.User;
 import com.renergetic.hdrapi.service.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +49,7 @@ public class UIAggregatorController {
                                                          @RequestBody WrapperRequestDAO wrapperRequestBodyDAO) {
 
         WrapperResponseDAO wrapperResponseDAO = new WrapperResponseDAO();
-        var user = loggedInService.getLoggedInUser();
+        User user = loggedInService.getLoggedInUser();
         if (user == null) {
 //            todo: raise error
         }
