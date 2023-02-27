@@ -152,7 +152,6 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/profile/settings", produces = "application/json")
     public ResponseEntity<String> getAllUsersSettings() {
-//        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_STAFF.mask);
         Long userId = loggedInService.getLoggedInUser().getId();
         return new ResponseEntity<>(userSv.getSettings(userId), HttpStatus.OK);
     }
