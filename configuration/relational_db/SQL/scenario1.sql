@@ -11,9 +11,9 @@ INSERT INTO asset_category ( id, name, label, description ) VALUES
 ( 6, 'residence', 'residence', NULL );
 
 /* CREATE USERS */
-INSERT INTO users ( id, uuid ) VALUES
-( 1, '2' ),
-( 2, '2' );
+INSERT INTO users ( id, keycloak_id, uuid ) VALUES
+( 1, 'd8040f51-77e7-4dd8-9bc3-567ccd501adf', '2' ),
+( 2, 'b7c25233-815e-4e26-ae3a-b18519df14ce', '2' );
 
 INSERT INTO asset ( id, name, label, asset_type_id, user_id, uuid, asset_category_id ) VALUES
 ( 1, 'user1', 'User 1', 18, 1, '2', NULL ),

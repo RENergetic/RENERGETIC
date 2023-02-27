@@ -12,6 +12,7 @@ import com.renergetic.hdrapi.exception.InvalidArgumentException;
 import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.exception.UnauthorizedAccessException;
 
 @RestControllerAdvice
 public class ExceptionController extends ResponseEntityExceptionHandler {
@@ -24,6 +25,8 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
 			status = HttpStatus.CONFLICT;
 		else if (ex instanceof InvalidNonExistingIdException || ex instanceof NotFoundException)
 			status = HttpStatus.NOT_FOUND;
+		else if (ex instanceof UnauthorizedAccessException)
+			status = HttpStatus.UNAUTHORIZED;
 
 		return ErrorMessage.response(ex, request, status);
 	}
