@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.renergetic.measurementapi.service.ConvertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,9 @@ public class MeasurementController {
 
 	@Autowired
 	MeasurementService service;
+
+	@Autowired
+	ConvertService convertService;
 
 // GET REQUESTS
 	
@@ -128,7 +132,8 @@ public class MeasurementController {
 			@RequestParam("to") Optional<String> to,
 			@RequestParam("bucket") Optional<String> bucket,
 			@RequestParam Map<String, String> tags,
-			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
+			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
+			@RequestParam(name = "dashboardId") Optional<String> dashboardId){
 		
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -137,6 +142,7 @@ public class MeasurementController {
 		tags.remove("from");
 		tags.remove("to");
 		tags.remove("hideNotFound");
+		tags.remove("dashboardId");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -147,6 +153,10 @@ public class MeasurementController {
 						); 
 		
 		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time");
+
+		if(dashboardId.isPresent() && fields.size() == 1){
+			ret = convertService.convert(ret, dashboardId.get(), fields, null);
+		}
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);
@@ -168,7 +178,8 @@ public class MeasurementController {
 			@RequestParam(name = "fields", required = false) List<String> fields,
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
-			@PathVariable(name = "function") String function){
+			@PathVariable(name = "function") String function,
+			@RequestParam(name = "dashboardId") Optional<String> dashboardId){
 
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -180,6 +191,7 @@ public class MeasurementController {
 		tags.remove("from");
 		tags.remove("to");
 		tags.remove("hideNotFound");
+		tags.remove("dashboardId");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -190,6 +202,11 @@ public class MeasurementController {
 						); 
 
 		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""), byMeasurement.orElse(false), toFloat.orElse(false));
+
+		//We only apply conversion if there is one field. as functions and grouping on multiple fields will cause issues.
+		if(dashboardId.isPresent() && fields.size() == 1){
+			ret = convertService.convert(ret, dashboardId.get(), fields, function);
+		}
 
 		if (ret != null && ret.size() > 0)
 			return ResponseEntity.ok(ret);

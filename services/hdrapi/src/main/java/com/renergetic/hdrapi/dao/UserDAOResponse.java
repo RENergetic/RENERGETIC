@@ -1,61 +1,48 @@
 package com.renergetic.hdrapi.dao;
 
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.hdrapi.model.User;
-import com.renergetic.hdrapi.model.UserRoles;
-import com.renergetic.hdrapi.model.UserSettings;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.keycloak.representations.idm.UserRepresentation;
+
+import java.util.List;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
 @ToString
 public class UserDAOResponse {
-	@JsonProperty(required = false, access = Access.READ_ONLY)
-	private Long id;
-	
-	@JsonProperty(required = true)
-	private String name;
+//	@JsonProperty(required = false, access = Access.READ_ONLY)
+//	private Long id;
 
-	@JsonProperty(required = true)
-	private List<UserRolesDAO> roles;
+    @JsonProperty(required = true)
+    private String username;
+    @JsonProperty(required = true)
+    private String email;
+    @JsonProperty(required = false)
+    private String firstName;
+    @JsonProperty(required = false)
+    private String lastName;
 
-	@JsonProperty(required = true)
-	private List<UserSettingsDAO> settings;
-	
-	public static UserDAOResponse create(User user, List<UserRoles> roles, List<UserSettings> settings) {
-		UserDAOResponse dao = null;
-		
-		if (user != null) {
-			dao = new UserDAOResponse();
+    @JsonProperty(required = true)
+    private List<String> roles;
 
-			dao.setId(user.getId());
-			//dao.setName(user.getName());
-			
-			if (roles != null)
-				dao.setRoles(roles.stream().map(role -> UserRolesDAO.create(role)).collect(Collectors.toList()));
-			
-			if (settings != null)
-				dao.setSettings(settings.stream().map(setting -> UserSettingsDAO.create(setting)).collect(Collectors.toList()));
-		}
-		return dao;
-	}
-	
-	public User mapToEntity() {
-		User user = new User();
-		
-		user.setId(id);
-		//user.setName(name);
+    @JsonProperty(required = true)
+    private String settingsJson;
 
-		return user;
-	}
+    public static UserDAOResponse create(UserRepresentation user, List<String> roles, String settingsJson) {
+        UserDAOResponse dao = new UserDAOResponse();
+        dao.setEmail(user.getEmail());
+        dao.setFirstName(user.getFirstName());
+        dao.setLastName(user.getLastName());
+        dao.setUsername(user.getUsername());
+        dao.setRoles(roles);
+        dao.setSettingsJson(settingsJson);
+        return dao;
+    }
+
+
 }

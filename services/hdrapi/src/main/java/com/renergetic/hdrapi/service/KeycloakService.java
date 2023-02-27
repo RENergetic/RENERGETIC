@@ -88,15 +88,15 @@ public class KeycloakService {
     }
 
 
-    public RealmResource getRealmApi(String authToken) {
-        Keycloak instance = this.getInstance(authToken);
-        return instance.realms().realm(this.realm);
-    }
-
-    public ClientResource getClientApi(String authToken) {
-        Keycloak instance = this.getInstance(authToken);
-        return instance.realms().realm(this.realm).clients().get(this.clientId);
-    }
+//    public RealmResource getRealmApi(String authToken) {
+//        Keycloak instance = this.getInstance(authToken);
+//        return instance.realms().realm(this.realm);
+//    }
+//
+//    public ClientResource getClientApi(String authToken) {
+//        Keycloak instance = this.getInstance(authToken);
+//        return instance.realms().realm(this.realm).clients().get(this.clientId);
+//    }
 
     public KeycloakAuthenticationToken getAuthenticationToken(String keycloakJWTToken) {
         //TODO: verify token and expiration timeout

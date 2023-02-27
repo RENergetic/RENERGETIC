@@ -48,7 +48,8 @@ public class UserService {
 
     // USER CRUD OPERATIONS
     @Transactional
-    public UserDAOResponse save(UserDAORequest user) {
+    public UserDAOResponse save(UserRepresentation keycloakUser,UserDAORequest user) {
+
         if (user.getId() != null && userRepository.findByKeycloakId(user.getId()) != null)
             throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
 
@@ -67,7 +68,7 @@ public class UserService {
         Asset asset = Asset.initUserAsset(user.getUsername(), userEntity, assetType, null);
         asset.setUuid(uuidRepository.saveAndFlush(new UUID()));
         assetRepository.save(asset);
-        return UserDAOResponse.create(userEntity, null, null);
+        return UserDAOResponse.create(keycloakUser, null, null);
     }
 
     @Transactional
@@ -87,7 +88,7 @@ public class UserService {
         uuidRepository.delete(asset.getUuid());
         userRepository.deleteById(entityUser.getId());
         uuidRepository.delete(entityUser.getUuid());
-        return UserDAOResponse.create(entityUser, null, null);
+        return UserDAOResponse.create(keycloakUser, null, null);
     }
 
     public UserSettingsDAO saveSetting(UserSettingsDAO settings) {
@@ -177,8 +178,7 @@ public class UserService {
         } else {
             //else todo:
         }
-
-        return UserDAOResponse.create(userEntity, null, null);
+        return UserDAOResponse.create(userRepresentation, null, null);
     }
 
 
@@ -197,10 +197,8 @@ public class UserService {
         if (filters != null)
             stream.filter(setting -> {
                 boolean equals = true;
-
                 if (equals && filters.containsKey("user_id"))
                     equals = String.valueOf(setting.getUser().getId()).equalsIgnoreCase(filters.get("user_id"));
-
                 return equals;
             });
         List<UserSettingsDAO> list = stream

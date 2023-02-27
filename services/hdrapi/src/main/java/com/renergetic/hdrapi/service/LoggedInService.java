@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.service;
 
+import com.renergetic.hdrapi.exception.UnauthorizedAccessException;
 import com.renergetic.hdrapi.model.User;
 import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
@@ -29,7 +30,7 @@ public class LoggedInService {
     public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof AnonymousAuthenticationToken || authentication == null) {
-            return null;
+            throw new UnauthorizedAccessException("Empty Authoritation header");
         } else if (authentication instanceof KeycloakAuthenticationToken) {
 
             KeycloakAuthenticationToken keycloakAuthenticationToken = (KeycloakAuthenticationToken) authentication;
@@ -38,7 +39,7 @@ public class LoggedInService {
             return keycloakAuthenticationToken.getUser();
         } else {
             //TODO:
-            throw new NotImplementedException();
+            throw new UnauthorizedAccessException("Invalid Authoritation header to get the logged user");
         }
     }
 
@@ -49,7 +50,7 @@ public class LoggedInService {
             return keycloakAuthenticationToken;
         } else {
             //TODO:
-            throw new NotImplementedException();
+            throw new UnauthorizedAccessException("Invalid Authoritation header, doesn't contain a token");
         }
     }
 
@@ -58,7 +59,7 @@ public class LoggedInService {
     }
 
     public KeycloakWrapper getKeycloakClient(boolean admin) {
-        var token = this.getKeycloakUser().getToken();
+        String token = this.getKeycloakUser().getToken();
         //verify
         if (admin && !this.hasRole(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask)) {
             //TODO: raise exception
