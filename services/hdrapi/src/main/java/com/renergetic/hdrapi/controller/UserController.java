@@ -185,6 +185,7 @@ public class UserController {
     }
     )
     @PostMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
+    @PutMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
     public ResponseEntity<String> saveUserSetting(@RequestBody String settings) {
 //        Long userId = 2l;
         var userId = loggedInService.getLoggedInUser().getId();
