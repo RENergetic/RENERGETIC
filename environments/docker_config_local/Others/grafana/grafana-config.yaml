@@ -12,14 +12,14 @@ data:
       allow_embedding = true
     [auth]
       oauth_auto_login = true
-      signout_redirect_url = http://localhost/auth/realms/realm-renergetic/protocol/openid-connect/logout?redirect_uri=http%3A%2F%2Fgrafana-ren-prototype.apps.paas-dev.psnc.pl
+      signout_redirect_url = http://localhost/auth/realms/realm-renergetic/protocol/openid-connect/logout?redirect_uri=http%3A%2F%2Flocalhost%3A3000
     [auth.generic_oauth]
       enabled = true
       allow_sign_up = true
       name = OAuth
       allow_sign_up = true
       client_id = grafana
-      client_secret = NpD4ZN6sqt3zhOmVHbkRxpApBzIINH4B
+      client_secret = KHGfbZM7KeGieHJSdkZ8w0941EpG72Cf
       auth_url = http://localhost/auth/realms/realm-renergetic/protocol/openid-connect/auth
       token_url = http://keycloak-sv:8080/auth/realms/realm-renergetic/protocol/openid-connect/token
       api_url = http://keycloak-sv:8080/auth/realms/realm-renergetic/protocol/openid-connect/userinfo

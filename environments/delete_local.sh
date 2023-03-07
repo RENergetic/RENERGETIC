@@ -52,5 +52,7 @@ then
         kubectl get pv | grep Released | awk '$1 {print$1}' | while read vol; do kubectl delete pv/${vol} --grace-period=0 --force; done
     fi
 
+    docker image rm $(docker images | grep "^<none>" | awk "{print $3}")
+
 fi
 
