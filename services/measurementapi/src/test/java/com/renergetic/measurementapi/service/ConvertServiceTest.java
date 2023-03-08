@@ -134,7 +134,7 @@ public class ConvertServiceTest {
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
         MeasurementType dashboardUnit = new MeasurementType();
         dashboardUnit.setBaseUnit("Wh");
-        dashboardUnit.setFactor(3600.0);
+        dashboardUnit.setFactor(1.0/3600.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("Wh");
         measurementType.setFactor(1000000.0);
@@ -150,7 +150,7 @@ public class ConvertServiceTest {
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
         MeasurementType dashboardUnit = new MeasurementType();
         dashboardUnit.setBaseUnit("Wh");
-        dashboardUnit.setFactor(3600.0);
+        dashboardUnit.setFactor(1.0/3600.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("Wh");
         measurementType.setFactor(1.0);
@@ -230,7 +230,7 @@ public class ConvertServiceTest {
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
         MeasurementType dashboardUnit = new MeasurementType();
         dashboardUnit.setBaseUnit("Wh");
-        dashboardUnit.setFactor(3600.0);
+        dashboardUnit.setFactor(1.0/3600.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1000000.0);
@@ -246,7 +246,7 @@ public class ConvertServiceTest {
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
         MeasurementType dashboardUnit = new MeasurementType();
         dashboardUnit.setBaseUnit("Wh");
-        dashboardUnit.setFactor(3600.0);
+        dashboardUnit.setFactor(1.0/3600.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1.0);
