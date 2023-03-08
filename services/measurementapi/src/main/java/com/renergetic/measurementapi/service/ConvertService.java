@@ -17,8 +17,6 @@ import java.util.Map;
 
 @Service
 public class ConvertService {
-    @Autowired
-    DashboardRepository dashboardRepository;
 
     @Autowired
     DashboardService dashboardService;

@@ -1,7 +1,6 @@
 package com.renergetic.measurementapi.service;
 
 import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
-import com.renergetic.measurementapi.model.DashboardUnit;
 import com.renergetic.measurementapi.model.MeasurementType;
 import org.apache.commons.lang3.function.TriFunction;
 import org.junit.Assert;
