@@ -143,10 +143,10 @@ public class MeasurementController {
 		@ApiResponse(responseCode = "200", description = "Details saved correctly"),
 		@ApiResponse(responseCode = "500", description = "Error saving details")
 	})
-	@PostMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<MeasurementDetails> insertInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id){
+	@PostMapping(path = "{id}/info", produces = "application/json", consumes = "application/json")
+	public ResponseEntity<MeasurementDetails> insertInformation (@RequestBody MeasurementDetails detail, @PathVariable Long id){
 		Measurement measurement = new Measurement();
-		measurement.setId(measurement_id);
+		measurement.setId(id);
 		detail.setMeasurement(measurement);
 		MeasurementDetails _detail = measurementSv.saveDetail(detail);
 		return new ResponseEntity<>(_detail, HttpStatus.CREATED);

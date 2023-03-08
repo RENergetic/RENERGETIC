@@ -5,10 +5,8 @@ import com.renergetic.hdrapi.model.User;
 import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.model.security.KeycloakUser;
-import com.renergetic.hdrapi.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,8 +20,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class LoggedInService {
-
-    private final UserRepository userRepository;
     @Autowired
     KeycloakService keycloakService;
 
