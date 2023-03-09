@@ -12,5 +12,7 @@ public interface AssetDetailsRepository extends JpaRepository<AssetDetails, Long
 
 	Boolean existsByIdAndAssetId(long resourceId, long assetId);
 	List<AssetDetails> findByAssetId(long resourceId);
+
+	boolean existsByKeyAndAssetId(String key, long resourceId);
 	
 }

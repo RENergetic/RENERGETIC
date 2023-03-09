@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,14 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     public List<Asset> findByUserIdAndCategoryId(Long userId, Long category, long offset, int limit);
 
     List<Asset> findByUser(User userId);
+    
+    @Transactional
+	@Modifying(flushAutomatically = true)
+	@Query("update Asset a set"
+			+ " a.name = :#{#asset.name}, a.label = :#{#asset.label}, a.location = :#{#asset.location},"
+			+ " a.parentAsset = :#{#asset.parentAsset}, a.user = :#{#asset.user}, a.assetCategory = :#{#asset.assetCategory},"
+			+ " a.type = :#{#asset.type} where a.id = :#{#asset.id}")
+    public void update(@Param("asset")Asset asset);
 
     //	@Query("SELECT u FROM User u WHERE u.keycloakId = :keycloakId")
     @Query("SELECT asset FROM Asset asset " +

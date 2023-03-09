@@ -71,7 +71,8 @@ public class AssetService {
         if (assetExists && asset.getType() != null &&
                 assetTypeRepository.existsById(asset.getType())) {
             asset.setId(id);
-            return AssetDAOResponse.create(assetRepository.save(asset.mapToEntity()), null, null);
+            assetRepository.update(asset.mapToEntity());
+            return AssetDAOResponse.create(assetRepository.findById(id).orElse(null), null, null);
         } else throw new InvalidNonExistingIdException(assetExists
                 ? "The asset type doesn't exists"
                 : "The asset to update doesn't exists");
@@ -284,6 +285,9 @@ public class AssetService {
     public AssetDetails saveDetail(AssetDetails detail, Long assetId) {
         detail.setId(null);
         if (assetId != null && assetRepository.existsById(assetId)) {
+        	if(assetDetailsRepository.existsByKeyAndAssetId(detail.getKey(), assetId))
+        		throw new InvalidCreationIdAlreadyDefinedException("There are details with the same key and asset id");
+        	
 	        Asset asset = new Asset();
 	        asset.setId(assetId);
 	        detail.setAsset(asset);
