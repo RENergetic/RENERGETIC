@@ -22,19 +22,19 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class KeycloakService {
-    @Value("${keycloak.url}")
+    @Value("${keycloak.auth-server-url}")
     private String serverUrl;
-    @Value("${keycloak.realm}")
+    @Value("${renergetic.keycloak.realm}")
     private String realm;
-    @Value(value = "${keycloak.client-id}")
+    @Value(value = "${renergetic.keycloak.client-id}")
     private String clientId;
 
 
-    @Value("${keycloak.admin.username}")
+    @Value("${renergetic.keycloak.admin.username}")
     private String adminUsername;
-    @Value("${keycloak.admin.password}")
+    @Value("${renergetic.keycloak.admin.password}")
     private String adminPassword;
-    @Value(value = "${keycloak.admin.client-id}")
+    @Value(value = "${renergetic.keycloak.admin.client-id}")
     private String adminClient;
 
     @Autowired

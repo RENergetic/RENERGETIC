@@ -27,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String jwtToken = request.getHeader("Authorization");
+            System.err.println(jwtToken);
             if (StringUtils.hasText(jwtToken)) {
                 KeycloakAuthenticationToken authenticationToken = keycloakService.getAuthenticationToken(jwtToken);
 
