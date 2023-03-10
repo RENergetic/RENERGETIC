@@ -177,6 +177,19 @@ public class AssetController {
         return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @Operation(summary = "Update Information from its key")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Details saved correctly"),
+            @ApiResponse(responseCode = "400", description = "Path isn't valid"),
+            @ApiResponse(responseCode = "404", description = "Detail not exist"),
+            @ApiResponse(responseCode = "500", description = "Error saving information")
+    })
+    @PutMapping(path = "{asset_id}/info", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<AssetDetails> updateInformationByKey(@RequestBody AssetDetails detail, @PathVariable("asset_id") Long assetId) {
+        AssetDetails _detail = assetSv.updateDetailByKey(detail, assetId);
+        return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
     @Operation(summary = "Delete Information from its id")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Information delete"),
@@ -186,6 +199,19 @@ public class AssetController {
     public ResponseEntity<AssetDetails> deleteInformation(@PathVariable("asset_id") Long assetId,
             @PathVariable("info_id") Long infoId) {
         assetSv.deleteDetailById(infoId, assetId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Delete Information from its key")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Information delete"),
+            @ApiResponse(responseCode = "500", description = "Error deleting information")
+    })
+    @DeleteMapping(path = "{asset_id}/info/{key}")
+    public ResponseEntity<AssetDetails> deleteInformationByKey(@PathVariable("asset_id") Long assetId,
+            @PathVariable("key") String key) {
+        assetSv.deleteDetailByKey(key, assetId);
 
         return ResponseEntity.noContent().build();
     }
