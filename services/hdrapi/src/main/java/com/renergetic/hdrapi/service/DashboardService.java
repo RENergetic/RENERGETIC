@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.renergetic.hdrapi.model.MeasurementType;
+import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,9 @@ public class DashboardService {
 	
 	@Autowired
 	DashboardRepository dashboardRepository;
+
+	@Autowired
+	MeasurementTypeRepository measurementTypeRepository;
 	@Autowired
 	UserRepository userRepository;
 	@Autowired
@@ -112,6 +117,9 @@ public class DashboardService {
 		} else throw new NotFoundException("No users found related with id " + id);
 	}
 
+	public List<MeasurementType> getUnits(){
+		return measurementTypeRepository.findByDashboardVisibility();
+	}
 	public List<DashboardDAO> getAvailableToUserId(Long userId, Long offset, Integer limit){
 		User user = userRepository.findById(userId).orElse(null);
 		if(user == null)

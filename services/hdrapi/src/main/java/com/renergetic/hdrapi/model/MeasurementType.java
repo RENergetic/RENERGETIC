@@ -19,6 +19,7 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @ToString
 public class MeasurementType {
+	//TODO: store symbol ,"ºC",
 	@Id
 	@JsonProperty(required = true)
 	@Column(name = "id", nullable = false, insertable = true, updatable = true, unique = true)
@@ -50,10 +51,13 @@ public class MeasurementType {
 	@Column(name = "factor", nullable = true, insertable = true, updatable = true)
 	@JsonProperty(required = false)
 	private Double factor;
-	
+
 	@Column(name = "color", nullable = true, insertable = true, updatable = true)
 	@JsonProperty(required = false)
 	private String color;
+	@Column(name = "dashboard_visibility", nullable = true   )
+	@JsonProperty(required = true)
+	private Boolean dashboardVisibility = true;
 
 	public MeasurementType(long id, String name,String physicalName, String label, String baseUnit, String unit, String metricType, Double factor, String color) {
 		super();

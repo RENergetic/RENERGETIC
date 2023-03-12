@@ -32,6 +32,8 @@ public class DataService {
     @Autowired
     private AssetRepository assetRepository;
     @Autowired
+    private DummyDataGenerator dummyDataGenerator;
+    @Autowired
     private MeasurementTagsRepository measurementTagsRepository;
     @Autowired
     private InformationPanelService informationPanelService;
@@ -75,7 +77,7 @@ public class DataService {
 
     public DataDAO getData(Collection<Measurement> measurements, Long from, Optional<Long> to) {
         if (generateDummy) {
-            return DummyDataGenerator.getData(measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(Collectors.toList()));
+            return dummyDataGenerator.getData(measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(Collectors.toList()));
         } else {
         	DataDAO ret = new DataDAO();
         	Set<Thread> threads = new HashSet<>();

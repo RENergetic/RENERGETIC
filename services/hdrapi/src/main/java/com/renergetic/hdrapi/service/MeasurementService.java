@@ -148,6 +148,10 @@ public class MeasurementService {
     		return list;
 		else throw new NotFoundException("No measurement types found");		
 	}
+	//toremove
+//	public List<MeasurementType> getDashboardTypes() {
+//		return measurementTypeRepository.findByDashboardVisibility();
+//	}
 
 	public MeasurementType getTypeById(Long id) {
 		return measurementTypeRepository.findById(id).orElseThrow(() -> new NotFoundException("No measurement types with id " + id + " found"));
