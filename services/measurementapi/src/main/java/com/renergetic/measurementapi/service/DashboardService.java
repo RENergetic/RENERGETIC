@@ -26,10 +26,10 @@ public class DashboardService {
 	public MeasurementType getDashboardUnitByGrafanaId(String grafanaId){
 		Dashboard dashboard = getByGrafanaId(grafanaId);
 
-		return dashboard == null ? null : retrieveDashboardUnitFromExt(dashboard.getExt());
+		return dashboard == null ? null : dashboard.getMeasurementType();
 	}
 
-	private MeasurementType retrieveDashboardUnitFromExt(String ext){
+	/*private MeasurementType retrieveDashboardUnitFromExt(String ext){
 		if(ext == null || ext.isEmpty())
 			return null;
 
@@ -39,5 +39,5 @@ public class DashboardService {
 		} catch (Exception e){
 			return null;
 		}
-	}
+	}*/
 }
