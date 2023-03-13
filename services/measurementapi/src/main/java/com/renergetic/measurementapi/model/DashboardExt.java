@@ -10,8 +10,5 @@ import lombok.Setter;
 public class DashboardExt {
     @JsonProperty(value = "measurement_type", required = false)
     @SerializedName("measurement_type")
-    private String measurementType;
-    @JsonProperty(value = "unit", required = false)
-    @SerializedName("unit")
-    private String unit;
+    private MeasurementType measurementType;
 }

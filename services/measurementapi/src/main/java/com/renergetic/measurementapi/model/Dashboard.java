@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
@@ -34,6 +36,11 @@ public class Dashboard {
 
 	@Column(name = "ext", nullable = true, insertable = true, updatable = true,columnDefinition="TEXT")
 	private String ext;
+
+	@OneToOne(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "measurement_type_id", nullable = true, insertable = true, updatable = true)
+	private MeasurementType measurementType;
 
 	public Dashboard(String name, String url, String label) {
 		super();

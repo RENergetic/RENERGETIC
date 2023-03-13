@@ -1,7 +1,6 @@
 package com.renergetic.measurementapi.service;
 
 import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
-import com.renergetic.measurementapi.model.DashboardUnit;
 import com.renergetic.measurementapi.model.MeasurementType;
 import org.apache.commons.lang3.function.TriFunction;
 import org.junit.Assert;
@@ -133,7 +132,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_MWhToJ(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.J;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("Wh");
+        dashboardUnit.setFactor(1.0/3600.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("Wh");
         measurementType.setFactor(1000000.0);
@@ -147,7 +148,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_WhToJ(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.J;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("Wh");
+        dashboardUnit.setFactor(1.0/3600.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("Wh");
         measurementType.setFactor(1.0);
@@ -161,7 +164,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_MWhToW(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.W;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("W");
+        dashboardUnit.setFactor(1.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("Wh");
         measurementType.setFactor(1000000.0);
@@ -175,7 +180,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_WhToW(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.W;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("W");
+        dashboardUnit.setFactor(1.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("Wh");
         measurementType.setFactor(1.0);
@@ -189,7 +196,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_WhToWh(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.Wh;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("Wh");
+        dashboardUnit.setFactor(1.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("Wh");
         measurementType.setFactor(1.0);
@@ -203,7 +212,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_WToW(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.W;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("W");
+        dashboardUnit.setFactor(1.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1.0);
@@ -217,7 +228,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_MWToJ(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.J;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("Wh");
+        dashboardUnit.setFactor(1.0/3600.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1000000.0);
@@ -231,7 +244,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_WToJ(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.J;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("Wh");
+        dashboardUnit.setFactor(1.0/3600.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1.0);
@@ -245,7 +260,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_MWToWh(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.Wh;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("Wh");
+        dashboardUnit.setFactor(1.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1000000.0);
@@ -259,7 +276,9 @@ public class ConvertServiceTest {
     public void test_retrieveConversionFunction_WToWh(){
         LocalDateTime pTs = LocalDateTime.parse("2023-02-24 08:00:00", formatter);
         LocalDateTime cTs = LocalDateTime.parse("2023-02-24 08:15:00", formatter);
-        DashboardUnit dashboardUnit = DashboardUnit.Wh;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("Wh");
+        dashboardUnit.setFactor(1.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1.0);
@@ -275,7 +294,9 @@ public class ConvertServiceTest {
 
         Map<String, TriFunction<String, LocalDateTime, LocalDateTime, String>> converters = new HashMap<>();
 
-        DashboardUnit dashboardUnit = DashboardUnit.Wh;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("Wh");
+        dashboardUnit.setFactor(1.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1000.0);
@@ -320,7 +341,9 @@ public class ConvertServiceTest {
 
         Map<String, TriFunction<String, LocalDateTime, LocalDateTime, String>> converters = new HashMap<>();
 
-        DashboardUnit dashboardUnit = DashboardUnit.W;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("W");
+        dashboardUnit.setFactor(1.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1000.0);
@@ -365,7 +388,9 @@ public class ConvertServiceTest {
 
         Map<String, TriFunction<String, LocalDateTime, LocalDateTime, String>> converters = new HashMap<>();
 
-        DashboardUnit dashboardUnit = DashboardUnit.W;
+        MeasurementType dashboardUnit = new MeasurementType();
+        dashboardUnit.setBaseUnit("W");
+        dashboardUnit.setFactor(1.0);
         MeasurementType measurementType = new MeasurementType();
         measurementType.setBaseUnit("W");
         measurementType.setFactor(1000.0);
