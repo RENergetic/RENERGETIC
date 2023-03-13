@@ -33,9 +33,11 @@ public class DashboardService {
 		if(ext == null || ext.isEmpty())
 			return null;
 
-		DashboardExt dashboardExt = gson.fromJson(ext, DashboardExt.class);
-		if(dashboardExt.getMeasurementType() != null && dashboardExt.getUnit() != null)
-			return measurementTypeService.getTypeByName(dashboardExt.getUnit());
-		return null;
+		try{
+			DashboardExt dashboardExt = gson.fromJson(ext, DashboardExt.class);
+			return dashboardExt.getMeasurementType();
+		} catch (Exception e){
+			return null;
+		}
 	}
 }
