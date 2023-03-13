@@ -13,7 +13,7 @@ public interface MeasurementTypeRepository extends JpaRepository<MeasurementType
 	
 	MeasurementType save(MeasurementType asset);
 
-	@Query("Select mt FROM MeasurementType mt WHERE mt.dashboardVisibility")
+	@Query("Select mt FROM MeasurementType mt WHERE mt.dashboardVisibility = true")
 	List<MeasurementType> findByDashboardVisibility ();
 
 }

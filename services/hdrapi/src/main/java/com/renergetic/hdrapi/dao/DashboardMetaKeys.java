@@ -72,9 +72,12 @@ public class DashboardMetaKeys {
 //    @JsonProperty(required = false, value = "units2")
 //    @JsonSerialize(using = DashboardMetaKeys.DashboardUnitSerializer2.class)
 //    private List<DashboardUnit> units2 = Arrays.asList(DashboardUnit.values());
-    @JsonProperty(required = false, value = "units")
+@JsonProperty(required = false, value = "units")
 //    @JsonSerialize(using = DashboardMetaKeys.DashboardUnitSerializer.class)
-    private List<MeasurementType> units;
+private List<MeasurementType> units;
+@JsonProperty(required = false, value = "measurement_types")
+//    @JsonSerialize(using = DashboardMetaKeys.DashboardUnitSerializer.class)
+    private List<MeasurementType> measurementTypes;
 
 
 //    static {
@@ -84,6 +87,7 @@ public class DashboardMetaKeys {
 
     public DashboardMetaKeys(List<MeasurementType> units) {
         this.units = units;
+        this.measurementTypes=units;
         //TODO: write some initialization here
     }
 
