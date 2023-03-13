@@ -1,4 +1,4 @@
-package com.renergetic.hdrapi;
+package com.renergetic.hdrapi.config;
 
 import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
