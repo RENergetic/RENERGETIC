@@ -4,6 +4,8 @@ import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.User;
 import com.renergetic.hdrapi.repository.UserRepository;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +19,7 @@ public class KeycloakAuthenticationToken extends AbstractAuthenticationToken {
 	private KeycloakUser principal;
     private User user;
     private UserRepository userRepository;
-//    private List<KeycloakRole> keycloakRoles;
+    private Collection<GrantedAuthority> authorities;
 
     public KeycloakAuthenticationToken(KeycloakUser keycloakUser, List<KeycloakRole> keycloakRoles,
                                        UserRepository userRepository) {
@@ -31,7 +33,7 @@ public class KeycloakAuthenticationToken extends AbstractAuthenticationToken {
         super(keycloakRoles);
         this.principal = keycloakUser;
         this.user = user;
-//        this.keycloakRoles = keycloakRoles;
+        this.authorities = keycloakRoles.stream().map(role ->  new SimpleGrantedAuthority("ROLE_" + role.name)).collect(Collectors.toList());
     }
 
     public User getUser() {
@@ -59,6 +61,11 @@ public class KeycloakAuthenticationToken extends AbstractAuthenticationToken {
     @Override
     public KeycloakUser getPrincipal() {
         return principal;
+    }
+
+    @Override
+    public Collection<GrantedAuthority> getAuthorities() {
+        return authorities;
     }
 
     public boolean hasRole(int expectedMask) {
