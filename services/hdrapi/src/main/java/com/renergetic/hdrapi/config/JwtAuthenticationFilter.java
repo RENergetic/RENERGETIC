@@ -30,13 +30,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    String clientId = "renergetic-app";
+    private String clientId;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-    		System.err.println("FILTER");
             String jwtToken = request.getHeader("Authorization");
             if (StringUtils.hasText(jwtToken)) {
                 KeycloakAuthenticationToken authenticationToken = this.getAuthenticationToken(jwtToken);

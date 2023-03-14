@@ -10,7 +10,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 	
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		System.err.println("AUTHENTICATION");
 		return authentication;
 	}
 	

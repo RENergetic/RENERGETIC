@@ -45,16 +45,12 @@ public class WebSecurityConfig {
     List<String> methods;
     @Value("${api.cors.max-age}")
     Long maxAge;
+
+    @Value(value = "${keycloak.client-id}")
+    private String clientId;
     
     @Autowired
     JwtAuthenticationProvider authProvider;
-
-    @Bean
-    JwtAuthenticationFilter jwtAuthenticationFilter() {
-    	JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
-        
-        return filter;
-    }
     
     @Bean
     protected JwtAuthenticationProvider authenticationProvider() throws Exception {
@@ -69,9 +65,11 @@ public class WebSecurityConfig {
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    	JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
+        filter.setClientId(clientId);
 
         http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(new JwtAuthenticationFilter(), FilterSecurityInterceptor.class);
+        http.addFilterBefore(filter, FilterSecurityInterceptor.class);
         //for some reason it doesnt work
 //        http.csrf().disable().authorizeRequests().antMatchers("/api/users")
 //                .hasAnyRole(KeycloakRole.REN_ADMIN.getAuthority(),
