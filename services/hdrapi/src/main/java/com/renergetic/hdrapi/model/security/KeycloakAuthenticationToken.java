@@ -1,8 +1,6 @@
 package com.renergetic.hdrapi.model.security;
 
-import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.User;
-import com.renergetic.hdrapi.repository.UserRepository;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,36 +15,18 @@ public class KeycloakAuthenticationToken extends AbstractAuthenticationToken {
 	private static final long serialVersionUID = -3324031070506421715L;
 	
 	private KeycloakUser principal;
-    private User user;
-    private UserRepository userRepository;
     private Collection<GrantedAuthority> authorities;
 
-    public KeycloakAuthenticationToken(KeycloakUser keycloakUser, List<KeycloakRole> keycloakRoles,
-                                       UserRepository userRepository) {
+    public KeycloakAuthenticationToken(KeycloakUser keycloakUser, List<KeycloakRole> keycloakRoles) {
         super(keycloakRoles);
         this.principal = keycloakUser;
-        this.userRepository = userRepository;
-//        this.keycloakRoles = keycloakRoles;
+        this.authorities = keycloakRoles.stream().map(role ->  new SimpleGrantedAuthority("ROLE_" + role.name)).collect(Collectors.toList());
     }
 
     public KeycloakAuthenticationToken(KeycloakUser keycloakUser, List<KeycloakRole> keycloakRoles, User user) {
         super(keycloakRoles);
         this.principal = keycloakUser;
-        this.user = user;
         this.authorities = keycloakRoles.stream().map(role ->  new SimpleGrantedAuthority("ROLE_" + role.name)).collect(Collectors.toList());
-    }
-
-    public User getUser() {
-        if (user != null) {
-            return user;
-        }
-        if (this.userRepository != null) {
-            this.user = this.userRepository.findByKeycloakId(this.principal.getId());
-            if (user == null) {
-                throw new NotFoundException("No matching renergetic user for: " + this.principal.getId());
-            }
-        }
-        return user;
     }
 
     @Override

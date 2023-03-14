@@ -3,15 +3,12 @@ package com.renergetic.hdrapi.service;
 import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.model.security.KeycloakUser;
-import com.renergetic.hdrapi.repository.UserRepository;
 import com.renergetic.hdrapi.service.utils.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
-import org.keycloak.admin.client.resource.ClientResource;
-import org.keycloak.admin.client.resource.RealmResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,8 +34,6 @@ public class KeycloakService {
     @Value(value = "${keycloak.admin.client-id}")
     private String adminClient;
 
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private LoggedInService loggedInService;
 
@@ -123,7 +118,7 @@ public class KeycloakService {
                     roles.toList().stream().map(it -> KeycloakRole.roleByName(it.toString())).collect(
                             Collectors.toList());
             KeycloakUser user = new KeycloakUser(userId, username, client, keycloakJWTToken);
-            return new KeycloakAuthenticationToken(user, keycloakRoles, userRepository);
+            return new KeycloakAuthenticationToken(user, keycloakRoles);
 
         } catch (Exception ex) {
             log.error("Could not set user authentication in security context", ex);

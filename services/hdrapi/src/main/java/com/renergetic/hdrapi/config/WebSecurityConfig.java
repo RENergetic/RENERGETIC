@@ -3,17 +3,24 @@ package com.renergetic.hdrapi.config;
 import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.service.CustomAccessDeniedHandler;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,7 +37,7 @@ import java.util.Map;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
     @Value("#{${api.cors.allowed-origins}}")
     List<String> origins;
@@ -38,11 +45,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     List<String> methods;
     @Value("${api.cors.max-age}")
     Long maxAge;
+    
+    @Autowired
+    JwtAuthenticationProvider authProvider;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    JwtAuthenticationFilter jwtAuthenticationFilter() {
+    	JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
+        
+        return filter;
+    }
+    
+    @Bean
+    protected JwtAuthenticationProvider authenticationProvider() throws Exception {
+    	JwtAuthenticationProvider provider = new JwtAuthenticationProvider();
+    	return provider;
+    }
+    
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+      return authConfig.getAuthenticationManager();
+    }
 
-        http.cors().and().csrf().disable();
+    @Bean
+    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.addFilterBefore(new JwtAuthenticationFilter(), FilterSecurityInterceptor.class);
         //for some reason it doesnt work
 //        http.csrf().disable().authorizeRequests().antMatchers("/api/users")
 //                .hasAnyRole(KeycloakRole.REN_ADMIN.getAuthority(),
@@ -90,6 +119,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         });
         //registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         registry.anyRequest().permitAll();
+        
+        return http.build();
     }
 
 
@@ -99,7 +130,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
     	
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(origins);
@@ -114,11 +145,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Bean
-    JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
     }
 
     public class RoleFilter implements Filter {
@@ -146,11 +172,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //TODO:
             }
 
-        }
-
-        @Override
-        public void init(FilterConfig arg0) throws ServletException {
-            // Do nothing
         }
 
     }
