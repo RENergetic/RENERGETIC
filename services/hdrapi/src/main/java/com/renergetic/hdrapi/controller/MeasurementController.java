@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,10 +52,23 @@ public class MeasurementController {
 	@Operation(summary = "Get All Measurements")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-		List<MeasurementDAOResponse> measurements = new ArrayList<>();
+	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (
+            @RequestParam(required = false) Optional<String> name,
+            @RequestParam(required = false) Optional<String> type,
+            @RequestParam(required = false) Optional<String> direction,
+            @RequestParam(required = false) Optional<String> domain,
+            @RequestParam(required = false) Optional<Long> offset, 
+            @RequestParam(required = false) Optional<Integer> limit){
 		
-		measurements = measurementSv.get(null, offset.orElse(0L), limit.orElse(20));
+		List<MeasurementDAOResponse> measurements = new ArrayList<>();
+        HashMap<String, String> filters = new HashMap<>();
+
+        if (name.isPresent()) filters.put("name", name.get());
+        if (type.isPresent()) filters.put("type", type.get());
+        if (direction.isPresent()) filters.put("direction", direction.get());
+        if (domain.isPresent()) filters.put("parent", domain.get());
+		
+		measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20));
 		
 		return new ResponseEntity<>(measurements, HttpStatus.OK);
 	}
