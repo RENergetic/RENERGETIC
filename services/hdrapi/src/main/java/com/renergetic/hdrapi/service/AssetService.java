@@ -71,7 +71,8 @@ public class AssetService {
         if (assetExists && asset.getType() != null &&
                 assetTypeRepository.existsById(asset.getType())) {
             asset.setId(id);
-            return AssetDAOResponse.create(assetRepository.save(asset.mapToEntity()), null, null);
+            assetRepository.update(asset.mapToEntity());
+            return AssetDAOResponse.create(assetRepository.findById(id).orElse(null), null, null);
         } else throw new InvalidNonExistingIdException(assetExists
                 ? "The asset type doesn't exists"
                 : "The asset to update doesn't exists");
@@ -284,28 +285,51 @@ public class AssetService {
     public AssetDetails saveDetail(AssetDetails detail, Long assetId) {
         detail.setId(null);
         if (assetId != null && assetRepository.existsById(assetId)) {
+        	if(assetDetailsRepository.existsByKeyAndAssetId(detail.getKey(), assetId))
+        		throw new InvalidCreationIdAlreadyDefinedException("There are details with the same key and asset id");
+        	
 	        Asset asset = new Asset();
 	        asset.setId(assetId);
 	        detail.setAsset(asset);
 	        return assetDetailsRepository.save(detail);
-        } else throw new InvalidNonExistingIdException("No asset with id" + assetId + "found");
+        } else throw new InvalidNonExistingIdException("No asset with id " + assetId + " found");
     }
 
     public AssetDetails updateDetail(AssetDetails detail, Long id, Long assetId) {
         if (id != null && assetDetailsRepository.existsByIdAndAssetId(id, assetId)) {
+        	if(assetDetailsRepository.existsByKeyAndAssetId(detail.getKey(), assetId))
+        		throw new InvalidCreationIdAlreadyDefinedException("There are details with the same key and asset id");
             detail.setId(id);
 	        Asset asset = new Asset();
 	        asset.setId(assetId);
 	        detail.setAsset(asset);
             return assetDetailsRepository.save(detail);
-        } else throw new InvalidNonExistingIdException("No asset detail with id" + id + " related with " + assetId + " found");
+        } else throw new InvalidNonExistingIdException("No asset detail with id " + id + " related with " + assetId + " found");
+    }
+
+    public AssetDetails updateDetailByKey(AssetDetails detail, Long assetId) {
+    	AssetDetails entity = assetDetailsRepository.findByKeyAndAssetId(detail.getKey(), assetId).orElse(null);
+        if (entity != null) {
+            detail.setId(entity.getId());
+	        Asset asset = new Asset();
+	        asset.setId(assetId);
+	        detail.setAsset(asset);
+            return assetDetailsRepository.save(detail);
+        } else throw new InvalidNonExistingIdException("No asset detail with key " + detail.getKey() + " related with " + assetId + " found");
     }
 
     public boolean deleteDetailById(Long id, Long assetId) {
         if (id != null && assetDetailsRepository.existsByIdAndAssetId(id, assetId)) {
             assetDetailsRepository.deleteById(id);
             return true;
-        } else throw new InvalidNonExistingIdException("No asset detail with id" + id + " related with " + assetId + " found");
+        } else throw new InvalidNonExistingIdException("No asset detail with id " + id + " related with " + assetId + " found");
+    }
+
+    public boolean deleteDetailByKey(String key, Long assetId) {
+        if (key != null && assetDetailsRepository.existsByKeyAndAssetId(key, assetId)) {
+            assetDetailsRepository.deleteByKeyAndAssetId(key, assetId);
+            return true;
+        } else throw new InvalidNonExistingIdException("No asset detail with key " + key + " related with " + assetId + " found");
     }
 
     public List<AssetDetails> getDetails(Map<String, String> filters, long offset, int limit) {

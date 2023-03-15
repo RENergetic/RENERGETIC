@@ -18,6 +18,7 @@ import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.Direction;
+import com.renergetic.hdrapi.model.Domain;
 import com.renergetic.hdrapi.model.Measurement;
 import com.renergetic.hdrapi.model.MeasurementType;
 import com.renergetic.hdrapi.model.UUID;
@@ -73,26 +74,28 @@ public class MeasurementService {
 	public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {
 		Page<Measurement> measurements = measurementRepository.findAll(new OffSetPaging(offset, limit));
 		Stream<Measurement> stream = measurements.stream();
+		List<MeasurementDAOResponse> list;
 		
 		if (filters != null)
-			stream.filter(measurement -> {
+			list = stream.filter(measurement -> {
 				boolean equals = true;
 				
-				if (filters.containsKey("name"))
-					equals = measurement.getName().equalsIgnoreCase(filters.get("name"));
-				if (equals && filters.containsKey("type"))
+				if (filters.containsKey("name")) {
+					equals = (measurement.getName().toLowerCase().startsWith(filters.get("name").toLowerCase()) ||
+							(measurement.getLabel() != null) && measurement.getLabel().toLowerCase().startsWith(filters.get("name").toLowerCase()));
+				} if (equals && filters.containsKey("type"))
 					equals = measurement.getType().getName().equalsIgnoreCase(filters.get("type"));
-//				if (equals && filters.containsKey("icon"))
-//					equals = measurement.getIcon().equalsIgnoreCase(filters.get("icon"));
 				if (equals && filters.containsKey("direction"))
 					equals = measurement.getDirection().equals(Direction.valueOf(filters.get("direction")));
-				if (equals && filters.containsKey("asset_id") && measurement.getAsset() != null) {
-					equals = String.valueOf(measurement.getAsset().getId()).equalsIgnoreCase(filters.get("asset_id"));
+				if (equals && filters.containsKey("domain") && measurement.getAsset() != null) {
+					equals = measurement.getDomain().equals(Domain.valueOf(filters.get("domain")));
 				}
 				
 				return equals;
-			});
-		List<MeasurementDAOResponse> list = stream
+			}).map(measurement -> MeasurementDAOResponse.create(measurement, measurementDetailsRepository.findByMeasurementId(measurement.getId())))
+			.collect(Collectors.toList());
+		else
+			list = stream
 				.map(measurement -> MeasurementDAOResponse.create(measurement, measurementDetailsRepository.findByMeasurementId(measurement.getId())))
 				.collect(Collectors.toList());
 		
