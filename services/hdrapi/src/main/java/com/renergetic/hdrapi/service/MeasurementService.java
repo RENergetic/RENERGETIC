@@ -81,7 +81,8 @@ public class MeasurementService {
 				boolean equals = true;
 				
 				if (filters.containsKey("name")) {
-					equals = measurement.getName().toLowerCase().contains(filters.get("name").toLowerCase());
+					equals = (measurement.getName().toLowerCase().startsWith(filters.get("name").toLowerCase()) ||
+							(measurement.getLabel() != null) && measurement.getLabel().toLowerCase().startsWith(filters.get("name").toLowerCase()));
 				} if (equals && filters.containsKey("type"))
 					equals = measurement.getType().getName().equalsIgnoreCase(filters.get("type"));
 				if (equals && filters.containsKey("direction"))
