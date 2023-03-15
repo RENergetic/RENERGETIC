@@ -1,6 +1,6 @@
 package com.renergetic.measurementapi.controller;
 
-import com.renergetic.measurementapi.model.DashboardUnit;
+import com.renergetic.measurementapi.model.MeasurementType;
 import com.renergetic.measurementapi.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,10 +28,10 @@ public class DashboardController {
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "unit/{grafanaId}", produces = "application/json")
 	public ResponseEntity<Map<String, String>> getDashboardUnitAndType (@PathVariable String grafanaId){
-		DashboardUnit dashboardUnit = dashboardSv.getDashboardUnitByGrafanaId(grafanaId);
+		MeasurementType dashboardUnit = dashboardSv.getDashboardUnitByGrafanaId(grafanaId);
 		Map<String, String> result = new HashMap<>();
-		result.put("unit", dashboardUnit != null ? dashboardUnit.getSYMBOL() : "N/A");
-		result.put("type", dashboardUnit != null ? dashboardUnit.getDESCRIPTION() : "N/A");
+		result.put("unit", dashboardUnit != null ? dashboardUnit.getUnit() : "N/A");
+		result.put("type", dashboardUnit != null ? dashboardUnit.getPhysicalName() : "N/A");
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	

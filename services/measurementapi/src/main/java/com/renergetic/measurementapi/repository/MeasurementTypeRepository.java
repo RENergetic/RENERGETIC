@@ -8,4 +8,5 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public interface MeasurementTypeRepository extends JpaRepository<MeasurementType, Long> {
 	MeasurementType findByName (String name);
+	MeasurementType findByUnit (String unit);
 }

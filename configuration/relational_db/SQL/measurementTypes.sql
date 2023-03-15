@@ -2,7 +2,7 @@
 INSERT INTO measurement_type ( id, name, physical_name, label, base_unit, unit, factor, color ) 
     VALUES( 1, 'power_w', 'power', 'Power [W]', 'W', 'W', 1.0, '#4CAF50'),
      ( 2, 'energy_wh', 'energy', 'Energy[Wh]', 'Wh', 'Wh', 1.0, '#AAAF50'), 
-     ( 3, 'heat_energy_gj', 'energy', 'Energy [GJ]', 'Wh', 'GJ', 0.0000036, '#4CAF50'),
+     ( 3, 'heat_energy_gj', 'energy', 'Energy [GJ]', 'Wh', 'GJ', 277777.777778, '#4CAF50'),
      ( 4, 'temperature', 'temperature', 'Temperature [°C]', '°C', '°C', 1.0, '#4CAF50'),
      ( 5, 'percentage', 'percentage', 'Ratio [%]', '%', '%', 1.0, '#4CAF50'),
      ( 6, 'power_kw', 'power', 'Power [kW]', 'W', 'kW', 1000, '#4CAF50'),
