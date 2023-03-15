@@ -36,6 +36,7 @@ public class UserController {
     UserService userSv;
     @Value("${api.generate.dummy-data}")
     private Boolean generateDummy;
+    @Autowired
     private DummyDataGenerator dummyDataGenerator;
     @Autowired
     NotificationService notificationSv;
