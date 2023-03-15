@@ -244,7 +244,7 @@ public class AssetController {
     )
     @PutMapping(path = "/connect/{id}", produces = "application/json")
     public ResponseEntity<AssetDAOResponse> connectAssets(@PathVariable  Long id,
-                                                          @PathVariable("connected_asset_id") Long connectId,
+    													  @RequestParam("connect_to") Long connectId,
                                                           @RequestParam(value = "type", required = false) Optional<ConnectionType> type) {
         AssetConnectionDAORequest connection = new AssetConnectionDAORequest();
         connection.setAssetId(id);

@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.service;
 
+import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.exception.UnauthorizedAccessException;
 import com.renergetic.hdrapi.model.User;
 import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
@@ -8,7 +9,6 @@ import com.renergetic.hdrapi.model.security.KeycloakUser;
 import com.renergetic.hdrapi.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,10 +22,10 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class LoggedInService {
-
-    private final UserRepository userRepository;
     @Autowired
     KeycloakService keycloakService;
+    @Autowired
+    UserRepository userRepository;
 
     public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -36,7 +36,11 @@ public class LoggedInService {
             KeycloakAuthenticationToken keycloakAuthenticationToken = (KeycloakAuthenticationToken) authentication;
 
             // If user doesn't exist it must send a not found exception
-            return keycloakAuthenticationToken.getUser();
+            User user = this.userRepository.findByKeycloakId(keycloakAuthenticationToken.getPrincipal().getId());
+            if (user == null) {
+                throw new NotFoundException("No matching renergetic user for: " + keycloakAuthenticationToken.getPrincipal().getId());
+            }
+            return user;
         } else {
             //TODO:
             throw new UnauthorizedAccessException("Invalid Authoritation header to get the logged user");

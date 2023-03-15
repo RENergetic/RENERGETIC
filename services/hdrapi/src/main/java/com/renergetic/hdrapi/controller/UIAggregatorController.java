@@ -2,7 +2,9 @@ package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.exception.NotFoundException;
+import com.renergetic.hdrapi.exception.UnauthorizedAccessException;
 import com.renergetic.hdrapi.model.User;
+import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.service.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,49 +46,67 @@ public class UIAggregatorController {
 
     @Operation(summary = "API wrapper for front-end")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PostMapping(path = {"/wrapper", "/wrapper/{userId}"}, produces = "application/json")
-    public ResponseEntity<WrapperResponseDAO> apiWrapper(@PathVariable(required = false) String userId,
-                                                         @RequestBody WrapperRequestDAO wrapperRequestBodyDAO) {
-
-        WrapperResponseDAO wrapperResponseDAO = new WrapperResponseDAO();
+    @PostMapping(path = "/wrapper", produces = "application/json")
+    public ResponseEntity<WrapperResponseDAO> apiWrapper(@RequestBody WrapperRequestDAO wrapperRequestBodyDAO) {
         User user = loggedInService.getLoggedInUser();
         if (user == null) {
-//            todo: raise error
+        	throw new UnauthorizedAccessException("Invalid user, an authenticated user is required");
         }
-        if (userId != null) {
-//            check admin rights TODO:
-        } else
-            userId = user.getId().toString();
-        if (wrapperRequestBodyDAO.getCalls().getAssets() != null) {
-            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssets();
+        Long userId = user.getId();
+
+        WrapperResponseDAO wrapperResponseDAO = createWrapperResponse(userId, wrapperRequestBodyDAO);
+        return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
+    }
+
+    @Operation(summary = "API wrapper for front-end")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PostMapping(path = "/wrapper/{userId}", produces = "application/json")
+    public ResponseEntity<WrapperResponseDAO> apiWrapperAdmin(@PathVariable(required = true) Long userId,
+                                                         @RequestBody WrapperRequestDAO wrapperRequestBodyDAO) {
+        User user = loggedInService.getLoggedInUser();
+        if (user == null) {
+        	throw new UnauthorizedAccessException("Invalid user, an authenticated user is required");
+        } else if (!loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask))
+        	throw new UnauthorizedAccessException("Unauthorized user, you should have admin privileges");
+
+        WrapperResponseDAO wrapperResponseDAO = createWrapperResponse(userId, wrapperRequestBodyDAO);
+        return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
+    }
+
+    private WrapperResponseDAO createWrapperResponse(Long userId, WrapperRequestDAO body) {
+
+        WrapperResponseDAO wrapperResponseDAO = new WrapperResponseDAO();
+
+        if (body.getCalls().getAssets() != null) {
+            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getAssets();
             wrapperResponseDAO.setAssets(getSimpleAssets(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
         }
-        if (wrapperRequestBodyDAO.getCalls().getAssetPanels() != null) {
-            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getAssetPanels();
+        if (body.getCalls().getAssetPanels() != null) {
+            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getAssetPanels();
             wrapperResponseDAO.setAssetPanels(getAssetPanels(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
         }
-        if (wrapperRequestBodyDAO.getCalls().getMeasurementTypes() != null) {
+        if (body.getCalls().getMeasurementTypes() != null) {
             wrapperResponseDAO.setMeasurementTypes(measurementSv.getTypes(null, 0, 1000));
         }
-        if (wrapperRequestBodyDAO.getCalls().getData() != null) {
+        if (body.getCalls().getData() != null) {
             //get data related to panelId -> TODO: something to consider later
         }
-        if (wrapperRequestBodyDAO.getCalls().getAssetMetaKeys() != null) {
+        if (body.getCalls().getAssetMetaKeys() != null) {
             wrapperResponseDAO.setAssetMetaKeys(
                     new AssetMetaKeys(assetService.listTypes(), assetService.listCategories()));
             //get data related to panelId -> TODO: something to consider later
         }
 
-        if (wrapperRequestBodyDAO.getCalls().getPanels() != null) {
+        if (body.getCalls().getPanels() != null) {
             //also called public dashboards
-            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getPanels();
+            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getPanels();
             wrapperResponseDAO.setPanels(
                     getPanels(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
         }
-        if (wrapperRequestBodyDAO.getCalls().getDashboards() != null) {
-            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDashboards();
+        if (body.getCalls().getDashboards() != null) {
+            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getDashboards();
             List<DashboardDAO> dashboards =
                     getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit()));
             if (dashboards.isEmpty() && generateDummy) {
@@ -99,15 +119,15 @@ public class UIAggregatorController {
 
 
         }
-        if (wrapperRequestBodyDAO.getCalls().getDemands() != null) {
+        if (body.getCalls().getDemands() != null) {
             //TODO: ask someone about public demands ?
-            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = wrapperRequestBodyDAO.getCalls().getDemands();
+            WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getDemands();
             wrapperResponseDAO.setDemands(getDemandSchedules(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
             if (wrapperResponseDAO.getDemands().isEmpty() && generateDummy) {
                 //generate some random demands
                 List<DemandScheduleDAO> schedule =
-                        demandRequestService.getByUserIdGroup(Long.parseLong(userId), 0, 10);
+                        demandRequestService.getByUserIdGroup(userId, 0, 10);
 
                 schedule = DummyDataGenerator.getDemand(schedule);
                 wrapperResponseDAO.setDemands(schedule);
@@ -125,55 +145,45 @@ public class UIAggregatorController {
             //if the user chooses interval it wouldnt make sense from the demand/request perspective
             measurements.forEach(System.err::println);
             wrapperResponseDAO.appendData(demandData);
-
         }
-        return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
+        return wrapperResponseDAO;
     }
 
-//    private List<AssetDAOResponse> getAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
-//        //not used function - can be deleted
-//        try {
-//            return assetService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
-//        } catch (NotFoundException ex) {
-//            return new ArrayList<>();
-//        }
-//    }
-
-    private List<SimpleAssetDAO> getSimpleAssets(String userId, Optional<Long> offset, Optional<Integer> limit) {
+    private List<SimpleAssetDAO> getSimpleAssets(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
-            return assetService.findSimpleByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+            return assetService.findSimpleByUserId(userId, offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
     }
 
-    private List<DemandScheduleDAO> getDemandSchedules(String userId, Optional<Long> offset, Optional<Integer> limit) {
+    private List<DemandScheduleDAO> getDemandSchedules(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
-            return demandRequestService.getByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+            return demandRequestService.getByUserId(userId, offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
     }
 
-    private List<InformationPanelDAOResponse> getPanels(String userId, Optional<Long> offset, Optional<Integer> limit) {
+    private List<InformationPanelDAOResponse> getPanels(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
-            return informationPanelService.findByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+            return informationPanelService.findByUserId(userId, offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
     }
 
-    private List<AssetPanelDAO> getAssetPanels(String userId, Optional<Long> offset, Optional<Integer> limit) {
+    private List<AssetPanelDAO> getAssetPanels(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
-            return assetService.findAssetsPanelsByUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+            return assetService.findAssetsPanelsByUserId(userId, offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
     }
 
-    private List<DashboardDAO> getDashboards(String userId, Optional<Long> offset, Optional<Integer> limit) {
+    private List<DashboardDAO> getDashboards(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
-            return dashboardService.getAvailableToUserId(Long.parseLong(userId), offset.orElse(0L), limit.orElse(20));
+            return dashboardService.getAvailableToUserId(userId, offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
