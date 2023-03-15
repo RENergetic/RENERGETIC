@@ -5,6 +5,7 @@ import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.exception.UnauthorizedAccessException;
 import com.renergetic.hdrapi.model.User;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
+import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
 import com.renergetic.hdrapi.service.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,10 @@ public class UIAggregatorController {
 
     @Autowired
     private DemandRequestService demandRequestService;
+    @Autowired
+    private DummyDataGenerator dummyDataGenerator;
+    @Autowired
+    private MeasurementTypeRepository measurementTypeRepository;
     @Autowired
     private AssetService assetService;
     @Autowired
@@ -111,10 +116,11 @@ public class UIAggregatorController {
                     getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit()));
             if (dashboards.isEmpty() && generateDummy) {
                 //generate some random demands
-                dashboards = DummyDataGenerator.getDashboards(5);
+                dashboards = dummyDataGenerator.getDashboards(5);
 
             }
-            wrapperResponseDAO.setDashboardMetaKeys(DashboardMetaKeys.getInstance());
+            DashboardMetaKeys meta = new DashboardMetaKeys(measurementTypeRepository.findByDashboardVisibility());
+            wrapperResponseDAO.setDashboardMetaKeys(meta);
             wrapperResponseDAO.setDashboards(dashboards);
 
 
@@ -134,8 +140,8 @@ public class UIAggregatorController {
             }
             List<MeasurementDAOResponse> measurements =
                     wrapperResponseDAO.getDemands().stream().filter(
-                            it -> it.getDemandDefinition().getTile() != null
-                    ).flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
+                                    it -> it.getDemandDefinition().getTile() != null
+                            ).flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
                             .collect(Collectors.toList());
             DataDAO demandData = dataService.getData(
                     measurements.stream().map(MeasurementDAOResponse::mapToEntity).collect(Collectors.toList()), null,

@@ -36,6 +36,8 @@ public class UserController {
     @Value("${api.generate.dummy-data}")
     private Boolean generateDummy;
     @Autowired
+    private DummyDataGenerator dummyDataGenerator;
+    @Autowired
     NotificationService notificationSv;
     @Autowired
     LoggedInService loggedInService;
@@ -121,7 +123,7 @@ public class UserController {
         //TODO: filter by user id
         //TODO: filter by user id
         if (generateDummy) {
-            notifications = DummyDataGenerator.getNotifications();
+            notifications = dummyDataGenerator.getNotifications();
         } else {
             notifications = notificationSv.get(offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
         }

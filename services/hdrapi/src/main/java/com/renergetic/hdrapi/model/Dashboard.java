@@ -56,6 +56,10 @@ public class Dashboard {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
 	private UUID uuid;
+	@OneToOne(cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "measurement_type_id", nullable = true, insertable = true, updatable = true)
+	private MeasurementType measurementType;
 
 	public Dashboard(String name, String url, String label) {
 		super();

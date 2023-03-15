@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.hdrapi.model.Dashboard;
+import com.renergetic.hdrapi.model.MeasurementType;
 import com.renergetic.hdrapi.model.User;
 import com.renergetic.hdrapi.service.utils.Json;
 import lombok.Getter;
@@ -13,7 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.tomcat.util.json.ParseException;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
+import javax.persistence.CascadeType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Pattern;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +56,8 @@ public class DashboardDAO {
     @JsonInclude(value = Include.NON_NULL)
     @JsonProperty(access = Access.READ_ONLY, required = false)
     private Integer status;
+    @JsonProperty(value = "measurement_type", required = false)
+    private MeasurementType measurementType;
 
     public DashboardDAO(String name, String url, String label) {
         super();
@@ -69,6 +77,9 @@ public class DashboardDAO {
             dao.setName(dashboard.getName());
             dao.setLabel(dashboard.getLabel());
             dao.setGrafanaId(dashboard.getGrafanaId());
+            dao.setMeasurementType(dashboard.getMeasurementType());
+
+
             if (dashboard.getExt() != null) {
                 try {
                     dao.setExt(Json.parse(dashboard.getExt()).toMap());
@@ -92,13 +103,16 @@ public class DashboardDAO {
 
         dashboard.setId(id);
         dashboard.setGrafanaId(grafanaId);
-        if(this.ext!=null)
-        dashboard.setExt(Json.toJson(this.ext));
+        if (this.ext != null)
+            dashboard.setExt(Json.toJson(this.ext));
 
         if (userId != null) {
             User userEntity = new User();
             userEntity.setId(userId);
             dashboard.setUser(userEntity);
+        }
+        if (measurementType != null) {
+            dashboard.setMeasurementType(measurementType);
         }
         return dashboard;
     }
