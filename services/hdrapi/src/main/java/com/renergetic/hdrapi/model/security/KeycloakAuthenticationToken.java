@@ -15,17 +15,20 @@ public class KeycloakAuthenticationToken extends AbstractAuthenticationToken {
 	private static final long serialVersionUID = -3324031070506421715L;
 	
 	private KeycloakUser principal;
+	private Collection<KeycloakRole> roles;
     private Collection<GrantedAuthority> authorities;
 
     public KeycloakAuthenticationToken(KeycloakUser keycloakUser, List<KeycloakRole> keycloakRoles) {
         super(keycloakRoles);
         this.principal = keycloakUser;
+        this.roles = keycloakRoles;
         this.authorities = keycloakRoles.stream().map(role ->  new SimpleGrantedAuthority("ROLE_" + role.name)).collect(Collectors.toList());
     }
 
     public KeycloakAuthenticationToken(KeycloakUser keycloakUser, List<KeycloakRole> keycloakRoles, User user) {
         super(keycloakRoles);
         this.principal = keycloakUser;
+        this.roles = keycloakRoles;
         this.authorities = keycloakRoles.stream().map(role ->  new SimpleGrantedAuthority("ROLE_" + role.name)).collect(Collectors.toList());
     }
 
@@ -35,7 +38,7 @@ public class KeycloakAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     public Collection<KeycloakRole> getRoles() {
-        return this.getAuthorities().stream().map(it -> (KeycloakRole) it).collect(Collectors.toList());
+        return this.roles;
     }
 
     @Override
