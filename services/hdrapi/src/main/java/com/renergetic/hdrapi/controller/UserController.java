@@ -1,10 +1,10 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
 import com.renergetic.hdrapi.model.security.KeycloakRole;
 import com.renergetic.hdrapi.model.security.KeycloakUser;
 import com.renergetic.hdrapi.service.KeycloakService;
+import com.renergetic.hdrapi.service.KeycloakWrapper;
 import com.renergetic.hdrapi.service.LoggedInService;
 import com.renergetic.hdrapi.service.NotificationService;
 import com.renergetic.hdrapi.service.UserService;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +35,8 @@ public class UserController {
     UserService userSv;
     @Value("${api.generate.dummy-data}")
     private Boolean generateDummy;
+    @Autowired
+    private DummyDataGenerator dummyDataGenerator;
     @Autowired
     NotificationService notificationSv;
     @Autowired
@@ -54,9 +55,9 @@ public class UserController {
                                                                 @RequestParam(required = false) Optional<Integer> limit) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        var token = loggedInService.getKeycloakUser().getToken();
+        String token = loggedInService.getKeycloakUser().getToken();
         List<UserRepresentation> users;
-        var client = keycloakService.getClient(token, true);
+        KeycloakWrapper client = keycloakService.getClient(token, true);
 
         if (role.isPresent() && KeycloakRole.roleByName(role.get()) != null) {
             users = client.listUsers(KeycloakRole.roleByName(role.get()).name);
@@ -72,8 +73,8 @@ public class UserController {
     public ResponseEntity<List<String>> getRoles(@PathVariable String userId) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        var token = loggedInService.getKeycloakUser().getToken();
-        var client = keycloakService.getClient(token, true);
+        String token = loggedInService.getKeycloakUser().getToken();
+        KeycloakWrapper client = keycloakService.getClient(token, true);
         try {
             List<String> roles = client.getRoles(userId).stream().map(RoleRepresentation::getName).collect(
                     Collectors.toList());
@@ -91,13 +92,13 @@ public class UserController {
     })
     @GetMapping(path = "/profile", produces = "application/json")
     public ResponseEntity<UserDAOResponse> getProfile() {
-        var user = loggedInService.getKeycloakUser();
-        List<UserRepresentation> users;
-        var client = keycloakService.getClient(true);
-        var keycloakProfile = client.getUser(user.getId()).toRepresentation();
+        KeycloakUser user = loggedInService.getKeycloakUser();
+
+        KeycloakWrapper client = keycloakService.getClient(true);
+        UserRepresentation keycloakProfile = client.getUser(user.getId()).toRepresentation();
         List<String> roles = client.getRoles(keycloakProfile.getId()).stream().map(RoleRepresentation::getName).collect(
                 Collectors.toList());
-        var userId = loggedInService.getLoggedInUser().getId();
+        Long userId = loggedInService.getLoggedInUser().getId();
         String settingsJson = userSv.getSettings(userId);
         UserDAOResponse profile = UserDAOResponse.create(keycloakProfile, roles, settingsJson);
         return new ResponseEntity<>(profile, HttpStatus.OK);
@@ -122,7 +123,7 @@ public class UserController {
         //TODO: filter by user id
         //TODO: filter by user id
         if (generateDummy) {
-            notifications = DummyDataGenerator.getNotifications();
+            notifications = dummyDataGenerator.getNotifications();
         } else {
             notifications = notificationSv.get(offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
         }
@@ -152,7 +153,6 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/profile/settings", produces = "application/json")
     public ResponseEntity<String> getAllUsersSettings() {
-//        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_STAFF.mask);
         Long userId = loggedInService.getLoggedInUser().getId();
         return new ResponseEntity<>(userSv.getSettings(userId), HttpStatus.OK);
     }
@@ -169,7 +169,7 @@ public class UserController {
     public ResponseEntity<UserDAOResponse> createUser(@RequestBody UserDAORequest user) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        var client = keycloakService.getClient(true);
+        KeycloakWrapper client = keycloakService.getClient(true);
         UserRepresentation ur = client.createUser(user);
         user.setId(ur.getId());
         UserDAOResponse save = userSv.save(ur, user);
@@ -185,9 +185,10 @@ public class UserController {
     }
     )
     @PostMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
+    @PutMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
     public ResponseEntity<String> saveUserSetting(@RequestBody String settings) {
 //        Long userId = 2l;
-        var userId = loggedInService.getLoggedInUser().getId();
+        Long userId = loggedInService.getLoggedInUser().getId();
         settings = userSv.saveSettings(userId, settings);
 
         return new ResponseEntity<>(settings, HttpStatus.OK);
@@ -213,7 +214,7 @@ public class UserController {
     public ResponseEntity<Boolean> updateUser(@RequestBody UserDAORequest user, @PathVariable String id) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        var client = keycloakService.getClient(true);
+        KeycloakWrapper client = keycloakService.getClient(true);
         //TODO: synchronized section
         try {
             client.updateUser(user);
@@ -236,7 +237,7 @@ public class UserController {
     )
     @PutMapping(path = "/profile", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Boolean> updateProfile(@RequestBody UserDAORequest user) {
-        var client = keycloakService.getClient(true);
+        KeycloakWrapper client = keycloakService.getClient(true);
         KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
         user.setId(keycloakUser.getId());
         //TODO: synchronized section
@@ -276,12 +277,12 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Error saving user")
     }
     )
-    @PutMapping(path = "/{userId}/roles/{roleName}", produces = "application/json")
-    public ResponseEntity<List<String>> addRole(@PathVariable String userId, @PathVariable String roleName) {
+    @PutMapping(path = "/{id}/roles/{roleName}", produces = "application/json")
+    public ResponseEntity<List<String>> addRole(@PathVariable String id, @PathVariable String roleName) {
         loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
-        var token = loggedInService.getKeycloakUser().getToken();
-        var client = keycloakService.getClient(token, true);
-        List<String> roles = client.assignRole(userId, roleName).stream().map(RoleRepresentation::getName).collect(
+        String token = loggedInService.getKeycloakUser().getToken();
+        KeycloakWrapper client = keycloakService.getClient(token, true);
+        List<String> roles = client.assignRole(id, roleName).stream().map(RoleRepresentation::getName).collect(
                 Collectors.toList());
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
@@ -306,14 +307,14 @@ public class UserController {
     @Operation(summary = "Delete a existing User", hidden = false)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "User deleted correctly"),
             @ApiResponse(responseCode = "500", description = "Error deleting user")})
-    @DeleteMapping(path = "/{userId}")
-    public ResponseEntity deleteUser(@PathVariable String userId) {
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable String id) {
         loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
-        var token = loggedInService.getKeycloakUser().getToken();
-        var client = keycloakService.getClient(token, true);
-        UserRepresentation userRepresentation = client.getUser(userId).toRepresentation();
-        var deleted = client.deleteUser(userRepresentation.getId());
-        UserDAOResponse user = userSv.delete(userRepresentation);
+        String token = loggedInService.getKeycloakUser().getToken();
+        KeycloakWrapper client = keycloakService.getClient(token, true);
+        UserRepresentation userRepresentation = client.getUser(id).toRepresentation();
+        client.deleteUser(userRepresentation.getId());
+        userSv.delete(userRepresentation);
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
@@ -321,12 +322,12 @@ public class UserController {
     @Operation(summary = "Revoke role", hidden = false)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Role deleted correctly"),
             @ApiResponse(responseCode = "500", description = "Error deleting user")})
-    @DeleteMapping(path = "/{userId}/roles/{roleName}")
-    public ResponseEntity<?> deleteRole(@PathVariable String userId, @PathVariable String roleName) {
+    @DeleteMapping(path = "/{id}/roles/{roleName}")
+    public ResponseEntity<?> deleteRole(@PathVariable String id, @PathVariable String roleName) {
         loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
-        var token = loggedInService.getKeycloakUser().getToken();
-        var client = keycloakService.getClient(token, true);
-        List<String> roles = client.revokeRole(userId, roleName).stream().map(RoleRepresentation::getName).collect(
+        String token = loggedInService.getKeycloakUser().getToken();
+        KeycloakWrapper client = keycloakService.getClient(token, true);
+        List<String> roles = client.revokeRole(id, roleName).stream().map(RoleRepresentation::getName).collect(
                 Collectors.toList());
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }

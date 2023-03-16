@@ -15,4 +15,8 @@ public class MeasurementTypeService {
     public MeasurementType getTypeByName(String measurementTypeName) {
         return measurementTypeRepository.findByName(measurementTypeName);
     }
+
+    public MeasurementType getTypeByUnit(String unit) {
+        return measurementTypeRepository.findByUnit(unit);
+    }
 }

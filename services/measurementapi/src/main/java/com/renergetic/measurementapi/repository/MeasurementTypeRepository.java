@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MeasurementTypeRepository extends JpaRepository<MeasurementType, Long> {
 	MeasurementType findByName (String name);
+	MeasurementType findByUnit (String unit);
 }

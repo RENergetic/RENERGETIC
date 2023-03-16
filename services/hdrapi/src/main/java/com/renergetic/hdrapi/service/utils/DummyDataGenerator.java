@@ -3,13 +3,20 @@ package com.renergetic.hdrapi.service.utils;
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.model.Dashboard;
 import com.renergetic.hdrapi.model.Measurement;
+import com.renergetic.hdrapi.model.MeasurementType;
 import com.renergetic.hdrapi.model.NotificationType;
+import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class DummyDataGenerator {
+    @Autowired
+    MeasurementTypeRepository measurementTypeRepository;
     private static final Random random = new Random();
     static final String s =
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce tellus nisl, finibus condimentum " +
@@ -27,34 +34,9 @@ public class DummyDataGenerator {
         return (random.nextInt(300 * 100)) / 100.0 + 200.0;
     }
 
-//    public static DataDAO getDemandData(List<DemandScheduleDAO> demands) {
-//        DataDAO data = new DataDAO();
-//        List<MeasurementDAOResponse> measurementDAOResponseStream = demands.stream().filter(
-//                it -> it.getDemandDefinition().getTile() != null
-//        )
-//                .flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream()).collect(
-//                        Collectors.toList());
-//        Map<String, Double> measurementValues = demands.stream().filter(
-//                it -> it.getDemandDefinition().getTile() != null
-//        )
-//                .flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
-//                .collect(Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue,
-//                        (a1, a2) -> a1));
-//
-//        data.getCurrent().setLast(measurementValues);
-//
-//        return data;
-//    }
 
-//    public static DataDAO getData(List<Measurement> measurements) {
-//        DataDAO data = new DataDAO();
-//        Map<String, Double> measurementValues = measurements.stream().collect(
-//                Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
-//        data.getCurrent().setLast(measurementValues);
-//        return data;
-//    }
 
-    public static DataDAO getData(Collection<MeasurementDAOResponse> measurements) {
+    public   DataDAO getData(Collection<MeasurementDAOResponse> measurements) {
         DataDAO data = new DataDAO();
         Map<String, Double> measurementValues = measurements.stream().collect(
                 Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
@@ -62,23 +44,6 @@ public class DummyDataGenerator {
         return data;
     }
 
-//    public static List<DemandScheduleDAO> getDemand(List<DemandDefinition> demands, List<Asset> assets) {
-//        long current = (new Date()).getTime();
-//
-//        return demands.stream().flatMap(
-//                def -> assets.stream().map(
-//                        asset -> {
-//                            DemandSchedule demandSchedule = new DemandSchedule();
-//                            demandSchedule.setAsset(asset);
-//                            demandSchedule.setDemandDefinition(def);
-//                            demandSchedule.setDemandStart(DateConverter.toLocalDateTime(current - 3600000));
-//                            demandSchedule.setDemandStop(DateConverter.toLocalDateTime(current + 3600000));
-//                            return demandSchedule;
-//                        }
-//                )
-//
-//        ).map(DemandScheduleDAO::create).collect(Collectors.toList());
-//    }
 
     public static List<DemandScheduleDAO> getDemand(List<DemandScheduleDAO> schedule) {
         long current = (new Date()).getTime();
@@ -89,7 +54,7 @@ public class DummyDataGenerator {
         ).collect(Collectors.toList());
     }
 
-    public static List<NotificationDAO> getNotifications() {
+    public   List<NotificationDAO> getNotifications() {
         float chance = 0.75f;
         ArrayList<NotificationDAO> l = new ArrayList<>();
         while (random.nextFloat() < chance) {
@@ -123,23 +88,27 @@ public class DummyDataGenerator {
 
     }
 
-    private static DashboardDAO initDashboard(int n) {
+    private DashboardDAO initDashboard(int n) {
         Dashboard d = new Dashboard("dashboard_" + n, "http://www.example.org/" + n, "Sample, test dashboard " + n);
         d.setId((long) n);
         d.setGrafanaId("grafanaid_" + n);
-        Map<String, ? extends Serializable> ext = Map.of("model", random.nextBoolean() ? "model_" + n : "",
-                "measurement_type", random.nextBoolean() ? random.nextBoolean() ? "energy" : "power" : "",
-                "unit", random.nextBoolean() ?
-                        DashboardMetaKeys.getInstance().getUnits().get(
-                                random.nextInt(DashboardMetaKeys.getInstance().getUnits().size()))
-                        : "");
+        List<MeasurementType> l = this.measurementTypeRepository.findByDashboardVisibility();
+        Map<String, ? extends Serializable> ext;
+        if (l.size() == 0 || !random.nextBoolean()) {
+            ext = Map.of("model", random.nextBoolean() ? "model_" + n : "",
+                    "measurement_type", "", "unit", "");
+        } else {
+            MeasurementType type = l.get(random.nextInt(l.size()));
+            ext = Map.of("model", random.nextBoolean() ? "model_" + n : "",
+                    "measurement_type", type.getPhysicalName(), "unit", type.getUnit());
+        }
 
         d.setExt(Json.toJson(ext));
         return DashboardDAO.create(d);
     }
 
 
-    public static List<DashboardDAO> getDashboards(int n) {
+    public List<DashboardDAO> getDashboards(int n) {
         List<DashboardDAO> l = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             l.add(i, initDashboard(i));
@@ -180,4 +149,46 @@ public class DummyDataGenerator {
  * }
  * }
  * }
- */
+ *///    public static List<DemandScheduleDAO> getDemand(List<DemandDefinition> demands, List<Asset> assets) {
+//        long current = (new Date()).getTime();
+//
+//        return demands.stream().flatMap(
+//                def -> assets.stream().map(
+//                        asset -> {
+//                            DemandSchedule demandSchedule = new DemandSchedule();
+//                            demandSchedule.setAsset(asset);
+//                            demandSchedule.setDemandDefinition(def);
+//                            demandSchedule.setDemandStart(DateConverter.toLocalDateTime(current - 3600000));
+//                            demandSchedule.setDemandStop(DateConverter.toLocalDateTime(current + 3600000));
+//                            return demandSchedule;
+//                        }
+//                )
+//
+//        ).map(DemandScheduleDAO::create).collect(Collectors.toList());
+//    }
+//    public static DataDAO getDemandData(List<DemandScheduleDAO> demands) {
+//        DataDAO data = new DataDAO();
+//        List<MeasurementDAOResponse> measurementDAOResponseStream = demands.stream().filter(
+//                it -> it.getDemandDefinition().getTile() != null
+//        )
+//                .flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream()).collect(
+//                        Collectors.toList());
+//        Map<String, Double> measurementValues = demands.stream().filter(
+//                it -> it.getDemandDefinition().getTile() != null
+//        )
+//                .flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
+//                .collect(Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue,
+//                        (a1, a2) -> a1));
+//
+//        data.getCurrent().setLast(measurementValues);
+//
+//        return data;
+//    }
+
+//    public static DataDAO getData(List<Measurement> measurements) {
+//        DataDAO data = new DataDAO();
+//        Map<String, Double> measurementValues = measurements.stream().collect(
+//                Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
+//        data.getCurrent().setLast(measurementValues);
+//        return data;
+//    }

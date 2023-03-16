@@ -1,10 +1,6 @@
 package com.renergetic.measurementapi.service;
 
-import com.google.gson.Gson;
 import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
-import com.renergetic.measurementapi.model.Dashboard;
-import com.renergetic.measurementapi.model.DashboardExt;
-import com.renergetic.measurementapi.model.DashboardUnit;
 import com.renergetic.measurementapi.model.MeasurementType;
 import com.renergetic.measurementapi.repository.DashboardRepository;
 import org.apache.commons.lang3.function.TriFunction;
@@ -18,15 +14,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class ConvertService {
-    @Autowired
-    DashboardRepository dashboardRepository;
 
     @Autowired
     DashboardService dashboardService;
@@ -43,7 +33,7 @@ public class ConvertService {
 
     public List<MeasurementDAOResponse> convert(List<MeasurementDAOResponse> measurements, String dashboardId,
                                                 List<String> fields, String function){
-        DashboardUnit dashboardUnit = dashboardService.getDashboardUnitByGrafanaId(dashboardId);
+        MeasurementType dashboardUnit = dashboardService.getDashboardUnitByGrafanaId(dashboardId);
 
         if(dashboardUnit == null)
             return measurements;
@@ -84,44 +74,38 @@ public class ConvertService {
     }
 
     protected Map<String, TriFunction<String, LocalDateTime, LocalDateTime, String>> retrieveAllConversionFunctions
-            (DashboardUnit dashboardUnit, List<String> fields, String function){
+            (MeasurementType dashboardUnit, List<String> fields, String function){
         Map<String, TriFunction<String, LocalDateTime, LocalDateTime, String>> converters = new HashMap<>();
         for(String field : fields)
             converters.put(function == null ? field : function, retrieveConversionFunction(dashboardUnit, measurementTypeService.getTypeByName(field)));
         return converters;
     }
 
-    protected TriFunction<String, LocalDateTime, LocalDateTime, String> retrieveConversionFunction(DashboardUnit dashboardUnit, MeasurementType measurementType){
+    protected TriFunction<String, LocalDateTime, LocalDateTime, String> retrieveConversionFunction(MeasurementType dashboardUnit, MeasurementType measurementType){
         if(dashboardUnit == null || measurementType == null)
             return null;
 
-        final Double factor = measurementType.getFactor();
+        final double factor = measurementType.getFactor() / dashboardUnit.getFactor();
         switch (measurementType.getBaseUnit()){
             case "Wh":
-                switch (dashboardUnit){
-                    case Wh:
+                switch (dashboardUnit.getBaseUnit()){
+                    case "Wh":
                         return factor == 1.0 ? null : (fieldValue, pTs, cTs) ->
                                 df.format(Double.parseDouble(fieldValue) * factor);
-                    case J:
-                        return (fieldValue, pTs, cTs) ->
-                                df.format(Double.parseDouble(fieldValue) * factor * 3600);
-                    case W:
+                    case "W":
                         return (fieldValue, pTs, cTs) ->
                                 df.format(Double.parseDouble(fieldValue) * factor / getRatio(pTs, cTs));
                     default:
                         return null;
                 }
             case "W":
-                switch (dashboardUnit){
-                    case W:
+                switch (dashboardUnit.getBaseUnit()){
+                    case "W":
                         return factor == 1.0 ? null : (fieldValue, pTs, cTs) ->
                                 df.format(Double.parseDouble(fieldValue) * factor);
-                    case Wh:
+                    case "Wh":
                         return (fieldValue, pTs, cTs) ->
                                 df.format(Double.parseDouble(fieldValue) * factor * getRatio(pTs, cTs));
-                    case J:
-                        return (fieldValue, pTs, cTs) ->
-                                df.format(Double.parseDouble(fieldValue) * factor * getRatio(pTs, cTs) * 3600);
                     default:
                         return null;
                 }
