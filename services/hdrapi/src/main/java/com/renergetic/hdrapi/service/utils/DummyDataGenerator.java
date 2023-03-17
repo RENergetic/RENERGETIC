@@ -27,6 +27,7 @@ public class DummyDataGenerator {
                     "nisl vel, scelerisque venenatis ex. Vivamus pellentesque suscipit nunc id pulvinar. Aliquam vel" +
                     " hendrerit turpis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur " +
                     "ridiculus mus. Aenean efficitur elementum mollis. Donec vel metus eu justo congue commodo";
+    static final String notificationTemplate = "test_prediction_template";
 
     private static Double getMeasurementValue(Measurement m) {
 //TODO: consider measurement type and domains
@@ -39,8 +40,7 @@ public class DummyDataGenerator {
     }
 
 
-
-    public   DataDAO getData(Collection<MeasurementDAOResponse> measurements) {
+    public DataDAO getData(Collection<MeasurementDAOResponse> measurements) {
         DataDAO data = new DataDAO();
         Map<String, Double> measurementValues = measurements.stream().collect(
                 Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
@@ -58,7 +58,7 @@ public class DummyDataGenerator {
         ).collect(Collectors.toList());
     }
 
-    public   List<NotificationScheduleDAO> getNotifications() {
+    public List<NotificationScheduleDAO> getNotifications() {
         float chance = 0.75f;
         ArrayList<NotificationScheduleDAO> l = new ArrayList<>();
         while (random.nextFloat() < chance) {
@@ -84,12 +84,13 @@ public class DummyDataGenerator {
             if (random.nextInt() % 2 == 0) {
                 not.setDashboard(initDashboard(l.size()));
             }
-            if(random.nextBoolean()){
-                Page<Measurement> ml= measurementRepository.findAll(new OffSetPaging(0, 100));
-                int idx = random.nextInt(ml.getSize());
+            if (random.nextBoolean()) {
+                Page<Measurement> ml = measurementRepository.findAll(new OffSetPaging(0, 100));
+                int idx = random.nextInt(ml.getContent().size());
                 Measurement measurement = ml.getContent().get(idx);
-                not.setMeasurement(MeasurementDAOResponse.create(measurement,null));
-                not.setValue(this.getMeasurementValue(measurement));
+                not.setMeasurement(MeasurementDAOResponse.create(measurement, null));
+                not.setValue(getMeasurementValue(measurement));
+                not.setMessage("test_prediction_template");
             }
 
             //        assetId,dashboardId,informationTileId;

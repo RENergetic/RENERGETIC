@@ -33,6 +33,9 @@ public class NotificationSchedule {
 	@Column(name = "date_to", nullable = true, insertable = true, updatable = true, unique = false)
 	private LocalDateTime dateTo;
 
+	@Column(name = "notification_timestamp", nullable = true, insertable = true, updatable = true, unique = false)
+	private LocalDateTime notificationTimestamp;
+
 	@ManyToOne(cascade = CascadeType.REFRESH, optional = false)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "notification_id", nullable = false, insertable = true, updatable = true)

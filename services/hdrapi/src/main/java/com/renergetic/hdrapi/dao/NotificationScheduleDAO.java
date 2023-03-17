@@ -29,6 +29,10 @@ public class NotificationScheduleDAO {
     @JsonProperty(value = "date_from", required = true)
     private Long dateFrom;
 
+    @JsonProperty(value = "timestamp", required = true)
+    private Long timestamp;
+
+
     @JsonProperty(value = "date_to", required = false)
     private Long dateTo;
 
@@ -60,6 +64,7 @@ public class NotificationScheduleDAO {
             dao.setNotificationCode(notification.getDefinition().getCode());
             dao.setType(notification.getDefinition().getType());
             dao.setMessage(notification.getDefinition().getMessage());
+            dao.setTimestamp(DateConverter.toEpoch(notification.getNotificationTimestamp()));
 
             dao.setDateFrom(DateConverter.toEpoch(notification.getDateFrom()));
             dao.setDateTo(DateConverter.toEpoch(notification.getDateTo()));
@@ -98,6 +103,7 @@ public class NotificationScheduleDAO {
         }
         notification.setDateFrom(DateConverter.toLocalDateTime(dateFrom));
         notification.setDateTo(DateConverter.toLocalDateTime(dateTo));
+        notification.setNotificationTimestamp(DateConverter.toLocalDateTime(timestamp));
         notification.setNotificationValue(value);
         if (asset != null) {
             notification.setAsset(asset.mapToEntity());
