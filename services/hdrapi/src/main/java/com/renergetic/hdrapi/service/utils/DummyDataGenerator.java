@@ -5,8 +5,10 @@ import com.renergetic.hdrapi.model.Dashboard;
 import com.renergetic.hdrapi.model.Measurement;
 import com.renergetic.hdrapi.model.MeasurementType;
 import com.renergetic.hdrapi.model.NotificationType;
+import com.renergetic.hdrapi.repository.MeasurementRepository;
 import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
 public class DummyDataGenerator {
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;
+    @Autowired
+    MeasurementRepository measurementRepository;
     private static final Random random = new Random();
     static final String s =
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce tellus nisl, finibus condimentum " +
@@ -54,11 +58,11 @@ public class DummyDataGenerator {
         ).collect(Collectors.toList());
     }
 
-    public   List<NotificationDAO> getNotifications() {
+    public   List<NotificationScheduleDAO> getNotifications() {
         float chance = 0.75f;
-        ArrayList<NotificationDAO> l = new ArrayList<>();
+        ArrayList<NotificationScheduleDAO> l = new ArrayList<>();
         while (random.nextFloat() < chance) {
-            var not = new NotificationDAO();
+            var not = new NotificationScheduleDAO();
             switch (random.nextInt(3)) {
                 case 0:
                     not.setType(NotificationType.anomaly);
@@ -80,6 +84,14 @@ public class DummyDataGenerator {
             if (random.nextInt() % 2 == 0) {
                 not.setDashboard(initDashboard(l.size()));
             }
+            if(random.nextBoolean()){
+                Page<Measurement> ml= measurementRepository.findAll(new OffSetPaging(0, 100));
+                int idx = random.nextInt(ml.getSize());
+                Measurement measurement = ml.getContent().get(idx);
+                not.setMeasurement(MeasurementDAOResponse.create(measurement,null));
+                not.setValue(this.getMeasurementValue(measurement));
+            }
+
             //        assetId,dashboardId,informationTileId;
             l.add(not);
             chance *= 0.9f;

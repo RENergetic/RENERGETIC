@@ -108,19 +108,11 @@ public class UserController {
     @Operation(summary = "Get All Notifications for the user")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/notifications", produces = "application/json")
-    public ResponseEntity<List<NotificationDAO>> getUserNotifications(
+    public ResponseEntity<List<NotificationScheduleDAO>> getUserNotifications(
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit,
             @RequestParam(value = "show_expired", required = false) Optional<Boolean> showExpired) {
-        List<NotificationDAO> notifications;
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
+        List<NotificationScheduleDAO> notifications;
         //TODO: filter by user id
         if (generateDummy) {
             notifications = dummyDataGenerator.getNotifications();
