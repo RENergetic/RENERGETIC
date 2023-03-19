@@ -113,15 +113,15 @@ public class KeycloakWrapper {
 
     }
 
-    public List<UserRepresentation> listUsers() {
-        return getRealmApi().users().list();
+    public List<UserRepresentation> listUsers(int offset,int limit) {
+        return getRealmApi().users().list(  offset,  limit);
         //TODO: make every user with guest role
 //        return new ArrayList<>(this.getRealmApi().clients().get(this.getClient_Id()).roles().get(
 //                KeycloakRole.REN_GUEST.name).getRoleUserMembers());
     }
 
-    public List<UserRepresentation> listUsers(String role) {
-        return new ArrayList<UserRepresentation>(getRealmApi().roles().get(role).getRoleUserMembers());
+    public List<UserRepresentation> listUsers(String role,int offset,int limit) {
+        return new ArrayList<UserRepresentation>(getRealmApi().roles().get(role).getRoleUserMembers(offset,limit));
     }
 
     public RoleRepresentation getRole(String role) {
