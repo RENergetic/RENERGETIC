@@ -7,6 +7,10 @@ spec:
   selector:
     app: renergetic-ui
   ports:
-    - port: 8080
+    - name: api-http
+      port: 8080
       targetPort: 8080
+    - name: api-https
+      port: 8443
+      targetPort: 8443
   type: NodePort
