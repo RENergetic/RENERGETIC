@@ -12,13 +12,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Table(name = "notification_schedule")
@@ -36,6 +32,9 @@ public class NotificationSchedule {
 	
 	@Column(name = "date_to", nullable = true, insertable = true, updatable = true, unique = false)
 	private LocalDateTime dateTo;
+
+	@Column(name = "notification_timestamp", nullable = true, insertable = true, updatable = true, unique = false)
+	private LocalDateTime notificationTimestamp;
 
 	@ManyToOne(cascade = CascadeType.REFRESH, optional = false)
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -56,5 +55,13 @@ public class NotificationSchedule {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "information_tile_id", nullable = true, insertable = true, updatable = true)
 	private InformationTile informationTile;
+
+
+	@Column(name = "notification_value", nullable = true, insertable = true, updatable = true, unique = false)
+	private Double notificationValue;
+	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "measurement_id", nullable = true, insertable = true, updatable = true)
+	private Measurement measurement;
 
 }

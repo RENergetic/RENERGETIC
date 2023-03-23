@@ -9,7 +9,6 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.hdrapi.dao.NotificationDAO;
 import com.renergetic.hdrapi.dao.NotificationDefinitionDAO;
 import com.renergetic.hdrapi.dao.NotificationScheduleDAO;
 import com.renergetic.hdrapi.exception.InvalidArgumentException;
@@ -33,21 +32,21 @@ public class NotificationService {
 	@Autowired
 	NotificationDefinitionRepository repositoryDefinition;
 	
-	public NotificationDAO save(NotificationScheduleDAO notification) {
+	public NotificationScheduleDAO save(NotificationScheduleDAO notification) {
 		NotificationDefinition definition = repositoryDefinition.findByCode(notification.getNotificationCode()).orElse(null);
 		if (definition == null)
 			throw new InvalidArgumentException("Invalid notification definition code");
 		if (notification.getId() == null  || !repositorySchedule.existsById(notification.getId())) {
-			return NotificationDAO.create(repositorySchedule.save(notification.mapToEntity(definition)));
+			return NotificationScheduleDAO.create(repositorySchedule.save(notification.mapToEntity(definition)));
 		} else throw new InvalidCreationIdAlreadyDefinedException("Notification with id " + notification.getId() + " already exists");
 	}
 	
-	public NotificationDAO update(NotificationScheduleDAO notification) {
+	public NotificationScheduleDAO update(NotificationScheduleDAO notification) {
 		NotificationDefinition definition = repositoryDefinition.findByCode(notification.getNotificationCode()).orElse(null);
 		if (definition == null)
 			throw new InvalidArgumentException("Invalid notification definition code");
 		if (notification.getId() != null  && repositorySchedule.existsById(notification.getId())) {
-			return NotificationDAO.create(repositorySchedule.save(notification.mapToEntity(definition)));
+			return NotificationScheduleDAO.create(repositorySchedule.save(notification.mapToEntity(definition)));
 		} else throw new InvalidNonExistingIdException("Notification with id " + notification.getId() + " doesn't exists");
 	}
 	
@@ -57,30 +56,30 @@ public class NotificationService {
 		} else throw new InvalidNonExistingIdException("Notification with id " + id + " doesn't exists");
 	}
 	
-	public List<NotificationDAO> get(Long offset, Integer limit, Boolean showExpired) {
-		List<NotificationDAO> notifications = (showExpired? 
+	public List<NotificationScheduleDAO> get(Long offset, Integer limit, Boolean showExpired) {
+		List<NotificationScheduleDAO> notifications = (showExpired?
 					repositorySchedule.findAll(new OffSetPaging(offset, limit)).toList()
 					: repositorySchedule.findNotExpired(new OffSetPaging(offset, limit))
-				).stream().map(NotificationDAO::create).collect(Collectors.toList());
+				).stream().map(NotificationScheduleDAO::create).collect(Collectors.toList());
 
         if (notifications.size() > 0)
             return notifications;
         else throw new NotFoundException("No notifications are found");
 	}
 	
-	public NotificationDAO getById(Long id) {
+	public NotificationScheduleDAO getById(Long id) {
 		NotificationSchedule notification =  repositorySchedule.findById(id).orElse(null);
 
         if (notification != null)
-            return NotificationDAO.create(notification);
+            return NotificationScheduleDAO.create(notification);
         else throw new NotFoundException("No notification with id " + id + " found");
 	}
 	
-	public List<NotificationDAO> getByAssetId(Long assetId, Long offset, Integer limit, Boolean showExpired) {
-		List<NotificationDAO> notifications =  (showExpired? 
+	public List<NotificationScheduleDAO> getByAssetId(Long assetId, Long offset, Integer limit, Boolean showExpired) {
+		List<NotificationScheduleDAO> notifications =  (showExpired?
 					repositorySchedule.findAll(new OffSetPaging(offset, limit)).toList()
 					: repositorySchedule.findNotExpired(new OffSetPaging(offset, limit))
-				).stream().map(NotificationDAO::create).collect(Collectors.toList());
+				).stream().map(NotificationScheduleDAO::create).collect(Collectors.toList());
 
         if (notifications.size() > 0)
             return notifications;

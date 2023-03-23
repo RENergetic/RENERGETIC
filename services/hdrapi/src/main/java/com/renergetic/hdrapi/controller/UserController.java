@@ -51,18 +51,19 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "", produces = "application/json")
     public ResponseEntity<List<UserRepresentation>> getAllUsers(@RequestParam(required = false) Optional<String> role,
-                                                                @RequestParam(required = false) Optional<Long> offset,
+                                                                @RequestParam(required = false) Optional<Integer> offset,
                                                                 @RequestParam(required = false) Optional<Integer> limit) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
         String token = loggedInService.getKeycloakUser().getToken();
         List<UserRepresentation> users;
         KeycloakWrapper client = keycloakService.getClient(token, true);
-
+        int mOffset = offset.orElse(0);
+        int mLimit = limit.orElse(50);
         if (role.isPresent() && KeycloakRole.roleByName(role.get()) != null) {
-            users = client.listUsers(KeycloakRole.roleByName(role.get()).name);
+            users = client.listUsers(KeycloakRole.roleByName(role.get()).name, mOffset, mLimit);
         } else {
-            users = client.listUsers();
+            users = client.listUsers(  mOffset, mLimit);
         }
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
@@ -108,19 +109,11 @@ public class UserController {
     @Operation(summary = "Get All Notifications for the user")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/notifications", produces = "application/json")
-    public ResponseEntity<List<NotificationDAO>> getUserNotifications(
+    public ResponseEntity<List<NotificationScheduleDAO>> getUserNotifications(
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit,
             @RequestParam(value = "show_expired", required = false) Optional<Boolean> showExpired) {
-        List<NotificationDAO> notifications;
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
-        //TODO: filter by user id
+        List<NotificationScheduleDAO> notifications;
         //TODO: filter by user id
         if (generateDummy) {
             notifications = dummyDataGenerator.getNotifications();

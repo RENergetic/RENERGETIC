@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.hdrapi.dao.NotificationDAO;
 import com.renergetic.hdrapi.dao.NotificationDefinitionDAO;
 import com.renergetic.hdrapi.dao.NotificationScheduleDAO;
 import com.renergetic.hdrapi.repository.NotificationScheduleRepository;
@@ -46,11 +45,11 @@ public class NotificationController {
 	@Operation(summary = "Get All Notifications")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<NotificationDAO>> getAllNotifications (
+	public ResponseEntity<List<NotificationScheduleDAO>> getAllNotifications (
 			@RequestParam(required = false) Optional<Long> offset,
 			@RequestParam(required = false) Optional<Integer> limit,
 			@RequestParam(name = "show_expired", required = false) Optional<Boolean> showExpired){
-		 List<NotificationDAO> notifications = notificationSv.get(offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
+		 List<NotificationScheduleDAO> notifications = notificationSv.get(offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
 
 		return new ResponseEntity<>(notifications, HttpStatus.OK);
 	}
@@ -61,12 +60,12 @@ public class NotificationController {
 		@ApiResponse(responseCode = "404", description = "No notifications found with related with that asset")
 	})
 	@GetMapping(path = "asset/{asset_id}", produces = "application/json")
-	public ResponseEntity<List<NotificationDAO>> getNotificationsByAssetId (
+	public ResponseEntity<List<NotificationScheduleDAO>> getNotificationsByAssetId (
 			@PathVariable Long asset_id,
 			@RequestParam(required = false) Optional<Long> offset,
 			@RequestParam(required = false) Optional<Integer> limit,
 			@RequestParam(name = "show_expired", required = false) Optional<Boolean> showExpired){
-		List<NotificationDAO> notifications = new ArrayList<>();
+		List<NotificationScheduleDAO> notifications = new ArrayList<>();
 		
 		notifications = notificationSv.getByAssetId(asset_id, offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
 		
@@ -80,8 +79,8 @@ public class NotificationController {
 		@ApiResponse(responseCode = "404", description = "No notifications found with this id")
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
-	public ResponseEntity<NotificationDAO> getNotificationsById (@PathVariable Long id){
-		NotificationDAO notification = null;
+	public ResponseEntity<NotificationScheduleDAO> getNotificationsById (@PathVariable Long id){
+		NotificationScheduleDAO notification = null;
 		
 		notification = notificationSv.getById(id);
 		
@@ -112,9 +111,9 @@ public class NotificationController {
 		}
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<NotificationDAO> createNotification(@RequestBody NotificationScheduleDAO notification) {
+	public ResponseEntity<NotificationScheduleDAO> createNotification(@RequestBody NotificationScheduleDAO notification) {
 		notification.setId(null);
-		NotificationDAO _notification = notificationSv.save(notification);
+		NotificationScheduleDAO _notification = notificationSv.save(notification);
 		
 		return new ResponseEntity<>(_notification, HttpStatus.CREATED);
 	}
@@ -140,7 +139,7 @@ public class NotificationController {
 		}
 	)
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<NotificationDAO> updateNotification(@RequestBody NotificationScheduleDAO notification, @PathVariable Long id) {
+	public ResponseEntity<NotificationScheduleDAO> updateNotification(@RequestBody NotificationScheduleDAO notification, @PathVariable Long id) {
 		notification.setId(id);
 		return new ResponseEntity<>(notificationSv.update(notification), HttpStatus.OK);
 	}

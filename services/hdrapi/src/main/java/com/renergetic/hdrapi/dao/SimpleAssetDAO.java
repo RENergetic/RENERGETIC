@@ -40,6 +40,8 @@ public class SimpleAssetDAO {
     private String geoLocation;
 
     public static SimpleAssetDAO create(Asset asset) {
+        if(asset==null)
+            return null;
         SimpleAssetDAO dao = new SimpleAssetDAO();
 
         dao.setId(asset.getId());
