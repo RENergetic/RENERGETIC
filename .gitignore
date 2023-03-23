@@ -4,6 +4,7 @@ environments/_installers.properties
 environments/**/api.jar
 environments/**/dist
 environments/**/keycloak/themes
+environments/**/renergetic-ui/certs
 
 services/**/application.properties-prd.properties
 services/**/.metadata

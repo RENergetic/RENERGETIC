@@ -19,7 +19,10 @@ spec:
           image: docker-registry.default.svc:5000/${PROJECT}/renergetic-ui:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - name: api-http
+              containerPort: 8080
+            - name: api-https
+              containerPort: 8443
           resources:
             requests:
               cpu: 50m
