@@ -36,19 +36,32 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     public List<Asset> findByUserIdAndCategoryId(Long userId, Long category, long offset, int limit);
 
     List<Asset> findByUser(User userId);
-    
+
     @Transactional
-	@Modifying(flushAutomatically = true)
-	@Query("update Asset a set"
-			+ " a.name = :#{#asset.name}, a.label = :#{#asset.label}, a.location = :#{#asset.location},"
-			+ " a.parentAsset = :#{#asset.parentAsset}, a.user = :#{#asset.user}, a.assetCategory = :#{#asset.assetCategory},"
-			+ " a.type = :#{#asset.type} where a.id = :#{#asset.id}")
-    public void update(@Param("asset")Asset asset);
+    @Modifying(flushAutomatically = true)
+    @Query("update Asset a set"
+            + " a.name = :#{#asset.name}, a.label = :#{#asset.label}, a.location = :#{#asset.location},"
+            + " a.parentAsset = :#{#asset.parentAsset}, a.user = :#{#asset.user}, a.assetCategory = :#{#asset.assetCategory},"
+            + " a.type = :#{#asset.type} where a.id = :#{#asset.id}")
+    public void update(@Param("asset") Asset asset);
 
     //	@Query("SELECT u FROM User u WHERE u.keycloakId = :keycloakId")
     @Query("SELECT asset FROM Asset asset " +
             " WHERE asset.user.id = :userId and asset.type.name ='user'")
     Asset findByUserId(@Param("userId") Long userId);
+
+        @Query(value = "SELECT m_asset.* " +
+            "FROM  asset m_asset " +
+            "LEFT JOIN asset_type ON asset_type.id = m_asset.asset_type_id " +
+            "LEFT JOIN asset_category   ON asset_category.id = m_asset.asset_category_id " +
+            " WHERE COALESCE(asset_category.name = :categoryName ,:categoryName is null) " +
+            " AND COALESCE(m_asset.name ilike CONCAT('%', :name, '%'),:name is null ) " +
+            " AND COALESCE(m_asset.label ilike CONCAT('%', :label,'%'),:label is null ) " +
+            " AND COALESCE(asset_type.name = :typeName ,:typeName is null) " +
+            " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
+    public List<Asset> filterAssets(@Param("name") String name, @Param("label") String label,
+                                    @Param("categoryName") String categoryName, @Param("typeName") String typeName,
+                                    @Param("offset") long offset, @Param("limit") int limit);
 
 //    @Modifying
 //    @Query(value = "DELETE FROM asset " +
@@ -58,7 +71,7 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     @Modifying
     @Query(value = "UPDATE  asset SET  user_id = NULL " +
             " WHERE user_id = :userId and asset_type_id <> :userTypeId", nativeQuery = true)
-    void clearUserId(@Param("userId") Long userId,@Param("userTypeId") Long userTypeId);
+    void clearUserId(@Param("userId") Long userId, @Param("userTypeId") Long userTypeId);
 
 
     List<Asset> findByAssetCategoryId(Long categoryId, Pageable pageable);

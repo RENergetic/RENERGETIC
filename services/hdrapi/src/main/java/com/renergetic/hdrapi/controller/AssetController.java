@@ -49,14 +49,15 @@ public class AssetController {
         List<AssetDAOResponse> assets = new ArrayList<AssetDAOResponse>();
         HashMap<String, String> filters = new HashMap<>();
 
-        if (category.isPresent()) filters.put("category", category.get().toString());
-        if (type.isPresent()) filters.put("type", type.get());
-        if (name.isPresent()) filters.put("name", name.get());
-        if (owner_id.isPresent()) filters.put("owner", owner_id.get().toString());
-        if (parent_id.isPresent()) filters.put("parent", parent_id.get().toString());
+        if (category.isPresent()&&!category.get().isEmpty( )) filters.put("category", category.get().toString());
+        if (type.isPresent()&&!type.get().isEmpty( )) filters.put("type", type.get());
+        if (name.isPresent()&&name.get().length()>2) filters.put("name", name.get());
+        if (label.isPresent()&&label.get().length()>2) filters.put("label", label.get());
+        owner_id.ifPresent(aLong -> filters.put("owner", aLong.toString()));
+        parent_id.ifPresent(aLong -> filters.put("parent", aLong.toString()));
 
         try {
-            assets = assetSv.get(filters.size() > 0 ? filters : null, offset.orElse(0L), limit.orElse(20));
+            assets = assetSv.get(filters  , offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             assets = Collections.emptyList();
         }

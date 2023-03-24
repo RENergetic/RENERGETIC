@@ -99,42 +99,18 @@ public class AssetService {
     }
 
     public List<AssetDAOResponse> get(Map<String, String> filters, long offset, int limit) {
-        Stream<Asset> stream = assetRepository.findAll(new OffSetPaging(offset, limit)).stream();
+
+        Stream<Asset> stream = assetRepository.filterAssets(
+                filters.getOrDefault("name",null),
+                filters.getOrDefault("label",null),
+                filters.getOrDefault("category",null),
+                filters.getOrDefault("type",null),
+                offset,limit).stream();
         List<AssetDAOResponse> assets;
-
-        if (filters != null)
-            assets = stream.filter(asset -> {
-                boolean equals = true;
-
-                if (filters.containsKey("name"))
-                    equals = asset.getName().equalsIgnoreCase(filters.get("name"));
-                if (equals && filters.containsKey("type") && asset.getType() != null)
-                    equals = asset.getType().getName().equalsIgnoreCase(filters.get("type")) ||
-                            asset.getType().getLabel().equalsIgnoreCase(filters.get("type"));
-                if (equals && filters.containsKey("category") && asset.getType() != null) {
-                    equals = asset.getAssetCategory().getName().equals(filters.get("category"));
-                }
-                if (equals && filters.containsKey("location"))
-                    equals = asset.getLocation().equalsIgnoreCase(filters.get("location"));
-//				if (equals && filters.containsKey("owner"))
-//					equals = asset.getOwner() != null? String.valueOf(asset.getOwner().getId()).equalsIgnoreCase(filters.get("owner")) : false;
-                if (equals && filters.containsKey("parent"))
-                    equals = asset.getParentAsset() != null ? String.valueOf(
-                            asset.getParentAsset().getId()).equalsIgnoreCase(filters.get("parent")) : false;
-
-                return equals;
-            }).map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
-                    measurementRepository.findByAsset(asset)))
-                    .collect(Collectors.toList());
-        else
-            assets = stream
-                    .map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
-                            measurementRepository.findByAsset(asset)))
-                    .collect(Collectors.toList());
-
-        if (assets.size() > 0)
+        assets=stream.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
+                        measurementRepository.findByAsset(asset)))
+                .collect(Collectors.toList());
             return assets;
-        else throw new NotFoundException("No assets are found");
     }
 
     public AssetDAOResponse getById(Long id) {
