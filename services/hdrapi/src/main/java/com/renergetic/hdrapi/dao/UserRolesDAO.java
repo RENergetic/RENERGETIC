@@ -5,9 +5,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.hdrapi.model.RoleType;
 import com.renergetic.hdrapi.model.User;
-import com.renergetic.hdrapi.model.UserRoles;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

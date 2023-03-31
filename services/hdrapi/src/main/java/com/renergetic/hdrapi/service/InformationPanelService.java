@@ -129,6 +129,26 @@ public class InformationPanelService {
             return list;
         else throw new NotFoundException("No information panels related with userId " + userId + " found");
     }
+    /**
+     *
+     *
+     * @param isTemplate
+     * @param limit  result length limit
+     */
+    public List<InformationPanelDAOResponse> findFeatured(boolean isTemplate,int limit) {
+        /*
+            Highly inefficient !!
+            Just as a first draft to get it working but there is really a structural issue in the data highlighted here as this is a pure mess to get the request.
+        */
+        List<InformationPanel> informationPanels = informationPanelRepository.findFeatured(isTemplate, 0, limit);
+        List<InformationPanelDAOResponse> list =
+                informationPanels.stream()
+                        .map(panel -> InformationPanelDAOResponse.create(panel, null))
+                        .collect(Collectors.toList());
+
+
+            return list;
+    }
 
     /**
      * get panel template by panelId and infer measurements by assetId

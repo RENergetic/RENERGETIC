@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.repository;
 
 import com.renergetic.hdrapi.model.Asset;
+import com.renergetic.hdrapi.model.ConnectionType;
 import com.renergetic.hdrapi.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,6 +31,17 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     @Query(value = "SELECT asset_conn.* " +
             "FROM (asset asset_conn " +
             "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
+            "INNER JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId" +
+            " WHERE asset_connection.connection_type in :connTypes )" +
+            "LIMIT :limit OFFSET :offset ;", nativeQuery = true)
+    public List<Asset> findByUserIdConnectionTypes(@Param("userId") Long userId,
+                                                   @Param("connTypes") List<ConnectionType> connectionTypes,
+                                                   long offset, int limit);
+
+
+    @Query(value = "SELECT asset_conn.* " +
+            "FROM (asset asset_conn " +
+            "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
             "INNER JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId)" +
             "WHERE asset_conn.asset_category_id = :category " +
             "LIMIT :limit OFFSET :offset ;", nativeQuery = true)
@@ -50,14 +62,14 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
             " WHERE asset.user.id = :userId and asset.type.name ='user'")
     Asset findByUserId(@Param("userId") Long userId);
 
-        @Query(value = "SELECT m_asset.* " +
+    @Query(value = "SELECT m_asset.* " +
             "FROM  asset m_asset " +
             "LEFT JOIN asset_type ON asset_type.id = m_asset.asset_type_id " +
             "LEFT JOIN asset_category   ON asset_category.id = m_asset.asset_category_id " +
-            " WHERE COALESCE(asset_category.name = :categoryName ,:categoryName is null) " +
+            " WHERE COALESCE(asset_category.name ilike CONCAT('%', :categoryName, '%'),:categoryName is null) " +
             " AND COALESCE(m_asset.name ilike CONCAT('%', :name, '%'),:name is null ) " +
             " AND COALESCE(m_asset.label ilike CONCAT('%', :label,'%'),:label is null ) " +
-            " AND COALESCE(asset_type.name = :typeName ,:typeName is null) " +
+            " AND COALESCE(asset_type.name ilike CONCAT('%', :typeName, '%'),:typeName is null) " +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<Asset> filterAssets(@Param("name") String name, @Param("label") String label,
                                     @Param("categoryName") String categoryName, @Param("typeName") String typeName,
