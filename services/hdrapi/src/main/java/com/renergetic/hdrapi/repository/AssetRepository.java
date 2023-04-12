@@ -29,13 +29,13 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     public List<Asset> findByUserId(Long userId, long offset, int limit);
 
     @Query(value = "SELECT asset_conn.* " +
-            "FROM (asset asset_conn " +
-            "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
-            "INNER JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId" +
-            " WHERE asset_connection.connection_type in :connTypes )" +
-            "LIMIT :limit OFFSET :offset ;", nativeQuery = true)
+            " FROM (asset asset_conn " +
+            " INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
+            " INNER JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId)" +
+            " WHERE asset_connection.connection_type in :connTypes " +
+            " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<Asset> findByUserIdConnectionTypes(@Param("userId") Long userId,
-                                                   @Param("connTypes") List<ConnectionType> connectionTypes,
+                                                   @Param("connTypes") List<String> connectionTypes,
                                                    long offset, int limit);
 
 

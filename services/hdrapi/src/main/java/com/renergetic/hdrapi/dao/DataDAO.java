@@ -16,6 +16,7 @@ public class DataDAO {
 	@JsonProperty(value = "current", required = false)
 	private Map<String, Map<String, Double>> current;
 
+
 	@JsonProperty(value = "prediction", required = false)
 	private Map<String, Map<String, Double>> prediction;
 

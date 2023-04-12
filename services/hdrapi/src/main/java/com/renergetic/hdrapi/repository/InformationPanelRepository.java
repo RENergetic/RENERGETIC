@@ -32,7 +32,7 @@ public interface InformationPanelRepository extends JpaRepository<InformationPan
             " LEFT JOIN asset asset_conn ON asset_conn.id = asset_panel.asset_id" +
             " LEFT JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id" +
             " ) " +
-            " WHERE is_iemplate =:isTemplate and featured" +
+            " WHERE is_template =:isTemplate and featured" +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<InformationPanel> findFeatured(@Param("isTemplate") boolean isTemplate, long offset, int limit);
 

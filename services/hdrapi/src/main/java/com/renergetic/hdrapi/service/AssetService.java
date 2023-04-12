@@ -239,8 +239,11 @@ public class AssetService {
         else throw new NotFoundException("No assets found related with user " + id + " found");
     }
 
-    public List<SimpleAssetDAO> findSimpleByUserId(Long id,List<ConnectionType> connectionTypes, long offset, int limit) {
-        List<SimpleAssetDAO> list = assetRepository.findByUserIdConnectionTypes(id,connectionTypes, offset, limit).stream()
+    public List<SimpleAssetDAO> findSimpleByUserId(Long id, List<ConnectionType> connectionTypes, long offset,
+                                                   int limit) {
+        List<SimpleAssetDAO> list = assetRepository.findByUserIdConnectionTypes(id,
+                        connectionTypes.stream().map(ConnectionType::toString).collect(Collectors.toList()),
+                        offset, limit).stream()
                 .map(x -> SimpleAssetDAO.create(x)).collect(Collectors.toList());
 
         if (list != null && list.size() > 0)
@@ -249,10 +252,12 @@ public class AssetService {
     }
 
 
+    public List<AssetPanelDAO> findAssetsPanelsByUserId(Long userId, List<ConnectionType> connectionTypes, long offset,
+                                                        int limit) {
 
-    public List<AssetPanelDAO> findAssetsPanelsByUserId( Long userId, List<ConnectionType> connectionTypes,long offset, int limit                                                       ) {
         List<AssetPanelDAO> list =
-                assetRepository.findByUserIdConnectionTypes(userId,connectionTypes,
+                assetRepository.findByUserIdConnectionTypes(userId,
+                                connectionTypes.stream().map(ConnectionType::toString).collect(Collectors.toList()),
                                 offset, limit).stream()
                         .map(x -> x.getInformationPanels().stream().map(y -> AssetPanelDAO.fromEntities(x, y)).collect(
                                 Collectors.toList()))

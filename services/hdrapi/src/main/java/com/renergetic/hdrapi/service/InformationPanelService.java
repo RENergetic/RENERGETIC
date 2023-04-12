@@ -12,6 +12,7 @@ import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.model.UUID;
 import com.renergetic.hdrapi.repository.AssetRepository;
 import com.renergetic.hdrapi.repository.InformationPanelRepository;
+import com.renergetic.hdrapi.repository.InformationTileRepository;
 import com.renergetic.hdrapi.repository.MeasurementRepository;
 import com.renergetic.hdrapi.repository.UuidRepository;
 import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
@@ -27,6 +28,8 @@ import java.util.stream.Stream;
 public class InformationPanelService {
     @Autowired
     private InformationPanelRepository informationPanelRepository;
+    @Autowired
+    private InformationTileRepository informationTileRepository;
 
     @Autowired
     private InformationPanelMapper informationPanelMapper;
@@ -129,13 +132,12 @@ public class InformationPanelService {
             return list;
         else throw new NotFoundException("No information panels related with userId " + userId + " found");
     }
+
     /**
-     *
-     *
      * @param isTemplate
-     * @param limit  result length limit
+     * @param limit      result length limit
      */
-    public List<InformationPanelDAOResponse> findFeatured(boolean isTemplate,int limit) {
+    public List<InformationPanelDAOResponse> findFeatured(boolean isTemplate, int limit) {
         /*
             Highly inefficient !!
             Just as a first draft to get it working but there is really a structural issue in the data highlighted here as this is a pure mess to get the request.
@@ -147,7 +149,7 @@ public class InformationPanelService {
                         .collect(Collectors.toList());
 
 
-            return list;
+        return list;
     }
 
     /**
@@ -168,17 +170,18 @@ public class InformationPanelService {
             InformationPanelDAOResponse p = InformationPanelDAOResponse.create(panel.get(),
                     panel.get().getTiles().stream().map(tile -> InformationTileDAOResponse.create(tile,
                             tile.getInformationTileMeasurements().stream().map(
-                                    tileM -> tileM.getMeasurement() == null
-                                            && panel.get().getIsTemplate() && assetId != null
-                                            && tileM.getAssetCategory() == null ?
-                                            getInferredMeasurements(panelId, tileM, assetId)
-                                            : Collections.singletonList(getMeasurementFromTileMeasurement(tileM)))
-                                    .flatMap(List::stream).filter(Objects::nonNull)  .collect(Collectors.toList())
+                                            tileM -> tileM.getMeasurement() == null
+                                                    && panel.get().getIsTemplate() && assetId != null
+                                                    && tileM.getAssetCategory() == null ?
+                                                    getInferredMeasurements(  tileM, assetId,null)
+                                                    : Collections.singletonList(getMeasurementFromTileMeasurement(tileM)))
+                                    .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList())
                     )).collect(Collectors.toList())
             );
             return p;
         } else throw new NotFoundException("No information panel  " + panelId + " not found");
     }
+
 
     public List<Measurement> getPanelMeasurements(long id) {
         InformationPanel panel = informationPanelRepository.findById(id).orElse(null);
@@ -192,9 +195,34 @@ public class InformationPanelService {
         throw new NotFoundException("No panel found related with id " + id);
     }
 
+    public List<Measurement> getTileMeasurements( long tileId, Long assetId,Long userId) {
 
-    private List<MeasurementDAOResponse> getInferredMeasurements(Long userId, InformationTileMeasurement tileM,
-                                                                 Long assetId) {
+        InformationTile tile = informationTileRepository.findById(tileId).orElse(null);
+        //TODO: check if user has access to the panel
+        //var panel = tile.getInformationPanel()
+        if (tile != null ) {
+            if (assetId != null) {
+                Boolean isTemplate = tile.getInformationPanel().getIsTemplate();
+                //TODO: simplify it
+                return tile.getInformationTileMeasurements().stream().map(
+                                tileM -> tileM.getMeasurement() == null
+                                        && isTemplate
+                                        && tileM.getAssetCategory() == null ?
+                                        getInferredMeasurements(  tileM, assetId,userId).stream().map(
+                                                MeasurementDAOResponse::mapToEntity).collect(Collectors.toList())
+                                        : Collections.singletonList(tileM.getMeasurement()))
+                        .flatMap(List::stream)  .filter(Objects::nonNull).collect(Collectors.toList());
+            } else {
+                return tile.getInformationTileMeasurements().stream().map(
+                        InformationTileMeasurement::getMeasurement).filter(Objects::nonNull).collect(
+                        Collectors.toList());
+            }
+        }
+        throw new NotFoundException("No tile found related with tile id: " + tileId);
+    }
+
+    private List<MeasurementDAOResponse> getInferredMeasurements(  InformationTileMeasurement tileM,
+                                                                 Long assetId,Long userId) {
 
         List<MeasurementDAOResponse> list = measurementRepository
                 .findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(assetId,
@@ -208,7 +236,7 @@ public class InformationPanelService {
         if (list.size() > 0)
             return list;
         else throw new NotFoundException(
-                "No measurements related with the user " + userId + " and  asset " + assetId + "with the tile data found");
+                "No measurements related with the user:" + (userId!=null?userId.toString():" N/A ") + " and  asset " + assetId + "with the tile data found");
     }
 
 
