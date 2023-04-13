@@ -318,6 +318,25 @@ public class AssetService {
         } else throw new InvalidNonExistingIdException("No asset detail with key " + detail.getKey() + " related with " + assetId + " found");
     }
 
+    public AssetDAOResponse updateAssetCategory(AssetCategoryDAO category,Long assetId) {
+    	Asset asset = assetRepository.findById(assetId).orElse(null);
+    	AssetCategory assetCategory = assetCategoryRepository.getById(category.getId());
+    	if (asset!=null && assetCategory != null) {
+    		asset.setAssetCategory(assetCategory);
+    		return AssetDAOResponse.create(assetRepository.save(asset),null);
+    	} else throw new InvalidNonExistingIdException(asset == null
+    		? "The asset to update doens´t exist" 
+    		:"The assetcategory to update doesn't exist");
+    }
+    
+    public AssetDAOResponse deleteAssetCategory(Long assetId) {
+    	Asset asset = assetRepository.findById(assetId).orElse(null);
+    	if (asset!=null) {
+    		asset.setAssetCategory(null);
+    		return AssetDAOResponse.create(assetRepository.save(asset),null);
+    	} else throw new InvalidNonExistingIdException("The asset to update doesn't exists");
+    }
+    
     public boolean deleteDetailById(Long id, Long assetId) {
         if (id != null && assetDetailsRepository.existsByIdAndAssetId(id, assetId)) {
             assetDetailsRepository.deleteById(id);
