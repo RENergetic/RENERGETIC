@@ -31,8 +31,8 @@ spec:
               cpu: 200m
               memory: 1300Mi
             limits:
-              cpu: 900m
-              memory: 1800Mi
+              cpu: '2'
+              memory: 3Gi
       restartPolicy: Always
 #      volumes:
 #        - name: wso-disk

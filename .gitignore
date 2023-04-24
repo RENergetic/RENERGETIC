@@ -21,3 +21,4 @@ docker_config_local/app/keycloak/
 docker_config_local/app/hdr-api/hdrapi-0.0.1-SNAPSHOT.jar
 docker_config_local/app/api/backdb-0.0.1-SNAPSHOT.jar
 docker_config_local/data/api/backinflux-0.0.1-SNAPSHOT.jar
+/.metadata/

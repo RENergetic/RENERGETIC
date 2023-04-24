@@ -223,9 +223,9 @@ then
         mkdir -p certs
         if ! [ "$(ls -A certs)" ]
         then
-            cd "${current}/docker_config/Others/renergetic-ui/certs"
+            cd "${current}/docker_config_local/Others/renergetic-ui/certs"
             openssl req --new --newkey rsa:4096 --x509 --sha256 --days 365 --nodes --out nginx-certificate.crt --subj '//C=ES\ST=Madrid\L=Madrid\O=Inetum\OU=IT\CN=front-ren-prototype.apps.paas-dev.psnc.pl' --keyout nginx.key
-            cd "${current}/docker_config/Others/renergetic-ui"
+            cd "${current}/docker_config_local/Others/renergetic-ui"
         fi
 
         # delete kubernetes resources if exists

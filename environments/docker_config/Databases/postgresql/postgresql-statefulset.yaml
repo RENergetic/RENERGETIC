@@ -26,8 +26,8 @@ spec:
               cpu: 150m
               memory: 250Mi
             limits:
-              cpu: 200m
-              memory: 250Mi
+              cpu: '1'
+              memory: 2Gi
           # Config from ConfigMap
           envFrom:
           - configMapRef:
