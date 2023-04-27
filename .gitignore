@@ -1,4 +1,4 @@
-
+# DEPLOYs CONFIGURATION
 environments/_credentials.properties
 environments/_installers.properties
 environments/**/api.jar
@@ -6,19 +6,18 @@ environments/**/dist
 environments/**/keycloak/themes
 environments/**/renergetic-ui/certs
 
+# APIs CONFIGURATION
 services/**/application.properties-prd.properties
 services/**/.metadata
 services/**/target
 
-front/**
-!front/README.md
 
-configuration/**/node_modules
-docker_config_local/app/front/dist/
+# IDEs FILES
 .idea/
 .vscode/
-docker_config_local/app/keycloak/
-docker_config_local/app/hdr-api/hdrapi-0.0.1-SNAPSHOT.jar
-docker_config_local/app/api/backdb-0.0.1-SNAPSHOT.jar
-docker_config_local/data/api/backinflux-0.0.1-SNAPSHOT.jar
-/.metadata/
+.metadata/
+.settings/
+.project
+.classpath
+.factorypath
+HELP.md

@@ -4,9 +4,10 @@ import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.model.details.MeasurementTags;
 import com.renergetic.hdrapi.repository.*;
+import com.renergetic.hdrapi.service.utils.DateConverter;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import com.renergetic.hdrapi.service.utils.HttpAPIs;
-import org.apache.commons.lang3.NotImplementedException;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ public class DataService {
     private MeasurementTagsRepository measurementTagsRepository;
     @Autowired
     private InformationPanelService informationPanelService;
+    @Autowired
+    private MeasurementTypeRepository measurementTypeRepository;
 
     public DataWrapperDAO getPanelData(Long panelId, Long from, Optional<Long> to) {
         return this.getPanelData(panelId, null, from, to);
@@ -174,8 +177,82 @@ public class DataService {
                     measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(Collectors.toList()),
                     from, to);
         } else {
-            //TODO:
-            throw new NotImplementedException("getTimeseries");
+            TimeseriesDAO ret = new TimeseriesDAO();
+            Set<Thread> threads = new HashSet<>();
+            
+            List<String> types = measurementTypeRepository.findAll().stream().map(MeasurementType::getName).collect(Collectors.toList());
+            
+            for (final Measurement measurement : measurements) {
+                Thread thread = new Thread(() -> {
+                    Map<String, String> params = new HashMap<>();
+                    List<String> assetNames = new LinkedList<>();
+
+                    // SET DEFAULT VALUES TO THE MEASUREMENT
+                    ret.getCurrent().put(measurement.getId().toString(), new ArrayList<>());
+
+                    // GET ASSETS RELATED WITH THE MEASUREMENT (If the assets is a energy island and there isn't category it doesn't filter by asset)
+                    if (measurement.getAsset() != null && !measurement.getAsset().getType().getName().equalsIgnoreCase(
+                            "energy_island"))
+                        assetNames.add(measurement.getAsset().getName());
+                    if (measurement.getAssetCategory() != null)
+                        assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
+                                .stream().map(asset -> asset.getName()).collect(Collectors.toList()));
+
+                    // GET MEASUREMENT TAGS
+                    List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
+
+                    // PREPARE INFLUX FILTERS
+                    if (from != null)
+                        params.put("from", from.toString());
+                    if (to != null && to.isPresent())
+                        params.put("to", to.get().toString());
+                    if (measurement.getSensorName() != null)
+                        params.put("measurements", measurement.getSensorName());
+                    if (measurement.getType() != null)
+                        params.put("fields", measurement.getType().getName());
+                    if (measurement.getDirection() != null)
+                        params.put("direction", measurement.getDirection().name());
+                    if (measurement.getDomain() != null)
+                        params.put("domain", measurement.getDomain().name());
+                    if (assetNames != null && !assetNames.isEmpty())
+                        params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
+                    if (tags != null && !tags.isEmpty())
+                        params.putAll(tags.stream()
+                                .filter(tag -> !params.containsKey(tag.getValue()))
+                                .collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+
+                    // INFLUX API REQUEST
+                    HttpResponse<String> response =
+                            HttpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
+
+                    if (response.statusCode() < 300) {
+                        JSONArray array = new JSONArray(response.body());
+                        if (array.length() > 0)
+                            array.forEach(obj -> {
+                                if (obj instanceof JSONObject) {
+                                    JSONObject json = ((JSONObject) obj).getJSONObject("fields");
+                                    for (String type : types) {
+                                    	if (json.has(type)) {
+                                    		ret.getTimestamps().add(DateConverter.toEpoch(json.getString("time")));
+                                    		ret.getCurrent().get(measurement.getId().toString()).add(json.getDouble(type));
+                                    		break;
+                                    	}
+                                    }
+                                }
+                            });
+                    }
+                });
+                thread.start();
+                threads.add(thread);
+            }
+            threads.forEach(thread -> {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            return ret;
         }
     }
 }

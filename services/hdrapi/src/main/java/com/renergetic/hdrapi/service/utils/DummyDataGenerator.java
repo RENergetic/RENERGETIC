@@ -74,8 +74,8 @@ public class DummyDataGenerator {
         for (int i = 0; i < timestamps.length; i++) {
             timestamps[i] = dateFrom + interval * i;
         }
-        data.setTimestamps(timestamps);
-        Map<String, Double[]> map = new HashMap<>();
+        data.setTimestamps(Arrays.asList(timestamps));
+        Map<String, List<Double>> map = new HashMap<>();
 
         ArrayList<MeasurementDAOResponse> tList = new ArrayList<>(measurements);
         for (int j = 0; j < tList.size(); j++) {
@@ -85,7 +85,7 @@ public class DummyDataGenerator {
                 values[i] = getMeasurementValue(m, i > 0 ? values[i - 1] : null);
             }
 
-            map.put(m.getId().toString(), values);
+            map.put(m.getId().toString(), Arrays.asList(values));
         }
         data.setCurrent(map);
 
