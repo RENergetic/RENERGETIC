@@ -1,10 +1,13 @@
 package com.renergetic.hdrapi.service.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+
+import com.renergetic.hdrapi.exception.InvalidArgumentException;
 
 public final class DateConverter {
     //TODO: Raul set date format as you wish :)
@@ -20,6 +23,14 @@ public final class DateConverter {
 
     public static Long toEpoch(Date date) {
         return date.getTime();
+    }
+
+    public static Long toEpoch(String date) {
+    	try {
+    		return dateFormat.parse(date).toInstant().toEpochMilli();
+    	} catch (ParseException ex) {
+			throw new InvalidArgumentException("The date %s can't be pased to epoch");
+		}
     }
 
     public static LocalDateTime toLocalDateTime(Long epoch) {
