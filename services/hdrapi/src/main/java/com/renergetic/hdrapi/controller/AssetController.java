@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.controller;
 
+import com.renergetic.hdrapi.dao.AssetCategoryDAO;
 import com.renergetic.hdrapi.dao.AssetConnectionDAORequest;
 import com.renergetic.hdrapi.dao.AssetDAORequest;
 import com.renergetic.hdrapi.dao.AssetDAOResponse;
@@ -8,6 +9,7 @@ import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.model.AssetType;
 import com.renergetic.hdrapi.model.ConnectionType;
 import com.renergetic.hdrapi.model.details.AssetDetails;
+import com.renergetic.hdrapi.repository.AssetRepository;
 import com.renergetic.hdrapi.repository.information.AssetDetailsRepository;
 import com.renergetic.hdrapi.service.AssetService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +34,8 @@ public class AssetController {
     AssetService assetSv;
     @Autowired
     AssetDetailsRepository informationRepository;
+    @Autowired
+    AssetService assetService;
 
 //=== GET REQUESTS====================================================================================
 
@@ -309,6 +313,19 @@ public class AssetController {
         return new ResponseEntity<>(_type, _type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @Operation(summary = "Connect an existing asset to an asset category", hidden = false)
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Asset category correctly updated"),
+            @ApiResponse(responseCode = "404", description = "Asset not exists "),
+            @ApiResponse(responseCode = "500", description = "Error saving measurement")
+    }
+    )
+    @PutMapping(path = "/{id}/category")
+    public ResponseEntity<AssetDAOResponse> connectAssetToCategory(@PathVariable Long id, @RequestBody AssetCategoryDAO connectCategory ) {
+    	AssetDAOResponse assetDAOupdate = assetService.updateAssetCategory(connectCategory, id);
+    	return new ResponseEntity<>(assetDAOupdate, HttpStatus.OK);
+    }
+    
     //=== DELETE REQUESTS ================================================================================
     @DeleteMapping(path = "/connect/{id}", produces = "application/json")
     public ResponseEntity<?> connectAssets(@PathVariable Long id, @RequestParam("connected_asset_id") Long connectId) {
@@ -340,6 +357,18 @@ public class AssetController {
     public ResponseEntity<?> deleteAssetType(@PathVariable Long id) {
         assetSv.deleteTypeById(id);
 
+        return ResponseEntity.noContent().build();
+    } 
+    
+    @Operation(summary = "Delete a connection between an asset an its category", hidden = false)
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Connection deleted correctly"),
+            @ApiResponse(responseCode = "500", description = "Error deleting the connection")
+    }
+    )
+    @DeleteMapping(path = "/{id}/category")
+    public ResponseEntity<?> deleteConnectionAssetToCategory(@PathVariable Long id) {
+    	assetService.deleteAssetCategory(id);
         return ResponseEntity.noContent().build();
     }
 }
