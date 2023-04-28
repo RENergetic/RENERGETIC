@@ -36,6 +36,7 @@ public class AssetPanelDAO {
         panelSimplifiedDAO.setId(panel.getId());
         panelSimplifiedDAO.setName(panel.getName());
         panelSimplifiedDAO.setLabel(panel.getLabel());
+        panelSimplifiedDAO.setTemplate(panel.getIsTemplate());
         assetPanelDAO.setPanel(panelSimplifiedDAO);
 
         return assetPanelDAO;
@@ -54,6 +55,7 @@ public class AssetPanelDAO {
         panelSimplifiedDAO.setId(panel.getId());
         panelSimplifiedDAO.setName(panel.getName());
         panelSimplifiedDAO.setLabel(panel.getLabel());
+        panelSimplifiedDAO.setTemplate(panel.getIsTemplate());
         assetPanelDAO.setPanel(panelSimplifiedDAO);
 
         return assetPanelDAO;
@@ -87,5 +89,7 @@ public class AssetPanelDAO {
 
         @JsonProperty(required = true)
         private String label;
+        @JsonProperty(required = true,value = "is_template" )
+        private boolean isTemplate;
     }
 }

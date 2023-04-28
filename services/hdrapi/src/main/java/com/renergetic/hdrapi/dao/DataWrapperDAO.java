@@ -11,6 +11,9 @@ public class DataWrapperDAO {
 
 	@JsonProperty(value = "data" )
 	private DataDAO data;
+	//TODO: add this here?
+//	@JsonProperty(value = "timeseries" )
+//	private TimeseriesDAO timeseries;
 
 	@JsonProperty(value = "panel" )
 	private InformationPanelDAOResponse panel=null;

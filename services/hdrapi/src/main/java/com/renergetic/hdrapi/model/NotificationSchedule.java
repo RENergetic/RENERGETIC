@@ -27,12 +27,16 @@ public class NotificationSchedule {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	/**
+	 * notification valid from, value occurs at
+	 */
 	@Column(name = "date_from", nullable = false, insertable = true, updatable = true, unique = false)
 	private LocalDateTime dateFrom;
 	
 	@Column(name = "date_to", nullable = true, insertable = true, updatable = true, unique = false)
 	private LocalDateTime dateTo;
 
+	//time the prediction was made
 	@Column(name = "notification_timestamp", nullable = true, insertable = true, updatable = true, unique = false)
 	private LocalDateTime notificationTimestamp;
 

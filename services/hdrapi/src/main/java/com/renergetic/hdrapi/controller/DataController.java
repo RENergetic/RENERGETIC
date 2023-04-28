@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.DataWrapperDAO;
+import com.renergetic.hdrapi.dao.TimeseriesDAO;
 import com.renergetic.hdrapi.service.DataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @Tag(name = "Data Controller", description = "Allows collect data about Influx measurement")
 @RequestMapping("/api/data")
 public class DataController {
+    //TODO: predictions
 
     @Autowired
     DataService dataSv;
@@ -68,5 +70,45 @@ public class DataController {
                 dataSv.getPanelData(panelId, assetId, from.orElse((new Date()).getTime() - 3600000), to);
         return new ResponseEntity<>(panelData, HttpStatus.OK);
     }
+    @GetMapping(path = "/timeseries/tile/{tileId}", produces = "application/json")
+    public ResponseEntity<TimeseriesDAO> getTileTimeseries(
+            @PathVariable Long tileId,
+            @RequestParam("from") Optional<Long> from,
+            @RequestParam("to") Optional<Long> to) {
+        TimeseriesDAO tileTimeseries =
+                dataSv.getTileTimeseries(  tileId, null, from.orElse((new Date()).getTime() - 3600000), to);
+        return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
+    }
 
+
+
+    @GetMapping(path = "/timeseries/tile/{tileId}/asset/{assetId}", produces = "application/json")
+    public ResponseEntity<TimeseriesDAO> getTileAssetTimeseries(
+            @PathVariable Long tileId,
+            @PathVariable Long assetId,
+            @RequestParam("from") Optional<Long> from,
+            @RequestParam("to") Optional<Long> to) {
+        TimeseriesDAO tileTimeseries =
+                dataSv.getTileTimeseries( tileId, assetId, from.orElse((new Date()).getTime() - 3600000), to);
+        return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
+    }
+    //TODO:
+//    @GetMapping(path = "/timeseries/panel/{panelId}", produces = "application/json")
+//    public ResponseEntity<TimeseriesDAO> getTileTimeseries(
+//            @PathVariable Long panelId,
+//            @RequestParam("from") Optional<Long> from,
+//            @RequestParam("to") Optional<Long> to) {
+//        TimeseriesDAO tileTimeseries =
+//                dataSv.getTileTimeseries(  tileId, null, from.orElse((new Date()).getTime() - 3600000), to);
+//        return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
+//    } @GetMapping(path = "/timeseries/panel/{panelId}/asset/{assetId}", produces = "application/json")
+//    public ResponseEntity<TimeseriesDAO> getTileAssetTimeseries(
+//            @PathVariable Long panelId,
+//            @PathVariable Long assetId,
+//            @RequestParam("from") Optional<Long> from,
+//            @RequestParam("to") Optional<Long> to) {
+//        TimeseriesDAO tileTimeseries =
+//                dataSv.getTileTimeseries(panelId,tileId, assetId, from.orElse((new Date()).getTime() - 3600000), to);
+//        return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
+//    }
 }
