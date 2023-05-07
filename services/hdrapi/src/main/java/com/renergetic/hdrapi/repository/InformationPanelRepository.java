@@ -2,6 +2,7 @@ package com.renergetic.hdrapi.repository;
 
 import com.renergetic.hdrapi.model.InformationPanel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -35,7 +36,15 @@ public interface InformationPanelRepository extends JpaRepository<InformationPan
             " WHERE is_template =:isTemplate and featured" +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<InformationPanel> findFeatured(@Param("isTemplate") boolean isTemplate, long offset, int limit);
+    @Modifying
+    @Query(value = " INSERT INTO asset_panel ( panel_id, asset_id) " +
+            " SELECT :id, :assetId WHERE NOT EXISTS " +
+            " (SELECT * from asset_panel j WHERE j.panel_id = :id and j.asset_id = :assetId)", nativeQuery = true)
+    public int assignAsset(@Param("id") Long id, @Param("assetId") Long assetId);
 
+    @Modifying
+    @Query(value = " DELETE FROM asset_panel  WHERE asset_panel.panel_id = :id and asset_panel.asset_id = :assetId ", nativeQuery = true)
+    public void revokeAsset(@Param("id") Long id, @Param("assetId") Long assetId);
 
 
 }

@@ -13,6 +13,7 @@ import com.renergetic.hdrapi.dao.InformationPanelDAORequest;
 import com.renergetic.hdrapi.dao.InformationPanelDAOResponse;
 import com.renergetic.hdrapi.service.InformationPanelService;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,19 +79,41 @@ public class InformationPanelController {
     public ResponseEntity<InformationPanelDAOResponse> updateInformationPanel(@RequestBody InformationPanelDAORequest informationPanelDAORequest) {
         return new ResponseEntity<>(informationPanelService.update(informationPanelDAORequest), HttpStatus.OK);
     }
-    
-	@Operation(summary = "Connect a Panel with a existing Asset")
-	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Asset and panel connected correctly"),
-			@ApiResponse(responseCode = "404", description = "Asset and panel or panel didn't found"),
-			@ApiResponse(responseCode = "500", description = "Error connecting asset")
-		}
-	)
-	@PutMapping(path = "/connect", produces = "application/json")
-	public ResponseEntity<InformationPanelDAOResponse> connectPanelAsset(@RequestParam("panel_id") Long id, @RequestParam("asset_id") Long assetId) {
-		InformationPanelDAOResponse _panel = informationPanelService.connect(id, assetId);
-		return new ResponseEntity<>(_panel, _panel != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-	}
+
+    @Operation(summary = "Set dashboard visibility in the menu list")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Information Panel saved correctly. Return current state"),
+            @ApiResponse(responseCode = "500", description = "Error saving Information Panel")
+    })
+    @PostMapping(path = "/id/{id}/featured", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<Boolean> setFeatured(@PathParam("id") Long id,
+                                               @RequestBody Boolean state) {
+//todo check privileges
+        var currentFeatured = informationPanelService.setFeatured(id, state);
+        return new ResponseEntity<>(currentFeatured, currentFeatured == state ? HttpStatus.OK : HttpStatus.CONFLICT);
+    }
+
+
+
+    @Operation(summary = "Connect a Panel with a existing Asset")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Asset and panel connected correctly"),
+            @ApiResponse(responseCode = "404", description = "Asset and panel or panel didn't found"),
+            @ApiResponse(responseCode = "500", description = "Error connecting asset")
+    }
+    )
+
+    @PutMapping(path = "/id/{id}/asset/{assetId}", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<Boolean> assignAsset(@PathParam("panel_id") Long id, @PathParam("asset_id") Long assetId) {
+        Boolean assign = informationPanelService.assign(id, assetId);
+        return new ResponseEntity<>(assign, assign ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
+
+    @DeleteMapping(path = "/id/{id}/asset/{assetId}", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<Boolean> revokeAsset(@PathParam("panel_id") Long id, @PathParam("asset_id") Long assetId) {
+        Boolean assign = informationPanelService.revoke(id, assetId);
+        return new ResponseEntity<>(assign, assign ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
 
     @Operation(summary = "Delete Panel by id")
     @ApiResponses({

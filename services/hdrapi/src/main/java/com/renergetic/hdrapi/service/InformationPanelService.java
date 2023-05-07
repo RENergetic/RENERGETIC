@@ -98,6 +98,43 @@ public class InformationPanelService {
         informationPanelRepository.deleteById(id);
         return true;
     }
+    public Boolean assign(Long id, Long assetId) {
+        return this.setConnection(id, assetId, true);
+    }
+
+    public Boolean revoke(Long id, Long assetId) {
+        return this.setConnection(id, assetId, true);
+    }
+
+    public Boolean setConnection(Long id, Long assetId, boolean state) {
+        boolean panelExists = id != null && informationPanelRepository.existsById(id);
+
+        if (panelExists && assetRepository.existsById(assetId)) {
+//            InformationPanel asset = informationPanelRepository.findById(id).get();
+            if (state)
+                informationPanelRepository.assignAsset(id, assetId);
+            else {
+                informationPanelRepository.revokeAsset(id, assetId);
+
+            }
+            return true;
+        } else if (!panelExists) throw new InvalidNonExistingIdException("The panel to connect doesn't exists");
+        else throw new InvalidNonExistingIdException("The asset to connect doesn't exists");
+    }
+
+
+    public Boolean setFeatured(Long id, boolean state) {
+        boolean panelExists = id != null && informationPanelRepository.existsById(id);
+
+        if (panelExists) {
+            InformationPanel panel = informationPanelRepository.findById(id).get();
+            panel.setFeatured(state);
+            panel = informationPanelRepository.save(panel);
+            return panel.getFeatured();
+        } else throw new InvalidNonExistingIdException("The panel to connect doesn't exists");
+
+    }
+
 
     public InformationPanelDAOResponse connect(Long id, Long assetId) {
         boolean panelExists = id != null && informationPanelRepository.existsById(id);
