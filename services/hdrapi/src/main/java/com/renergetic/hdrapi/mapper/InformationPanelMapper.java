@@ -39,6 +39,8 @@ public class InformationPanelMapper implements MapperReponseRequest<InformationP
         dao.setId(entity.getId());
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
+        dao.setFeatured(entity.getFeatured());
+        dao.setIsTemplate(entity.getIsTemplate());
         if(entity.getTiles() != null)
             dao.setTiles(entity.getTiles().stream().map(x -> informationTileMapper.toDTO(x)).collect(Collectors.toList()));
         else
