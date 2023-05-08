@@ -103,7 +103,7 @@ public class InformationPanelController {
             @ApiResponse(responseCode = "200", description = "Asset and panel connected correctly"),
             @ApiResponse(responseCode = "404", description = "Asset and panel or panel didn't found"),
             @ApiResponse(responseCode = "500", description = "Error connecting asset")})
-    @GetMapping(path = "/id/{id}/asset/{assetId}", produces = "application/json", consumes = "application/json")
+    @GetMapping(path = "/id/{panel_id}/asset", produces = "application/json", consumes = "application/json")
     public ResponseEntity<  List<SimpleAssetDAO>> listConnectedAssets(@PathParam("panel_id") Long id) {
         List<SimpleAssetDAO> assigned = informationPanelService.getConnectedAssets(id);
         return new ResponseEntity< >(assigned, HttpStatus.OK);
