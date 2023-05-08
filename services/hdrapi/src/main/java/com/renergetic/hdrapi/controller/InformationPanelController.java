@@ -1,5 +1,7 @@
 package com.renergetic.hdrapi.controller;
 
+import com.renergetic.hdrapi.dao.AssetPanelDAO;
+import com.renergetic.hdrapi.dao.SimpleAssetDAO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,15 +30,16 @@ public class InformationPanelController {
     @Operation(summary = "Get All Panels")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "", produces = "application/json")
-    public ResponseEntity<List<InformationPanelDAOResponse>> getAllPanels (@RequestParam(required = false) Optional<Long> offset,
-                                                                           @RequestParam(required = false) Optional<Integer> limit){
+    public ResponseEntity<List<InformationPanelDAOResponse>> getAllPanels(
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit) {
         return new ResponseEntity<>(informationPanelService.getAll(offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
     }
 
     @Operation(summary = "Get All Panels by owner id")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/owner/{ownerId}", produces = "application/json")
-    public ResponseEntity<List<InformationPanelDAOResponse>> getAllPanelsOwnerId (@PathVariable Long ownerId){
+    public ResponseEntity<List<InformationPanelDAOResponse>> getAllPanelsOwnerId(@PathVariable Long ownerId) {
         return new ResponseEntity<>(informationPanelService.getAll(ownerId), HttpStatus.OK);
     }
 
@@ -46,7 +49,7 @@ public class InformationPanelController {
             @ApiResponse(responseCode = "404", description = "panel not found")
     })
     @GetMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<InformationPanelDAOResponse> getById (@PathVariable Long id){
+    public ResponseEntity<InformationPanelDAOResponse> getById(@PathVariable Long id) {
         return new ResponseEntity<>(informationPanelService.getById(id), HttpStatus.OK);
     }
 
@@ -56,7 +59,7 @@ public class InformationPanelController {
             @ApiResponse(responseCode = "404", description = "panel not found")
     })
     @GetMapping(path = "/name/{name}", produces = "application/json")
-    public ResponseEntity<InformationPanelDAOResponse> getByName (@PathVariable String name){
+    public ResponseEntity<InformationPanelDAOResponse> getByName(@PathVariable String name) {
         return new ResponseEntity<>(informationPanelService.getByName(name), HttpStatus.OK);
     }
 
@@ -66,7 +69,8 @@ public class InformationPanelController {
             @ApiResponse(responseCode = "500", description = "Error saving Information Panel")
     })
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<InformationPanelDAOResponse> createInformationPanel(@RequestBody InformationPanelDAORequest informationPanelDAORequest) {
+    public ResponseEntity<InformationPanelDAOResponse> createInformationPanel(
+            @RequestBody InformationPanelDAORequest informationPanelDAORequest) {
         return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
     }
 
@@ -76,7 +80,8 @@ public class InformationPanelController {
             @ApiResponse(responseCode = "500", description = "Error saving Information Panel")
     })
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<InformationPanelDAOResponse> updateInformationPanel(@RequestBody InformationPanelDAORequest informationPanelDAORequest) {
+    public ResponseEntity<InformationPanelDAOResponse> updateInformationPanel(
+            @RequestBody InformationPanelDAORequest informationPanelDAORequest) {
         return new ResponseEntity<>(informationPanelService.update(informationPanelDAORequest), HttpStatus.OK);
     }
 
@@ -93,23 +98,33 @@ public class InformationPanelController {
         return new ResponseEntity<>(currentFeatured, currentFeatured == state ? HttpStatus.OK : HttpStatus.CONFLICT);
     }
 
-
+    @Operation(summary = "Get Connected assets")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Asset and panel connected correctly"),
+            @ApiResponse(responseCode = "404", description = "Asset and panel or panel didn't found"),
+            @ApiResponse(responseCode = "500", description = "Error connecting asset")})
+    @GetMapping(path = "/id/{id}/asset/{assetId}", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<  List<SimpleAssetDAO>> listConnectedAssets(@PathParam("panel_id") Long id) {
+        List<SimpleAssetDAO> assigned = informationPanelService.getConnectedAssets(id);
+        return new ResponseEntity< >(assigned, HttpStatus.OK);
+    }
 
     @Operation(summary = "Connect a Panel with a existing Asset")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Asset and panel connected correctly"),
             @ApiResponse(responseCode = "404", description = "Asset and panel or panel didn't found"),
-            @ApiResponse(responseCode = "500", description = "Error connecting asset")
-    }
-    )
-
-    @PutMapping(path = "/id/{id}/asset/{assetId}", produces = "application/json", consumes = "application/json")
+            @ApiResponse(responseCode = "500", description = "Error connecting asset")})
+    @PutMapping(path = "/id/{panel_id}/asset/{assetId}", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Boolean> assignAsset(@PathParam("panel_id") Long id, @PathParam("asset_id") Long assetId) {
         Boolean assign = informationPanelService.assign(id, assetId);
         return new ResponseEntity<>(assign, assign ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
-    @DeleteMapping(path = "/id/{id}/asset/{assetId}", produces = "application/json", consumes = "application/json")
+    @Operation(summary = "Revoke Asset-Panel assignment")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Asset and panel or panel didn't found"),
+            @ApiResponse(responseCode = "500", description = "Error disconnecting asset")})
+    @DeleteMapping(path = "/id/{panel_id}/asset/{assetId}", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Boolean> revokeAsset(@PathParam("panel_id") Long id, @PathParam("asset_id") Long assetId) {
         Boolean assign = informationPanelService.revoke(id, assetId);
         return new ResponseEntity<>(assign, assign ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
@@ -122,7 +137,7 @@ public class InformationPanelController {
             @ApiResponse(responseCode = "500", description = "Error deleting Information Panel")
     })
     @DeleteMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<Boolean> getByName (@PathVariable Long id){
+    public ResponseEntity<Boolean> getByName(@PathVariable Long id) {
         return new ResponseEntity<>(informationPanelService.deleteById(id), HttpStatus.OK);
     }
 }

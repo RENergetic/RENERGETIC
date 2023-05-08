@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.repository;
 
+import com.renergetic.hdrapi.model.Asset;
 import com.renergetic.hdrapi.model.InformationPanel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -45,6 +46,9 @@ public interface InformationPanelRepository extends JpaRepository<InformationPan
     @Modifying
     @Query(value = " DELETE FROM asset_panel  WHERE asset_panel.panel_id = :id and asset_panel.asset_id = :assetId ", nativeQuery = true)
     public void revokeAsset(@Param("id") Long id, @Param("assetId") Long assetId);
+
+    @Query("SELECT asset FROM Asset asset  WHERE asset.informationPanels.id = :panelId ")
+    List<Asset> findConnectedAssets(@Param("panelId") Long panelId);
 
 
 }
