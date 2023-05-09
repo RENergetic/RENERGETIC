@@ -111,7 +111,7 @@ public class InformationPanelService {
 
 
     public Boolean revoke(Long id, Long assetId) {
-        return this.setConnection(id, assetId, true);
+        return this.setConnection(id, assetId, false);
     }
 
     public Boolean setConnection(Long id, Long assetId, boolean state) {

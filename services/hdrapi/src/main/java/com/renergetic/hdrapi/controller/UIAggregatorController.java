@@ -179,6 +179,13 @@ public class UIAggregatorController {
         }
     }
 
+    /**
+     * private dashboards
+     * @param userId
+     * @param offset
+     * @param limit
+     * @return
+     */
     private List<AssetPanelDAO> getPrivateAssetPanels(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
             return assetService.findAssetsPanelsByUserId(userId, List.of(ConnectionType.owner, ConnectionType.resident), offset.orElse(0L), limit.orElse(20));

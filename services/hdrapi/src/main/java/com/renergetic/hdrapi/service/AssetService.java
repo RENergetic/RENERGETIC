@@ -259,7 +259,7 @@ public class AssetService {
                 assetRepository.findByUserIdConnectionTypes(userId,
                                 connectionTypes.stream().map(ConnectionType::toString).collect(Collectors.toList()),
                                 offset, limit).stream()
-                        .map(x -> x.getInformationPanels().stream().map(y -> AssetPanelDAO.fromEntities(x, y)).collect(
+                        .map(x -> x.getInformationPanels().stream().filter(InformationPanel::getFeatured).map(y -> AssetPanelDAO.fromEntities(x, y)).collect(
                                 Collectors.toList()))
                         .flatMap(List::stream).collect(Collectors.toList());
 
