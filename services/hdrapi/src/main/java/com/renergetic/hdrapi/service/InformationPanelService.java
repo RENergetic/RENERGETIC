@@ -83,9 +83,10 @@ public class InformationPanelService {
     public InformationPanelDAOResponse update(InformationPanelDAORequest informationPanel) {
         if (informationPanel.getId() == null || !informationPanelRepository.existsById(informationPanel.getId()))
             throw new InvalidNonExistingIdException();
-
+//TODO: validate, check user privileges
+        var panel = informationPanelRepository.getById(informationPanel.getId());
         return informationPanelMapper.toDTO(
-                informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel)));
+                informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel,panel )));
     }
 
     public boolean deleteById(Long id) {
