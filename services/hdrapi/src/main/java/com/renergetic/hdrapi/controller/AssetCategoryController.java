@@ -1,7 +1,11 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.hdrapi.dao.AssetCategoryDAO;
+import com.renergetic.hdrapi.dao.AssetDAOResponse;
+import com.renergetic.hdrapi.model.Asset;
 import com.renergetic.hdrapi.service.AssetCategoryService;
+import com.renergetic.hdrapi.service.AssetService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -21,6 +27,9 @@ public class AssetCategoryController {
     @Autowired
     AssetCategoryService assetCategoryService;
 
+    @Autowired
+    AssetService assetService;
+    
     @Operation(summary = "Create a new Asset Category")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Asset category saved correctly"),
@@ -91,4 +100,18 @@ public class AssetCategoryController {
         boolean deleted = assetCategoryService.deleteById(id);
         return new ResponseEntity<>(deleted, deleted ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
+    
+    @Operation(summary = "Get all the assets that have a certain category")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "404", description = "No asset found with asset category"),
+            @ApiResponse(responseCode = "500", description = "Error executing the request")
+    }
+    )
+    @GetMapping(path = "/{id}/assets", produces = "application/json")
+    public ResponseEntity<List<AssetDAOResponse>> getAssetsByCategory(@PathVariable Long id,@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit) {
+    	List<AssetDAOResponse> assets = assetService.getByCategory(id, offset.orElse(0L), limit.orElse(100));
+        return new ResponseEntity<>(assets, HttpStatus.OK);
+    }
+
 }
