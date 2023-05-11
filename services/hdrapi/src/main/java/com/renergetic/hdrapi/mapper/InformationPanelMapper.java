@@ -38,9 +38,12 @@ public class InformationPanelMapper implements MapperReponseRequest<InformationP
     public InformationPanel toEntity(InformationPanelDAORequest dto ) {
    return this.toEntity(dto,null);
     }
-
     @Override
     public InformationPanelDAOResponse toDTO(InformationPanel entity) {
+        return this.toDTO(entity,false);
+    }
+
+    public InformationPanelDAOResponse toDTO(InformationPanel entity, Boolean detailed) {
         if (entity == null)
             return null;
         InformationPanelDAOResponse dao = new InformationPanelDAOResponse();
@@ -51,7 +54,7 @@ public class InformationPanelMapper implements MapperReponseRequest<InformationP
         dao.setIsTemplate(entity.getIsTemplate());
         if (entity.getTiles() != null)
             dao.setTiles(
-                    entity.getTiles().stream().map(x -> informationTileMapper.toDTO(x)).collect(Collectors.toList()));
+                    entity.getTiles().stream().map(x -> informationTileMapper.toDTO(x,detailed)).collect(Collectors.toList()));
         else
             dao.setTiles(new ArrayList<>());
         return dao;

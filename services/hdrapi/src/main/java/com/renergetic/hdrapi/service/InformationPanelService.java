@@ -59,10 +59,12 @@ public class InformationPanelService {
             return list;
         else throw new NotFoundException("No information panels related with user " + ownerId + " found");
     }
-
-    public InformationPanelDAOResponse getById(Long id) {
+//    public InformationPanelDAOResponse getById(Long id ) {
+//        return this.getById(id,false)
+//    }
+    public InformationPanelDAOResponse getById(Long id,Boolean detailed) {
         return informationPanelMapper.toDTO(
-                informationPanelRepository.findById(id).orElseThrow(NotFoundException::new));
+                informationPanelRepository.findById(id).orElseThrow(NotFoundException::new),detailed);
     }
 
     public InformationPanelDAOResponse getByName(String name) {
