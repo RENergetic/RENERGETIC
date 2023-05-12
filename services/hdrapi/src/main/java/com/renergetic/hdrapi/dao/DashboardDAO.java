@@ -29,7 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @ToString
 public class DashboardDAO {
-    @JsonProperty(required = false, access = Access.READ_ONLY)
+    @JsonProperty(required = false )
     private Long id;
 
 

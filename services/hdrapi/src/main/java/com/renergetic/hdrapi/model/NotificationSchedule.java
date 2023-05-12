@@ -42,7 +42,7 @@ public class NotificationSchedule {
 
 	@ManyToOne(cascade = CascadeType.REFRESH, optional = false)
 	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "notification_id", nullable = false, insertable = true, updatable = true)
+	@JoinColumn(name = "definition_id", nullable = false, insertable = true, updatable = true)
 	private NotificationDefinition definition;
 
 	@ManyToOne(cascade = CascadeType.REFRESH)
