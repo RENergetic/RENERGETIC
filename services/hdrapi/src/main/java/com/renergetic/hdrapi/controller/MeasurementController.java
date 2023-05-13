@@ -51,28 +51,40 @@ public class MeasurementController {
 	
 	@Operation(summary = "Get All Measurements")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
-	@GetMapping(path = "", produces = "application/json")
+	@GetMapping(path = "/key/{key}/{value}", produces = "application/json")
 	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (
-            @RequestParam(required = false) Optional<String> name,
-            @RequestParam(required = false) Optional<String> type,
-            @RequestParam(required = false) Optional<String> direction,
-            @RequestParam(required = false) Optional<String> domain,
-            @RequestParam(required = false) Optional<Long> offset, 
+			@PathVariable(name = "key") String key,
+			@PathVariable(name = "value") String value,
+            @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit){
 		
-		List<MeasurementDAOResponse> measurements = new ArrayList<>();
-        HashMap<String, String> filters = new HashMap<>();
-
-        if (name.isPresent()) filters.put("name", name.get());
-        if (type.isPresent()) filters.put("type", type.get());
-        if (direction.isPresent()) filters.put("direction", direction.get());
-        if (domain.isPresent()) filters.put("parent", domain.get());
-		
-		measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20));
+		List<MeasurementDAOResponse> measurements = measurementSv.getByProperty(key,value, offset.orElse(0L), limit.orElse(100));
 		
 		return new ResponseEntity<>(measurements, HttpStatus.OK);
 	}
-	
+	@Operation(summary = "Get All Measurements")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "", produces = "application/json")
+	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (
+			@RequestParam(required = false) Optional<String> name,
+			@RequestParam(required = false) Optional<String> type,
+			@RequestParam(required = false) Optional<String> direction,
+			@RequestParam(required = false) Optional<String> domain,
+			@RequestParam(required = false) Optional<Long> offset,
+			@RequestParam(required = false) Optional<Integer> limit){
+
+		List<MeasurementDAOResponse> measurements = new ArrayList<>();
+		HashMap<String, String> filters = new HashMap<>();
+
+		if (name.isPresent()) filters.put("name", name.get());
+		if (type.isPresent()) filters.put("type", type.get());
+		if (direction.isPresent()) filters.put("direction", direction.get());
+		if (domain.isPresent()) filters.put("parent", domain.get());
+
+		measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20));
+
+		return new ResponseEntity<>(measurements, HttpStatus.OK);
+	}
 	@Operation(summary = "Get Measurement by id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
@@ -193,7 +205,18 @@ public class MeasurementController {
 		
 		return ResponseEntity.noContent().build();
 	}
+	@Operation(summary = "Get All Measurements")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "{measurement_id}/key/{key}/{value}", produces = "application/json")
+	public ResponseEntity<Boolean> setMeasurementProperty (
+			@PathVariable(name = "measurement_id")Long measurementId,
+			@PathVariable(name = "key") String key,
+			@PathVariable(name = "value") String value ){
+//TODO check privileges
+		boolean res = measurementSv.setProperty(measurementId, key, value)==1;
 
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
 	//=== TAGS REQUESTS ===================================================================================	
 
 	@Operation(summary = "Get All Tags")
