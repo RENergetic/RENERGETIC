@@ -66,23 +66,23 @@ public class InformationPanelDAOResponse {
         return dao;
     }
 
-    public InformationPanel mapToEntity() {
-        InformationPanel panel = new InformationPanel();
-        panel.setId(this.id);
-        panel.setName(this.name);
-        panel.setLabel(this.label);
-        panel.setIsTemplate(this.isTemplate);
-        panel.setFeatured(this.featured);
-        panel.setProps(Json.toJson(this.props));
-        if(this.tiles!=null && this.tiles.size()>0){
-//            TODO: map dao tile to sql model
+//    public InformationPanel mapToEntity() {
+//        InformationPanel panel = new InformationPanel();
+//        panel.setId(this.id);
+//        panel.setName(this.name);
+//        panel.setLabel(this.label);
+//        panel.setIsTemplate(this.isTemplate);
+//        panel.setFeatured(this.featured);
+//        panel.setProps(Json.toJson(this.props));
+//        if(this.tiles!=null && this.tiles.size()>0){
+////            TODO: map dao tile to sql model
 //            panel.setTiles(
-//                    tiles.stream().map( InformationTileDAORequest::)
+//                    tiles.stream().map( it->it.)
 //            );
-        }
-//        panel.setTiles();
-
-        //set user ?
-        return panel;
-    }
+//        }
+////        panel.setTiles();
+//
+//        //set user ?
+//        return panel;
+//    }
 }

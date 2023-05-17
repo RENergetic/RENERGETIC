@@ -17,6 +17,7 @@ import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,6 +79,22 @@ public class InformationPanelService {
                     "Already exists a information panel with ID " + informationPanel.getId());
 
         InformationPanel infoPanelEntity = informationPanelMapper.toEntity(informationPanel);
+        infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
+    }
+    public InformationPanelDAOResponse update(InformationPanelDAO  informationPanel) {
+        if ( ! informationPanelRepository.findByName(informationPanel.getName()).isPresent())
+            throw new InvalidCreationIdAlreadyDefinedException(
+                    "Panel with name does not exists: " + informationPanel.getName());
+        InformationPanel infoPanelEntity = informationPanel.mapToEntity();
+
+        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
+    }
+    public InformationPanelDAOResponse save(InformationPanelDAO  informationPanel) {
+        if (  informationPanelRepository.findByName(informationPanel.getName()).isPresent())
+            throw new InvalidCreationIdAlreadyDefinedException(
+                    "Already exists a information panel with name " + informationPanel.getName());
+        InformationPanel infoPanelEntity = informationPanel.mapToEntity();
         infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
         return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
     }

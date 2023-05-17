@@ -1,7 +1,6 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.AssetPanelDAO;
-import com.renergetic.hdrapi.dao.SimpleAssetDAO;
+import com.renergetic.hdrapi.dao.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -11,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.renergetic.hdrapi.dao.InformationPanelDAORequest;
-import com.renergetic.hdrapi.dao.InformationPanelDAOResponse;
 import com.renergetic.hdrapi.service.InformationPanelService;
 
 import java.util.List;
@@ -70,6 +67,21 @@ public class InformationPanelController {
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationPanelDAOResponse> createInformationPanel(
             @RequestBody InformationPanelDAORequest informationPanelDAORequest) {
+        informationPanelDAORequest.setId(null);
+        return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Create a new Information Panel")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Information Panel saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving Information Panel")
+    })
+    @PostMapping(path = "/name/{name}", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<InformationPanelDAOResponse> createInformationPanel(@PathVariable("name") String name,
+                                                                              @RequestBody InformationPanelDAO informationPanelDAORequest) {
+        informationPanelDAORequest.setName(name);
+        informationPanelDAORequest.setId(null);
+        informationPanelDAORequest.setFeatured(false);
         return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
     }
 
@@ -80,7 +92,8 @@ public class InformationPanelController {
     })
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationPanelDAOResponse> updateInformationPanel(
-            @RequestBody InformationPanelDAORequest informationPanelDAORequest) {
+            @RequestBody InformationPanelDAO informationPanelDAORequest) {
+
         return new ResponseEntity<>(informationPanelService.update(informationPanelDAORequest), HttpStatus.OK);
     }
 

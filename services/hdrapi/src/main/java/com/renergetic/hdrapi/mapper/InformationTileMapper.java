@@ -24,8 +24,8 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
 
         entity.setType(dto.getType());
 
-        entity.setLayout(dto.getLayout());
-        entity.setProps(dto.getProps());
+        entity.setLayout(Json.toJson(dto.getLayout()));
+        entity.setProps(Json.toJson(dto.getProps()));
         if (dto.getPanelId() != null) {
             InformationPanel infoPanel = new InformationPanel();
             infoPanel.setId(dto.getPanelId());
