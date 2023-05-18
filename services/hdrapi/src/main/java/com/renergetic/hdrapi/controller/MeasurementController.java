@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.renergetic.hdrapi.model.details.AssetDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class MeasurementController {
 	
 //=== GET REQUESTS====================================================================================
 	
-	@Operation(summary = "Get All Measurements")
+	@Operation(summary = "Get All Measurements having details key and value")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "/key/{key}/{value}", produces = "application/json")
 	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (
@@ -205,15 +206,16 @@ public class MeasurementController {
 		
 		return ResponseEntity.noContent().build();
 	}
-	@Operation(summary = "Get All Measurements")
+
+
+	@Operation(summary = "Insert Details for Measurement")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
-	@GetMapping(path = "{measurement_id}/key/{key}/{value}", produces = "application/json")
+	@PostMapping(path = "{measurement_id}/info", produces = "application/json")
 	public ResponseEntity<Boolean> setMeasurementProperty (
 			@PathVariable(name = "measurement_id")Long measurementId,
-			@PathVariable(name = "key") String key,
-			@PathVariable(name = "value") String value ){
+			@RequestBody MeasurementDetails detail  ){
 //TODO check privileges
-		boolean res = measurementSv.setProperty(measurementId, key, value)==1;
+		boolean res = measurementSv.setProperty(measurementId,detail) ;
 
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
