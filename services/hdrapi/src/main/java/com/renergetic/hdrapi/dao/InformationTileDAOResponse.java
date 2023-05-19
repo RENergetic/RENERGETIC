@@ -88,4 +88,6 @@ public class InformationTileDAOResponse {
         else dao.setMeasurements(measurements);
         return dao;
     }
+
+
 }

@@ -45,14 +45,16 @@ public class MeasurementDAOResponse {
     private Direction direction;
 
     @JsonProperty(required = false)
+    private SimpleAssetDAO asset;
+    @JsonProperty(required = false)
     private String category;
 
     @JsonProperty(value = "measurement_details", required = false)
     private HashMap<String, ?> measurementDetails;
 
     @JsonInclude(Include.NON_EMPTY)
-	@JsonProperty(value = "aggregation_function", required = false)
-	private InfluxFunction function;
+    @JsonProperty(value = "aggregation_function", required = false)
+    private InfluxFunction function;
 
 //	private transient InformationTileMeasurement categoryQuery;
 
@@ -70,10 +72,13 @@ public class MeasurementDAOResponse {
             dao.setDomain(measurement.getDomain());
             dao.setDirection(measurement.getDirection());
             if (measurement.getFunction() != null)
-            	dao.setFunction(InfluxFunction.obtain(measurement.getFunction()));
+                dao.setFunction(InfluxFunction.obtain(measurement.getFunction()));
             else dao.setFunction(InfluxFunction.last);
             if (measurement.getAssetCategory() != null)
                 dao.setCategory(measurement.getAssetCategory().getName());
+            if (measurement.getAsset() != null) {
+                dao.setAsset(SimpleAssetDAO.create(measurement.getAsset()));
+            }
 
             if (details != null && !details.isEmpty()) {
                 HashMap<String, String> detailsDao = details.stream()
@@ -81,16 +86,14 @@ public class MeasurementDAOResponse {
                                 (prev, next) -> next, HashMap::new));
 
                 dao.setMeasurementDetails(detailsDao);
-            }
-            else {
+            } else {
 //                measurement.getDetails() -> sometimes its sometimes it's null...
-                if(measurement.getDetails()!=null) {
+                if (measurement.getDetails() != null) {
                     HashMap<String, String> detailsDao = measurement.getDetails().stream()
                             .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
                                     (prev, next) -> next, HashMap::new));
                     dao.setMeasurementDetails(detailsDao);
-                }
-                else{
+                } else {
                     dao.setMeasurementDetails(new HashMap<>());
                 }
             }
@@ -99,20 +102,21 @@ public class MeasurementDAOResponse {
     }
 
 
-	public Measurement mapToEntity() {
-		Measurement measurement = new Measurement();
+    public Measurement mapToEntity() {
+        Measurement measurement = new Measurement();
 
-		measurement.setId(id);
-		measurement.setName(name);
-		measurement.setSensorName(sensorName);
-		if (type != null)
-			measurement.setType(type);
-		measurement.setLabel(label);
-		measurement.setDomain(domain);
-		measurement.setDirection(direction);
-		if (function != null)
-			measurement.setFunction(function.name().toLowerCase());
-
-		return measurement;
-	}
+        measurement.setId(id);
+        measurement.setName(name);
+        measurement.setSensorName(sensorName);
+        if (type != null)
+            measurement.setType(type);
+        measurement.setLabel(label);
+        measurement.setDomain(domain);
+        measurement.setDirection(direction);
+        if (function != null)
+            measurement.setFunction(function.name().toLowerCase());
+        if (asset != null)
+            measurement.setAsset(asset.mapToEntity());
+        return measurement;
+    }
 }

@@ -46,7 +46,7 @@ public class NotificationScheduleDAO {
     @JsonProperty(value = "asset", required = false)
     private SimpleAssetDAO asset;
 
-    @JsonProperty(value = "dashboard", required = false, access = Access.READ_ONLY)
+    @JsonProperty(value = "dashboard", required = false )
     private DashboardDAO dashboard;
 
     @JsonProperty(value = "information_tile_id", required = false)

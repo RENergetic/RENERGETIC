@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.renergetic.hdrapi.model.details.AssetDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,30 +50,42 @@ public class MeasurementController {
 	
 //=== GET REQUESTS====================================================================================
 	
+	@Operation(summary = "Get All Measurements having details key and value")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "/key/{key}/{value}", produces = "application/json")
+	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (
+			@PathVariable(name = "key") String key,
+			@PathVariable(name = "value") String value,
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit){
+		
+		List<MeasurementDAOResponse> measurements = measurementSv.getByProperty(key,value, offset.orElse(0L), limit.orElse(100));
+		
+		return new ResponseEntity<>(measurements, HttpStatus.OK);
+	}
 	@Operation(summary = "Get All Measurements")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
 	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (
-            @RequestParam(required = false) Optional<String> name,
-            @RequestParam(required = false) Optional<String> type,
-            @RequestParam(required = false) Optional<String> direction,
-            @RequestParam(required = false) Optional<String> domain,
-            @RequestParam(required = false) Optional<Long> offset, 
-            @RequestParam(required = false) Optional<Integer> limit){
-		
-		List<MeasurementDAOResponse> measurements = new ArrayList<>();
-        HashMap<String, String> filters = new HashMap<>();
+			@RequestParam(required = false) Optional<String> name,
+			@RequestParam(required = false) Optional<String> type,
+			@RequestParam(required = false) Optional<String> direction,
+			@RequestParam(required = false) Optional<String> domain,
+			@RequestParam(required = false) Optional<Long> offset,
+			@RequestParam(required = false) Optional<Integer> limit){
 
-        if (name.isPresent()) filters.put("name", name.get());
-        if (type.isPresent()) filters.put("type", type.get());
-        if (direction.isPresent()) filters.put("direction", direction.get());
-        if (domain.isPresent()) filters.put("parent", domain.get());
-		
+		List<MeasurementDAOResponse> measurements = new ArrayList<>();
+		HashMap<String, String> filters = new HashMap<>();
+
+		if (name.isPresent()) filters.put("name", name.get());
+		if (type.isPresent()) filters.put("type", type.get());
+		if (direction.isPresent()) filters.put("direction", direction.get());
+		if (domain.isPresent()) filters.put("parent", domain.get());
+
 		measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20));
-		
+
 		return new ResponseEntity<>(measurements, HttpStatus.OK);
 	}
-	
 	@Operation(summary = "Get Measurement by id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
@@ -194,6 +207,18 @@ public class MeasurementController {
 		return ResponseEntity.noContent().build();
 	}
 
+
+	@Operation(summary = "Insert Details for Measurement")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@PostMapping(path = "{measurement_id}/info", produces = "application/json")
+	public ResponseEntity<Boolean> setMeasurementProperty (
+			@PathVariable(name = "measurement_id")Long measurementId,
+			@RequestBody MeasurementDetails detail  ){
+//TODO check privileges
+		boolean res = measurementSv.setProperty(measurementId,detail) ;
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
 	//=== TAGS REQUESTS ===================================================================================	
 
 	@Operation(summary = "Get All Tags")
