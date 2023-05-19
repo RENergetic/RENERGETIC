@@ -96,7 +96,7 @@ public class InformationTileDAORequest {
         tile.setId(id);
         tile.setName(name);
         tile.setLabel(label);
-        if (tile.getType() != null)
+        if (type != null)
             tile.setType(type);
 
         // dao.setFeatured(entity.getFeatured());

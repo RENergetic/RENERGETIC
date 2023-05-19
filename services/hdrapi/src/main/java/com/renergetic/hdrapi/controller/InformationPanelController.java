@@ -151,7 +151,7 @@ public class InformationPanelController {
             @ApiResponse(responseCode = "500", description = "Error deleting Information Panel")
     })
     @DeleteMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<Boolean> getByName(@PathVariable Long id) {
+    public ResponseEntity<Boolean> deleteByName(@PathVariable Long id) {
         return new ResponseEntity<>(informationPanelService.deleteById(id), HttpStatus.OK);
     }
 }

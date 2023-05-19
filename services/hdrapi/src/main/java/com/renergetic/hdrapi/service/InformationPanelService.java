@@ -7,11 +7,7 @@ import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.mapper.InformationPanelMapper;
 import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.model.UUID;
-import com.renergetic.hdrapi.repository.AssetRepository;
-import com.renergetic.hdrapi.repository.InformationPanelRepository;
-import com.renergetic.hdrapi.repository.InformationTileRepository;
-import com.renergetic.hdrapi.repository.MeasurementRepository;
-import com.renergetic.hdrapi.repository.UuidRepository;
+import com.renergetic.hdrapi.repository.*;
 import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +23,8 @@ public class InformationPanelService {
     private InformationPanelRepository informationPanelRepository;
     @Autowired
     private InformationTileRepository informationTileRepository;
+    @Autowired
+    private InformationTileMeasurementRepository informationTileMeasurementRepository;
 
     @Autowired
     private InformationPanelMapper informationPanelMapper;
@@ -60,12 +58,13 @@ public class InformationPanelService {
             return list;
         else throw new NotFoundException("No information panels related with user " + ownerId + " found");
     }
-//    public InformationPanelDAOResponse getById(Long id ) {
+
+    //    public InformationPanelDAOResponse getById(Long id ) {
 //        return this.getById(id,false)
 //    }
-    public InformationPanelDAOResponse getById(Long id,Boolean detailed) {
+    public InformationPanelDAOResponse getById(Long id, Boolean detailed) {
         return informationPanelMapper.toDTO(
-                informationPanelRepository.findById(id).orElseThrow(NotFoundException::new),detailed);
+                informationPanelRepository.findById(id).orElseThrow(NotFoundException::new), detailed);
     }
 
     public InformationPanelDAOResponse getByName(String name) {
@@ -82,21 +81,49 @@ public class InformationPanelService {
         infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
         return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
     }
-    public InformationPanelDAOResponse update(InformationPanelDAO  informationPanel) {
-        if ( ! informationPanelRepository.findByName(informationPanel.getName()).isPresent())
+
+    public InformationPanelDAOResponse update(InformationPanelDAO informationPanel) {
+        if (!informationPanelRepository.findByName(informationPanel.getName()).isPresent())
             throw new InvalidCreationIdAlreadyDefinedException(
                     "Panel with name does not exists: " + informationPanel.getName());
+        var id = informationPanel.getId();
+        var panel = informationPanelRepository.getById(id);
+        deleteTiles(panel);
+        informationPanelRepository.flush();
         InformationPanel infoPanelEntity = informationPanel.mapToEntity();
+        infoPanelEntity.setId(id);
+        this.saveTiles(infoPanelEntity);
+        infoPanelEntity = informationPanelRepository.save(infoPanelEntity);
+        return informationPanelMapper.toDTO(infoPanelEntity);
 
-        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
+
     }
-    public InformationPanelDAOResponse save(InformationPanelDAO  informationPanel) {
-        if (  informationPanelRepository.findByName(informationPanel.getName()).isPresent())
+
+    public InformationPanelDAOResponse save(InformationPanelDAO informationPanel) {
+        if (informationPanelRepository.findByName(informationPanel.getName()).isPresent())
             throw new InvalidCreationIdAlreadyDefinedException(
                     "Already exists a information panel with name " + informationPanel.getName());
+
         InformationPanel infoPanelEntity = informationPanel.mapToEntity();
         infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
+        informationPanelRepository.save(infoPanelEntity);
+        this.saveTiles(infoPanelEntity);
+        return informationPanelMapper.toDTO(infoPanelEntity);
+    }
+    private void saveTiles(InformationPanel infoPanelEntity) {
+        var tiles = infoPanelEntity.getTiles();
+        infoPanelEntity.setTiles(null);
+       tiles.stream().forEach(it -> {
+            it.setId(null);
+            it.setInformationPanel(infoPanelEntity);
+            informationTileRepository.save(it);
+            it.getInformationTileMeasurements().stream().forEach(tm ->
+            {
+                tm.setId(null);
+                tm.setInformationTile(it);
+                informationTileMeasurementRepository.save(tm);
+            });
+        });
     }
 
     public InformationPanelDAOResponse update(InformationPanelDAORequest informationPanel) {
@@ -105,14 +132,25 @@ public class InformationPanelService {
 //TODO: validate, check user privileges
         var panel = informationPanelRepository.getById(informationPanel.getId());
         return informationPanelMapper.toDTO(
-                informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel,panel )));
+                informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel, panel)));
     }
 
     public boolean deleteById(Long id) {
         if (id == null || !informationPanelRepository.existsById(id))
             throw new InvalidNonExistingIdException();
-        informationPanelRepository.deleteById(id);
+        var panel = informationPanelRepository.getById(id);
+        deleteTiles(panel);
+        informationPanelRepository.delete(panel);
+//        informationPanelRepository.deleteById(id);
         return true;
+    }
+
+    private void deleteTiles(InformationPanel panel) {
+        panel.getTiles().forEach(t -> {
+                    t.getInformationTileMeasurements().forEach(m -> informationTileMeasurementRepository.delete(m));
+                    informationTileRepository.delete(t);
+                }
+        );
     }
 
     public Boolean assign(Long id, Long assetId) {

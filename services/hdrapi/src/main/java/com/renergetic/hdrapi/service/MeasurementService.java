@@ -72,8 +72,9 @@ public class MeasurementService {
         } else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
     }
 
-    public int setProperty(Long measurementId, String key, String value) {
-        return measurementRepository.setProperty(measurementId, key, value);
+    public boolean setProperty(Long measurementId, MeasurementDetails details) {
+
+        return measurementRepository.setProperty(measurementId,details.getKey(),details.getValue())==1;
     }
 
     public List<MeasurementDAOResponse> getByProperty(String key, String value, long offset, long limit) {
