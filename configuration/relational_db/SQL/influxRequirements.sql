@@ -22,7 +22,8 @@ INSERT INTO measurement
 ( 1006, 'tapping_water', 3 , 'tapping_water', 1 ),
 ( 1007, 'thermostate', 4 , 'thermostate', 1 ),
 ( 1008, 'temperature', 4 , 'temperature', 1 ),
-( 1009, 'cpu', 4 , 'cpu', 1 );
+( 1009, 'cpu', 4 , 'cpu', 1 ),
+( 1010, 'report', 5 , 'report', 1 );
 
 /* CREATE TAGS TO CHECK INFLUXDB TAGS */
 INSERT INTO tags ( id, key, value ) VALUES
@@ -33,4 +34,8 @@ INSERT INTO tags ( id, key, value ) VALUES
 ( 5, 'asset_name', null ),
 ( 6, 'direction', '(?i)((in)|(out)|(none))' ),
 ( 7, 'domain', '(?i)((heat)|(electricity))' ),
-( 8, 'type_data', '(?i)((simulated)|(real))' );
+( 8, 'type_data', '(?i)((simulated)|(real))' ),
+( 9, 'parameter', null ),
+( 10, 'sensor_id', null ),
+( 11, 'interpolation_method', null ),
+( 12, 'facility_description', null );
