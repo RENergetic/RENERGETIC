@@ -73,7 +73,7 @@ public class MeasurementService {
     }
 
     public boolean setProperty(Long measurementId, MeasurementDetails details) {
-
+            
         return measurementRepository.setProperty(measurementId,details.getKey(),details.getValue())==1;
     }
 
