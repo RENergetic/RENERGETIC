@@ -1,8 +1,8 @@
 INSERT INTO public.asset_type(
 	id, label, name, renovable)
-	VALUES (27, 'Optimizer Domain', 'optimizer_domain', NULL),
-	(28, 'Energy Consumer', 'energy_consumer', NULL),
-	(29, 'Energy Storage', 'energy_storage', NULL);
+	VALUES (28, 'Energy Consumer', 'energy_consumer', NULL),
+	(29, 'Energy Storage', 'energy_storage', NULL),
+	(30, 'Optimizer Domain', 'optimizer_domain', NULL);
 
 
 UPDATE public.asset_type
@@ -10,22 +10,29 @@ UPDATE public.asset_type
 	WHERE name = 'generation_plant';
 
 
+INSERT INTO public.asset_category(
+	id, description, label, name)
+	VALUES (1, '', 'Heating', 'heating'),
+	(2, '', 'Charging Stations', 'charging_station'),
+	(3, '', 'Water Treatment', 'water_treatment');
+
+
 INSERT INTO public.asset(
 	id, name, geo_location, label, asset_category_id, parent_asset_id, asset_type_id, user_id, uuid)
 	VALUES (1000, 'energy_island', NULL, 'Energy Island', NULL, null, 4, NULL, 1),
-	(1001, 'electricity_domain', NULL, 'Electricity Domain', NULL, 1000, 27, NULL, 1),
-	(1002, 'heat_domain', NULL, 'Heat Domain', NULL, 1000, 27, NULL, 1),
+	(1001, 'electricity_domain', NULL, 'Electricity Domain', NULL, 1000, 30, NULL, 1),
+	(1002, 'heat_domain', NULL, 'Heat Domain', NULL, 1000, 30, NULL, 1),
 	(1003, 'pv_panels', NULL, 'PV Panels', NULL, 1000, 10, NULL, 1),
 	-- (1100, 'de-nieuwe-dokken-total', NULL, 'de Nieuwe Dokken Total', NULL, 1000, ???, NULL, 1),
-	(1101, 'de-nieuwe-dokken-charging-stations', NULL, 'de Nieuwe Dokken Charing Stations', NULL, 1000, 19, NULL, 1),
-	(1102, 'de-nieuwe-dokken-vacuumnet', NULL, 'Electricity consumption of vacuum', NULL, 1000, 28, NULL, 1),
-	(1103, 'de-nieuwe-dokken-districtheating', NULL, 'de Nieuwe Dokken District Heating', NULL, 1000, 15, NULL, 1),
-	(1104, 'de-nieuwe-dokken-heatpump', NULL, 'de Nieuwe Dokken Heat Pump', NULL, 1000, 6, NULL, 1),
-	(1105, 'de-nieuwe-dokken-watertreatment', NULL, 'de Nieuwe Dokken Water Treatment', NULL, 1000, 28, NULL, 1),
+	(1101, 'de-nieuwe-dokken-charging-stations', NULL, 'de Nieuwe Dokken Charing Stations', 2, 1000, 19, NULL, 1),
+	(1102, 'de-nieuwe-dokken-vacuumnet', NULL, 'Electricity consumption of vacuum', 3, 1000, 28, NULL, 1),
+	(1103, 'de-nieuwe-dokken-districtheating', NULL, 'de Nieuwe Dokken District Heating', 1, 1000, 15, NULL, 1),
+	(1104, 'de-nieuwe-dokken-heatpump', NULL, 'de Nieuwe Dokken Heat Pump', 1, 1000, 6, NULL, 1),
+	(1105, 'de-nieuwe-dokken-watertreatment', NULL, 'de Nieuwe Dokken Water Treatment', 3, 1000, 28, NULL, 1),
 	(1106, 'de-nieuwe-dokken-gas-christeyns', NULL, 'de Nieuwe Dokken Gas Christeyns', NULL, 1000, 5, NULL, 1),
 	(1107, 'de-nieuwe-dokken-wasteheat-christeyns', NULL, 'de Nieuwe Dokken Wasterheat Christeyns', NULL, 1000, 5, NULL, 1),
 	-- (1108, 'de-nieuwe-dokken-total-heat-christeyns', NULL, 'de Nieuwe Dokken Total Heat Christeyns', NULL, 1000, 5, NULL, 1),
-	(1109, 'de-nieuwe-dokken-total-heat', NULL, 'de Nieuwe Dokken Total Heat', NULL, 1000, 28, NULL, 1),
+	(1109, 'de-nieuwe-dokken-total-heat', NULL, 'de Nieuwe Dokken Total Heat', 1, 1000, 28, NULL, 1),
 	(1110, 'de-nieuwe-dokken-pv-017A-xxxxx9A1', NULL, 'de Nieuwe Dokken PV 017A-xxxxx9A1', NULL, 1003, 10, NULL, 1),
 	(1111, 'de-nieuwe-dokken-pv-0198-xxxxx4B4', NULL, 'de Nieuwe Dokken PV 0198-xxxxx4B4', NULL, 1003, 10, NULL, 1),
 	(1112, 'de-nieuwe-dokken-pv-0198-xxxxx853', NULL, 'de Nieuwe Dokken PV 0198-xxxxx853', NULL, 1003, 10, NULL, 1),
