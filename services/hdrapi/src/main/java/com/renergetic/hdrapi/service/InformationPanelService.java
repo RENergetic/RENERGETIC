@@ -93,6 +93,7 @@ public class InformationPanelService {
         InformationPanel infoPanelEntity = informationPanel.mapToEntity();
         infoPanelEntity.setId(id);
         this.saveTiles(infoPanelEntity);
+        infoPanelEntity.setAssets(panel.getAssets());
         infoPanelEntity = informationPanelRepository.save(infoPanelEntity);
         return informationPanelMapper.toDTO(infoPanelEntity);
 
@@ -110,10 +111,11 @@ public class InformationPanelService {
         this.saveTiles(infoPanelEntity);
         return informationPanelMapper.toDTO(infoPanelEntity);
     }
+
     private void saveTiles(InformationPanel infoPanelEntity) {
         var tiles = infoPanelEntity.getTiles();
         infoPanelEntity.setTiles(null);
-       tiles.stream().forEach(it -> {
+        tiles.stream().forEach(it -> {
             it.setId(null);
             it.setInformationPanel(infoPanelEntity);
             informationTileRepository.save(it);
@@ -332,7 +334,9 @@ public class InformationPanelService {
                 .findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(assetId,
                         tileM.getMeasurementName(),
                         tileM.getSensorName(),
-                        tileM.getDomain().name(), tileM.getDirection().name(), tileM.getType().getId())
+                        tileM.getDomain() != null ? tileM.getDomain().name() : null,
+                        tileM.getDirection() != null ? tileM.getDirection().name() : null,
+                        tileM.getType().getId())
                 .stream().map(x -> MeasurementDAOResponse.create(x,
                         measurementDetailsRepository.findByMeasurementId(x.getId())))
                 .collect(Collectors.toList());
