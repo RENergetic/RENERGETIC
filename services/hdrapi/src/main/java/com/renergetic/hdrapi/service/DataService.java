@@ -177,6 +177,7 @@ public class DataService {
                     measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(Collectors.toList()),
                     from, to);
         } else {
+        	Map<String, JSONArray> responses = new HashMap<>();
             TimeseriesDAO ret = new TimeseriesDAO();
             Set<Thread> threads = new HashSet<>();
             
@@ -186,9 +187,6 @@ public class DataService {
                 Thread thread = new Thread(() -> {
                     Map<String, String> params = new HashMap<>();
                     List<String> assetNames = new LinkedList<>();
-
-                    // SET DEFAULT VALUES TO THE MEASUREMENT
-                    ret.getCurrent().put(measurement.getId().toString(), new ArrayList<>());
 
                     // GET ASSETS RELATED WITH THE MEASUREMENT (If the assets is a energy island and there isn't category it doesn't filter by asset)
                     if (measurement.getAsset() != null && !measurement.getAsset().getType().getName().equalsIgnoreCase(
@@ -226,20 +224,7 @@ public class DataService {
                             HttpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
 
                     if (response.statusCode() < 300) {
-                        JSONArray array = new JSONArray(response.body());
-                        if (array.length() > 0)
-                            array.forEach(obj -> {
-                                if (obj instanceof JSONObject) {
-                                    JSONObject json = ((JSONObject) obj).getJSONObject("fields");
-                                    for (String type : types) {
-                                    	if (json.has(type)) {
-                                    		ret.getTimestamps().add(DateConverter.toEpoch(json.getString("time")));
-                                    		ret.getCurrent().get(measurement.getId().toString()).add(json.getDouble(type));
-                                    		break;
-                                    	}
-                                    }
-                                }
-                            });
+                        responses.put(measurement.getId().toString(), new JSONArray(response.body()));
                     }
                 });
                 thread.start();
@@ -251,6 +236,33 @@ public class DataService {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+            });
+            responses.forEach((measurementId, response) -> {
+            	ret.getCurrent().put(measurementId, new ArrayList<>(Collections.nCopies(ret.getTimestamps().size(), null)));
+    			if (response.length() > 0)
+                    response.forEach(obj -> {
+                        if (obj instanceof JSONObject) {
+                            JSONObject json = ((JSONObject) obj).getJSONObject("fields");
+                            for (String type : types) {
+                            	if (json.has(type)) {
+                            		Map<String, Double> values = null;
+                            		Long timestamp = DateConverter.toEpoch(json.getString("time"));
+                            		if (!ret.getTimestamps().contains(timestamp)) {
+                            			ret.getTimestamps().add(timestamp);
+                            			ret.getCurrent().forEach((key, data) -> {
+                            				if (key != measurementId)
+                            					ret.getCurrent().get(key).add(null);
+                            				else
+                            					ret.getCurrent().get(key).add(json.getDouble(type));
+                            			});
+                            		} else {
+                    					ret.getCurrent().get(measurementId).set(ret.getTimestamps().indexOf(timestamp), json.getDouble(type));
+                					}
+                            		break;
+                            	}
+                            }
+                        }
+                    });
             });
             return ret;
         }
