@@ -52,10 +52,10 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             "INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
             "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id )" +
             " WHERE measurement.sensor_name = :sensorName " +
-            " AND COALESCE(measurement.domain = :domain,TRUE) " +
-            " AND COALESCE(measurement.name = :measurementName,TRUE) " +
+            " AND COALESCE(measurement.domain = CAST(:domain AS text) ,TRUE) " +
+            " AND COALESCE(measurement.name = CAST(:measurementName AS text),TRUE) " +
             " AND measurement.asset_id = :assetId " +
-            " AND COALESCE(measurement.direction = :direction,TRUE) " +
+            " AND COALESCE(measurement.direction = CAST(:direction AS text)  ,TRUE) " +
             " AND  measurement.measurement_type_id = :type  ", nativeQuery = true)
     //some fields aren't optional because there would be no sense to mix them -> can be discussed
     public List<Measurement> findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(

@@ -89,6 +89,7 @@ public class MeasurementTileDAORequest {
             entity.setDirection(direction);
             entity.setDomain(domain);
             entity.setSensorName(sensorName);
+            entity.setMeasurementName(name);
             try {
                 entity.setProps(Json.toJson(entity.getProps()));
             } catch (NullPointerException e) {
