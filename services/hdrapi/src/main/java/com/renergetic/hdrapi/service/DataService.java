@@ -4,6 +4,7 @@ import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.model.details.MeasurementTags;
 import com.renergetic.hdrapi.repository.*;
+import com.renergetic.hdrapi.service.utils.Basic;
 import com.renergetic.hdrapi.service.utils.DateConverter;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import com.renergetic.hdrapi.service.utils.HttpAPIs;
@@ -237,6 +238,38 @@ public class DataService {
                     e.printStackTrace();
                 }
             });
+            
+            Map<Long, Map<String, Double>> formattedResponse = new TreeMap<>();
+            responses.forEach((measurementId, response) -> {
+    			if (response.length() > 0) {
+    				response.forEach(obj -> {
+                        if (obj instanceof JSONObject) {
+                            JSONObject json = ((JSONObject) obj).getJSONObject("fields");
+                            
+                            for (String type : types) {
+                            	if (json.has(type)) {
+                                    Long timestamp = DateConverter.toEpoch(json.getString("time"));
+                                    
+                                    if (!formattedResponse.containsKey(timestamp)) {
+			                            formattedResponse.put(timestamp, new TreeMap<>());
+			                            
+			                            measurements.forEach(measurement -> {
+			                            	if (measurementId.equals(measurement.getId().toString()))
+			                            		formattedResponse.get(timestamp).put(measurementId, json.getDouble(type));
+			                            	else formattedResponse.get(timestamp).put(measurement.getId().toString(), null);
+			                            });
+                                    } else {
+                                    	formattedResponse.get(timestamp).put(measurementId, json.getDouble(type));
+                                    }
+                            	}
+                            }
+                        }    					
+    				});    				
+    			}
+            });
+            ret.setTimestamps(new ArrayList<>(formattedResponse.keySet()));
+            ret.setCurrent(Basic.combineMaps(formattedResponse.values()));
+            /*
             responses.forEach((measurementId, response) -> {
             	ret.getCurrent().put(measurementId, new ArrayList<>(Collections.nCopies(ret.getTimestamps().size(), null)));
     			if (response.length() > 0)
@@ -264,6 +297,7 @@ public class DataService {
                         }
                     });
             });
+            */
             return ret;
         }
     }
