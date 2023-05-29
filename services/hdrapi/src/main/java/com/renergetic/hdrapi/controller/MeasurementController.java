@@ -179,22 +179,37 @@ public class MeasurementController {
 		return new ResponseEntity<>(_detail, HttpStatus.CREATED);
 	}
 	
-	@Operation(summary = "Update Information from its id")
+//	@Operation(summary = "Update Information from its id")
+//	@ApiResponses({
+//		@ApiResponse(responseCode = "200", description = "Details saved correctly"),
+//		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
+//		@ApiResponse(responseCode = "404", description = "Detail not exist"),
+//		@ApiResponse(responseCode = "500", description = "Error saving information")
+//	})
+//	@PutMapping(path = "{measurement_id}/info/{info_id}", produces = "application/json", consumes = "application/json")
+//	public ResponseEntity<MeasurementDetails> updateInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id, @PathVariable Long info_id){
+//		Measurement measurement = new Measurement();
+//		measurement.setId(measurement_id);
+//		detail.setMeasurement(measurement);
+//		MeasurementDetails _detail = measurementSv.updateDetail(detail, info_id);
+//		return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+//	}
+	@Operation(summary = "Update measurement detail's property")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Details saved correctly"),
-		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
-		@ApiResponse(responseCode = "404", description = "Detail not exist"),
-		@ApiResponse(responseCode = "500", description = "Error saving information")
+			@ApiResponse(responseCode = "200", description = "Details saved correctly"),
+			@ApiResponse(responseCode = "400", description = "Path isn't valid"),
+			@ApiResponse(responseCode = "404", description = "Detail not exist"),
+			@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
-	@PutMapping(path = "{measurement_id}/info/{info_id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<MeasurementDetails> updateInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id, @PathVariable Long info_id){
+	@PutMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
+	public ResponseEntity<Boolean> updateProperty (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id ){
 		Measurement measurement = new Measurement();
 		measurement.setId(measurement_id);
 		detail.setMeasurement(measurement);
-		MeasurementDetails _detail = measurementSv.updateDetail(detail, info_id);
-		return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		boolean res = measurementSv.setProperty(measurement_id, detail);
+		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
-	
+
 	@Operation(summary = "Delete Information from its id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", description = "Information deleted"),

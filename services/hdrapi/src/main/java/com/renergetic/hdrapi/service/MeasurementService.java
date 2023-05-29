@@ -246,6 +246,8 @@ public class MeasurementService {
         } else throw new InvalidNonExistingIdException("No measurement details with id " + id + "found");
     }
 
+
+
     public boolean deleteDetailById(Long id) {
         if (id != null && measurementDetailsRepository.existsById(id)) {
             measurementDetailsRepository.deleteById(id);
