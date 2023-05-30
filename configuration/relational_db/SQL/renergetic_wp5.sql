@@ -52,7 +52,8 @@ INSERT INTO measurement(
     (2029, 'relative_to_monthly_average', 'report', 'electricity', 'in', 5, 1, NULL, NULL, NULL, NULL, '2'),
     (2030, 'co2_reduction', 'report', NULL, NULL, 18, 1, NULL, NULL, NULL, NULL, '2'),
     (2031, 'energy_produced', 'pv', 'electricity', 'out', 8, 3, 'all_inverters', NULL, NULL, NULL, '2'),
-    (2032, 'heat_lost', 'heat_meter', 'heat', 'out', 17, 2, NULL, NULL, NULL, NULL, '2');
+    (2032, 'heat_lost', 'heat_meter', 'heat', 'out', 17, 2, NULL, NULL, NULL, NULL, '2'),
+    (2033, 'current_power', 'heat_meter', 'heat', 'in', 6, 3, NULL, NULL, NULL, NULL, '2');
     
 INSERT INTO tags(
     id, key, value)
@@ -96,6 +97,7 @@ INSERT INTO measurement_tags(
     (1000, 2030),
     (1000, 2031),
     (1000, 2032),
+    (1000, 2033),
     (1001, 2000),
     (1002, 2001),
     (1001, 2002),
@@ -125,4 +127,5 @@ INSERT INTO measurement_tags(
     (1001, 2026),
     (1001, 2027),
     (1001, 2031),
-    (1001, 2032);
+    (1001, 2032),
+    (1001, 2033);
