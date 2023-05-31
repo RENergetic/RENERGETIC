@@ -7,7 +7,6 @@ import org.hibernate.annotations.NotFoundAction;
 import jakarta.persistence.*;
 
 @Entity
-
 @Data
 @Table(name = "users", indexes = {@Index(name = "uniqueIndex", columnList = "keycloak_id", unique = true)})
 public class User {
