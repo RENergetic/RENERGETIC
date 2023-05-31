@@ -14,8 +14,8 @@ public class HttpRuntimeException extends RuntimeException{
 		super (message);
 	}
 	
-	public HttpRuntimeException(String formatString, Object...paramenters) {
-		super (String.format(formatString, paramenters));
+	public HttpRuntimeException(String formatString, Object...parameters) {
+		super (String.format(formatString, parameters));
 	}
 
 	public HttpStatus getHttpStatus() {

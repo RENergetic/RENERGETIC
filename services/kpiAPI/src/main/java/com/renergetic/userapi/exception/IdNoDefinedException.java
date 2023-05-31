@@ -10,8 +10,8 @@ public class IdNoDefinedException extends HttpRuntimeException{
 		super();
 	}
 
-	public IdNoDefinedException(String formatString, Object... paramenters) {
-		super(formatString, paramenters);
+	public IdNoDefinedException(String formatString, Object... parameters) {
+		super(formatString, parameters);
 	}
 
 	public IdNoDefinedException(String message) {

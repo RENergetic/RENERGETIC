@@ -10,8 +10,8 @@ public class IdAlreadyDefinedException extends HttpRuntimeException{
 		super();
 	}
 
-	public IdAlreadyDefinedException(String formatString, Object... paramenters) {
-		super(formatString, paramenters);
+	public IdAlreadyDefinedException(String formatString, Object... parameters) {
+		super(formatString, parameters);
 	}
 
 	public IdAlreadyDefinedException(String message) {

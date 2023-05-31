@@ -10,8 +10,8 @@ public class NotFoundException extends HttpRuntimeException{
 		super();
 	}
 
-	public NotFoundException(String formatString, Object... paramenters) {
-		super(formatString, paramenters);
+	public NotFoundException(String formatString, Object... parameters) {
+		super(formatString, parameters);
 	}
 
 	public NotFoundException(String message) {

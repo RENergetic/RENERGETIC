@@ -10,8 +10,8 @@ public class UnauthorizedAccessException extends HttpRuntimeException{
 		super();
 	}
 
-	public UnauthorizedAccessException(String formatString, Object... paramenters) {
-		super(formatString, paramenters);
+	public UnauthorizedAccessException(String formatString, Object... parameters) {
+		super(formatString, parameters);
 	}
 
 	public UnauthorizedAccessException(String message) {
