@@ -76,8 +76,8 @@ public class WebSecurityConfig {
 	        	registry.requestMatchers(HttpMethod.DELETE, urlPattern).access(new JwtAuthorizationManager(roles));
 	        });
 	        
-	        registry.anyRequest().access(new JwtAuthorizationManager()); // Access to authenticated users 
-	        //registry.anyRequest().permitAll(); // Access to all users
+	        //registry.anyRequest().access(new JwtAuthorizationManager()); // Access to authenticated users 
+	        registry.anyRequest().permitAll(); // Access to all users
         });
         
         return http.build();
