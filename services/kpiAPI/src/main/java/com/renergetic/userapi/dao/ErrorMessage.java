@@ -19,7 +19,7 @@ import lombok.ToString;
 public class ErrorMessage {
 	Instant timestamp;
 	
-	HttpMethod method;
+	String method;
 	String path;
 	
 	String error;
@@ -32,7 +32,7 @@ public class ErrorMessage {
 		timestamp = Instant.now();
 
 		path = request.getRequest().getRequestURI();
-		method = request.getHttpMethod();
+		method = request.getHttpMethod().name();
 		
 		error = exception.getClass().getSimpleName();
 		message = exception.getMessage();

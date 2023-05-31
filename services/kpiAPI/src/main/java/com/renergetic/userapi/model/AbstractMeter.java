@@ -1,28 +1,28 @@
 package com.renergetic.userapi.model;
 
 public enum AbstractMeter {
-	lrs ("LRS", "Local renewable sources"),
-	lns ("LNS", "Local non renewable sources"),
-	ers ("ERS", "External renewable sources"),
-	ens ("ENS", "External non renewable sources"),
-	losses ("Losses", "Energy losses"),
-	load ("Load", "Energy load"),
-	excess ("Excess", "Energy Excess"),
-	storage ("Storage", "Energy Storage"),
-	res ("Storage RES", "Renewable energy storage"),
-	nonres ("Storage non RES", "Non renewable energy storage");
+	LRS ("LRS", "Local renewable sources"),
+	LNS ("LNS", "Local non renewable sources"),
+	ERS ("ERS", "External renewable sources"),
+	ENS ("ENS", "External non renewable sources"),
+	LOSSES ("Losses", "Energy losses"),
+	LOAD ("Load", "Energy load"),
+	EXCESS ("Excess", "Energy Excess"),
+	STORAGE ("Storage", "Energy Storage"),
+	RES ("Storage RES", "Renewable energy storage"),
+	NONRES ("Storage non RES", "Non renewable energy storage");
 	
-	public String name;
-	public String description;
+	public final String meter;
+	public final String description;
 	
 	AbstractMeter(String name, String description) {
-		this.name = name;
+		this.meter = name;
 		this.description = description;
 	}
 	
 	public static AbstractMeter get(String name) {
 		for (AbstractMeter meter: AbstractMeter.values()) {
-			if (meter.name().equalsIgnoreCase(name) || meter.name.equalsIgnoreCase(name))
+			if (meter.name().equalsIgnoreCase(name) || meter.meter.equalsIgnoreCase(name))
 				return meter;
 		}
 		

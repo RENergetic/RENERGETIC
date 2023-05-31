@@ -29,7 +29,7 @@ public class AbstractMeterService {
 	public Map<String, String> list() {
 		Map<String, String> meters = new TreeMap<>();
 		for (AbstractMeter meter : AbstractMeter.values()) {
-			meters.put(meter.name, meter.description);
+			meters.put(meter.meter, meter.description);
 		}
 		return meters;
 	}
@@ -46,32 +46,36 @@ public class AbstractMeterService {
 				.map(AbstractMeterDAO::create)
 				.collect(Collectors.toList());
 		
-		if (ret.size() > 0) {
+		if (!ret.isEmpty()) {
 			return ret;
 		} else throw new NotFoundException("There aren't abstract meter configured yet"); 
 	}
 
 	public AbstractMeterDAO get(String name, Domain domain) {
-		return AbstractMeterDAO.create(amRepo.findByNameAndDomain(name, domain)
+		return AbstractMeterDAO.create(amRepo.findByNameAndDomain(AbstractMeter.get(name), domain)
 				.orElseThrow(() -> new NotFoundException("The abstract meter with name %s and domain %s isn't configured", name, domain)));
 	}
 
 	public AbstractMeterDAO create(AbstractMeterDAO meter) {
-		if( !amRepo.existsByNameAndDomain(meter.getName(), meter.getDomain())) {
+		if( !amRepo.existsByNameAndDomain(AbstractMeter.get(meter.getName()), meter.getDomain())) {
 			return AbstractMeterDAO.create(amRepo.save(meter.mapToEntity()));
 		}
 		else throw new IdAlreadyDefinedException("The abstract meter with name %s and domain %s already is configured, use PUT request", meter.getName(), meter.getDomain());
 	}
 
 	public AbstractMeterDAO update(AbstractMeterDAO meter) {
-		if( amRepo.existsByNameAndDomain(meter.getName(), meter.getDomain())) {
-			return AbstractMeterDAO.create(amRepo.save(meter.mapToEntity()));
+		Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(AbstractMeter.get(meter.getName()), meter.getDomain());
+		if(previousConfig.isPresent()) {
+			AbstractMeterConfig config = meter.mapToEntity();
+			config.setId(previousConfig.get().getId());
+
+			return AbstractMeterDAO.create(amRepo.save(config));
 		}
 		else throw new IdNoDefinedException("The abstract meter with name %s and domain %s isn't configured, use POST request", meter.getName(), meter.getDomain());
 	}
 
 	public AbstractMeterDAO delete(AbstractMeterDAO meter) {
-		Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(meter.getName(), meter.getDomain());
+		Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(AbstractMeter.get(meter.getName()), meter.getDomain());
 		if(previousConfig.isPresent()) {
 			amRepo.delete(previousConfig.get());
 			return AbstractMeterDAO.create(previousConfig.get());

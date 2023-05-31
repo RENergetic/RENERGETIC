@@ -33,7 +33,7 @@ public class AbstractMeterDAO {
 			dao.setId(meter.getId());
 			
 			if (meter.getName() != null)
-				dao.setName(meter.getName().name);
+				dao.setName(meter.getName().meter);
 			
 			dao.setFormula(meter.getFormula());
 			dao.setCondition(meter.getCondition());
