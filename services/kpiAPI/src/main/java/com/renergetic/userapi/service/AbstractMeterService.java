@@ -58,6 +58,7 @@ public class AbstractMeterService {
 
 	public AbstractMeterDAO create(AbstractMeterDAO meter) {
 		if( !amRepo.existsByNameAndDomain(AbstractMeter.get(meter.getName()), meter.getDomain())) {
+			meter.setId(null);
 			return AbstractMeterDAO.create(amRepo.save(meter.mapToEntity()));
 		}
 		else throw new IdAlreadyDefinedException("The abstract meter with name %s and domain %s already is configured, use PUT request", meter.getName(), meter.getDomain());
