@@ -124,6 +124,8 @@ public class DataService {
                         params.put("from", from.toString());
                     if (to != null && to.isPresent())
                         params.put("to", to.get().toString());
+                    if (measurement.getName() != null)
+                    	params.put("measurement_type", measurement.getName());
                     if (measurement.getSensorName() != null)
                         params.put("measurements", measurement.getSensorName());
                     if (measurement.getType() != null)
@@ -205,6 +207,8 @@ public class DataService {
                         params.put("from", from.toString());
                     if (to != null && to.isPresent())
                         params.put("to", to.get().toString());
+                    if (measurement.getName() != null)
+                    	params.put("measurement_type", measurement.getName());
                     if (measurement.getSensorName() != null)
                         params.put("measurements", measurement.getSensorName());
                     if (measurement.getType() != null)
