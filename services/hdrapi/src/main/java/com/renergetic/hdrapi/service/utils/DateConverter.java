@@ -3,6 +3,7 @@ package com.renergetic.hdrapi.service.utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -26,11 +27,11 @@ public final class DateConverter {
     }
 
     public static Long toEpoch(String date) {
-    	try {
-    		return dateFormat.parse(date).toInstant().toEpochMilli();
-    	} catch (ParseException ex) {
-			throw new InvalidArgumentException("The date %s can't be pased to epoch");
-		}
+        try {
+            return dateFormat.parse(date).toInstant().toEpochMilli();
+        } catch (ParseException ex) {
+            throw new InvalidArgumentException("The date %s can't be pased to epoch");
+        }
     }
 
     public static LocalDateTime toLocalDateTime(Long epoch) {
@@ -40,6 +41,8 @@ public final class DateConverter {
     public static Date toDate(Long epoch) {
         return new Date(epoch);
     }
+
+
 
     public static String toString(long epoch) {
         return dateFormat.format(new Date(epoch));
@@ -53,4 +56,8 @@ public final class DateConverter {
         return dateFormat.format(localDateTime);
     }
 
+    public static long currentMonth() {
+        LocalDateTime date = LocalDateTime.now();
+        return toEpoch(date.withDayOfMonth(1));
+    }
 }

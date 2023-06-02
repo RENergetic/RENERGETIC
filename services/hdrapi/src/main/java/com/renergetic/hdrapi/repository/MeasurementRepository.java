@@ -51,7 +51,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             "FROM (measurement " +
             "INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
             "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id )" +
-            " WHERE measurement.sensor_name = :sensorName " +
+            " WHERE COALESCE(measurement.sensor_name = CAST(:sensorName AS text),TRUE) " +
             " AND COALESCE(measurement.domain = CAST(:domain AS text) ,TRUE) " +
             " AND COALESCE(measurement.name = CAST(:measurementName AS text),TRUE) " +
             " AND measurement.asset_id = :assetId " +
