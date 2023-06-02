@@ -45,16 +45,28 @@ public class NotificationController {
 
 //=== GET REQUESTS ====================================================================================
 
+
     @Operation(summary = "Get All Notifications")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "", produces = "application/json")
     public ResponseEntity<List<NotificationScheduleDAO>> getAllNotifications(
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit,
+            @RequestParam(required = false, name = "from") Optional<Long> dateFrom,
+            @RequestParam(required = false, name = "to") Optional<Long> dateTo,
             @RequestParam(name = "show_expired", required = false) Optional<Boolean> showExpired) {
-        List<NotificationScheduleDAO> notifications =
-                notificationSv.get(offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
-
+        List<NotificationScheduleDAO> notifications;
+        if (showExpired.isPresent()) {
+            //TODO: remove this API later
+            notifications =
+                    notificationSv.get(offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
+        }
+        else  {
+            //TODO: remove this API later
+            notifications =
+                    notificationSv.get(dateFrom.orElse(DateConverter.currentMonth()), dateTo.orElse(null),
+                            offset.orElse(0L), limit.orElse(60));
+        }
         return new ResponseEntity<>(notifications, HttpStatus.OK);
     }
 

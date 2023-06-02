@@ -341,10 +341,10 @@ public class InformationPanelService {
                         measurementDetailsRepository.findByMeasurementId(x.getId())))
                 .collect(Collectors.toList());
 //TODO: throw some exception code to the UI - so the users know that not all measurements are not available for this asset
-        if (list.size() > 0)
+//        if (list.size() > 0)
             return list;
-        else throw new NotFoundException(
-                "No measurements related with the user:" + (userId != null ? userId.toString() : " N/A ") + " and  asset " + assetId + "with the tile data found");
+//        else throw new NotFoundException(
+//                "No measurements related with the user:" + (userId != null ? userId.toString() : " N/A ") + " and  asset " + assetId + "with the tile data found");
     }
 
 
