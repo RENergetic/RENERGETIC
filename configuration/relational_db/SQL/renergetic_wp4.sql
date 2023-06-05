@@ -157,28 +157,28 @@ INSERT INTO public.measurement(
 	id, direction, domain, label, name, sensor_id, sensor_name, asset_id, asset_category_id, energy_island_asset_id, measurement_type_id, uuid)
 	VALUES
 	-- (2000, 'in', 'electricity', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1100, NULL, 1000, 2, 1),
-	(2001, 'in', 'electricity', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1101, NULL, 1000, 2, 1),
-	(2002, 'in', 'electricity', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1102, NULL, 1000, 2, 1),
-	(2003, 'in', 'electricity', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1103, NULL, 1000, 2, 1),
-	(2004, 'in', 'electricity', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1104, NULL, 1000, 2, 1),
-	(2005, 'in', 'electricity', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1105, NULL, 1000, 2, 1),
-	(2006, 'out', 'heat', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1106, NULL, 1000, 2, 1),
-	(2007, 'out', 'heat', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1107, NULL, 1000, 2, 1),
-	-- (2008, 'out', 'heat', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1108, NULL, 1000, 2, 1),
-	(2009, 'out', 'heat', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1104, NULL, 1000, 2, 1),
-	(2010, 'in', 'heat', 'energy_meter', 'energy_meter', NULL, 'energy_meter', 1109, NULL, 1000, 2, 1),
-	(2011, 'out', 'electricity', 'pv', 'pv', NULL, 'pv', 1110, NULL, 1000, 1, 1),
-	(2012, 'out', 'electricity', 'pv', 'pv', NULL, 'pv', 1111, NULL, 1000, 1, 1),
-	(2013, 'out', 'electricity', 'pv', 'pv', NULL, 'pv', 1112, NULL, 1000, 1, 1),
-	(2014, 'out', 'electricity', 'pv', 'pv', NULL, 'pv', 1113, NULL, 1000, 1, 1),
+	(2001, 'in', 'electricity', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1101, NULL, 1000, 2, 1),
+	(2002, 'in', 'electricity', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1102, NULL, 1000, 2, 1),
+	(2003, 'in', 'electricity', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1103, NULL, 1000, 2, 1),
+	(2004, 'in', 'electricity', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1104, NULL, 1000, 2, 1),
+	(2005, 'in', 'electricity', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1105, NULL, 1000, 2, 1),
+	(2006, 'out', 'heat', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1106, NULL, 1000, 2, 1),
+	(2007, 'out', 'heat', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1107, NULL, 1000, 2, 1),
+	-- (2008, 'out', 'heat', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1108, NULL, 1000, 2, 1),
+	(2009, 'out', 'heat', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1104, NULL, 1000, 2, 1),
+	(2010, 'in', 'heat', 'energy_meter', 'current_energy', NULL, 'energy_meter', 1109, NULL, 1000, 2, 1),
+	(2011, 'out', 'electricity', 'pv', 'current_power', NULL, 'pv', 1110, NULL, 1000, 1, 1),
+	(2012, 'out', 'electricity', 'pv', 'current_power', NULL, 'pv', 1111, NULL, 1000, 1, 1),
+	(2013, 'out', 'electricity', 'pv', 'current_power', NULL, 'pv', 1112, NULL, 1000, 1, 1),
+	(2014, 'out', 'electricity', 'pv', 'current_power', NULL, 'pv', 1113, NULL, 1000, 1, 1),
 	-- Measurements for categories: Heating
-	(2050, 'in', 'electricity', 'energy_meter', 'energy_meter', NULL, 'energy_meter', NULL, 1, 1000, 2, 1),
-	(2051, 'out', 'heat', 'energy_meter', 'energy_meter', NULL, 'energy_meter', NULL, 1, 1000, 2, 1),
-	(2052, 'in', 'heat', 'energy_meter', 'energy_meter', NULL, 'energy_meter', NULL, 1, 1000, 2, 1),
+	(2050, 'in', 'electricity', 'energy_meter', 'current_energy', NULL, 'energy_meter', NULL, 1, 1000, 2, 1),
+	(2051, 'out', 'heat', 'energy_meter', 'current_energy', NULL, 'energy_meter', NULL, 1, 1000, 2, 1),
+	(2052, 'in', 'heat', 'energy_meter', 'current_energy', NULL, 'energy_meter', NULL, 1, 1000, 2, 1),
 	-- Measurements for categories: Charging stations
-	(2053, 'in', 'electricity', 'energy_meter', 'energy_meter', NULL, 'energy_meter', NULL, 2, 1000, 2, 1),
+	(2053, 'in', 'electricity', 'energy_meter', 'current_energy', NULL, 'energy_meter', NULL, 2, 1000, 2, 1),
 	-- Measurements for categories: Water Treatmeant
-	(2054, 'in', 'electricity', 'energy_meter', 'energy_meter', NULL, 'energy_meter', NULL, 3, 1000, 2, 1);
+	(2054, 'in', 'electricity', 'energy_meter', 'current_energy', NULL, 'energy_meter', NULL, 3, 1000, 2, 1);
 
 
 
@@ -222,7 +222,7 @@ INSERT INTO information_tile_measurement ( id, measurement_id, asset_category_id
 ( 1, 2050, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'sum' ),
 ( 2, 2051, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'sum' ),
 ( 3, 2052, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'sum' ),
-( 4, 2053 NULL, NULL, NULL, NULL, NULL, NULL, 2, 'sum' ),
+( 4, 2053, NULL, NULL, NULL, NULL, NULL, NULL, 2, 'sum' ),
 ( 5, 2054, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'sum' );
 
 --TODO: Missing maybe measurement details.
