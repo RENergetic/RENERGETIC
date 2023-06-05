@@ -1,8 +1,12 @@
 package com.renergetic.hdrapi.model;
 
+import lombok.Getter;
+
 public enum ConnectionType {
-	owner,
+	 owner,
 	resident,
 	visitor,
-	energy_connection
+	energy_connection 
+
+
 }

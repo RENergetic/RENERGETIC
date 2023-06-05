@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.Column;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -29,8 +32,10 @@ public class NotificationScheduleDAO {
     @JsonProperty(value = "date_from", required = true)
     private Long dateFrom;
 
+    @JsonProperty(value = "notification_timestamp", required = true)
+    private Long notificationTimestamp;
     @JsonProperty(value = "timestamp", required = true)
-    private Long timestamp;
+    private Long predictionDate;
 
 
     @JsonProperty(value = "date_to", required = false)
@@ -41,7 +46,7 @@ public class NotificationScheduleDAO {
     @JsonProperty(value = "asset", required = false)
     private SimpleAssetDAO asset;
 
-    @JsonProperty(value = "dashboard", required = false, access = Access.READ_ONLY)
+    @JsonProperty(value = "dashboard", required = false )
     private DashboardDAO dashboard;
 
     @JsonProperty(value = "information_tile_id", required = false)
@@ -64,7 +69,7 @@ public class NotificationScheduleDAO {
             dao.setNotificationCode(notification.getDefinition().getCode());
             dao.setType(notification.getDefinition().getType());
             dao.setMessage(notification.getDefinition().getMessage());
-            dao.setTimestamp(DateConverter.toEpoch(notification.getNotificationTimestamp()));
+            dao.setNotificationTimestamp(DateConverter.toEpoch(notification.getNotificationTimestamp()));
 
             dao.setDateFrom(DateConverter.toEpoch(notification.getDateFrom()));
             dao.setDateTo(DateConverter.toEpoch(notification.getDateTo()));
@@ -103,7 +108,7 @@ public class NotificationScheduleDAO {
         }
         notification.setDateFrom(DateConverter.toLocalDateTime(dateFrom));
         notification.setDateTo(DateConverter.toLocalDateTime(dateTo));
-        notification.setNotificationTimestamp(DateConverter.toLocalDateTime(timestamp));
+        notification.setNotificationTimestamp(DateConverter.toLocalDateTime(notificationTimestamp));
         notification.setNotificationValue(value);
         if (asset != null) {
             notification.setAsset(asset.mapToEntity());

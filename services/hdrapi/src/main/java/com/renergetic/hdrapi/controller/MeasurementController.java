@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.renergetic.hdrapi.model.details.AssetDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,30 +50,42 @@ public class MeasurementController {
 	
 //=== GET REQUESTS====================================================================================
 	
+	@Operation(summary = "Get All Measurements having details key and value")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "/key/{key}/{value}", produces = "application/json")
+	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (
+			@PathVariable(name = "key") String key,
+			@PathVariable(name = "value") String value,
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit){
+		
+		List<MeasurementDAOResponse> measurements = measurementSv.getByProperty(key,value, offset.orElse(0L), limit.orElse(100));
+		
+		return new ResponseEntity<>(measurements, HttpStatus.OK);
+	}
 	@Operation(summary = "Get All Measurements")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
 	public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements (
-            @RequestParam(required = false) Optional<String> name,
-            @RequestParam(required = false) Optional<String> type,
-            @RequestParam(required = false) Optional<String> direction,
-            @RequestParam(required = false) Optional<String> domain,
-            @RequestParam(required = false) Optional<Long> offset, 
-            @RequestParam(required = false) Optional<Integer> limit){
-		
-		List<MeasurementDAOResponse> measurements = new ArrayList<>();
-        HashMap<String, String> filters = new HashMap<>();
+			@RequestParam(required = false) Optional<String> name,
+			@RequestParam(required = false) Optional<String> type,
+			@RequestParam(required = false) Optional<String> direction,
+			@RequestParam(required = false) Optional<String> domain,
+			@RequestParam(required = false) Optional<Long> offset,
+			@RequestParam(required = false) Optional<Integer> limit){
 
-        if (name.isPresent()) filters.put("name", name.get());
-        if (type.isPresent()) filters.put("type", type.get());
-        if (direction.isPresent()) filters.put("direction", direction.get());
-        if (domain.isPresent()) filters.put("parent", domain.get());
-		
+		List<MeasurementDAOResponse> measurements = new ArrayList<>();
+		HashMap<String, String> filters = new HashMap<>();
+
+		if (name.isPresent()) filters.put("name", name.get());
+		if (type.isPresent()) filters.put("type", type.get());
+		if (direction.isPresent()) filters.put("direction", direction.get());
+		if (domain.isPresent()) filters.put("parent", domain.get());
+
 		measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20));
-		
+
 		return new ResponseEntity<>(measurements, HttpStatus.OK);
 	}
-	
 	@Operation(summary = "Get Measurement by id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
@@ -166,22 +179,37 @@ public class MeasurementController {
 		return new ResponseEntity<>(_detail, HttpStatus.CREATED);
 	}
 	
-	@Operation(summary = "Update Information from its id")
+//	@Operation(summary = "Update Information from its id")
+//	@ApiResponses({
+//		@ApiResponse(responseCode = "200", description = "Details saved correctly"),
+//		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
+//		@ApiResponse(responseCode = "404", description = "Detail not exist"),
+//		@ApiResponse(responseCode = "500", description = "Error saving information")
+//	})
+//	@PutMapping(path = "{measurement_id}/info/{info_id}", produces = "application/json", consumes = "application/json")
+//	public ResponseEntity<MeasurementDetails> updateInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id, @PathVariable Long info_id){
+//		Measurement measurement = new Measurement();
+//		measurement.setId(measurement_id);
+//		detail.setMeasurement(measurement);
+//		MeasurementDetails _detail = measurementSv.updateDetail(detail, info_id);
+//		return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+//	}
+	@Operation(summary = "Update measurement detail's property")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Details saved correctly"),
-		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
-		@ApiResponse(responseCode = "404", description = "Detail not exist"),
-		@ApiResponse(responseCode = "500", description = "Error saving information")
+			@ApiResponse(responseCode = "200", description = "Details saved correctly"),
+			@ApiResponse(responseCode = "400", description = "Path isn't valid"),
+			@ApiResponse(responseCode = "404", description = "Detail not exist"),
+			@ApiResponse(responseCode = "500", description = "Error saving information")
 	})
-	@PutMapping(path = "{measurement_id}/info/{info_id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<MeasurementDetails> updateInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id, @PathVariable Long info_id){
+	@PutMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
+	public ResponseEntity<Boolean> updateProperty (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id ){
 		Measurement measurement = new Measurement();
 		measurement.setId(measurement_id);
 		detail.setMeasurement(measurement);
-		MeasurementDetails _detail = measurementSv.updateDetail(detail, info_id);
-		return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		boolean res = measurementSv.setProperty(measurement_id, detail);
+		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
-	
+
 	@Operation(summary = "Delete Information from its id")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", description = "Information deleted"),
@@ -194,6 +222,18 @@ public class MeasurementController {
 		return ResponseEntity.noContent().build();
 	}
 
+
+	@Operation(summary = "Insert Details for Measurement")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@PostMapping(path = "{measurement_id}/info", produces = "application/json")
+	public ResponseEntity<Boolean> setMeasurementProperty (
+			@PathVariable(name = "measurement_id")Long measurementId,
+			@RequestBody MeasurementDetails detail  ){
+//TODO check privileges
+		boolean res = measurementSv.setProperty(measurementId,detail) ;
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
 	//=== TAGS REQUESTS ===================================================================================	
 
 	@Operation(summary = "Get All Tags")

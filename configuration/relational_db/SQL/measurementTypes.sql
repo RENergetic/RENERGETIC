@@ -15,4 +15,6 @@ INSERT INTO measurement_type ( id, name, physical_name, label, base_unit, unit, 
      ( 13, 'co2eq_kgperMwh', 'co2eq', 'CO2eq [kg/kWh]', 'g/kWh', 'kg/MWh', 1000, '#4CAF50'),
      ( 14, 'co2eq_tgpermwh', 'co2eq', 'CO2eq [t/MWh]', 'g/kWh', 't/MWh', 1000, '#4CAF50'),
      ( 15, 'flow_m3perh', 'flow', 'Flow [m3/h]', 'm3/h', 'm3/h', 1, '#4CAF50'),
-     ( 16, 'flow_lperh', 'flow', 'Flow [l/h]', 'm3/h', 'l/h', 0.001, '#4CAF50');
+     ( 16, 'flow_lperh', 'flow', 'Flow [l/h]', 'm3/h', 'l/h', 0.001, '#4CAF50'),
+	 ( 17, 'energy_gj', 'energy', 'Energy [GJ]', 'Wh', 'GJ', 277778, '#4CAF50'),
+	 ( 18, 'mass_kg', 'mass', 'Mass [kg]', 'kg', 'kg', 1, '#4CAF50');

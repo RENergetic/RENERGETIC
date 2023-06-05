@@ -1,12 +1,10 @@
 package com.renergetic.hdrapi.service.utils;
 
 import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.model.Dashboard;
-import com.renergetic.hdrapi.model.Measurement;
-import com.renergetic.hdrapi.model.MeasurementType;
-import com.renergetic.hdrapi.model.NotificationType;
+import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.repository.MeasurementRepository;
 import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
+import org.apache.commons.lang3.stream.Streams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -28,16 +26,50 @@ public class DummyDataGenerator {
                     " hendrerit turpis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur " +
                     "ridiculus mus. Aenean efficitur elementum mollis. Donec vel metus eu justo congue commodo";
     static final String notificationTemplate = "test_prediction_template";
-
-    private static Double getMeasurementValue(Measurement m) {
+    private static Double getMeasurementValue(Measurement m ) {
+        return getMeasurementValue(m,null);
+    }
+    private static Double getMeasurementValue(Measurement m, Double previousValue) {
+        Double max = 30000.0;
+        if(m.getDomain()== Domain.heat){
+            max =50000.0;
+        }
+        if(Objects.equals(m.getType().getPhysicalName(), "percentage")){
+            max =100.0;
+        }
 //TODO: consider measurement type and domains
-        return (random.nextInt(300 * 100)) / 100.0 + 200.0;
+        if (previousValue == null)
+            return (random.nextInt(max.intValue() * 100)) / 100.0 + max*0.66;
+        else {
+            return previousValue+(random.nextInt( (max.intValue()/3) * 100)) / 100.0 - max*0.1;
+        }
+    }
+    private static Double getMeasurementValue(MeasurementDAOResponse m ) {
+        return getMeasurementValue(m,null);
+    }
+    private static Double getMeasurementValue(MeasurementDAOResponse m, Double previousValue) {
+//TODO: consider measurement type and domains
+        Double max = 300.0;
+        if(m.getDomain()== Domain.heat){
+            max =5000.0;
+        }
+        if(Objects.equals(m.getType().getPhysicalName(), "percentage")){
+            max =100.0;
+        }
+//TODO: consider measurement type and domains
+        if (previousValue == null)
+            return (random.nextInt(max.intValue() * 100)) / 100.0 + max*0.66;
+        else {
+            return previousValue+(random.nextInt( (max.intValue()/3) * 100)) / 100.0 - max*0.1;
+        }
+//        if (previousValue == null)
+//            return (random.nextInt(300 * 100)) / 100.0 + 200.0;
+//        else {
+//            return previousValue+(random.nextInt(40 * 100)) / 100.0 -15.0;
+//        }
     }
 
-    private static Double getMeasurementValue(MeasurementDAOResponse m) {
-//TODO: consider measurement type and domains
-        return (random.nextInt(300 * 100)) / 100.0 + 200.0;
-    }
+
 
 
     public DataDAO getData(Collection<MeasurementDAOResponse> measurements) {
@@ -45,6 +77,35 @@ public class DummyDataGenerator {
         Map<String, Double> measurementValues = measurements.stream().collect(
                 Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
         data.getCurrent().put("last", measurementValues);
+        return data;
+    }
+
+
+    public TimeseriesDAO getTimeseries(Collection<MeasurementDAOResponse> measurements, Long from, Optional<Long> to) {
+        TimeseriesDAO data = new TimeseriesDAO();
+        Long dateTo = (new Date()).getTime();
+        Long dateFrom = dateTo - 3600L * 1000L * 24L; //24h
+        Long interval = 300L * 1000L;//  5 min interval, 6 points per hour
+        int points = 24 * 6;
+        Long[] timestamps = new Long[points];
+        for (int i = 0; i < timestamps.length; i++) {
+            timestamps[i] = dateFrom + interval * i;
+        }
+        data.setTimestamps(Arrays.asList(timestamps));
+        Map<String, List<Double>> map = new HashMap<>();
+
+        ArrayList<MeasurementDAOResponse> tList = new ArrayList<>(measurements);
+        for (int j = 0; j < tList.size(); j++) {
+            Double[] values = new Double[points];
+            var m = tList.get(j);
+            for (int i = 0; i < values.length; i++) {
+                values[i] = getMeasurementValue(m, i > 0 ? values[i - 1] : null);
+            }
+
+            map.put(m.getId().toString(), Arrays.asList(values));
+        }
+        data.setCurrent(map);
+
         return data;
     }
 
@@ -92,7 +153,7 @@ public class DummyDataGenerator {
                 not.setAsset(SimpleAssetDAO.create(measurement.getAsset()));
                 not.setValue(getMeasurementValue(measurement));
                 Date dt = new Date((new Date()).getTime() + (3600 * 1000));
-                not.setTimestamp(DateConverter.toEpoch(dt));
+                not.setNotificationTimestamp(DateConverter.toEpoch(dt));
                 not.setMessage("test_prediction_template");
             }
 

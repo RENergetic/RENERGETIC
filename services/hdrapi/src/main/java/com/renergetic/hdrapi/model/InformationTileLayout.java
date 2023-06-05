@@ -20,7 +20,7 @@ public class InformationTileLayout {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "layout")
+    @Column(name = "layout",columnDefinition="TEXT")
     private String layout;
 
     @ManyToOne(cascade = CascadeType.REFRESH)

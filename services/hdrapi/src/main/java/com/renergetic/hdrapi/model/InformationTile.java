@@ -28,10 +28,10 @@ public class InformationTile {
     @Column(name = "label")
     private String label;
 
-    @Column(name = "layout")
+    @Column(name = "layout",columnDefinition="TEXT")
     private String layout;
 
-    @Column(name = "props")
+    @Column(name = "props",columnDefinition="TEXT")
     private String props;
     
     @Column(name = "type")
