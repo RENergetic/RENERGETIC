@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 
 public class HttpAPIs {
 
-    static public HttpResponse<String> sendRequest(String url, String HttpMethod, Map<String, String> params,
+    static public HttpResponse<String> sendRequest(String url, String httpMethod, Map<String, String> params,
                                                    Object body, Map<String, String> headers) {
         try {
             // Create client
@@ -34,13 +34,11 @@ public class HttpAPIs {
                     builder = builder.header(header.getKey(), header.getValue());
                 }
             if (body == null)
-                builder.method(HttpMethod, HttpRequest.BodyPublishers.noBody());
+                builder.method(httpMethod, HttpRequest.BodyPublishers.noBody());
             else
-                builder.method(HttpMethod, HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)));
+                builder.method(httpMethod, HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)));
             // Send request
-            HttpResponse<String> ret = client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-
-            return ret;
+            return client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
 
         } catch (IllegalArgumentException e) {
             System.err.println("Check that the URL is valid and  the HTTP Method is allowed");
