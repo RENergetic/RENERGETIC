@@ -37,10 +37,10 @@ public class MeasurementDAORequest {
 	private String icon;
 
 	@JsonProperty(required = false)
-	private Long type;
+	private MeasurementType type;
 
 	@JsonProperty(value = "asset_id", required = false)
-	private Long assetId;
+	private SimpleAssetDAO asset;
 
 	@JsonProperty(required = false)
 	private Domain domain;
@@ -58,14 +58,14 @@ public class MeasurementDAORequest {
 			dao.setName(measurement.getName());
 			dao.setSensorName(measurement.getSensorName());
 			if (measurement.getType() != null)
-				dao.setType(measurement.getType().getId());
+				dao.setType(measurement.getType() );
 			dao.setLabel(measurement.getLabel());
 			//dao.setDescription(measurement.getDescription());
 			//dao.setIcon(measurement.getIcon());
 			dao.setDomain(measurement.getDomain());
 			dao.setDirection(measurement.getDirection());
 			if (measurement.getAsset() != null)
-				dao.setAssetId(measurement.getAsset().getId());
+				dao.setAsset(SimpleAssetDAO.create(measurement.getAsset()));
 		}
 		return dao;
 	}
@@ -76,9 +76,7 @@ public class MeasurementDAORequest {
 		measurement.setId(id);
 		measurement.setName(name);
 		if (type != null) {
-			MeasurementType entityType = new MeasurementType();
-			entityType.setId(type);
-			measurement.setType(entityType);
+			measurement.setType(type);
 		}
 		measurement.setLabel(label);
 		//measurement.setDescription(description);
@@ -86,10 +84,8 @@ public class MeasurementDAORequest {
 		measurement.setDomain(domain);
 		measurement.setDirection(direction);
 		measurement.setSensorName(sensorName);
-		if (assetId != null) {
-			Asset asset = new Asset();
-			asset.setId(assetId);
-			measurement.setAsset(asset);
+		if (asset != null) {
+			measurement.setAsset(asset.mapToEntity());
 		}
 
 		return measurement;
