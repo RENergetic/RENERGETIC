@@ -52,12 +52,12 @@ public class AbstractMeterService {
 	}
 
 	public AbstractMeterDAO get(String name, Domain domain) {
-		return AbstractMeterDAO.create(amRepo.findByNameAndDomain(AbstractMeter.get(name), domain)
+		return AbstractMeterDAO.create(amRepo.findByNameAndDomain(AbstractMeter.obtain(name), domain)
 				.orElseThrow(() -> new NotFoundException("The abstract meter with name %s and domain %s isn't configured", name, domain)));
 	}
 
 	public AbstractMeterDAO create(AbstractMeterDAO meter) {
-		if( !amRepo.existsByNameAndDomain(AbstractMeter.get(meter.getName()), meter.getDomain())) {
+		if( !amRepo.existsByNameAndDomain(AbstractMeter.obtain(meter.getName()), meter.getDomain())) {
 			meter.setId(null);
 			return AbstractMeterDAO.create(amRepo.save(meter.mapToEntity()));
 		}
@@ -65,7 +65,7 @@ public class AbstractMeterService {
 	}
 
 	public AbstractMeterDAO update(AbstractMeterDAO meter) {
-		Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(AbstractMeter.get(meter.getName()), meter.getDomain());
+		Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(AbstractMeter.obtain(meter.getName()), meter.getDomain());
 		if(previousConfig.isPresent()) {
 			AbstractMeterConfig config = meter.mapToEntity();
 			config.setId(previousConfig.get().getId());
@@ -76,7 +76,7 @@ public class AbstractMeterService {
 	}
 
 	public AbstractMeterDAO delete(AbstractMeterDAO meter) {
-		Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(AbstractMeter.get(meter.getName()), meter.getDomain());
+		Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(AbstractMeter.obtain(meter.getName()), meter.getDomain());
 		if(previousConfig.isPresent()) {
 			amRepo.delete(previousConfig.get());
 			return AbstractMeterDAO.create(previousConfig.get());

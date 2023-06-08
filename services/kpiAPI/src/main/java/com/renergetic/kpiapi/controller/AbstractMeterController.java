@@ -118,6 +118,6 @@ public class AbstractMeterController {
 			@RequestParam(name = "to", required = false) Optional<Long> to,
 			@RequestParam(name = "group", required = false) String group) {
 		
-		return ResponseEntity.ok(amDataSv.getAggregated(name, domain, InfluxFunction.obtain(group), from.orElse(null), to.orElse(null), group));
+		return ResponseEntity.ok(amDataSv.getAggregated(name, domain, InfluxFunction.obtain(operation), from.orElse(null), to.orElse(null), group));
 	}
 }

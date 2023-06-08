@@ -14,6 +14,9 @@ public enum InfluxFunction {
 	LAST;
 	
 	public static InfluxFunction obtain(String function) {
+		if (function == null) {
+			throw new InvalidArgumentException("Function can't be null");
+		}
 		try {
 			return InfluxFunction.valueOf(function.toUpperCase());
 		}catch (IllegalArgumentException e) {

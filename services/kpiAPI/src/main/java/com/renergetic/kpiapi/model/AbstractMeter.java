@@ -1,5 +1,7 @@
 package com.renergetic.kpiapi.model;
 
+import com.renergetic.kpiapi.exception.InvalidArgumentException;
+
 public enum AbstractMeter {
 	LRS ("LRS", "Local renewable sources"),
 	LNS ("LNS", "Local non renewable sources"),
@@ -20,12 +22,12 @@ public enum AbstractMeter {
 		this.description = description;
 	}
 	
-	public static AbstractMeter get(String name) {
+	public static AbstractMeter obtain(String name) {
 		for (AbstractMeter meter: AbstractMeter.values()) {
 			if (meter.name().equalsIgnoreCase(name) || meter.meter.equalsIgnoreCase(name))
 				return meter;
 		}
 		
-		return null;
+		throw new InvalidArgumentException("%s is not a valid meter", name);
 	}
 }

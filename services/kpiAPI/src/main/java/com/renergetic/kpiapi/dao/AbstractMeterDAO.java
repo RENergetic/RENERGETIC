@@ -47,7 +47,7 @@ public class AbstractMeterDAO {
 		AbstractMeterConfig entity = new AbstractMeterConfig();
 
 		entity.setId(this.id);
-		entity.setName(AbstractMeter.get(this.name));
+		entity.setName(AbstractMeter.obtain(this.name));
 		entity.setFormula(this.formula);
 		entity.setCondition(this.condition);
 		entity.setDomain(this.domain);

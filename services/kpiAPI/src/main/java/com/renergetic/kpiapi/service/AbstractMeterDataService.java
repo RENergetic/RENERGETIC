@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.renergetic.kpiapi.dao.AbstractMeterDataDAO;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
+import com.renergetic.kpiapi.model.AbstractMeter;
 import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.model.InfluxFunction;
 import com.renergetic.kpiapi.model.MeasurementType;
@@ -48,7 +49,7 @@ public class AbstractMeterDataService {
 		
 		AbstractMeterDataDAO ret = new AbstractMeterDataDAO();
 
-		ret.setName(name);
+		ret.setName(AbstractMeter.obtain(name));
 		ret.setDomain(domain);
 
 		Map<String, String> params = new HashMap<>();
@@ -113,7 +114,7 @@ public class AbstractMeterDataService {
 		
 		AbstractMeterDataDAO ret = new AbstractMeterDataDAO();
 
-		ret.setName(name);
+		ret.setName(AbstractMeter.obtain(name));
 		ret.setDomain(domain);
 
 		Map<String, String> params = new HashMap<>();
