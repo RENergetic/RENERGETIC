@@ -60,6 +60,9 @@ public class MeasurementService {
 
     public boolean deleteById(Long id) {
         if (id != null && measurementRepository.existsById(id)) {
+            var m = measurementRepository.getById(id);
+            m.getDetails().forEach((it) -> measurementDetailsRepository.delete(it));
+            measurementTagsRepository.findByMeasurementId(m.getId()).forEach((it) -> measurementTagsRepository.delete(it));
             measurementRepository.deleteById(id);
             return true;
         } else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
@@ -74,7 +77,7 @@ public class MeasurementService {
 
     public boolean setProperty(Long measurementId, MeasurementDetails details) {
 
-        return measurementRepository.setProperty(measurementId,details.getKey(),details.getValue())==1;
+        return measurementRepository.setProperty(measurementId, details.getKey(), details.getValue()) == 1;
     }
 
     public List<MeasurementDAOResponse> getByProperty(String key, String value, long offset, long limit) {
@@ -245,7 +248,6 @@ public class MeasurementService {
             return measurementDetailsRepository.save(detail);
         } else throw new InvalidNonExistingIdException("No measurement details with id " + id + "found");
     }
-
 
 
     public boolean deleteDetailById(Long id) {
