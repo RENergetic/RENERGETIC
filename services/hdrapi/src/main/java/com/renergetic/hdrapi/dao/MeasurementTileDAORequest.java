@@ -2,14 +2,12 @@ package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.service.utils.Json;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.apache.tomcat.util.json.ParseException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +31,7 @@ public class MeasurementTileDAORequest {
     private String icon;
 
     @JsonProperty(required = false)
-    private MeasurementType type;
+    private MeasurementTypeDAORequest type;
 
 
     @JsonProperty(required = false)
@@ -82,9 +80,15 @@ public class MeasurementTileDAORequest {
             entity.setMeasurement(measurement);
         } else {
             if (type != null) {
-                MeasurementType entityType = new MeasurementType();
-                entityType.setId(type.getId());
-                entity.setType(entityType);
+                if (type.getId() != null) {
+                    MeasurementType entityType = new MeasurementType();
+                    entityType.setId(type.getId());
+                    entity.setType(entityType);
+                } else {
+                    entity.setPhysicalName(type.getPhysicalName());
+                }
+
+
             }
             entity.setDirection(direction);
             entity.setDomain(domain);
@@ -99,7 +103,7 @@ public class MeasurementTileDAORequest {
 
 
         }
-        if (function != null && InfluxFunction.obtain(function)!= null) {
+        if (function != null && InfluxFunction.obtain(function) != null) {
             entity.setFunction(function);
         }
 

@@ -336,7 +336,8 @@ public class InformationPanelService {
                         tileM.getSensorName(),
                         tileM.getDomain() != null ? tileM.getDomain().name() : null,
                         tileM.getDirection() != null ? tileM.getDirection().name() : null,
-                        tileM.getType().getId())
+                        tileM.getType()!=null?tileM.getType().getId():null,
+                        tileM.getPhysicalName())
                 .stream().map(x -> MeasurementDAOResponse.create(x,
                         measurementDetailsRepository.findByMeasurementId(x.getId())))
                 .collect(Collectors.toList());

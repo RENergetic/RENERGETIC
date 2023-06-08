@@ -47,19 +47,22 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
                                                                                                String direction,
                                                                                                Long type);
 
-    @Query(value = "SELECT measurement.* " +
+    @Query(value = "SELECT distinct measurement.* " +
             "FROM (measurement " +
             "INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
-            "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id )" +
+            "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
+            "INNER JOIN measurement_type ON measurement_type.id = measurement.measurement_type_id " +
+            ")" +
             " WHERE COALESCE(measurement.sensor_name = CAST(:sensorName AS text),TRUE) " +
             " AND COALESCE(measurement.domain = CAST(:domain AS text) ,TRUE) " +
             " AND COALESCE(measurement.name = CAST(:measurementName AS text),TRUE) " +
             " AND measurement.asset_id = :assetId " +
             " AND COALESCE(measurement.direction = CAST(:direction AS text)  ,TRUE) " +
-            " AND  measurement.measurement_type_id = :type  ", nativeQuery = true)
+            " AND COALESCE(measurement_type.physical_name = CAST(:physicalName AS text) ,TRUE) " +
+            " AND COALESCE(measurement.measurement_type_id  = CAST ( CAST(:type AS text ) as bigint ) ,TRUE) " , nativeQuery = true)
     //some fields aren't optional because there would be no sense to mix them -> can be discussed
     public List<Measurement> findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(
-            Long assetId, String measurementName, String sensorName, String domain, String direction, Long type);
+            Long assetId, String measurementName, String sensorName, String domain, String direction, Long type,String physicalName);
 
     @Query(value = "SELECT measurement.* " +
             "FROM (asset asset_conn " +

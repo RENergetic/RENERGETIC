@@ -35,6 +35,8 @@ public class InformationTileMeasurement {
 
     @Column(name = "sensor_name", nullable = true, insertable = true, updatable = true)
     private String sensorName;
+    @Column(name = "physical_name", nullable = true, insertable = true, updatable = true)
+    private String physicalName;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
     @NotFound(action = NotFoundAction.IGNORE)
@@ -85,13 +87,13 @@ public class InformationTileMeasurement {
             return MeasurementDAOResponse.create(measurement, measurement.getDetails());
         }
         var dao = new MeasurementDAOResponse();
-dao.setId(null);
+        dao.setId(null);
         dao.setDirection(direction);
         dao.setDomain(domain);
         dao.setName(measurementName);
         dao.setSensorName(sensorName);
         dao.setType(type);
-        dao.setCategory(assetCategory!=null? assetCategory.getName():null);
+        dao.setCategory(assetCategory != null ? assetCategory.getName() : null);
         if (this.function != null)
             dao.setFunction(InfluxFunction.obtain(this.function));
         else dao.setFunction(InfluxFunction.last);
