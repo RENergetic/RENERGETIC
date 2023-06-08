@@ -31,6 +31,9 @@ public class AbstractMeterDataService {
 
 	@Autowired
 	private MeasurementTypeRepository measurementTypeRepository;
+
+	@Autowired
+	private HttpAPIs httpAPIs;
 	
 	/**
 	 * Retrieves the meter data DAO for the given name, domain, and time range.
@@ -60,7 +63,7 @@ public class AbstractMeterDataService {
 
 		// Send request to Influx API
 		HttpResponse<String> response =
-				HttpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
+				httpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
 
 		// Get measurement types
 		List<MeasurementType> types = measurementTypeRepository.findAll();
@@ -127,7 +130,7 @@ public class AbstractMeterDataService {
 
 		// Send request to Influx API
 		HttpResponse<String> response =
-				HttpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
+				httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
 
 		// Get measurement types
 		List<MeasurementType> types = measurementTypeRepository.findAll();
