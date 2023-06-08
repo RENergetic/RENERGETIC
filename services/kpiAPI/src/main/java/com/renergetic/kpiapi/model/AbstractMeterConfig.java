@@ -25,7 +25,7 @@ public class AbstractMeterConfig {
 	private Long id;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)
+	@Column(name = "name", nullable = false, insertable = true, updatable = true, unique = false)
 	private AbstractMeter name;
 
 	@Column(name = "formula", nullable = false, insertable = true, updatable = true, unique = false)
