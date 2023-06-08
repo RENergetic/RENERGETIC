@@ -1,5 +1,7 @@
 package com.renergetic.kpiapi.model;
 
+import com.renergetic.kpiapi.exception.InvalidArgumentException;
+
 public enum InfluxFunction {
 	COUNT,
 	DISTINCT,
@@ -15,7 +17,7 @@ public enum InfluxFunction {
 		try {
 			return InfluxFunction.valueOf(function.toUpperCase());
 		}catch (IllegalArgumentException e) {
-			return null;
+			throw new InvalidArgumentException("%s is not a valid function", function);
 		}
 	}
 }

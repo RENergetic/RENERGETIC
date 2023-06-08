@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.kpiapi.dao.AbstractMeterDAO;
+import com.renergetic.kpiapi.dao.AbstractMeterDataDAO;
 import com.renergetic.kpiapi.model.Domain;
+import com.renergetic.kpiapi.model.InfluxFunction;
+import com.renergetic.kpiapi.service.AbstractMeterDataService;
 import com.renergetic.kpiapi.service.AbstractMeterService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +36,9 @@ public class AbstractMeterController {
 	
 	@Autowired
 	AbstractMeterService amSv;
+
+	@Autowired
+	AbstractMeterDataService amDataSv;
 
     @Operation(summary = "Get all Abstract Meters configuration")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -87,5 +93,31 @@ public class AbstractMeterController {
 			@RequestBody AbstractMeterDAO body) {
 		
 		return ResponseEntity.ok(amSv.delete(body));
+	}
+	
+    @Operation(summary = "Get an Abstract Meter data")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "{domain}/{meter_name}/data", produces = "application/json")
+	public ResponseEntity<AbstractMeterDataDAO> getAbstractMetersData(
+			@PathVariable("domain") Domain domain,
+			@PathVariable("meter_name") String name,
+			@RequestParam(name = "from", required = false) Optional<Long> from,
+			@RequestParam(name = "to", required = false) Optional<Long> to) {
+		
+		return ResponseEntity.ok(amDataSv.get(name, domain, from.orElse(null), to.orElse(null)));
+	}
+	
+    @Operation(summary = "Get an Abstract Meter data aggregated")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "{domain}/{meter_name}/data/{operation}", produces = "application/json")
+	public ResponseEntity<AbstractMeterDataDAO> getAbstractMeterAggregatedData(
+			@PathVariable("domain") Domain domain,
+			@PathVariable("meter_name") String name,
+			@PathVariable("operation") String operation,
+			@RequestParam(name = "from", required = false) Optional<Long> from,
+			@RequestParam(name = "to", required = false) Optional<Long> to,
+			@RequestParam(name = "group", required = false) String group) {
+		
+		return ResponseEntity.ok(amDataSv.getAggregated(name, domain, InfluxFunction.obtain(group), from.orElse(null), to.orElse(null), group));
 	}
 }
