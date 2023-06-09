@@ -26,41 +26,45 @@ public class DummyDataGenerator {
                     " hendrerit turpis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur " +
                     "ridiculus mus. Aenean efficitur elementum mollis. Donec vel metus eu justo congue commodo";
     static final String notificationTemplate = "test_prediction_template";
-    private static Double getMeasurementValue(Measurement m ) {
-        return getMeasurementValue(m,null);
+
+    private static Double getMeasurementValue(Measurement m) {
+        return getMeasurementValue(m, null);
     }
+
     private static Double getMeasurementValue(Measurement m, Double previousValue) {
         Double max = 30000.0;
-        if(m.getDomain()== Domain.heat){
-            max =50000.0;
+        if (m.getDomain() == Domain.heat) {
+            max = 50000.0;
         }
-        if(Objects.equals(m.getType().getPhysicalName(), "percentage")){
-            max =100.0;
+        if (Objects.equals(m.getType().getPhysicalName(), "percentage")) {
+            max = 100.0;
         }
 //TODO: consider measurement type and domains
         if (previousValue == null)
-            return (random.nextInt(max.intValue() * 100)) / 100.0 + max*0.66;
+            return (random.nextInt(max.intValue() * 100)) / 100.0 + max * 0.66;
         else {
-            return previousValue+(random.nextInt( (max.intValue()/3) * 100)) / 100.0 - max*0.1;
+            return previousValue + (random.nextInt((max.intValue() / 3) * 100)) / 100.0 - max * 0.1;
         }
     }
-    private static Double getMeasurementValue(MeasurementDAOResponse m ) {
-        return getMeasurementValue(m,null);
+
+    private static Double getMeasurementValue(MeasurementDAOResponse m) {
+        return getMeasurementValue(m, null);
     }
+
     private static Double getMeasurementValue(MeasurementDAOResponse m, Double previousValue) {
 //TODO: consider measurement type and domains
         Double max = 300.0;
-        if(m.getDomain()== Domain.heat){
-            max =5000.0;
+        if (m.getDomain() == Domain.heat) {
+            max = 5000.0;
         }
-        if(Objects.equals(m.getType().getPhysicalName(), "percentage")){
-            max =100.0;
+        if (Objects.equals(m.getType().getPhysicalName(), "percentage")) {
+            max = 100.0;
         }
 //TODO: consider measurement type and domains
         if (previousValue == null)
-            return (random.nextInt(max.intValue() * 100)) / 100.0 + max*0.66;
+            return (random.nextInt(max.intValue() * 100)) / 100.0 + max * 0.66;
         else {
-            return previousValue+(random.nextInt( (max.intValue()/3) * 100)) / 100.0 - max*0.1;
+            return previousValue + (random.nextInt((max.intValue() / 3) * 100)) / 100.0 - max * 0.1;
         }
 //        if (previousValue == null)
 //            return (random.nextInt(300 * 100)) / 100.0 + 200.0;
@@ -70,13 +74,21 @@ public class DummyDataGenerator {
     }
 
 
-
-
     public DataDAO getData(Collection<MeasurementDAOResponse> measurements) {
         DataDAO data = new DataDAO();
-        Map<String, Double> measurementValues = measurements.stream().collect(
-                Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
-        data.getCurrent().put("last", measurementValues);
+
+//        Map<String, Double> measurementValues = measurements.stream().collect(
+//                Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
+
+        for (MeasurementDAOResponse it : measurements) {
+            if (!data.getCurrent().containsKey(it.getFunction().name())) {
+                data.getCurrent().put(it.getFunction().name(), new HashMap<>());
+            }
+            data.getCurrent().get(it.getFunction().name()).put(it.getId().toString(),
+                    DummyDataGenerator.getMeasurementValue(it));
+        }
+
+//        data.getCurrent().put("last", measurementValues);
         return data;
     }
 
