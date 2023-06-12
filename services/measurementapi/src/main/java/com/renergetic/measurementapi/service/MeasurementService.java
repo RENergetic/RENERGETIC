@@ -77,7 +77,7 @@ public class MeasurementService {
     			registry);
 	}
 
-	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar) {
+	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, Boolean performDecumulation) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -101,9 +101,9 @@ public class MeasurementService {
 		
 
 		// FILTER MEASUREMENTS IN MEASUREMENTS LIST IF LIST IS EMPTY SEARCH IN ALL MEASUREMENTS
-				if (measurements != null && !measurements.isEmpty())
-					fluxQuery.add( String.format("filter(fn: (r) => %s)",
-							measurements.stream().map(measurement -> String.format("r[\"_measurement\"] == \"%s\"", measurement)).collect(Collectors.joining(" or "))) );
+		if (measurements != null && !measurements.isEmpty())
+			fluxQuery.add( String.format("filter(fn: (r) => %s)",
+					measurements.stream().map(measurement -> String.format("r[\"_measurement\"] == \"%s\"", measurement)).collect(Collectors.joining(" or "))) );
 
 		// FILTER FIELDS IN FIELDS LIST IF LIST IS EMPTY SEARCH IN ALL FIELDS
 		if (fields != null && !fields.isEmpty())
@@ -116,6 +116,11 @@ public class MeasurementService {
 					tags.keySet().stream()
 					.map(key -> '(' + tags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
 					.collect(Collectors.joining(" and "))) );
+		
+		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
+		if (performDecumulation /*||
+			(tags.containsKey("cumulative") && tags.get("cumulative").size() == 1 && tags.get("cumulative").get(0).equalsIgnoreCase("true"))*/)
+			fluxQuery.add("difference(columns: \"_value\")");
 
 		String flux = fluxQuery.stream().collect(Collectors.joining(" |> "));
 
@@ -124,7 +129,7 @@ public class MeasurementService {
 		return MeasurementMapper.fromFlux(tables);
 	}
 
-	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement, Boolean toFloat) {
+	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement, Boolean toFloat, Boolean performDecumulation) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -167,6 +172,11 @@ public class MeasurementService {
 					.map(key -> '(' + tags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
 					.collect(Collectors.joining(" and "))) );
 		fluxQuery.add("filter(fn: (r) => types.isType(v: r._value, type: \"float\") or types.isType(v: r._value, type: \"int\"))");
+
+		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
+		if (performDecumulation ||
+			(tags.containsKey("cumulative") && tags.get("cumulative").size() == 1 && tags.get("cumulative").get(0).equalsIgnoreCase("true")))
+			fluxQuery.add("difference(columns: \"_value\")");
 		
 		// GROUP DATA
 		if (byMeasurement) 
