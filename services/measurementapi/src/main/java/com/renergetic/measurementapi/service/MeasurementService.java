@@ -118,8 +118,7 @@ public class MeasurementService {
 					.collect(Collectors.joining(" and "))) );
 		
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
-		if (performDecumulation /*||
-			(tags.containsKey("cumulative") && tags.get("cumulative").size() == 1 && tags.get("cumulative").get(0).equalsIgnoreCase("true"))*/)
+		if (performDecumulation)
 			fluxQuery.add("difference(columns: \"_value\")");
 
 		String flux = fluxQuery.stream().collect(Collectors.joining(" |> "));
@@ -174,8 +173,7 @@ public class MeasurementService {
 		fluxQuery.add("filter(fn: (r) => types.isType(v: r._value, type: \"float\") or types.isType(v: r._value, type: \"int\"))");
 
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
-		if (performDecumulation ||
-			(tags.containsKey("cumulative") && tags.get("cumulative").size() == 1 && tags.get("cumulative").get(0).equalsIgnoreCase("true")))
+		if (performDecumulation)
 			fluxQuery.add("difference(columns: \"_value\")");
 		
 		// GROUP DATA
