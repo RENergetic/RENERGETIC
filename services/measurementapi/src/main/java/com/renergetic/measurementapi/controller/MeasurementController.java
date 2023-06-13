@@ -144,6 +144,7 @@ public class MeasurementController {
 		tags.remove("to");
 		tags.remove("hideNotFound");
 		tags.remove("dashboardId");
+		tags.remove("performDecumulation");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -194,6 +195,7 @@ public class MeasurementController {
 		tags.remove("to");
 		tags.remove("hideNotFound");
 		tags.remove("dashboardId");
+		tags.remove("performDecumulation");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
