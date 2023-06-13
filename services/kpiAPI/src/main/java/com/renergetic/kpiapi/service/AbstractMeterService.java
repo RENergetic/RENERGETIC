@@ -124,6 +124,24 @@ public class AbstractMeterService {
 	}
 
 	/**
+	 * Deletes an AbstractMeterDAO object given its name and domain.
+	 *
+	 * @param  name   the name of the AbstractMeterDAO object to delete
+	 * @param  domain the domain of the AbstractMeterDAO object to delete
+	 * @return        an AbstractMeterDAO object representing the deleted object's previous configuration
+	 * @throws IdNoDefinedException if the object with the given name and domain is not configured
+	 */
+	public AbstractMeterDAO delete(String name, Domain domain) {
+		AbstractMeter meter = AbstractMeter.obtain(name);
+		Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(meter, domain);
+		if(previousConfig.isPresent()) {
+			amRepo.deleteByNameAndDomain(meter, domain);
+			return AbstractMeterDAO.create(previousConfig.get());
+		}
+		else throw new IdNoDefinedException("The abstract meter with name %s and domain %s isn't configured", meter, domain);
+	}
+
+	/**
 	 * Deletes the given AbstractMeterDAO from the database if it exists, and returns the corresponding AbstractMeterDAO.
 	 *
 	 * @param  meter	the AbstractMeterDAO to be deleted

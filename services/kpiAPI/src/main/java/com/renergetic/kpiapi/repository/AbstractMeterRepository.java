@@ -14,4 +14,6 @@ public interface AbstractMeterRepository extends JpaRepository<AbstractMeterConf
 
 	boolean existsByNameAndDomain(AbstractMeter name, Domain domain);
 
+	void deleteByNameAndDomain(AbstractMeter name, Domain domain);
+
 }

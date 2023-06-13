@@ -94,6 +94,16 @@ public class AbstractMeterController {
 		
 		return ResponseEntity.ok(amSv.delete(body));
 	}
+
+    @Operation(summary = "Delete an Abstract Meter configuration")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@DeleteMapping(path = "{domain}/{meter_name}", produces = "application/json")
+	public ResponseEntity<AbstractMeterDAO> deleteAbstractMetersConfigurationByParams(
+			@PathVariable("domain") Domain domain,
+			@PathVariable("meter_name") String name) {
+		
+		return ResponseEntity.ok(amSv.delete(name, domain));
+	}
 	
     @Operation(summary = "Get an Abstract Meter data")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
