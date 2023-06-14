@@ -236,17 +236,19 @@ public class MeasurementService {
 
     // MEASUREMENTDETAILS CRUD OPERATIONS
     public MeasurementDetails saveDetail(MeasurementDetails detail) {
-        if (detail.getId() != null && measurementDetailsRepository.existsById(detail.getId()))
-            throw new InvalidCreationIdAlreadyDefinedException("Already exists a detail with ID " + detail.getId());
+        detail.setId(null);
+        if (measurementDetailsRepository.existsByKeyAndMeasurementId(detail.getKey(), detail.getMeasurement().getId()))
+            throw new InvalidCreationIdAlreadyDefinedException(String.format("Already exists a detail with key %s referring to measurement %s ", detail.getKey(), detail.getMeasurement().getId()));
 
         return measurementDetailsRepository.save(detail);
     }
 
-    public MeasurementDetails updateDetail(MeasurementDetails detail, Long id) {
-        if (id != null && measurementDetailsRepository.existsById(id)) {
-            detail.setId(id);
-            return measurementDetailsRepository.save(detail);
-        } else throw new InvalidNonExistingIdException("No measurement details with id " + id + "found");
+    public MeasurementDetails updateDetail(MeasurementDetails detail) {
+        MeasurementDetails entity = measurementDetailsRepository.findByKeyAndMeasurementId(detail.getKey(), detail.getMeasurement().getId()).orElse(null);
+        if (entity != null) {
+            detail.setId(entity.getId());
+            return measurementDetailsRepository.save(detail);            
+        } else throw new InvalidNonExistingIdException(String.format("Already exists a detail with key %s referring to measurement %s ", detail.getKey(), detail.getMeasurement().getId()));
     }
 
 
