@@ -119,7 +119,7 @@ public class MeasurementService {
 		
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
 		if (performDecumulation)
-			fluxQuery.add("difference(columns: \"_value\")");
+			fluxQuery.add("difference(columns: [\"_value\")]");
 
 		String flux = fluxQuery.stream().collect(Collectors.joining(" |> "));
 
@@ -174,7 +174,7 @@ public class MeasurementService {
 
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
 		if (performDecumulation)
-			fluxQuery.add("difference(columns: \"_value\")");
+			fluxQuery.add("difference(columns: [\"_value\"])");
 		
 		// GROUP DATA
 		if (byMeasurement) 
