@@ -2,6 +2,7 @@ package com.renergetic.hdrapi.service;
 
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.model.*;
+import com.renergetic.hdrapi.model.details.MeasurementDetails;
 import com.renergetic.hdrapi.model.details.MeasurementTags;
 import com.renergetic.hdrapi.repository.*;
 import com.renergetic.hdrapi.service.utils.Basic;
@@ -31,6 +32,8 @@ public class DataService {
     private Boolean generateDummy;
     @PersistenceContext
     EntityManager entityManager;
+
+    List<String> cumulativeTypes = List.of();
 
     @Autowired
     private AssetRepository assetRepository;
@@ -139,7 +142,16 @@ public class DataService {
                     if (tags != null && !tags.isEmpty())
                         params.putAll(tags.stream()
                                 .filter(tag -> !params.containsKey(tag.getValue()))
-                                .collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
+                                .collect(Collectors.toMap(Details::getKey, Details::getValue)));
+
+                    // PARSE TO NON CUMULATIVE DATA IF THE MEASUREMENT IS CUMULATIVE
+                    MeasurementDetails cumulative = measurement.getDetails().stream().filter(details -> details.getKey().equalsIgnoreCase("cumulative")).findFirst().orElse(null);
+
+                    if (cumulative == null && cumulativeTypes.contains(measurement.getType().getPhysicalName())) {
+                        params.put("performDecumulation", "true");
+                    } else if (cumulative != null) {
+                        params.put("performDecumulation", cumulative.getValue());
+                    }
 
                     // INFLUX API REQUEST
                     HttpResponse<String> response =
