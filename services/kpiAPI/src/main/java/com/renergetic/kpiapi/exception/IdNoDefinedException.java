@@ -20,6 +20,6 @@ public class IdNoDefinedException extends HttpRuntimeException{
 	
 	@Override
 	public HttpStatus getHttpStatus() {
-		return HttpStatus.NOT_MODIFIED;
+		return HttpStatus.NO_CONTENT;
 	}
 }
