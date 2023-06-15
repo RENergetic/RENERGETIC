@@ -2,7 +2,6 @@
 INSERT INTO measurement_type ( id, name, physical_name, label, base_unit, unit, factor, color ) 
     VALUES( 1, 'power_w', 'power', 'Power [W]', 'W', 'W', 1.0, '#4CAF50'),
      ( 2, 'energy_wh', 'energy', 'Energy[Wh]', 'Wh', 'Wh', 1.0, '#AAAF50'), 
-     ( 3, 'heat_energy_gj', 'energy', 'Energy [GJ]', 'Wh', 'GJ', 277777.777778, '#4CAF50'),
      ( 4, 'temperature', 'temperature', 'Temperature [°C]', '°C', '°C', 1.0, '#4CAF50'),
      ( 5, 'percentage', 'percentage', 'Ratio [%]', '%', '%', 1.0, '#4CAF50'),
      ( 6, 'power_kw', 'power', 'Power [kW]', 'W', 'kW', 1000, '#4CAF50'),
@@ -16,5 +15,8 @@ INSERT INTO measurement_type ( id, name, physical_name, label, base_unit, unit, 
      ( 14, 'co2eq_tgpermwh', 'co2eq', 'CO2eq [t/MWh]', 'g/kWh', 't/MWh', 1000, '#4CAF50'),
      ( 15, 'flow_m3perh', 'flow', 'Flow [m3/h]', 'm3/h', 'm3/h', 1, '#4CAF50'),
      ( 16, 'flow_lperh', 'flow', 'Flow [l/h]', 'm3/h', 'l/h', 0.001, '#4CAF50'),
-	 ( 17, 'energy_gj', 'energy', 'Energy [GJ]', 'Wh', 'GJ', 277778, '#4CAF50'),
-	 ( 18, 'mass_kg', 'mass', 'Mass [kg]', 'kg', 'kg', 1, '#4CAF50');
+	 ( 17, 'energy_gj', 'energy', 'Energy [GJ]', 'Wh', 'GJ', 277777.777778, '#4CAF50'),
+	 ( 18, 'mass_kg', 'mass', 'Mass [kg]', 'kg', 'kg', 1, '#4CAF50'),
+	 ( 19, 'energy_price', 'price', 'Price [€/MWh]', '€/MWh', '€/Wh', 0.000001, '#4CAF50'),
+	 ( 20, 'energy_price_wh', 'price', 'Price [€/Wh]', '€/Wh', '€/Wh', 1, '#4CAF50'),
+	 ( 21, 'energy_price_kwh', 'price', 'Price [€/kWh]', '€/kWh', '€/Wh', 0.001, '#4CAF50');
