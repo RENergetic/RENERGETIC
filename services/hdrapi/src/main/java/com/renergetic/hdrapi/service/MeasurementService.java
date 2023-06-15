@@ -82,6 +82,14 @@ public class MeasurementService {
         return measurementRepository.setProperty(measurementId, details.getKey(), details.getValue()) == 1;
     }
 
+    public boolean setProperties(Long measurementId, Map<String, String> properties) {
+        this.getById(measurementId);//check is exists
+        Optional<Boolean> any = properties.entrySet().stream().map(it ->
+                measurementRepository.setProperty(measurementId, it.getKey(), it.getValue()) != 1
+        ).filter(it -> it).findAny();
+        return any.isEmpty();
+    }
+
     public List<MeasurementDAOResponse> getByProperty(String key, String value, long offset, long limit) {
         List<Measurement> measurements = measurementRepository.getByProperty(key, value, offset, limit);
         Stream<Measurement> stream = measurements.stream();
@@ -249,17 +257,22 @@ public class MeasurementService {
     public MeasurementDetails saveDetail(MeasurementDetails detail) {
         detail.setId(null);
         if (measurementDetailsRepository.existsByKeyAndMeasurementId(detail.getKey(), detail.getMeasurement().getId()))
-            throw new InvalidCreationIdAlreadyDefinedException(String.format("Already exists a detail with key %s referring to measurement %s ", detail.getKey(), detail.getMeasurement().getId()));
+            throw new InvalidCreationIdAlreadyDefinedException(
+                    String.format("Already exists a detail with key %s referring to measurement %s ", detail.getKey(),
+                            detail.getMeasurement().getId()));
 
         return measurementDetailsRepository.save(detail);
     }
 
     public MeasurementDetails updateDetail(MeasurementDetails detail) {
-        MeasurementDetails entity = measurementDetailsRepository.findByKeyAndMeasurementId(detail.getKey(), detail.getMeasurement().getId()).orElse(null);
+        MeasurementDetails entity = measurementDetailsRepository.findByKeyAndMeasurementId(detail.getKey(),
+                detail.getMeasurement().getId()).orElse(null);
         if (entity != null) {
             detail.setId(entity.getId());
-            return measurementDetailsRepository.save(detail);            
-        } else throw new InvalidNonExistingIdException(String.format("Already exists a detail with key %s referring to measurement %s ", detail.getKey(), detail.getMeasurement().getId()));
+            return measurementDetailsRepository.save(detail);
+        } else throw new InvalidNonExistingIdException(
+                String.format("Already exists a detail with key %s referring to measurement %s ", detail.getKey(),
+                        detail.getMeasurement().getId()));
     }
 
 
@@ -303,4 +316,6 @@ public class MeasurementService {
             return list;
         else throw new NotFoundException("No tags found");
     }
+
+
 }

@@ -81,7 +81,7 @@ public class MeasurementDAOResponse {
             }
 
             if (details != null && !details.isEmpty()) {
-                HashMap<String, String> detailsDao = details.stream()
+                HashMap<String, String> detailsDao = details.stream().filter(it->it.getValue()!=null)
                         .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
                                 (prev, next) -> next, HashMap::new));
 
@@ -89,7 +89,7 @@ public class MeasurementDAOResponse {
             } else {
 //                measurement.getDetails() -> sometimes its sometimes it's null...
                 if (measurement.getDetails() != null) {
-                    HashMap<String, String> detailsDao = measurement.getDetails().stream()
+                    HashMap<String, String> detailsDao = measurement.getDetails().stream().filter(it->it.getValue()!=null)
                             .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
                                     (prev, next) -> next, HashMap::new));
                     dao.setMeasurementDetails(detailsDao);

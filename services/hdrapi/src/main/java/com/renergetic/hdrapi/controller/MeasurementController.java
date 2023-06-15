@@ -227,6 +227,18 @@ public class MeasurementController {
             @RequestBody MeasurementDetails detail) {
 //TODO check privileges
         boolean res = measurementSv.setProperty(measurementId, detail);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+
+    }
+    @Operation(summary = "Insert Details for Measurement")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "{measurement_id}/properties", produces = "application/json")
+    public ResponseEntity<Boolean> setMeasurementProperties(
+            @PathVariable(name = "measurement_id") Long measurementId,
+            @RequestBody Map<String,String> properties) {
+//TODO check privileges
+
+        boolean res = measurementSv.setProperties(measurementId, properties);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
