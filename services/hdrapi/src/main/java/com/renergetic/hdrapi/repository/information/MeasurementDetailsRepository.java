@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.repository.information;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,8 @@ public interface MeasurementDetailsRepository extends JpaRepository<MeasurementD
 	MeasurementDetails save(MeasurementDetails information);
 
 	List<MeasurementDetails> findByMeasurementId(long resource_id);
+
+    boolean existsByKeyAndMeasurementId(String key, Long id);
+
+    Optional<MeasurementDetails> findByKeyAndMeasurementId(String key, Long id);
 }

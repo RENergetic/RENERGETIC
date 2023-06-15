@@ -54,6 +54,20 @@ INSERT INTO measurement(
     (2031, 'energy_produced', 'pv', 'electricity', 'out', 8, 3, 'all_inverters', NULL, NULL, NULL, '2'),
     (2032, 'heat_lost', 'heat_meter', 'heat', 'out', 17, 2, NULL, NULL, NULL, NULL, '2'),
     (2033, 'current_power', 'heat_meter', 'heat', 'in', 6, 3, NULL, NULL, NULL, NULL, '2');
+
+INSERT INTO measurement_details(
+    id, measurement_id, key, value)
+    VALUES (1, 2000, 'cumulative', 'true'),
+    (2, 2001, 'cumulative', 'true'),
+    (3, 2002, 'cumulative', 'true'),
+    (4, 2003, 'cumulative', 'true'),
+    (5, 2004, 'cumulative', 'true'),
+    (6, 2005, 'cumulative', 'true'),
+    (7, 2006, 'cumulative', 'true'),
+    (8, 2007, 'cumulative', 'true'),
+    (9, 2026, 'cumulative', 'true'),
+    (10, 2027, 'cumulative', 'true'),
+    (11, 2032, 'cumulative', 'true');
     
 INSERT INTO tags(
     id, key, value)
