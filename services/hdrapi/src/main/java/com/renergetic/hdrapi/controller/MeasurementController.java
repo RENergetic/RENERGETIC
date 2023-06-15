@@ -323,6 +323,18 @@ public class MeasurementController {
         return new ResponseEntity<>(_type, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Set dashboard visibility")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Measurement type updated"),
+            @ApiResponse(responseCode = "400", description = "Error saving Measurement type")
+    })
+    @PostMapping(path = "/type/{id}/dashboard/{visibility}", produces = "application/json")
+    public ResponseEntity<Boolean> setDashboardVisibility(@PathVariable("id") Long id,
+                                               @PathVariable("visibility") Boolean visibility) {
+//todo check privileges
+        var currentFeatured = measurementSv.setDashboardVisibility(id, visibility);
+        return new ResponseEntity<>(currentFeatured, currentFeatured == visibility ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
 //=== PUT REQUESTS====================================================================================
 
     @Operation(summary = "Update a existing Measurement")

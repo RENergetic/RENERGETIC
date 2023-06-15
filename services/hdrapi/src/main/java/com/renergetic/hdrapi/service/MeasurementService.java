@@ -2,6 +2,7 @@ package com.renergetic.hdrapi.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +63,8 @@ public class MeasurementService {
         if (id != null && measurementRepository.existsById(id)) {
             var m = measurementRepository.getById(id);
             m.getDetails().forEach((it) -> measurementDetailsRepository.delete(it));
-            measurementTagsRepository.findByMeasurementId(m.getId()).forEach((it) -> measurementTagsRepository.delete(it));
+            measurementTagsRepository.findByMeasurementId(m.getId()).forEach(
+                    (it) -> measurementTagsRepository.delete(it));
             measurementRepository.deleteById(id);
             return true;
         } else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
@@ -140,6 +142,15 @@ public class MeasurementService {
                     "Already exists a measurement type with ID " + type.getId());
 
         return measurementTypeRepository.save(type);
+    }
+
+    public Boolean setDashboardVisibility(long id, boolean visibility) {
+        Optional<MeasurementType> type = measurementTypeRepository.findById(id);
+        if (type.isEmpty())
+            throw new InvalidCreationIdAlreadyDefinedException("Already exists a measurement type with ID " + id);
+        MeasurementType entity = type.get();
+        entity.setDashboardVisibility(visibility);
+        return measurementTypeRepository.save(entity).getDashboardVisibility();
     }
 
     public MeasurementType updateType(MeasurementType detail, Long id) {
