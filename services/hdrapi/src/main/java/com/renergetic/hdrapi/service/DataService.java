@@ -112,8 +112,9 @@ public class DataService {
                     ret.putCurrent(function, measurement.getId().toString(), null);
 
                     // GET ASSETS RELATED WITH THE MEASUREMENT (If the assets is a energy island and there isn't category it doesn't filter by asset)
-                    if (measurement.getAsset() != null && !measurement.getAsset().getType().getName().equalsIgnoreCase(
-                            "energy_island"))
+
+                    if (measurement.getAsset() != null && measurement.getAsset().getType() != null && 
+                        !measurement.getAsset().getType().getName().equalsIgnoreCase("energy_island"))
                         assetNames.add(measurement.getAsset().getName());
                     if (measurement.getAssetCategory() != null)
                         assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
@@ -145,7 +146,9 @@ public class DataService {
                                 .collect(Collectors.toMap(Details::getKey, Details::getValue)));
 
                     // PARSE TO NON CUMULATIVE DATA IF THE MEASUREMENT IS CUMULATIVE
-                    MeasurementDetails cumulative = measurement.getDetails().stream().filter(details -> details.getKey().equalsIgnoreCase("cumulative")).findFirst().orElse(null);
+                    MeasurementDetails cumulative = null;
+                    if (measurement.getDetails() != null)
+                        cumulative = measurement.getDetails().stream().filter(details -> details.getKey().equalsIgnoreCase("cumulative")).findFirst().orElse(null);
 
                     if (cumulative == null && cumulativeTypes.contains(measurement.getType().getPhysicalName())) {
                         params.put("performDecumulation", "true");
