@@ -67,8 +67,8 @@ INSERT INTO measurement_details(
     (8, 2007, 'cumulative', 'true'),
     (9, 2026, 'cumulative', 'true'),
     (10, 2027, 'cumulative', 'true'),
-    (10, 2031, 'cumulative', 'true'),
-    (11, 2032, 'cumulative', 'true');
+    (11, 2031, 'cumulative', 'true'),
+    (12, 2032, 'cumulative', 'true');
     
 INSERT INTO tags(
     id, key, value)
