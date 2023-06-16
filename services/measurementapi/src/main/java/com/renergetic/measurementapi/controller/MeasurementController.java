@@ -77,7 +77,7 @@ public class MeasurementController {
 				.collect(
 						Collectors.toMap(
 								entry -> entry.getKey(), 
-								entry -> Arrays.stream(entry.getValue().split(",")).map(value -> value.trim()).collect(Collectors.toList())
+								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
 								)
 						); 
 		
@@ -133,7 +133,8 @@ public class MeasurementController {
 			@RequestParam("bucket") Optional<String> bucket,
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
-			@RequestParam(name = "dashboardId") Optional<String> dashboardId){
+			@RequestParam(name = "dashboardId") Optional<String> dashboardId,
+			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation){
 		
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -143,6 +144,7 @@ public class MeasurementController {
 		tags.remove("to");
 		tags.remove("hideNotFound");
 		tags.remove("dashboardId");
+		tags.remove("performDecumulation");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -152,7 +154,7 @@ public class MeasurementController {
 								)
 						); 
 		
-		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time");
+		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", performDecumulation.orElse(false));
 
 		if(dashboardId.isPresent() && fields.size() == 1){
 			ret = convertService.convert(ret, dashboardId.get(), fields, null);
@@ -179,7 +181,8 @@ public class MeasurementController {
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
 			@PathVariable(name = "function") String function,
-			@RequestParam(name = "dashboardId") Optional<String> dashboardId){
+			@RequestParam(name = "dashboardId") Optional<String> dashboardId,
+			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation){
 
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -192,6 +195,7 @@ public class MeasurementController {
 		tags.remove("to");
 		tags.remove("hideNotFound");
 		tags.remove("dashboardId");
+		tags.remove("performDecumulation");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -201,7 +205,7 @@ public class MeasurementController {
 								)
 						); 
 
-		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""), byMeasurement.orElse(false), toFloat.orElse(false));
+		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""), byMeasurement.orElse(false), toFloat.orElse(false), performDecumulation.orElse(false));
 
 		//We only apply conversion if there is one field. as functions and grouping on multiple fields will cause issues.
 		if(dashboardId.isPresent() && fields.size() == 1){

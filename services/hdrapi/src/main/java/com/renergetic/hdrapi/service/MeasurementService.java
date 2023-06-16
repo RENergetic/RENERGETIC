@@ -2,6 +2,7 @@ package com.renergetic.hdrapi.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +63,8 @@ public class MeasurementService {
         if (id != null && measurementRepository.existsById(id)) {
             var m = measurementRepository.getById(id);
             m.getDetails().forEach((it) -> measurementDetailsRepository.delete(it));
-            measurementTagsRepository.findByMeasurementId(m.getId()).forEach((it) -> measurementTagsRepository.delete(it));
+            measurementTagsRepository.findByMeasurementId(m.getId()).forEach(
+                    (it) -> measurementTagsRepository.delete(it));
             measurementRepository.deleteById(id);
             return true;
         } else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
@@ -78,6 +80,14 @@ public class MeasurementService {
     public boolean setProperty(Long measurementId, MeasurementDetails details) {
 
         return measurementRepository.setProperty(measurementId, details.getKey(), details.getValue()) == 1;
+    }
+
+    public boolean setProperties(Long measurementId, Map<String, String> properties) {
+        this.getById(measurementId);//check is exists
+        Optional<Boolean> any = properties.entrySet().stream().map(it ->
+                measurementRepository.setProperty(measurementId, it.getKey(), it.getValue()) != 1
+        ).filter(it -> it).findAny();
+        return any.isEmpty();
     }
 
     public List<MeasurementDAOResponse> getByProperty(String key, String value, long offset, long limit) {
@@ -140,6 +150,15 @@ public class MeasurementService {
                     "Already exists a measurement type with ID " + type.getId());
 
         return measurementTypeRepository.save(type);
+    }
+
+    public Boolean setDashboardVisibility(long id, boolean visibility) {
+        Optional<MeasurementType> type = measurementTypeRepository.findById(id);
+        if (type.isEmpty())
+            throw new InvalidCreationIdAlreadyDefinedException("Already exists a measurement type with ID " + id);
+        MeasurementType entity = type.get();
+        entity.setDashboardVisibility(visibility);
+        return measurementTypeRepository.save(entity).getDashboardVisibility();
     }
 
     public MeasurementType updateType(MeasurementType detail, Long id) {
@@ -236,17 +255,24 @@ public class MeasurementService {
 
     // MEASUREMENTDETAILS CRUD OPERATIONS
     public MeasurementDetails saveDetail(MeasurementDetails detail) {
-        if (detail.getId() != null && measurementDetailsRepository.existsById(detail.getId()))
-            throw new InvalidCreationIdAlreadyDefinedException("Already exists a detail with ID " + detail.getId());
+        detail.setId(null);
+        if (measurementDetailsRepository.existsByKeyAndMeasurementId(detail.getKey(), detail.getMeasurement().getId()))
+            throw new InvalidCreationIdAlreadyDefinedException(
+                    String.format("Already exists a detail with key %s referring to measurement %s ", detail.getKey(),
+                            detail.getMeasurement().getId()));
 
         return measurementDetailsRepository.save(detail);
     }
 
-    public MeasurementDetails updateDetail(MeasurementDetails detail, Long id) {
-        if (id != null && measurementDetailsRepository.existsById(id)) {
-            detail.setId(id);
+    public MeasurementDetails updateDetail(MeasurementDetails detail) {
+        MeasurementDetails entity = measurementDetailsRepository.findByKeyAndMeasurementId(detail.getKey(),
+                detail.getMeasurement().getId()).orElse(null);
+        if (entity != null) {
+            detail.setId(entity.getId());
             return measurementDetailsRepository.save(detail);
-        } else throw new InvalidNonExistingIdException("No measurement details with id " + id + "found");
+        } else throw new InvalidNonExistingIdException(
+                String.format("Already exists a detail with key %s referring to measurement %s ", detail.getKey(),
+                        detail.getMeasurement().getId()));
     }
 
 
@@ -290,4 +316,6 @@ public class MeasurementService {
             return list;
         else throw new NotFoundException("No tags found");
     }
+
+
 }

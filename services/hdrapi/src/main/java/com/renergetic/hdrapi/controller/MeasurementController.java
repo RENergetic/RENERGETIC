@@ -163,8 +163,8 @@ public class MeasurementController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "Measurements havent details or doesn't exists")
     })
-    @GetMapping(path = "{id}/info", produces = "application/json")
-    public ResponseEntity<List<MeasurementDetails>> getInformationMeasurement(@PathVariable Long id) {
+    @GetMapping(path = "{measurement_id}/info", produces = "application/json")
+    public ResponseEntity<List<MeasurementDetails>> getInformationMeasurement(@PathVariable("measurement_id") Long id) {
         List<MeasurementDetails> info = null;
 
         info = measurementSv.getDetailsByMeasurementId(id);
@@ -174,14 +174,14 @@ public class MeasurementController {
         return new ResponseEntity<List<MeasurementDetails>>(info, info != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    @Operation(summary = "Insert Details for a Measurement")
+    @Operation(summary = "Insert measurement detail's property")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Details saved correctly"),
             @ApiResponse(responseCode = "500", description = "Error saving details")
     })
-    @PostMapping(path = "{id}/info", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<MeasurementDetails> insertInformation(@RequestBody MeasurementDetails detail,
-                                                                @PathVariable Long id) {
+    @PostMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<MeasurementDetails> saveProperty(@RequestBody MeasurementDetails detail,
+                                                                @PathVariable("measurement_id") Long id) {
         Measurement measurement = new Measurement();
         measurement.setId(id);
         detail.setMeasurement(measurement);
@@ -189,21 +189,6 @@ public class MeasurementController {
         return new ResponseEntity<>(_detail, HttpStatus.CREATED);
     }
 
-    //	@Operation(summary = "Update Information from its id")
-//	@ApiResponses({
-//		@ApiResponse(responseCode = "200", description = "Details saved correctly"),
-//		@ApiResponse(responseCode = "400", description = "Path isn't valid"),
-//		@ApiResponse(responseCode = "404", description = "Detail not exist"),
-//		@ApiResponse(responseCode = "500", description = "Error saving information")
-//	})
-//	@PutMapping(path = "{measurement_id}/info/{info_id}", produces = "application/json", consumes = "application/json")
-//	public ResponseEntity<MeasurementDetails> updateInformation (@RequestBody MeasurementDetails detail, @PathVariable Long measurement_id, @PathVariable Long info_id){
-//		Measurement measurement = new Measurement();
-//		measurement.setId(measurement_id);
-//		detail.setMeasurement(measurement);
-//		MeasurementDetails _detail = measurementSv.updateDetail(detail, info_id);
-//		return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-//	}
     @Operation(summary = "Update measurement detail's property")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Details saved correctly"),
@@ -212,13 +197,12 @@ public class MeasurementController {
             @ApiResponse(responseCode = "500", description = "Error saving information")
     })
     @PutMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<Boolean> updateProperty(@RequestBody MeasurementDetails detail,
-                                                  @PathVariable Long measurement_id) {
+    public ResponseEntity<MeasurementDetails> updateProperty(@RequestBody MeasurementDetails detail,
+                                                  @PathVariable("measurement_id") Long id) {
         Measurement measurement = new Measurement();
-        measurement.setId(measurement_id);
+        measurement.setId(id);
         detail.setMeasurement(measurement);
-        boolean res = measurementSv.setProperty(measurement_id, detail);
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return ResponseEntity.ok(measurementSv.updateDetail(detail));
     }
 
     @Operation(summary = "Delete Information from its id")
@@ -243,6 +227,18 @@ public class MeasurementController {
             @RequestBody MeasurementDetails detail) {
 //TODO check privileges
         boolean res = measurementSv.setProperty(measurementId, detail);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+
+    }
+    @Operation(summary = "Insert Details for Measurement")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "{measurement_id}/properties", produces = "application/json")
+    public ResponseEntity<Boolean> setMeasurementProperties(
+            @PathVariable(name = "measurement_id") Long measurementId,
+            @RequestBody Map<String,String> properties) {
+//TODO check privileges
+
+        boolean res = measurementSv.setProperties(measurementId, properties);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
@@ -323,6 +319,18 @@ public class MeasurementController {
         return new ResponseEntity<>(_type, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Set dashboard visibility")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Measurement type updated"),
+            @ApiResponse(responseCode = "400", description = "Error saving Measurement type")
+    })
+    @PostMapping(path = "/type/{id}/dashboard/{visibility}", produces = "application/json")
+    public ResponseEntity<Boolean> setDashboardVisibility(@PathVariable("id") Long id,
+                                               @PathVariable("visibility") Boolean visibility) {
+//todo check privileges
+        var currentFeatured = measurementSv.setDashboardVisibility(id, visibility);
+        return new ResponseEntity<>(currentFeatured, currentFeatured == visibility ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
 //=== PUT REQUESTS====================================================================================
 
     @Operation(summary = "Update a existing Measurement")
