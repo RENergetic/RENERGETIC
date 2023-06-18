@@ -74,6 +74,7 @@ public class MeasurementDAOResponse {
             dao.setDirection(measurement.getDirection());
             if (func != null)
                 dao.setFunction(InfluxFunction.obtain(func));
+            else dao.setFunction(InfluxFunction.last);
 //            if (measurement.getFunction() != null)f
 //                dao.setFunction(InfluxFunction.obtain(measurement.getFunction()));
 //            else dao.setFunction(InfluxFunction.last);

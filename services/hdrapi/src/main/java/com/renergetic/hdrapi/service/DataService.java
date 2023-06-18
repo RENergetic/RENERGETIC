@@ -96,7 +96,7 @@ public class DataService {
     public DataDAO getData(Collection<Measurement> measurements, Long from, Optional<Long> to) {
         if (generateDummy) {
             return dummyDataGenerator.getData(
-                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(
+                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null,"last")).collect(
                             Collectors.toList()));
         } else {
             DataDAO ret = new DataDAO();
@@ -189,7 +189,7 @@ public class DataService {
     public TimeseriesDAO getTimeseries(Collection<Measurement> measurements, Long from, Optional<Long> to) {
         if (generateDummy) {
             return dummyDataGenerator.getTimeseries(
-                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(Collectors.toList()),
+                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null,null)).collect(Collectors.toList()),
                     from, to);
         } else {
         	Map<String, JSONArray> responses = new HashMap<>();
