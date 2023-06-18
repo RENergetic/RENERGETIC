@@ -84,7 +84,7 @@ public class InformationTileMeasurement {
     public MeasurementDAOResponse getMeasurementDAO() {
         if (measurement != null) {
             measurement.setFunction(function);
-            return MeasurementDAOResponse.create(measurement, measurement.getDetails());
+            return MeasurementDAOResponse.create(measurement, measurement.getDetails(),function);
         }
         var dao = new MeasurementDAOResponse();
         dao.setId(null);
