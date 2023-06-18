@@ -99,7 +99,7 @@ public class MeasurementController {
         var measurement = measurementSv.getById(id);
         MeasurementDAOResponse daoResponse = null;
         if (measurement != null)
-            daoResponse = MeasurementDAOResponse.create(measurement, null);
+            daoResponse = MeasurementDAOResponse.create(measurement, null,null);
 
 
         return new ResponseEntity<>(daoResponse,

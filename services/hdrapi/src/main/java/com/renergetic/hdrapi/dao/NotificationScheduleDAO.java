@@ -74,7 +74,7 @@ public class NotificationScheduleDAO {
             dao.setDateFrom(DateConverter.toEpoch(notification.getDateFrom()));
             dao.setDateTo(DateConverter.toEpoch(notification.getDateTo()));
             if (notification.getMeasurement() != null) {
-                dao.setMeasurement(MeasurementDAOResponse.create(notification.getMeasurement(), null));
+                dao.setMeasurement(MeasurementDAOResponse.create(notification.getMeasurement(), null,null));
             }
             dao.setValue(notification.getNotificationValue());
             if (notification.getAsset() != null)
