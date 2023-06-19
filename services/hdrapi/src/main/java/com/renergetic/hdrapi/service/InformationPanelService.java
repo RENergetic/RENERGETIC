@@ -279,7 +279,7 @@ public class InformationPanelService {
                                             tileM -> tileM.getMeasurement() == null
                                                     && panel.get().getIsTemplate() && assetId != null
                                                     && tileM.getAssetCategory() == null ?
-                                                    getInferredMeasurements(tileM, assetId, null)
+                                                    getInferredMeasurements(tileM, assetId,  tileM.getFunction())
                                                     : Collections.singletonList(getMeasurementFromTileMeasurement(tileM)))
                                     .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList())
                     )).collect(Collectors.toList())

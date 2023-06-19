@@ -26,10 +26,10 @@ public class MeasurementDAOResponse {
     @JsonProperty(required = false)
     private Long id;
 
-    @JsonProperty(required = true)
+    @JsonProperty(required = false)
     private String name;
 
-    @JsonProperty(value = "sensor_name", required = true)
+    @JsonProperty(value = "sensor_name", required = false)
     private String sensorName;
 
     @JsonProperty(required = false)
