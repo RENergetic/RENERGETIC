@@ -34,7 +34,7 @@ public class Restrictions {
 			// Check if tags are valid
 			if (isValid) {
 				measurement.getTags().forEach((key, value) -> {
-					if (restrictions.getTags().containsKey(key)) {
+					if (key != null && restrictions.getTags().containsKey(key)) {
 						String valueFilter = restrictions.getTags().get(key);
 						if (valueFilter != null && !value.matches(valueFilter))
 							errors.add(String.format("'%s' isn't a valid value to the tag '%s'", value, key));
@@ -54,7 +54,7 @@ public class Restrictions {
 					if (!key.equals("time")) {
 						FieldRestrictionsDAO restriction = restrictions.getFields().stream().filter(fieldRestr -> fieldRestr.getName().equals(key)).findAny().orElse(null);
 						if (restriction != null) {
-							if (!restriction.getType().validate(value) || !(restriction.getFormat() == null || value.matches(restriction.getFormat())))
+							if (Boolean.TRUE.equals(!restriction.getType().validate(value)) || !(restriction.getFormat() == null || value.matches(restriction.getFormat())))
 								errors.add(String.format("'%s' isn't a valid value to field '%s'", value, key));
 						} else {
 							errors.add(String.format("'%s' isn't a valid field name", key));
@@ -79,7 +79,7 @@ public class Restrictions {
 		
 		// CHECK IF IS A NULL
 		if (value == null)
-			field = new AbstractMap.SimpleEntry<>(key, null);
+			field = new AbstractMap.SimpleEntry<>(key, "none");
 		// CHECK IF IS A BOOLEAN
 		else if (fieldRestrictions.get(key) == PrimitiveType.BOOLEAN && value.matches("(true)"))
 			field = new AbstractMap.SimpleEntry<>(key, true);
