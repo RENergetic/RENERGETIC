@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,8 @@ import com.renergetic.ingestionapi.dao.FieldRestrictionsDAO;
 import com.renergetic.ingestionapi.dao.MeasurementDAO;
 import com.renergetic.ingestionapi.dao.RestrictionsDAO;
 import com.renergetic.ingestionapi.exception.ConnectionException;
+import com.renergetic.ingestionapi.model.Measurement;
+import com.renergetic.ingestionapi.model.MeasurementType;
 import com.renergetic.ingestionapi.model.PrimitiveType;
 import com.renergetic.ingestionapi.model.Request;
 import com.renergetic.ingestionapi.model.RequestError;
@@ -59,7 +62,7 @@ public class MeasurementService {
 				// Create a list of entries to save
 				Map<MeasurementDAO, Boolean> checkedMeasurements = Restrictions.check(measurements, restrictions);
 				checkedMeasurements.forEach((key, value) -> {
-					if (value) {		
+					if (key != null && value != null) {	
 						Point registry = Point.measurement(key.getMeasurement());	
 						
 						if (key.getFields().containsKey("time")) {
@@ -73,7 +76,11 @@ public class MeasurementService {
 						} else
 							registry.time(System.currentTimeMillis(), WritePrecision.MS);
 						
-						registry.addTags(key.getTags());
+						if (key.getTags() != null) {
+							key.getTags().replaceAll((tagKey, tagValue) -> tagValue != null? tagValue: "none");
+							registry.addTags(key.getTags());
+						}
+						
 						key.getFields().forEach((fieldKey, fieldValue)-> {
 							if (!fieldKey.equalsIgnoreCase("time")) {
 								Entry<String, ?> field = Restrictions.parseField(fieldKey, fieldValue, restrictions);
@@ -128,7 +135,7 @@ public class MeasurementService {
 	}
 	
 	public List<String> getMeasurementNames(){
-		return repository.findByAssetIsNullAndAssetCategoryIsNull().stream().map(measurement -> measurement.getName()).collect(Collectors.toList());
+		return repository.findByAssetIsNullAndAssetCategoryIsNull().stream().map(Measurement::getSensorName).collect(Collectors.toList());
 //				Arrays.asList(new String[]{"heat_pump", "energy_meter", "pv", "battery", "hot_water", "cold_water",
 //				"weather", "heat_exchange", "cooling_circuits", "chiller", "heat_meter", "dh_temperature",
 //				"dhw_temperature", "tapping_water", "thermostate", "temperature", "cpu", "renewability"});

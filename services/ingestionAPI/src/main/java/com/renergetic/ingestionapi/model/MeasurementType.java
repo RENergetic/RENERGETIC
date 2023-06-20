@@ -29,6 +29,10 @@ public class MeasurementType {
 	@JsonProperty(required = true)
 	private String name;
 	
+	@Column(name = "physical_name", nullable = false, insertable = true, updatable = true )
+	@JsonProperty(required = true,value = "physical_name")
+	private String physicalName;
+	
 	@Column(name = "label", nullable = true, insertable = true, updatable = true)
 	@JsonProperty(required = false)
 	private String label;
