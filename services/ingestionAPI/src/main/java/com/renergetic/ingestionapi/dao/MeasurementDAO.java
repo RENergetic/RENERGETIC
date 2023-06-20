@@ -19,7 +19,6 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @ToString
 public class MeasurementDAO {
-	@Nonnull
 	String measurement;
 	Map<String, String> fields;
 	Map<String, String> tags;
