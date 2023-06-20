@@ -63,6 +63,7 @@ public class MeasurementService {
 				Map<MeasurementDAO, Boolean> checkedMeasurements = Restrictions.check(measurements, restrictions);
 				checkedMeasurements.forEach((key, value) -> {
 					if (key != null && value != null) {	
+						this.addDefaultTags(key);
 						Point registry = Point.measurement(key.getMeasurement());	
 						
 						if (key.getFields().containsKey("time")) {
@@ -166,5 +167,23 @@ public class MeasurementService {
 		List<Tags> tags = tagsRepository.findByMeasurementIdIsNull();
 
 		return tags.stream().collect(HashMap<String, String>::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
+	}
+
+	public void addDefaultTags(MeasurementDAO measurement) {
+		if (measurement != null) {
+			// Measurement type tag
+			Optional<MeasurementType> measurementType = typeRepository.findByName(measurement
+				.getFields()
+				.keySet()
+				.stream()
+				.filter((value) -> !value.equalsIgnoreCase("time"))
+				.findFirst().orElse(null));
+			
+			if (measurementType.isPresent())
+				measurement.getTags().putIfAbsent("measurement_type", measurementType.get().getPhysicalName());
+			else
+				measurement.getTags().putIfAbsent("measurement_type", "default");
+		}
+
 	}
 }
