@@ -120,6 +120,28 @@ then
         kubectl apply -f influx-api-service.yaml --namespace=$project
     fi
 
+    if [[ $kpi = 'true' ]]
+    then
+        cd "${apisPath}/kpiAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/kpi-api/api.jar"
+
+        cd "${current}/docker_config/APIs/kpi-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/kpi-api --namespace=$project
+        kubectl delete services/kpi-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=kpi-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f kpi-api-deployment.yaml --namespace=$project
+        kubectl apply -f kpi-api-service.yaml --namespace=$project
+    fi
+
     if [[ $ingestion = 'true' ]]
     then
         cd "${apisPath}/ingestionAPI"
