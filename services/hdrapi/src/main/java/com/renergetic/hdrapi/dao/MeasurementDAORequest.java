@@ -39,7 +39,7 @@ public class MeasurementDAORequest {
 	@JsonProperty(required = false)
 	private MeasurementType type;
 
-	@JsonProperty(value = "asset_id", required = false)
+	@JsonProperty(value = "asset", required = false)
 	private SimpleAssetDAO asset;
 
 	@JsonProperty(required = false)
