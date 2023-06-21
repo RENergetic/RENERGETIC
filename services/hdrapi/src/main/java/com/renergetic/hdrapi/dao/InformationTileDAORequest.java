@@ -83,7 +83,7 @@ public class InformationTileDAORequest {
                                 Measurement measurement = tileM.getMeasurement();
                                 if (measurement != null)
                                     measurement.setFunction(tileM.getFunction());
-                                return MeasurementDAOResponse.create(measurement, null);
+                                return MeasurementDAOResponse.create(measurement, null,tileM.getFunction());
                             })
                             .collect(Collectors.toList())
             );

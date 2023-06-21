@@ -85,8 +85,8 @@ public class DataService {
 
     }
 
-    public TimeseriesDAO getTileTimeseries(  Long tileId, Long assetId, Long from, Optional<Long> to) {
-        List<Measurement> measurements = informationPanelService.getTileMeasurements(  tileId, assetId,null);
+    public TimeseriesDAO getTileTimeseries(Long tileId, Long assetId, Long from, Optional<Long> to) {
+        List<Measurement> measurements = informationPanelService.getTileMeasurements(tileId, assetId, null);
         TimeseriesDAO res = this.getTimeseries(measurements, from, to);
         return res;
 
@@ -96,8 +96,9 @@ public class DataService {
     public DataDAO getData(Collection<Measurement> measurements, Long from, Optional<Long> to) {
         if (generateDummy) {
             return dummyDataGenerator.getData(
-                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(
-                            Collectors.toList()));
+                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null,
+                                    m.getFunction() != null ? m.getFunction() : "last"))
+                            .collect(Collectors.toList()));
         } else {
             DataDAO ret = new DataDAO();
             Set<Thread> threads = new HashSet<>();
@@ -129,7 +130,7 @@ public class DataService {
                     if (to != null && to.isPresent())
                         params.put("to", to.get().toString());
                     if (measurement.getName() != null)
-                    	params.put("measurement_type", measurement.getName());
+                        params.put("measurement_type", measurement.getName());
                     if (measurement.getSensorName() != null)
                         params.put("measurements", measurement.getSensorName());
                     if (measurement.getType() != null)
@@ -148,7 +149,8 @@ public class DataService {
                     // PARSE TO NON CUMULATIVE DATA IF THE MEASUREMENT IS CUMULATIVE
                     MeasurementDetails cumulative = null;
                     if (measurement.getDetails() != null)
-                        cumulative = measurement.getDetails().stream().filter(details -> details.getKey().equalsIgnoreCase("cumulative")).findFirst().orElse(null);
+                        cumulative = measurement.getDetails().stream().filter(
+                            details -> details.getKey().equalsIgnoreCase("cumulative")).findFirst().orElse(null);
 
                     if (cumulative == null && cumulativeTypes.contains(measurement.getType().getPhysicalName())) {
                         params.put("performDecumulation", "true");
@@ -192,15 +194,17 @@ public class DataService {
     public TimeseriesDAO getTimeseries(Collection<Measurement> measurements, Long from, Optional<Long> to) {
         if (generateDummy) {
             return dummyDataGenerator.getTimeseries(
-                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null)).collect(Collectors.toList()),
+                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null, null)).collect(
+                            Collectors.toList()),
                     from, to);
         } else {
-        	Map<String, JSONArray> responses = new HashMap<>();
+            Map<String, JSONArray> responses = new HashMap<>();
             TimeseriesDAO ret = new TimeseriesDAO();
             Set<Thread> threads = new HashSet<>();
-            
-            List<String> types = measurementTypeRepository.findAll().stream().map(MeasurementType::getName).collect(Collectors.toList());
-            
+
+            List<String> types = measurementTypeRepository.findAll().stream().map(MeasurementType::getName).collect(
+                    Collectors.toList());
+
             for (final Measurement measurement : measurements) {
                 Thread thread = new Thread(() -> {
                     Map<String, String> params = new HashMap<>();
@@ -223,7 +227,7 @@ public class DataService {
                     if (to != null && to.isPresent())
                         params.put("to", to.get().toString());
                     if (measurement.getName() != null)
-                    	params.put("measurement_type", measurement.getName());
+                        params.put("measurement_type", measurement.getName());
                     if (measurement.getSensorName() != null)
                         params.put("measurements", measurement.getSensorName());
                     if (measurement.getType() != null)
@@ -257,34 +261,36 @@ public class DataService {
                     e.printStackTrace();
                 }
             });
-            
+
             Map<Long, Map<String, Double>> formattedResponse = new TreeMap<>();
             responses.forEach((measurementId, response) -> {
-    			if (response.length() > 0) {
-    				response.forEach(obj -> {
+                if (response.length() > 0) {
+                    response.forEach(obj -> {
                         if (obj instanceof JSONObject) {
                             JSONObject json = ((JSONObject) obj).getJSONObject("fields");
-                            
+
                             for (String type : types) {
-                            	if (json.has(type)) {
+                                if (json.has(type)) {
                                     Long timestamp = DateConverter.toEpoch(json.getString("time"));
-                                    
+
                                     if (!formattedResponse.containsKey(timestamp)) {
-			                            formattedResponse.put(timestamp, new TreeMap<>());
-			                            
-			                            measurements.forEach(measurement -> {
-			                            	if (measurementId.equals(measurement.getId().toString()))
-			                            		formattedResponse.get(timestamp).put(measurementId, json.getDouble(type));
-			                            	else formattedResponse.get(timestamp).put(measurement.getId().toString(), null);
-			                            });
+                                        formattedResponse.put(timestamp, new TreeMap<>());
+
+                                        measurements.forEach(measurement -> {
+                                            if (measurementId.equals(measurement.getId().toString()))
+                                                formattedResponse.get(timestamp).put(measurementId,
+                                                        json.getDouble(type));
+                                            else formattedResponse.get(timestamp).put(measurement.getId().toString(),
+                                                    null);
+                                        });
                                     } else {
-                                    	formattedResponse.get(timestamp).put(measurementId, json.getDouble(type));
+                                        formattedResponse.get(timestamp).put(measurementId, json.getDouble(type));
                                     }
-                            	}
+                                }
                             }
-                        }    					
-    				});    				
-    			}
+                        }
+                    });
+                }
             });
             ret.setTimestamps(new ArrayList<>(formattedResponse.keySet()));
             ret.setCurrent(Basic.combineMaps(formattedResponse.values()));

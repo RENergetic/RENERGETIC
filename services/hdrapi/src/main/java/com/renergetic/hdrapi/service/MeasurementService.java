@@ -56,7 +56,7 @@ public class MeasurementService {
 
         Measurement measurementEntity = measurement.mapToEntity();
         measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null);
+        return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null, null);
     }
 
     public boolean deleteById(Long id) {
@@ -73,7 +73,7 @@ public class MeasurementService {
     public MeasurementDAOResponse update(MeasurementDAORequest measurement, Long id) {
         if (id != null && measurementRepository.existsById(id)) {
             measurement.setId(id);
-            return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null);
+            return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null, null);
         } else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
     }
 
@@ -96,7 +96,7 @@ public class MeasurementService {
         List<MeasurementDAOResponse> list;
         list = stream
                 .map(measurement -> MeasurementDAOResponse.create(measurement,
-                        measurementDetailsRepository.findByMeasurementId(measurement.getId())))
+                        measurementDetailsRepository.findByMeasurementId(measurement.getId()), null))
                 .collect(Collectors.toList());
         return list;
     }
@@ -125,12 +125,12 @@ public class MeasurementService {
 
                         return equals;
                     }).map(measurement -> MeasurementDAOResponse.create(measurement,
-                            measurementDetailsRepository.findByMeasurementId(measurement.getId())))
+                            measurementDetailsRepository.findByMeasurementId(measurement.getId()), null))
                     .collect(Collectors.toList());
         else
             list = stream
                     .map(measurement -> MeasurementDAOResponse.create(measurement,
-                            measurementDetailsRepository.findByMeasurementId(measurement.getId())))
+                            measurementDetailsRepository.findByMeasurementId(measurement.getId()), null))
                     .collect(Collectors.toList());
 
         if (list != null && list.size() > 0)

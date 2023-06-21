@@ -26,10 +26,10 @@ public class MeasurementDAOResponse {
     @JsonProperty(required = false)
     private Long id;
 
-    @JsonProperty(required = true)
+    @JsonProperty(required = false)
     private String name;
 
-    @JsonProperty(value = "sensor_name", required = true)
+    @JsonProperty(value = "sensor_name", required = false)
     private String sensorName;
 
     @JsonProperty(required = false)
@@ -58,7 +58,8 @@ public class MeasurementDAOResponse {
 
 //	private transient InformationTileMeasurement categoryQuery;
 
-    public static MeasurementDAOResponse create(Measurement measurement, List<MeasurementDetails> details) {
+    public static MeasurementDAOResponse create(Measurement measurement, List<MeasurementDetails> details,
+                                                String func) {
         MeasurementDAOResponse dao = null;
 
         if (measurement != null) {
@@ -71,9 +72,12 @@ public class MeasurementDAOResponse {
             dao.setLabel(measurement.getLabel());
             dao.setDomain(measurement.getDomain());
             dao.setDirection(measurement.getDirection());
-            if (measurement.getFunction() != null)
-                dao.setFunction(InfluxFunction.obtain(measurement.getFunction()));
+            if (func != null)
+                dao.setFunction(InfluxFunction.obtain(func));
             else dao.setFunction(InfluxFunction.last);
+//            if (measurement.getFunction() != null)f
+//                dao.setFunction(InfluxFunction.obtain(measurement.getFunction()));
+//            else dao.setFunction(InfluxFunction.last);
             if (measurement.getAssetCategory() != null)
                 dao.setCategory(measurement.getAssetCategory().getName());
             if (measurement.getAsset() != null) {
@@ -81,7 +85,7 @@ public class MeasurementDAOResponse {
             }
 
             if (details != null && !details.isEmpty()) {
-                HashMap<String, String> detailsDao = details.stream().filter(it->it.getValue()!=null)
+                HashMap<String, String> detailsDao = details.stream().filter(it -> it.getValue() != null)
                         .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
                                 (prev, next) -> next, HashMap::new));
 
@@ -89,9 +93,10 @@ public class MeasurementDAOResponse {
             } else {
 //                measurement.getDetails() -> sometimes its sometimes it's null...
                 if (measurement.getDetails() != null) {
-                    HashMap<String, String> detailsDao = measurement.getDetails().stream().filter(it->it.getValue()!=null)
-                            .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
-                                    (prev, next) -> next, HashMap::new));
+                    HashMap<String, String> detailsDao =
+                            measurement.getDetails().stream().filter(it -> it.getValue() != null)
+                                    .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
+                                            (prev, next) -> next, HashMap::new));
                     dao.setMeasurementDetails(detailsDao);
                 } else {
                     dao.setMeasurementDetails(new HashMap<>());

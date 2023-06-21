@@ -161,7 +161,7 @@ public class DummyDataGenerator {
                 Page<Measurement> ml = measurementRepository.findAll(new OffSetPaging(0, 100));
                 int idx = random.nextInt(ml.getContent().size());
                 Measurement measurement = ml.getContent().get(idx);
-                not.setMeasurement(MeasurementDAOResponse.create(measurement, null));
+                not.setMeasurement(MeasurementDAOResponse.create(measurement, null,null));
                 not.setAsset(SimpleAssetDAO.create(measurement.getAsset()));
                 not.setValue(getMeasurementValue(measurement));
                 Date dt = new Date((new Date()).getTime() + (3600 * 1000));

@@ -92,7 +92,7 @@ public class AssetService {
                 measurementId != null && measurementRepository.existsById(measurementId)) {
             Measurement measurement = measurementRepository.findById(measurementId).get();
 
-            return MeasurementDAOResponse.create(measurementRepository.save(measurement), null);
+            return MeasurementDAOResponse.create(measurementRepository.save(measurement), null,null);
 
         } else throw new InvalidNonExistingIdException(
                 assetRepository.existsById(assetId) ? "The measurement doesn't exists" : "The asset doesn't exists");
@@ -171,7 +171,7 @@ public class AssetService {
             if (measurements != null && measurements.size() > 0)
                 return measurements.stream()
                         .map(obj -> MeasurementDAOResponse.create(obj,
-                                measurementDetailsRepository.findByMeasurementId(obj.getId())))
+                                measurementDetailsRepository.findByMeasurementId(obj.getId()),null))
                         .collect(Collectors.toList());
             else return new ArrayList<>();
         }
