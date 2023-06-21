@@ -21,6 +21,7 @@ postgreSQL=$(grep -ioP "(postgreSQL\s*=\s*)\K.+" _installers.properties)
 influxDB=$(grep -ioP "(influxDB\s*=\s*)\K.+" _installers.properties)
 # APIs
 hdr=$(grep -ioP "(hdr\s*=\s*)\K.+" _installers.properties)
+kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 # Others
@@ -127,6 +128,29 @@ then
         # create kubernetes resources
         envsubst '$PROJECT' < influx-api-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f influx-api-service.yaml
+    fi
+
+    if [[ $kpi = 'true' ]]
+    then
+        cd "${apisPath}/kpiAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/kpi-api/api.jar"
+
+        cd "${current}/docker_config/APIs/kpi-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/kpi-api
+        kubectl delete services/kpi-api-sv
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/kpi-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/kpi-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < kpi-api-deployment.yaml | kubectl apply --force=true -f -
+        kubectl apply -f kpi-api-service.yaml
     fi
 
     if [[ $ingestion = 'true' ]]

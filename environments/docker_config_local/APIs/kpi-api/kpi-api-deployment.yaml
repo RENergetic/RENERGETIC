@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hdr-api
+  name: kpi-api
 spec:
   selector:
       matchLabels:
-        app: hdr-api
+        app: kpi-api
   replicas: 1
   template:
     metadata:
       labels:
-        app: hdr-api
+        app: kpi-api
     spec:
       containers:
-        - name: hdr-api
-          image: docker-registry.default.svc:5000/${PROJECT}/hdr-api:latest
+        - name: kpi-api
+          image: kpi-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8082
@@ -24,7 +24,7 @@ spec:
               memory: 275Mi
             limits:
               cpu: 300m
-              memory: 550Mi
+              memory: 525Mi
           readinessProbe:
             failureThreshold: 3
             tcpSocket:
