@@ -11,7 +11,7 @@ import com.renergetic.kpiapi.exception.InvalidArgumentException;
 
 public final class DateConverter {
     //TODO: Raul set date format as you wish :)
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static ZoneId getTimezone() {
         return ZoneId.systemDefault();
