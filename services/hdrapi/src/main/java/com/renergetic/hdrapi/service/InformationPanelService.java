@@ -7,6 +7,7 @@ import com.renergetic.hdrapi.exception.NotFoundException;
 import com.renergetic.hdrapi.mapper.InformationPanelMapper;
 import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.model.UUID;
+import com.renergetic.hdrapi.model.details.MeasurementDetails;
 import com.renergetic.hdrapi.repository.*;
 import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
@@ -273,7 +274,7 @@ public class InformationPanelService {
 
         Optional<InformationPanel> panel = informationPanelRepository.findById(panelId);
         if (panel.isPresent()) {
-            InformationPanelDAOResponse p = InformationPanelDAOResponse.create(panel.get(),
+            return InformationPanelDAOResponse.create(panel.get(),
                     panel.get().getTiles().stream().map(tile -> InformationTileDAOResponse.create(tile,
                             tile.getInformationTileMeasurements().stream().map(
                                             tileM -> tileM.getMeasurement() == null
@@ -284,7 +285,6 @@ public class InformationPanelService {
                                     .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList())
                     )).collect(Collectors.toList())
             );
-            return p;
         } else throw new NotFoundException("No information panel  " + panelId + " not found");
     }
 
@@ -353,8 +353,8 @@ public class InformationPanelService {
         if (tileM.getMeasurement() == null) {
             return null;
         }
-        var details = measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId());
-        return MeasurementDAOResponse.create(tileM.getMeasurement(), details,tileM.getFunction());
+        List<MeasurementDetails>  details = measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId());
+        return MeasurementDAOResponse.create(tileM.getMeasurement(), details, tileM.getFunction());
     }
 
 

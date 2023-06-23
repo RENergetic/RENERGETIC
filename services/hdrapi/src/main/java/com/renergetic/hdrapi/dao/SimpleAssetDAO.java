@@ -68,6 +68,7 @@ public class SimpleAssetDAO {
         Asset asset = new Asset();
         asset.setId(id);
         asset.setName(name);
+        asset.setType(type.mapToEntity());
         asset.setLabel(label);
         //asset.setDescription(description);
         asset.setLocation(geoLocation);
