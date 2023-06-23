@@ -55,7 +55,10 @@ INSERT INTO measurement(
     (2032, 'heat_lost', 'heat_meter', 'heat', 'out', 17, 2, NULL, NULL, NULL, NULL, '2'),
     (2033, 'current_power', 'heat_meter', 'heat', 'in', 6, 3, NULL, NULL, NULL, NULL, '2'),
     (2034, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 1, NULL, NULL, NULL, NULL, '2'),
-    (2035, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 1, NULL, NULL, NULL, NULL, '2');
+    (2035, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 1, NULL, NULL, NULL, NULL, '2'),
+    (2036, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 6, NULL, NULL, NULL, NULL, '2'),
+	(2037, 'heat_generated_power', 'heat_meter', 'heat', 'out', 6, 2, NULL, NULL, NULL, NULL, '2'),
+	(2038, 'heat_lost_power', 'heat_meter', 'heat', 'out', 6, 2, NULL, NULL, NULL, NULL, '2');
 
 INSERT INTO measurement_details(
     id, measurement_id, key, value)
@@ -72,7 +75,8 @@ INSERT INTO measurement_details(
     (11, 2031, 'cumulative', 'true'),
     (12, 2032, 'cumulative', 'true'),
     (13, 2034, 'cumulative', 'true'),
-    (14, 2035, 'cumulative', 'true');
+    (14, 2035, 'cumulative', 'true'),
+    (15, 2036, 'cumulative', 'true');
     
 INSERT INTO tags(
     id, key, value)
@@ -119,6 +123,9 @@ INSERT INTO measurement_tags(
     (1000, 2033),
     (1000, 2034),
     (1000, 2035),
+    (1000, 2036),
+	(1000, 2037),
+	(1000, 2038),
     (1001, 2000),
     (1002, 2001),
     (1001, 2002),
@@ -151,4 +158,7 @@ INSERT INTO measurement_tags(
     (1001, 2032),
     (1001, 2033),
     (1001, 2034),
-    (1002, 2035);
+    (1002, 2035),
+    (1001, 2036),
+    (1001, 2037),
+    (1001, 2038);
