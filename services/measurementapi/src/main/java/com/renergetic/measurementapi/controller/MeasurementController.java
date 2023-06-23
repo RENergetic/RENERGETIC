@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.renergetic.measurementapi.model.InfluxTimeAggregation;
 import com.renergetic.measurementapi.service.ConvertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -134,7 +135,9 @@ public class MeasurementController {
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
 			@RequestParam(name = "dashboardId") Optional<String> dashboardId,
-			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation){
+			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation,
+			@RequestParam(name = "timeAggregation") Optional<String> timeAggregation,
+			@RequestParam(name = "timeAggregationFunction") Optional<String> timeAggregationFunction){
 		
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -145,6 +148,8 @@ public class MeasurementController {
 		tags.remove("hideNotFound");
 		tags.remove("dashboardId");
 		tags.remove("performDecumulation");
+		tags.remove("timeAggregation");
+		tags.remove("timeAggregationFunction");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -153,8 +158,9 @@ public class MeasurementController {
 								entry -> Arrays.stream(entry.getValue().split(",")).map(value -> value.trim()).collect(Collectors.toList())
 								)
 						); 
-		
-		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", performDecumulation.orElse(false));
+
+		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time",
+				performDecumulation.orElse(false), InfluxTimeAggregation.obtain(timeAggregation.orElse("")), InfluxFunction.obtain(timeAggregationFunction.orElse("")));
 
 		if(dashboardId.isPresent() && fields.size() == 1){
 			ret = convertService.convert(ret, dashboardId.get(), fields, null);

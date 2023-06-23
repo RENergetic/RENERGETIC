@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import com.renergetic.measurementapi.model.InfluxTimeAggregation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,7 +78,8 @@ public class MeasurementService {
     			registry);
 	}
 
-	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, Boolean performDecumulation) {
+	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String,
+			List<String>> tags, String from, String to, String timeVar, Boolean performDecumulation, InfluxTimeAggregation timeAggregation, InfluxFunction timeAggFunction) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -119,7 +121,10 @@ public class MeasurementService {
 		
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
 		if (performDecumulation)
-			fluxQuery.add("difference(columns: [\"_value\")]");
+			fluxQuery.add("difference(columns: [\"_value\"])");
+
+		if(timeAggregation != null && timeAggFunction != null)
+			fluxQuery.add(String.format("aggregateWindow(every: %s, fn: %s)", timeAggregation.getValue(), timeAggFunction.name().toLowerCase()));
 
 		String flux = fluxQuery.stream().collect(Collectors.joining(" |> "));
 
