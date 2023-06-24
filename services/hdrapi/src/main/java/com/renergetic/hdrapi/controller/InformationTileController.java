@@ -33,6 +33,7 @@ public class InformationTileController {
         return new ResponseEntity<>(informationTileService.getAllByPanelId(panelId, offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
     }
 
+
     @Operation(summary = "Get Tile by id")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),

@@ -95,13 +95,18 @@ public class DummyDataGenerator {
 
     public TimeseriesDAO getTimeseries(Collection<MeasurementDAOResponse> measurements, Long from, Optional<Long> to) {
         TimeseriesDAO data = new TimeseriesDAO();
-        Long dateTo = (new Date()).getTime();
-        Long dateFrom = dateTo - 3600L * 1000L * 24L; //24h
-        Long interval = 300L * 1000L;//  5 min interval, 6 points per hour
-        int points = 24 * 6;
+        Long dateTo = to.isPresent() ? to.get() : (new Date()).getTime();
+        Long dateFrom = from != null ? from : dateTo - 3600L * 1000L * 24L; //24h
+//        Long interval = 300L * 1000L;//  5 min interval, 6 points per hour
+        int points = 500;//24 * 6;
+        long interval = (dateTo - dateFrom) / 500;
         Long[] timestamps = new Long[points];
         for (int i = 0; i < timestamps.length; i++) {
-            timestamps[i] = dateFrom + interval * i;
+            if (i > points * 0.6)
+                timestamps[i] = dateFrom + interval * i;
+            else {
+                timestamps[i] = dateFrom + interval / 10 * i;
+            }
         }
         data.setTimestamps(Arrays.asList(timestamps));
         Map<String, List<Double>> map = new HashMap<>();
@@ -161,7 +166,7 @@ public class DummyDataGenerator {
                 Page<Measurement> ml = measurementRepository.findAll(new OffSetPaging(0, 100));
                 int idx = random.nextInt(ml.getContent().size());
                 Measurement measurement = ml.getContent().get(idx);
-                not.setMeasurement(MeasurementDAOResponse.create(measurement, null,null));
+                not.setMeasurement(MeasurementDAOResponse.create(measurement, null, null));
                 not.setAsset(SimpleAssetDAO.create(measurement.getAsset()));
                 not.setValue(getMeasurementValue(measurement));
                 Date dt = new Date((new Date()).getTime() + (3600 * 1000));

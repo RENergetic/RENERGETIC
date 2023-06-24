@@ -9,6 +9,8 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
+import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -99,6 +101,11 @@ public class MeasurementService {
                         measurementDetailsRepository.findByMeasurementId(measurement.getId()), null))
                 .collect(Collectors.toList());
         return list;
+    }
+
+    public List<MeasurementDAOImpl> list(Long offset, Integer limit) {
+        return measurementRepository.report(offset, limit)
+                .stream().map(MeasurementDAOImpl::create).collect(Collectors.toList());
     }
 
     public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {
@@ -310,11 +317,8 @@ public class MeasurementService {
     }
 
     public List<MeasurementDetails> getDetailsByMeasurementId(Long id) {
-        List<MeasurementDetails> list = measurementDetailsRepository.findByMeasurementId(id);
+      return measurementDetailsRepository.findByMeasurementId(id);
 
-        if (list != null && list.size() > 0)
-            return list;
-        else throw new NotFoundException("No tags found");
     }
 
 

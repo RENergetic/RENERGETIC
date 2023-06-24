@@ -56,6 +56,8 @@ public class MeasurementDAOResponse {
     @JsonProperty(value = "aggregation_function", required = false)
     private InfluxFunction function;
 
+//    @JsonInclude(Include.NON_EMPTY)
+//    @JsonProperty(value = "is_used", required = false)
 //	private transient InformationTileMeasurement categoryQuery;
 
     public static MeasurementDAOResponse create(Measurement measurement, List<MeasurementDetails> details,

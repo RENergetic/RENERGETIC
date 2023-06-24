@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
+import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
 import com.renergetic.hdrapi.model.details.AssetDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -85,6 +87,19 @@ public class MeasurementController {
         if (domain.isPresent()) filters.put("parent", domain.get());
 
         measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20));
+
+        return new ResponseEntity<>(measurements, HttpStatus.OK);
+    }
+    @Operation(summary = "Get All Measurements")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/report", produces = "application/json")
+    public ResponseEntity<List<MeasurementDAOImpl>> listMeasurements(
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit) {
+
+        List<MeasurementDAOImpl> measurements = new ArrayList<>();
+
+        measurements = measurementSv.list( offset.orElse(0L), limit.orElse(1000));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
