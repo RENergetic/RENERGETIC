@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
+import com.renergetic.hdrapi.model.Details;
 import com.renergetic.hdrapi.model.details.AssetDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -90,6 +91,7 @@ public class MeasurementController {
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
+
     @Operation(summary = "Get All Measurements")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/report", produces = "application/json")
@@ -99,7 +101,7 @@ public class MeasurementController {
 
         List<MeasurementDAOImpl> measurements = new ArrayList<>();
 
-        measurements = measurementSv.list( offset.orElse(0L), limit.orElse(1000));
+        measurements = measurementSv.list(offset.orElse(0L), limit.orElse(1000));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
@@ -114,7 +116,7 @@ public class MeasurementController {
         var measurement = measurementSv.getById(id);
         MeasurementDAOResponse daoResponse = null;
         if (measurement != null)
-            daoResponse = MeasurementDAOResponse.create(measurement, null,null);
+            daoResponse = MeasurementDAOResponse.create(measurement, null, null);
 
 
         return new ResponseEntity<>(daoResponse,
@@ -189,6 +191,20 @@ public class MeasurementController {
         return new ResponseEntity<List<MeasurementDetails>>(info, info != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @Operation(summary = "Get Details from a Measurement")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "404", description = "Measurements havent details or doesn't exists")
+    })
+    @GetMapping(path = "{measurement_id}/properties", produces = "application/json")
+    public ResponseEntity<Map<String, String>> getInformationMeasurementProperties(@PathVariable("measurement_id") Long id) {
+        Map<String, String> info = null;
+
+        info = measurementSv.getDetailsByMeasurementId(id).stream()
+                .collect(Collectors.toMap(MeasurementDetails::getKey, Details::getValue));
+        return new ResponseEntity< >(info, HttpStatus.OK);
+    }
+
     @Operation(summary = "Insert measurement detail's property")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Details saved correctly"),
@@ -196,7 +212,7 @@ public class MeasurementController {
     })
     @PostMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
     public ResponseEntity<MeasurementDetails> saveProperty(@RequestBody MeasurementDetails detail,
-                                                                @PathVariable("measurement_id") Long id) {
+                                                           @PathVariable("measurement_id") Long id) {
         Measurement measurement = new Measurement();
         measurement.setId(id);
         detail.setMeasurement(measurement);
@@ -213,7 +229,7 @@ public class MeasurementController {
     })
     @PutMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
     public ResponseEntity<MeasurementDetails> updateProperty(@RequestBody MeasurementDetails detail,
-                                                  @PathVariable("measurement_id") Long id) {
+                                                             @PathVariable("measurement_id") Long id) {
         Measurement measurement = new Measurement();
         measurement.setId(id);
         detail.setMeasurement(measurement);
@@ -245,12 +261,13 @@ public class MeasurementController {
         return new ResponseEntity<>(res, HttpStatus.OK);
 
     }
+
     @Operation(summary = "Insert Details for Measurement")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PutMapping(path = "{measurement_id}/properties", produces = "application/json")
     public ResponseEntity<Boolean> setMeasurementProperties(
             @PathVariable(name = "measurement_id") Long measurementId,
-            @RequestBody Map<String,String> properties) {
+            @RequestBody Map<String, String> properties) {
 //TODO check privileges
 
         boolean res = measurementSv.setProperties(measurementId, properties);
@@ -341,10 +358,11 @@ public class MeasurementController {
     })
     @PostMapping(path = "/type/{id}/dashboard/{visibility}", produces = "application/json")
     public ResponseEntity<Boolean> setDashboardVisibility(@PathVariable("id") Long id,
-                                               @PathVariable("visibility") Boolean visibility) {
+                                                          @PathVariable("visibility") Boolean visibility) {
 //todo check privileges
         var currentFeatured = measurementSv.setDashboardVisibility(id, visibility);
-        return new ResponseEntity<>(currentFeatured, currentFeatured == visibility ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(currentFeatured,
+                currentFeatured == visibility ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 //=== PUT REQUESTS====================================================================================
 

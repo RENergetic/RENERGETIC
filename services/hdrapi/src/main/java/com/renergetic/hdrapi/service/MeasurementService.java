@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -317,7 +318,12 @@ public class MeasurementService {
     }
 
     public List<MeasurementDetails> getDetailsByMeasurementId(Long id) {
-      return measurementDetailsRepository.findByMeasurementId(id);
+
+        var x = measurementDetailsRepository.findByMeasurementId(id);
+        if (x == null) {
+            return Collections.emptyList();
+        }
+        return x;
 
     }
 
