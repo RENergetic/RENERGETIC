@@ -21,11 +21,8 @@ INSERT INTO measurement(
     id, name, sensor_name, domain, direction, measurement_type_id, asset_id, sensor_id, label,
     asset_category_id, energy_island_asset_id, uuid)
     VALUES (2000, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 4, NULL, NULL, NULL, NULL, '2'),
-    (2001, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 4, NULL, NULL, NULL, NULL, '2'),
     (2002, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 5, NULL, NULL, NULL, NULL, '2'),
-    (2003, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 5, NULL, NULL, NULL, NULL, '2'),
     (2004, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 3, NULL, NULL, NULL, NULL, '2'),
-    (2005, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 3, NULL, NULL, NULL, NULL, '2'),
     (2006, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 2, NULL, NULL, NULL, NULL, '2'),
     (2007, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 2, NULL, NULL, NULL, NULL, '2'),
     (2008, 'current_power', 'energy_meter', 'electricity', 'in', 6, 4, NULL, NULL, NULL, NULL, '2'),
@@ -55,7 +52,6 @@ INSERT INTO measurement(
     (2032, 'heat_lost', 'heat_meter', 'heat', 'out', 17, 2, NULL, NULL, NULL, NULL, '2'),
     (2033, 'current_power', 'heat_meter', 'heat', 'in', 6, 3, NULL, NULL, NULL, NULL, '2'),
     (2034, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 1, NULL, NULL, NULL, NULL, '2'),
-    (2035, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 1, NULL, NULL, NULL, NULL, '2'),
     (2036, 'energy_consumed', 'energy_meter', 'electricity', 'in', 8, 6, NULL, NULL, NULL, NULL, '2'),
 	(2037, 'heat_generated_power', 'heat_meter', 'heat', 'out', 6, 2, NULL, NULL, NULL, NULL, '2'),
 	(2038, 'heat_lost_power', 'heat_meter', 'heat', 'out', 6, 2, NULL, NULL, NULL, NULL, '2');
@@ -63,11 +59,8 @@ INSERT INTO measurement(
 INSERT INTO measurement_details(
     id, measurement_id, key, value)
     VALUES (1, 2000, 'cumulative', 'true'),
-    (2, 2001, 'cumulative', 'true'),
     (3, 2002, 'cumulative', 'true'),
-    (4, 2003, 'cumulative', 'true'),
     (5, 2004, 'cumulative', 'true'),
-    (6, 2005, 'cumulative', 'true'),
     (7, 2006, 'cumulative', 'true'),
     (8, 2007, 'cumulative', 'true'),
     (9, 2026, 'cumulative', 'true'),
@@ -75,7 +68,6 @@ INSERT INTO measurement_details(
     (11, 2031, 'cumulative', 'true'),
     (12, 2032, 'cumulative', 'true'),
     (13, 2034, 'cumulative', 'true'),
-    (14, 2035, 'cumulative', 'true'),
     (15, 2036, 'cumulative', 'true');
     
 INSERT INTO tags(
@@ -88,11 +80,8 @@ INSERT INTO tags(
 INSERT INTO measurement_tags(
     tag_id, measurement_id)
     VALUES (1000, 2000),
-    (1000, 2001),
     (1000, 2002),
-    (1000, 2003),
     (1000, 2004),
-    (1000, 2005),
     (1000, 2006),
     (1000, 2007),
     (1000, 2008),
@@ -122,16 +111,12 @@ INSERT INTO measurement_tags(
     (1000, 2032),
     (1000, 2033),
     (1000, 2034),
-    (1000, 2035),
     (1000, 2036),
 	(1000, 2037),
 	(1000, 2038),
     (1001, 2000),
-    (1002, 2001),
     (1001, 2002),
-    (1002, 2003),
     (1001, 2004),
-    (1002, 2005),
     (1001, 2006),
     (1002, 2007),
     (1001, 2008),
@@ -158,7 +143,6 @@ INSERT INTO measurement_tags(
     (1001, 2032),
     (1001, 2033),
     (1001, 2034),
-    (1002, 2035),
     (1001, 2036),
     (1001, 2037),
     (1001, 2038);
