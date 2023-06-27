@@ -36,7 +36,9 @@ public class DataController {
     public ResponseEntity<DataWrapperDAO> getPanelData(
             @PathVariable Long panelId,
             @RequestParam("from") Optional<Long> from,
-            @RequestParam("to") Optional<Long> to) {
+            @RequestParam("to") Optional<Long> to,
+            @RequestParam("timeAggregation") Optional<String> timeAggregation,
+            @RequestParam("timeAggregationFunction") Optional<String> timeAggregationFunction) {
     	// GET INSTANT TO FIRST DAY OF THE CURRENT 
 
 		Long fromInstant = null;
@@ -51,7 +53,7 @@ public class DataController {
             calendar.set(Calendar.MONTH, 0);
             fromInstant = calendar.toInstant().toEpochMilli();
         }
-        return new ResponseEntity<>(dataSv.getPanelData(panelId, from.orElse(fromInstant), to),
+        return new ResponseEntity<>(dataSv.getPanelData(panelId, from.orElse(fromInstant), to, timeAggregation, timeAggregationFunction),
                 HttpStatus.OK);
     }
 
@@ -65,9 +67,11 @@ public class DataController {
             @PathVariable Long panelId,
             @PathVariable Long assetId,
             @RequestParam("from") Optional<Long> from,
-            @RequestParam("to") Optional<Long> to) {
+            @RequestParam("to") Optional<Long> to,
+            @RequestParam("timeAggregation") Optional<String> timeAggregation,
+            @RequestParam("timeAggregationFunction") Optional<String> timeAggregationFunction) {
         DataWrapperDAO panelData =
-                dataSv.getPanelData(panelId, assetId, from.orElse((new Date()).getTime() - 3600000), to);
+                dataSv.getPanelData(panelId, assetId, from.orElse((new Date()).getTime() - 3600000), to, timeAggregation, timeAggregationFunction);
         return new ResponseEntity<>(panelData, HttpStatus.OK);
     }
     @GetMapping(path = "/timeseries/tile/{tileId}", produces = "application/json")

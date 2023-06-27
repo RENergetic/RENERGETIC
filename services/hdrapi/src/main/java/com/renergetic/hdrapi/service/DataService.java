@@ -46,8 +46,8 @@ public class DataService {
     @Autowired
     private MeasurementTypeRepository measurementTypeRepository;
 
-    public DataWrapperDAO getPanelData(Long panelId, Long from, Optional<Long> to) {
-        return this.getPanelData(panelId, null, from, to);
+    public DataWrapperDAO getPanelData(Long panelId, Long from, Optional<Long> to, Optional<String> timeAggregation, Optional<String> timeAggregationFunction) {
+        return this.getPanelData(panelId, null, from, to, timeAggregation, timeAggregationFunction);
     }
 
     /**
@@ -59,7 +59,7 @@ public class DataService {
      * @param to
      * @return
      */
-    public DataWrapperDAO getPanelData(Long panelId, Long assetId, Long from, Optional<Long> to) {
+    public DataWrapperDAO getPanelData(Long panelId, Long assetId, Long from, Optional<Long> to, Optional<String> timeAggregation, Optional<String> timeAggregationFunction) {
         if (assetId != null) {
             InformationPanelDAOResponse assetTemplate =
                     informationPanelService.getAssetTemplate(panelId, assetId);
@@ -72,14 +72,14 @@ public class DataService {
                             Collectors.toMap(MeasurementDAOResponse::getId, Function.identity(),
                                     (m1, m2) -> m1)).values();
             DataDAO res =
-                    this.getData(values.stream().map(v -> v.mapToEntity()).collect(Collectors.toList()), from, to);
+                    this.getData(values.stream().map(v -> v.mapToEntity()).collect(Collectors.toList()), from, to, timeAggregation, timeAggregationFunction);
             //we need to return template with filled measurements for the given assetId
             return new DataWrapperDAO(res, assetTemplate);
         } else {
             //TODO: TOMEK/or someone else - check : if asset is null and panel is an template - raise exception  - bad request
             List<Measurement> measurements =
                     informationPanelService.getPanelMeasurements(panelId);
-            DataDAO res = this.getData(measurements, from, to);
+            DataDAO res = this.getData(measurements, from, to, timeAggregation, timeAggregationFunction);
             return new DataWrapperDAO(res);
         }
 
@@ -93,7 +93,7 @@ public class DataService {
 
     }
 
-    public DataDAO getData(Collection<Measurement> measurements, Long from, Optional<Long> to) {
+    public DataDAO getData(Collection<Measurement> measurements, Long from, Optional<Long> to, Optional<String> timeAggregation, Optional<String> timeAggregationFunction) {
         if (generateDummy) {
             return dummyDataGenerator.getData(
                     measurements.stream().map(m -> MeasurementDAOResponse.create(m, null,
@@ -156,6 +156,11 @@ public class DataService {
                         params.put("performDecumulation", "true");
                     } else if (cumulative != null) {
                         params.put("performDecumulation", cumulative.getValue());
+                    }
+
+                    if(!timeAggregation.isEmpty() && !timeAggregationFunction.isEmpty()){
+                        params.put("timeAggregation", timeAggregation.get());
+                        params.put("timeAggregationFunction", timeAggregationFunction.get());
                     }
 
                     // INFLUX API REQUEST
