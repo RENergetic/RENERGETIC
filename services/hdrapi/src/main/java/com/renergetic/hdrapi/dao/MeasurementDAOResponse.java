@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,8 +107,12 @@ public class MeasurementDAOResponse {
         return dao;
     }
 
+    public Measurement mapToEntity(){
+        return this.mapToEntity(new ArrayList<>());
+    }
 
-    public Measurement mapToEntity() {
+
+    public Measurement mapToEntity(List<MeasurementDetails> measurementDetails) {
         Measurement measurement = new Measurement();
 
         measurement.setId(id);
@@ -122,6 +127,7 @@ public class MeasurementDAOResponse {
             measurement.setFunction(function.name().toLowerCase());
         if (asset != null)
             measurement.setAsset(asset.mapToEntity());
+        measurement.setDetails(measurementDetails);
         return measurement;
     }
 }
