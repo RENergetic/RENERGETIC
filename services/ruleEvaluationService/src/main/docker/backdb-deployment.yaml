@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backdb
+spec:
+  selector:
+      matchLabels:
+        app: backdb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: backdb
+    spec:
+      containers:
+        - name: backdb
+          image: backdb:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8082
+      restartPolicy: Always
