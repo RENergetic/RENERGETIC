@@ -1,8 +1,10 @@
 package com.renergetic.common.model;
 
 public enum ConnectionType {
-	owner,
+	 owner,
 	resident,
 	visitor,
-	energy_connection
+	energy_connection 
+
+
 }

@@ -5,7 +5,7 @@ package com.renergetic.common.dao;//package com.renergetic.common.dao;
 //import com.renergetic.common.model.NotificationSchedule;
 //import com.renergetic.common.model.NotificationType;
 //
-//import com.renergetic.common.service.utils.DateConverter;
+//import com.renergetic.common.utilities.DateConverter;
 //import lombok.Getter;
 //import lombok.RequiredArgsConstructor;
 //import lombok.Setter;

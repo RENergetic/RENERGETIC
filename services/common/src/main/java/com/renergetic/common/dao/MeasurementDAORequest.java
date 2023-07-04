@@ -2,7 +2,10 @@ package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.common.model.*;
+import com.renergetic.common.model.Direction;
+import com.renergetic.common.model.Domain;
+import com.renergetic.common.model.Measurement;
+import com.renergetic.common.model.MeasurementType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -32,10 +35,10 @@ public class MeasurementDAORequest {
 	private String icon;
 
 	@JsonProperty(required = false)
-	private Long type;
+	private MeasurementType type;
 
-	@JsonProperty(value = "asset_id", required = false)
-	private Long assetId;
+	@JsonProperty(value = "asset", required = false)
+	private SimpleAssetDAO asset;
 
 	@JsonProperty(required = false)
 	private Domain domain;
@@ -53,14 +56,14 @@ public class MeasurementDAORequest {
 			dao.setName(measurement.getName());
 			dao.setSensorName(measurement.getSensorName());
 			if (measurement.getType() != null)
-				dao.setType(measurement.getType().getId());
+				dao.setType(measurement.getType() );
 			dao.setLabel(measurement.getLabel());
 			//dao.setDescription(measurement.getDescription());
 			//dao.setIcon(measurement.getIcon());
 			dao.setDomain(measurement.getDomain());
 			dao.setDirection(measurement.getDirection());
 			if (measurement.getAsset() != null)
-				dao.setAssetId(measurement.getAsset().getId());
+				dao.setAsset(SimpleAssetDAO.create(measurement.getAsset()));
 		}
 		return dao;
 	}
@@ -71,9 +74,7 @@ public class MeasurementDAORequest {
 		measurement.setId(id);
 		measurement.setName(name);
 		if (type != null) {
-			MeasurementType entityType = new MeasurementType();
-			entityType.setId(type);
-			measurement.setType(entityType);
+			measurement.setType(type);
 		}
 		measurement.setLabel(label);
 		//measurement.setDescription(description);
@@ -81,10 +82,8 @@ public class MeasurementDAORequest {
 		measurement.setDomain(domain);
 		measurement.setDirection(direction);
 		measurement.setSensorName(sensorName);
-		if (assetId != null) {
-			Asset asset = new Asset();
-			asset.setId(assetId);
-			measurement.setAsset(asset);
+		if (asset != null) {
+			measurement.setAsset(asset.mapToEntity());
 		}
 
 		return measurement;

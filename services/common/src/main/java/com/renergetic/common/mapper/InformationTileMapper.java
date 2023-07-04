@@ -1,12 +1,14 @@
 package com.renergetic.common.mapper;
 
-import com.renergetic.common.dao.InformationTileDAORequest;
-import com.renergetic.common.dao.InformationTileDAOResponse;
+import com.renergetic.common.dao.*;
 import com.renergetic.common.model.InformationPanel;
 import com.renergetic.common.model.InformationTile;
+import com.renergetic.common.model.InformationTileMeasurement;
 import com.renergetic.common.utilities.Json;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 public class InformationTileMapper implements MapperReponseRequest<InformationTile, InformationTileDAOResponse, InformationTileDAORequest> {
@@ -21,9 +23,9 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
 
         entity.setType(dto.getType());
 
-        entity.setLayout(dto.getLayout());
-        entity.setProps(dto.getProps());
-        if(dto.getPanelId()!=null) {
+        entity.setLayout(Json.toJson(dto.getLayout()));
+        entity.setProps(Json.toJson(dto.getProps()));
+        if (dto.getPanelId() != null) {
             InformationPanel infoPanel = new InformationPanel();
             infoPanel.setId(dto.getPanelId());
             entity.setInformationPanel(infoPanel);
@@ -34,14 +36,24 @@ public class InformationTileMapper implements MapperReponseRequest<InformationTi
 
     @Override
     public InformationTileDAOResponse toDTO(InformationTile entity) {
+        return this.toDTO(entity, false);
+    }
+
+
+    public InformationTileDAOResponse toDTO(InformationTile entity, Boolean includeMeasurements) {
         try {
             if (entity == null)
                 return null;
             InformationTileDAOResponse dao = new InformationTileDAOResponse();
             dao.setId(entity.getId());
-            if(entity.getInformationPanel()!=null)
+//            if (entity.getInformationPanel() != null)
 //            dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel()));
-
+                if (includeMeasurements) {
+                    dao.setMeasurements(
+                            entity.getInformationTileMeasurements().stream()
+                                    .map(InformationTileMeasurement::getMeasurementDAO)
+                                    .collect(Collectors.toList()));
+                }
             dao.setName(entity.getName());
             dao.setLabel(entity.getLabel());
             if (entity.getType() != null)
