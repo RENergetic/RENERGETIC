@@ -5,6 +5,7 @@ import com.renergetic.hdrapi.model.*;
 import com.renergetic.hdrapi.model.details.MeasurementDetails;
 import com.renergetic.hdrapi.model.details.MeasurementTags;
 import com.renergetic.hdrapi.repository.*;
+import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.service.utils.Basic;
 import com.renergetic.hdrapi.service.utils.DateConverter;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
@@ -45,6 +46,8 @@ public class DataService {
     private InformationPanelService informationPanelService;
     @Autowired
     private MeasurementTypeRepository measurementTypeRepository;
+    @Autowired
+    private MeasurementDetailsRepository measurementDetailsRepository;
 
     public DataWrapperDAO getPanelData(Long panelId, Long from, Optional<Long> to) {
         return this.getPanelData(panelId, null, from, to);
@@ -72,7 +75,7 @@ public class DataService {
                             Collectors.toMap(MeasurementDAOResponse::getId, Function.identity(),
                                     (m1, m2) -> m1)).values();
             DataDAO res =
-                    this.getData(values.stream().map(v -> v.mapToEntity()).collect(Collectors.toList()), from, to);
+                    this.getData(values.stream().map(v -> v.mapToEntity(measurementDetailsRepository.findByMeasurementId(v.getId()))).collect(Collectors.toList()), from, to);
             //we need to return template with filled measurements for the given assetId
             return new DataWrapperDAO(res, assetTemplate);
         } else {
