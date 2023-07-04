@@ -1,8 +1,8 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.model.security.KeycloakRole;
-import com.renergetic.hdrapi.model.security.KeycloakUser;
+import com.renergetic.common.dao.*;
+import com.renergetic.common.model.security.KeycloakRole;
+import com.renergetic.common.model.security.KeycloakUser;
 import com.renergetic.hdrapi.service.KeycloakService;
 import com.renergetic.hdrapi.service.KeycloakWrapper;
 import com.renergetic.hdrapi.service.LoggedInService;

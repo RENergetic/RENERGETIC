@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.renergetic.hdrapi.dao.ErrorMessage;
-import com.renergetic.hdrapi.exception.InvalidArgumentException;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.exception.UnauthorizedAccessException;
+import com.renergetic.common.dao.ErrorMessage;
+import com.renergetic.common.exception.InvalidArgumentException;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.exception.UnauthorizedAccessException;
 
 @RestControllerAdvice
 public class ExceptionController extends ResponseEntityExceptionHandler {

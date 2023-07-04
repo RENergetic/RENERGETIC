@@ -1,13 +1,13 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.model.*;
-import com.renergetic.hdrapi.model.details.MeasurementDetails;
-import com.renergetic.hdrapi.model.details.MeasurementTags;
-import com.renergetic.hdrapi.repository.*;
-import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
+import com.renergetic.common.dao.*;
+import com.renergetic.common.model.*;
+import com.renergetic.common.model.details.MeasurementDetails;
+import com.renergetic.common.model.details.MeasurementTags;
+import com.renergetic.common.repository.*;
+import com.renergetic.common.repository.information.MeasurementDetailsRepository;
+import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.hdrapi.service.utils.Basic;
-import com.renergetic.hdrapi.service.utils.DateConverter;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import com.renergetic.hdrapi.service.utils.HttpAPIs;
 

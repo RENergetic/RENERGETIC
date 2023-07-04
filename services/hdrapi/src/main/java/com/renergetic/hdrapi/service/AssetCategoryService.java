@@ -1,11 +1,11 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.dao.AssetCategoryDAO;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.AssetCategory;
-import com.renergetic.hdrapi.repository.AssetCategoryRepository;
+import com.renergetic.common.dao.AssetCategoryDAO;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.AssetCategory;
+import com.renergetic.common.repository.AssetCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

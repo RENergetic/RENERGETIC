@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.hdrapi.dao.AreaDAO;
+import com.renergetic.common.dao.AreaDAO;
 import com.renergetic.hdrapi.service.AreaService;
 
 import io.swagger.v3.oas.annotations.Operation;

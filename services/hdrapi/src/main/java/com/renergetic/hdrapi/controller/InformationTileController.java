@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.renergetic.hdrapi.dao.InformationTileDAORequest;
-import com.renergetic.hdrapi.dao.InformationTileDAOResponse;
+import com.renergetic.common.dao.InformationTileDAORequest;
+import com.renergetic.common.dao.InformationTileDAOResponse;
 import com.renergetic.hdrapi.service.InformationTileService;
 
 import java.util.List;

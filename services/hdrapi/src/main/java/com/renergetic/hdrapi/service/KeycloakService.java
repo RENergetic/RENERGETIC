@@ -1,9 +1,9 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
-import com.renergetic.hdrapi.model.security.KeycloakRole;
-import com.renergetic.hdrapi.model.security.KeycloakUser;
-import com.renergetic.hdrapi.service.utils.Json;
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
+import com.renergetic.common.model.security.KeycloakRole;
+import com.renergetic.common.model.security.KeycloakUser;
+import com.renergetic.common.utilities.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;

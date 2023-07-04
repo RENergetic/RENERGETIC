@@ -1,6 +1,6 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.*;
+import com.renergetic.common.dao.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

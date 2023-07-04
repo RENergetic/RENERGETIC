@@ -16,7 +16,19 @@
 	<properties>
 		<java.version>11</java.version>
 	</properties>
+	<repositories>
+		<repository>
+			<id>renergetic-release</id>
+			<name>Local Nexus</name>
+			<url>http://localhost:8079/repository/renergetic-release/</url>
+		</repository>
+	</repositories>
 	<dependencies>
+		<dependency>
+			<groupId>com.renergetic</groupId>
+			<artifactId>common</artifactId>
+			<version>1.1.2</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-keycloak-admin-client -->
 <!--		<dependency>-->
 <!--			<groupId>io.quarkus</groupId>-->

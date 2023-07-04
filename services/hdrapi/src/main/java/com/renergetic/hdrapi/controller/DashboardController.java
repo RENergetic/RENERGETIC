@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.hdrapi.dao.DashboardDAO;
+import com.renergetic.common.dao.DashboardDAO;
 import com.renergetic.hdrapi.service.DashboardService;
 
 import io.swagger.v3.oas.annotations.Operation;

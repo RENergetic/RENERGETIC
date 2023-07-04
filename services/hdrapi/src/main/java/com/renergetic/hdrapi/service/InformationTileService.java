@@ -1,15 +1,15 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.dao.InformationTileDAORequest;
-import com.renergetic.hdrapi.dao.InformationTileDAOResponse;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.mapper.InformationTileMapper;
-import com.renergetic.hdrapi.model.InformationPanel;
-import com.renergetic.hdrapi.model.InformationTile;
-import com.renergetic.hdrapi.repository.InformationPanelRepository;
-import com.renergetic.hdrapi.repository.InformationTileRepository;
+import com.renergetic.common.dao.InformationTileDAORequest;
+import com.renergetic.common.dao.InformationTileDAOResponse;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.mapper.InformationTileMapper;
+import com.renergetic.common.model.InformationPanel;
+import com.renergetic.common.model.InformationTile;
+import com.renergetic.common.repository.InformationPanelRepository;
+import com.renergetic.common.repository.InformationTileRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
