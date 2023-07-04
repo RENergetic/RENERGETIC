@@ -1,19 +1,19 @@
 package com.renergetic.common.model;
 
 public enum InfluxFunction {
-	count,
-	distinct,
-	mean,
-	median,
-	sum,
-	max,
-	min,
-	first,
-	last;
+	COUNT,
+	DISTINCT,
+	MEAN,
+	MEDIAN,
+	SUM,
+	MAX,
+	MIN,
+	FIRST,
+	LAST;
 	
 	public static InfluxFunction obtain(String function) {
 		try {
-			return InfluxFunction.valueOf(function.toLowerCase());
+			return InfluxFunction.valueOf(function.toUpperCase());
 		}catch (IllegalArgumentException e) {
 			return null;
 		}

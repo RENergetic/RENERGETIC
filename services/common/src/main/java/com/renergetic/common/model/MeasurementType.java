@@ -58,7 +58,7 @@ public class MeasurementType {
 	@JsonProperty(required = true,value = "dashboard_visibility")
 	private Boolean dashboardVisibility = true;
 
-	public MeasurementType(long id, String name,String physicalName, String label, String baseUnit, String unit, String metricType, Double factor, String color,Boolean dashboardVisibility) {
+	public MeasurementType(long id, String name, String physicalName, String label, String baseUnit, String unit, String metricType, Double factor, String color, Boolean dashboardVisibility) {
 		super();
 		this.id = id;
 		this.name = name;

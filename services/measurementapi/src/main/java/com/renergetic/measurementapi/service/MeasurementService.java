@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import com.renergetic.common.model.InfluxFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,6 @@ import com.renergetic.measurementapi.dao.MeasurementDAORequest;
 import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
 import com.renergetic.measurementapi.exception.InvalidArgumentException;
 import com.renergetic.measurementapi.mapper.MeasurementMapper;
-import com.renergetic.measurementapi.model.InfluxFunction;
 import com.renergetic.measurementapi.model.InfluxTimeUnit;
 import com.renergetic.measurementapi.service.utils.FieldsFormat;
 

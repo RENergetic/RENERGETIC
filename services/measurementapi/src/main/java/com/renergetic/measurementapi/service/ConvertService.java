@@ -1,8 +1,7 @@
 package com.renergetic.measurementapi.service;
 
+import com.renergetic.common.model.MeasurementType;
 import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
-import com.renergetic.measurementapi.model.MeasurementType;
-import com.renergetic.measurementapi.repository.DashboardRepository;
 import org.apache.commons.lang3.function.TriFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

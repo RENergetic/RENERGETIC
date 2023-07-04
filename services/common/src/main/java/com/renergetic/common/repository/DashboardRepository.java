@@ -32,4 +32,6 @@ public interface DashboardRepository extends JpaRepository<Dashboard, Long> {
 			" 	LEFT JOIN asset asset_user ON asset_user.id = asset_conn.asset_id and asset_user.user_id = :userId " +
 			" ) LIMIT :limit OFFSET :offset ;", nativeQuery = true)
 	List<Dashboard> findAvailableForUserId(long userId, long offset, int limit);
+
+	Dashboard findByGrafanaId (String grafanaId);
 }

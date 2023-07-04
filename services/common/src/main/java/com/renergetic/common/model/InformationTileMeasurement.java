@@ -87,7 +87,7 @@ public class InformationTileMeasurement {
         dao.setCategory(assetCategory != null ? assetCategory.getName() : null);
         if (this.function != null)
             dao.setFunction(InfluxFunction.obtain(this.function));
-        else dao.setFunction(InfluxFunction.last);
+        else dao.setFunction(InfluxFunction.LAST);
         return dao;
     }
 }
