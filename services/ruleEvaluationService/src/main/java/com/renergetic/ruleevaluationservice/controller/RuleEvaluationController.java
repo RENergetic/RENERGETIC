@@ -18,10 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.ruleevaluationservice.dao.AlertThresholdDAORequest;
-import com.renergetic.ruleevaluationservice.dao.AlertThresholdDAOResponse;
-import com.renergetic.ruleevaluationservice.service.AlertThresholdService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -38,8 +34,9 @@ public class RuleEvaluationController {
 	@Operation(summary = "Trigger All Rule Evaluation")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<AlertThresholdDAOResponse>> triggerAllRules (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-		return new ResponseEntity<>(alert, HttpStatus.OK);
+	public ResponseEntity<List<Long>> triggerAllRules (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
+		//TODO: Add a parameter to allow to return at the same time the data used for computation.
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
 	
 	@Operation(summary = "Trigger Rule Evaluation by id")
@@ -49,8 +46,9 @@ public class RuleEvaluationController {
 		@ApiResponse(responseCode = "404", description = "No alert found with this id")
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
-	public ResponseEntity<AlertThresholdDAOResponse> triggerRuleById (@PathVariable Long id){
-		return new ResponseEntity<>(alert, alert != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	public ResponseEntity<Long> triggerRuleById (@PathVariable Long id){
+		//TODO: Add a parameter to allow to return at the same time the data used for computation.
+		return new ResponseEntity<>(null, null != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Trigger Rule Evaluation by asset id")
@@ -60,7 +58,8 @@ public class RuleEvaluationController {
 		}
 	)
 	@GetMapping(path = "asset/{id}", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<AlertThresholdDAOResponse> triggerAllAssetRules (@PathVariable Long id) {
-		return new ResponseEntity<>(_alert, HttpStatus.CREATED);
+	public ResponseEntity<Long> triggerAllAssetRules (@PathVariable Long id) {
+		//TODO: Add a parameter to allow to return at the same time the data used for computation.
+		return new ResponseEntity<>(null, HttpStatus.CREATED);
 	}
 }

@@ -1,9 +1,9 @@
 package com.renergetic.ruleevaluationservice.config;
 
-import com.renergetic.ruleevaluationservice.model.security.KeycloakAuthenticationToken;
-import com.renergetic.ruleevaluationservice.model.security.KeycloakRole;
-import com.renergetic.ruleevaluationservice.model.security.KeycloakUser;
-import com.renergetic.ruleevaluationservice.service.utils.Json;
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
+import com.renergetic.common.model.security.KeycloakRole;
+import com.renergetic.common.model.security.KeycloakUser;
+import com.renergetic.common.utilities.Json;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

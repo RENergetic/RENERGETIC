@@ -2,12 +2,16 @@ package com.renergetic.ruleevaluationservice.scheduler;
 
 import com.renergetic.ruleevaluationservice.model.AssetRule;
 import com.renergetic.ruleevaluationservice.repository.AssetRuleRepository;
+import com.renergetic.ruleevaluationservice.service.RuleEvaluationService;
 import com.renergetic.ruleevaluationservice.utils.AssetRuleUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -17,38 +21,17 @@ import java.util.Set;
 
 @Component
 public class RuleExecutionScheduler {
+
     @Autowired
-    private AssetRuleRepository assetRuleRepository;
+    RuleEvaluationService ruleEvaluationService;
 
     private HashMap<String, RuleEvaluationResult> evaluationResultHashMap = new HashMap<>();
 
-    @Scheduled(cron = "0 * * * * *")
+    //@Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "${rule.executionCRON}")
+    @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     public void executeRules(){
-        List<AssetRule> assetRules = assetRuleRepository.findByActiveTrue();
-        Set<Thread> threads = new HashSet<>();
-        for(AssetRule assetRule : assetRules){
-            String name = AssetRuleUtils.transformRuleToReadableName(assetRule);
-            boolean needUpdate = true;
-            if(evaluationResultHashMap.containsKey(name)){
-                RuleEvaluationResult ruleEvaluationResult = evaluationResultHashMap.get(name);
-                //TODO: If individual element need evaluation, compare here if needs update effectively.
-            }
-
-            if(needUpdate){
-                Thread thread = new Thread(() -> {
-
-                });
-                thread.start();
-                threads.add(thread);
-            }
-        }
-        threads.forEach(thread -> {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
+        ruleEvaluationService.retrieveAndExecuteAllRules();
     }
 
     @Getter

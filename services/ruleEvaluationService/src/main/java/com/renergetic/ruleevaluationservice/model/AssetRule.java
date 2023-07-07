@@ -1,5 +1,7 @@
 package com.renergetic.ruleevaluationservice.model;
 
+import com.renergetic.common.model.Asset;
+import com.renergetic.common.model.Measurement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -27,10 +29,12 @@ public class AssetRule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "asset_id", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "asset_id", nullable = false, insertable = true, updatable = true)
     private Asset asset;
 
-    @Column(name = "measurement_1", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "measurement_1", nullable = false, insertable = true, updatable = true)
     private Measurement measurement1;
 
     @Column(name = "measurement_1_function", nullable = false)
@@ -39,7 +43,8 @@ public class AssetRule {
     @Column(name = "measurement_1_time_range", nullable = false)
     private String timeRangeMeasurement1;
 
-    @Column(name = "measurement_2", nullable = true)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "measurement_2", nullable = true, insertable = true, updatable = true)
     private Measurement measurement2;
 
     @Column(name = "measurement_2_function", nullable = true)

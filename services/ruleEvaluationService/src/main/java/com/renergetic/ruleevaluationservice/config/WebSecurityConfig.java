@@ -1,7 +1,7 @@
 package com.renergetic.ruleevaluationservice.config;
 
-import com.renergetic.ruleevaluationservice.model.security.KeycloakAuthenticationToken;
-import com.renergetic.ruleevaluationservice.model.security.KeycloakRole;
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
+import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.ruleevaluationservice.service.CustomAccessDeniedHandler;
 
 import lombok.RequiredArgsConstructor;

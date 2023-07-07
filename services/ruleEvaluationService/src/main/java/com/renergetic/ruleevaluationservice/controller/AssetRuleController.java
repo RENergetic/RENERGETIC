@@ -1,29 +1,32 @@
 package com.renergetic.ruleevaluationservice.controller;
 
-import com.renergetic.ruleevaluationservice.dao.AlertThresholdDAOResponse;
 import com.renergetic.ruleevaluationservice.dao.AssetRuleDAO;
+import com.renergetic.ruleevaluationservice.service.AssetRuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Asset Rule Controller", description = "Allows to manage and retrieve asset rules")
 @RequestMapping("/api/assetRules")
 public class AssetRuleController {
+	@Autowired
+	private AssetRuleService assetRuleService;
 
 	@Operation(summary = "Get All Rule for a given asset id")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "asset/{id}", produces = "application/json")
 	public ResponseEntity<List<AssetRuleDAO>> getAllRulesForAssetId (@PathVariable Long id){
-		return new ResponseEntity<>(alert, HttpStatus.OK);
+		return new ResponseEntity<>(assetRuleService.getAllRulesAssetForAssetId(id), HttpStatus.OK);
 	}
 	
 	@Operation(summary = "Get rule by id")
@@ -34,7 +37,8 @@ public class AssetRuleController {
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
 	public ResponseEntity<AssetRuleDAO> getRuleById (@PathVariable Long id){
-		return new ResponseEntity<>(alert, alert != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		AssetRuleDAO assetRuleDAO = assetRuleService.getAssetRuleById(id);
+		return new ResponseEntity<>(assetRuleDAO, assetRuleDAO != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 	@Operation(summary = "Create a new Rule")
@@ -45,8 +49,7 @@ public class AssetRuleController {
 	)
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AssetRuleDAO> createNewRule(@RequestBody AssetRuleDAO assetCategoryDAO) {
-		AssetCategoryDAO assetCategory = assetCategoryService.save(assetCategoryDAO);
-		return new ResponseEntity<>(assetCategory, HttpStatus.CREATED);
+		return new ResponseEntity<>(assetRuleService.createAssetRule(assetCategoryDAO), HttpStatus.CREATED);
 	}
 
 	@Operation(summary = "Save Rule by batch")
@@ -55,10 +58,10 @@ public class AssetRuleController {
 			@ApiResponse(responseCode = "500", description = "Error saving asset category")
 	}
 	)
-	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<AssetRuleDAO> createNewRule(@RequestBody List<AssetRuleDAO> assetCategoryDAO) {
-		AssetCategoryDAO assetCategory = assetCategoryService.save(assetCategoryDAO);
-		return new ResponseEntity<>(assetCategory, HttpStatus.CREATED);
+	@PostMapping(path = "/batch", produces = "application/json", consumes = "application/json")
+	@Transactional
+	public ResponseEntity<List<AssetRuleDAO>> createNewRuleBatch(@RequestBody List<AssetRuleDAO> assetCategoryDAO) {
+		return new ResponseEntity<>(assetRuleService.createBatchAssetRule(assetCategoryDAO), HttpStatus.CREATED);
 	}
 
 	@Operation(summary = "Update an existing Rule")
@@ -70,8 +73,19 @@ public class AssetRuleController {
 	)
 	@PutMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AssetRuleDAO> updateRule(@RequestBody AssetRuleDAO assetCategoryDAO) {
-		AssetCategoryDAO assetCategory = assetCategoryService.update(assetCategoryDAO);
-		return new ResponseEntity<>(assetCategory, HttpStatus.OK);
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+
+	@Operation(summary = "Update Rule by batch")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Asset category saved correctly"),
+			@ApiResponse(responseCode = "500", description = "Error saving asset category")
+	}
+	)
+	@PutMapping(path = "/batch", produces = "application/json", consumes = "application/json")
+	@Transactional
+	public ResponseEntity<List<AssetRuleDAO>> updateRuleBatch(@RequestBody List<AssetRuleDAO> assetCategoryDAO) {
+		return new ResponseEntity<>(assetRuleService.updateBatchAssetRule(assetCategoryDAO), HttpStatus.CREATED);
 	}
 
 	@Operation(summary = "Delete Rule by id")
@@ -82,7 +96,7 @@ public class AssetRuleController {
 	)
 	@DeleteMapping(path = "/{id}", produces = "application/json")
 	public ResponseEntity<Boolean> deleteRule(@PathVariable Long id) {
-		boolean deleted = assetCategoryService.deleteById(id);
-		return new ResponseEntity<>(deleted, deleted ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		Boolean deleted = assetRuleService.deletAssetRule(id);
+		return new ResponseEntity<>(deleted, deleted == null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 }

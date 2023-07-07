@@ -1,20 +1,19 @@
 package com.renergetic.ruleevaluationservice.utils;
 
-import com.renergetic.ruleevaluationservice.model.Asset;
+import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.ruleevaluationservice.model.AssetRule;
-import com.renergetic.ruleevaluationservice.model.details.AssetDetails;
 
 public class AssetRuleUtils {
     public static String transformRuleToReadableName(AssetRule assetRule){
         StringBuilder sb = new StringBuilder();
-        sb.append(assetRule.getFunctionMeasurement1()).append("(")
-                .append(assetRule.getMeasurement1().getName()).append(",")
+        sb.append(assetRule.getFunctionMeasurement1()).append("(id:")
+                .append(assetRule.getMeasurement1().getId()).append(",")
                 .append(assetRule.getTimeRangeMeasurement1()).append(") ").append(assetRule.getComparator())
                 .append(" ");
 
         if(assetRule.getMeasurement2() != null){
-            sb.append(assetRule.getFunctionMeasurement2()).append("(")
-                    .append(assetRule.getMeasurement2().getName()).append(",")
+            sb.append(assetRule.getFunctionMeasurement2()).append("(id:")
+                    .append(assetRule.getMeasurement2().getId()).append(",")
                     .append(assetRule.getTimeRangeMeasurement2()).append(")");
         } else {
             if(assetRule.isCompareToConfigThreshold()){
