@@ -45,6 +45,11 @@ public class RuleEvaluationService {
         return executeAllRules(assetRules);
     }
 
+    public List<EvaluationResult> retrieveAndExecuteAllRulesForAssetId(Long id){
+        List<AssetRule> assetRules = assetRuleRepository.findByAssetId(id);
+        return executeAllRules(assetRules);
+    }
+
     public List<EvaluationResult> executeAllRules(List<AssetRule> assetRules){
         List<EvaluationResult> evaluationResults = new ArrayList<>();
         Set<Thread> threads = new HashSet<>();
@@ -64,6 +69,11 @@ public class RuleEvaluationService {
         });
 
         return evaluationResults;
+    }
+
+    public EvaluationResult executeRule(Long id){
+        Optional<AssetRule> assetRule = assetRuleRepository.findById(id);
+        return assetRule.map(this::executeRule).orElse(null);
     }
 
     public EvaluationResult executeRule(AssetRule assetRule){
