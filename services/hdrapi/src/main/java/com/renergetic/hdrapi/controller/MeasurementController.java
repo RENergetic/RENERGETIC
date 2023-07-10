@@ -7,8 +7,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.renergetic.hdrapi.dao.InformationPanelDAO;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
+import com.renergetic.hdrapi.dao.projection.ResourceDAO;
 import com.renergetic.hdrapi.model.Details;
 import com.renergetic.hdrapi.model.details.AssetDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +106,13 @@ public class MeasurementController {
         measurements = measurementSv.list(offset.orElse(0L), limit.orElse(1000));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
+    }
+    @Operation(summary = "Get linked panels for given measurement")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/{id}/panels", produces = "application/json")
+    public ResponseEntity<List<ResourceDAO>> listLinkedPanels(@PathVariable Long id ) {
+        List<ResourceDAO> l = measurementSv.listLinkedPanels(id);
+        return new ResponseEntity<>(l, HttpStatus.OK);
     }
 
     @Operation(summary = "Get Measurement by id")

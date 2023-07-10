@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.hdrapi.dao.projection.ResourceDAO;
 import com.renergetic.hdrapi.model.InformationPanel;
 import com.renergetic.hdrapi.service.utils.Json;
 import lombok.Getter;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @Setter
 @RequiredArgsConstructor
 @ToString
-public class InformationPanelDAOResponse {
+public class InformationPanelDAOResponse implements ResourceDAO {
     @JsonProperty()
     private Long id;
 

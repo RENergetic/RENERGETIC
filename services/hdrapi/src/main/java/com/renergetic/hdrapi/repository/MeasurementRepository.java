@@ -112,4 +112,12 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " order by me.id asc " +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<MeasurementDAO> report(long offset, long limit);
+
+
+    @Query("SELECT informationPanel FROM InformationPanel informationPanel " +
+            " JOIN informationPanel.tiles tile " +
+            " JOIN tile.informationTileMeasurements tileMeasurement " +
+            " JOIN tileMeasurement.measurement measurement" +
+            "  WHERE measurement.id = :measurementId")
+    public List<InformationPanel> getLinkedPanels(Long measurementId);
 }

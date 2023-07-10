@@ -10,22 +10,17 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
+import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
+import com.renergetic.hdrapi.dao.projection.ResourceDAO;
+import com.renergetic.hdrapi.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.hdrapi.dao.MeasurementDAORequest;
-import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
 import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
 import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.Direction;
-import com.renergetic.hdrapi.model.Domain;
-import com.renergetic.hdrapi.model.Measurement;
-import com.renergetic.hdrapi.model.MeasurementType;
-import com.renergetic.hdrapi.model.UUID;
 import com.renergetic.hdrapi.model.details.MeasurementDetails;
 import com.renergetic.hdrapi.model.details.MeasurementTags;
 import com.renergetic.hdrapi.repository.MeasurementRepository;
@@ -328,4 +323,9 @@ public class MeasurementService {
     }
 
 
+    public List<ResourceDAO> listLinkedPanels(Long id) {
+        return measurementRepository.getLinkedPanels(id).stream().map(
+                it-> ResourceDAOImpl.create(it.getId(),it.getName(),it.getLabel())
+        ).collect(Collectors.toList());
+    }
 }
