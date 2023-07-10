@@ -4,12 +4,10 @@ import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.common.model.security.KeycloakUser;
 import com.renergetic.common.utilities.Json;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
 import org.springframework.security.core.context.SecurityContextHolder;

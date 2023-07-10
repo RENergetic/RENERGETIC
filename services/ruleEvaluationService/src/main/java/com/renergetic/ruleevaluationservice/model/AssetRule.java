@@ -14,16 +14,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 public class AssetRule {
-    /*
-        TODO: Validator:
-            measurement1 completely filled
-                and
-                measurement2 completely filled
-                    or
-                compareToConfigThreshold false and threshold filled
-                    or
-                compareToConfigThreshold true and asset has threshold configured
-     */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,13 +1,9 @@
 package com.renergetic.ruleevaluationservice.scheduler;
 
-import com.renergetic.ruleevaluationservice.model.AssetRule;
-import com.renergetic.ruleevaluationservice.repository.AssetRuleRepository;
 import com.renergetic.ruleevaluationservice.service.RuleEvaluationService;
-import com.renergetic.ruleevaluationservice.utils.AssetRuleUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,9 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Component
 public class RuleExecutionScheduler {

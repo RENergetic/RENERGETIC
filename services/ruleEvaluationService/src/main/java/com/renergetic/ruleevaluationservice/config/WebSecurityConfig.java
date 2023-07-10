@@ -3,9 +3,7 @@ package com.renergetic.ruleevaluationservice.config;
 import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.ruleevaluationservice.service.CustomAccessDeniedHandler;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,5 +1,6 @@
 package com.renergetic.ruleevaluationservice.controller;
 
+import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.ruleevaluationservice.dao.AssetRuleDAO;
 import com.renergetic.ruleevaluationservice.service.AssetRuleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,8 +38,12 @@ public class AssetRuleController {
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
 	public ResponseEntity<AssetRuleDAO> getRuleById (@PathVariable Long id){
-		AssetRuleDAO assetRuleDAO = assetRuleService.getAssetRuleById(id);
-		return new ResponseEntity<>(assetRuleDAO, assetRuleDAO != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		try{
+			AssetRuleDAO assetRuleDAO = assetRuleService.getAssetRuleById(id);
+			return new ResponseEntity<>(assetRuleDAO, HttpStatus.OK);
+		} catch (NotFoundException nfe){
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@Operation(summary = "Create a new Rule")
@@ -73,7 +78,7 @@ public class AssetRuleController {
 	)
 	@PutMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<AssetRuleDAO> updateRule(@RequestBody AssetRuleDAO assetCategoryDAO) {
-		return new ResponseEntity<>(null, HttpStatus.OK);
+		return new ResponseEntity<>(assetRuleService.updateAssetRule(assetCategoryDAO), HttpStatus.OK);
 	}
 
 	@Operation(summary = "Update Rule by batch")
@@ -96,7 +101,11 @@ public class AssetRuleController {
 	)
 	@DeleteMapping(path = "/{id}", produces = "application/json")
 	public ResponseEntity<Boolean> deleteRule(@PathVariable Long id) {
-		Boolean deleted = assetRuleService.deletAssetRule(id);
-		return new ResponseEntity<>(deleted, deleted == null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		try{
+			Boolean deleted = assetRuleService.deleteAssetRule(id);
+			return new ResponseEntity<>(deleted, HttpStatus.OK);
+		} catch (NotFoundException nfe){
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
 	}
 }
