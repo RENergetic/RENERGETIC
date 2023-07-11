@@ -8,7 +8,7 @@ public class TimeUtils {
     public static Instant offsetCurrentInstantOfAtLeast3Hours(String durationLiteral){
         Instant now = Instant.now();
         Instant offset = Instant.now().minus(TimeUtils.extractValue(durationLiteral), TimeUtils.extractUnit(durationLiteral));
-        if(ChronoUnit.HOURS.between(offset, now) < 2)
+        if(ChronoUnit.HOURS.between(offset, now) < 3)
             offset = Instant.now().minus(3, ChronoUnit.HOURS);
         return offset;
     }
