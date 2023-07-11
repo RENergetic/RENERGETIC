@@ -78,43 +78,47 @@ public class RuleEvaluationService {
 
     public EvaluationResult executeRule(AssetRule assetRule){
         EvaluationResult evaluationResult = new EvaluationResult();
+        if(assetRule.isActive()){
+            evaluationResult.setExecutedString("inactive");
+            return evaluationResult;
+        }
+        LocalDateTime currentTime = LocalDateTime.now();
         try{
-            LocalDateTime currentTime = LocalDateTime.now();
             evaluationResult.setExecutedReadableString(AssetRuleUtils.transformRuleToReadableName(assetRule));
             setEvaluationStringAndData(assetRule, evaluationResult);
             evaluationResult.setExecutionResult(evaluateString(evaluationResult.getExecutedString()));
-
-            if(evaluationResult.getExecutionResult().equals("true")){
-                Optional<NotificationDefinition> ndo = notificationDefinitionRepository.findByCode(evaluationResult.getExecutedReadableString());
-                NotificationDefinition nd;
-                if(ndo.isEmpty()){
-                    nd = new NotificationDefinition();
-                    nd.setCode(evaluationResult.getExecutedReadableString());
-                    nd.setMessage(evaluationResult.getExecutedReadableString());
-                }
-                else
-                    nd = ndo.get();
-                nd.setType(evaluationResult.getErrorMessage() == null ? NotificationType.anomaly : NotificationType.error);
-                notificationDefinitionRepository.save(nd);
-
-                CronExpression cronTrigger = CronExpression.parse(executionCRON);
-                LocalDateTime nextExecution = cronTrigger.next(currentTime);
-
-                NotificationSchedule notificationSchedule = new NotificationSchedule();
-                notificationSchedule.setAsset(assetRule.getAsset());
-                notificationSchedule.setDateFrom(currentTime);
-                notificationSchedule.setDateTo(nextExecution);
-                notificationSchedule.setDefinition(nd);
-                notificationSchedule.setMeasurement(assetRule.getMeasurement1());
-                notificationSchedule.setNotificationTimestamp(LocalDateTime.now());
-                notificationScheduleRepository.save(notificationSchedule);
-            }
         } catch (RuleEvaluationException ree){
             evaluationResult.setExecutionResult(null);
             evaluationResult.setErrorMessage(ree.getMessage());
         } catch (ScriptException se) {
             evaluationResult.setExecutionResult(null);
             evaluationResult.setErrorMessage("evaluation failed.");
+        }
+
+        if(evaluationResult.getErrorMessage() != null && evaluationResult.getExecutionResult().equals("true")){
+            Optional<NotificationDefinition> ndo = notificationDefinitionRepository.findByCode(evaluationResult.getExecutedReadableString());
+            NotificationDefinition nd;
+            if(ndo.isEmpty()){
+                nd = new NotificationDefinition();
+                nd.setCode(evaluationResult.getExecutedReadableString());
+                nd.setMessage(evaluationResult.getExecutedReadableString());
+            }
+            else
+                nd = ndo.get();
+            nd.setType(evaluationResult.getErrorMessage() == null ? NotificationType.anomaly : NotificationType.error);
+            notificationDefinitionRepository.save(nd);
+
+            CronExpression cronTrigger = CronExpression.parse(executionCRON);
+            LocalDateTime nextExecution = cronTrigger.next(currentTime);
+
+            NotificationSchedule notificationSchedule = new NotificationSchedule();
+            notificationSchedule.setAsset(assetRule.getAsset());
+            notificationSchedule.setDateFrom(currentTime);
+            notificationSchedule.setDateTo(nextExecution);
+            notificationSchedule.setDefinition(nd);
+            notificationSchedule.setMeasurement(assetRule.getMeasurement1());
+            notificationSchedule.setNotificationTimestamp(LocalDateTime.now());
+            notificationScheduleRepository.save(notificationSchedule);
         }
 
         return evaluationResult;
