@@ -94,7 +94,7 @@ public class DataService {
             JSONArray array = new JSONArray(response.body());
 
             DataResponse dataResponse = new DataResponse();
-            dataResponse.setRawResult(array);
+            dataResponse.setRawResult(array.toList());
             DataFields lastData =  new DataFields();
 
             if (array.length() > 0) {

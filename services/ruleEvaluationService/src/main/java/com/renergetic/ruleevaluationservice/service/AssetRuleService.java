@@ -42,50 +42,26 @@ public class AssetRuleService {
     }
 
     public List<AssetRuleDAO> createBatchAssetRule(List<AssetRuleDAO> assetRuleDAOs){
-        List<AssetRuleDAO> output = new ArrayList<>();
-        for(AssetRuleDAO assetRule : assetRuleDAOs)
-            output.add(createAssetRule(assetRule));
-        return output;
+        return assetRuleRepository.saveAll(
+                assetRuleDAOs.stream().map(this::extractEntityWithDependencies).collect(Collectors.toList()))
+                .stream().map(AssetRuleDAO::fromEntity).collect(Collectors.toList());
     }
 
     public AssetRuleDAO createAssetRule(AssetRuleDAO assetRuleDAO){
-        Asset asset = null;
-        Measurement measurement1 = null;
-        Measurement measurement2 = null;
-        if(assetRuleDAO.getAssetId() != null)
-            asset = assetRepository.findById(assetRuleDAO.getAssetId()).orElseThrow(() -> new NotFoundException("Asset id not found."));
-        if(assetRuleDAO.getMeasurement1Id() != null)
-            measurement1 = measurementRepository.findById(assetRuleDAO.getMeasurement1Id()).orElseThrow(() -> new NotFoundException("Measurement1 id not found."));
-        if(assetRuleDAO.getMeasurement2Id() != null)
-            measurement2 = measurementRepository.findById(assetRuleDAO.getMeasurement2Id()).orElseThrow(() -> new NotFoundException("Measurement2 id not found."));
-        AssetRule assetRule = assetRuleDAO.mapToEntity(asset, measurement1, measurement2);
-        assetRuleValidator.validate(assetRule);
-        return AssetRuleDAO.fromEntity(assetRuleRepository.save(assetRule));
+        return AssetRuleDAO.fromEntity(assetRuleRepository.save(extractEntityWithDependencies(assetRuleDAO)));
     }
 
-    public List<AssetRuleDAO> updateBatchAssetRule(List<AssetRuleDAO> assetRuleDAOs){
-        List<AssetRuleDAO> output = new ArrayList<>();
-        for(AssetRuleDAO assetRule : assetRuleDAOs)
-            output.add(updateAssetRule(assetRule));
-        return output;
+    public List<AssetRuleDAO> updateAndCreateBatchAssetRule(List<AssetRuleDAO> assetRuleDAOs){
+        return assetRuleRepository.saveAll(
+                        assetRuleDAOs.stream().map(this::extractEntityWithDependencies).collect(Collectors.toList()))
+                .stream().map(AssetRuleDAO::fromEntity).collect(Collectors.toList());
     }
 
     public AssetRuleDAO updateAssetRule(AssetRuleDAO assetRuleDAO){
         if(!assetRuleRepository.existsById(assetRuleDAO.getId()))
             throw new NotFoundException("Asset rule id does not exist.");
 
-        Asset asset = null;
-        Measurement measurement1 = null;
-        Measurement measurement2 = null;
-        if(assetRuleDAO.getAssetId() != null)
-            asset = assetRepository.findById(assetRuleDAO.getAssetId()).orElseThrow(() -> new NotFoundException("Asset id not found."));
-        if(assetRuleDAO.getMeasurement1Id() != null)
-            measurement1 = measurementRepository.findById(assetRuleDAO.getMeasurement1Id()).orElseThrow(() -> new NotFoundException("Measurement1 id not found."));
-        if(assetRuleDAO.getMeasurement2Id() != null)
-            measurement2 = measurementRepository.findById(assetRuleDAO.getMeasurement2Id()).orElseThrow(() -> new NotFoundException("Measurement2 id not found."));
-        AssetRule assetRule = assetRuleDAO.mapToEntity(asset, measurement1, measurement2);
-        assetRuleValidator.validate(assetRule);
-        return AssetRuleDAO.fromEntity(assetRuleRepository.save(assetRule));
+        return AssetRuleDAO.fromEntity(assetRuleRepository.save(extractEntityWithDependencies(assetRuleDAO)));
     }
 
     public Boolean deleteAssetRule(Long id){
@@ -94,5 +70,20 @@ public class AssetRuleService {
 
         assetRuleRepository.deleteById(id);
         return true;
+    }
+
+    private AssetRule extractEntityWithDependencies(AssetRuleDAO assetRuleDAO){
+        Asset asset = null;
+        Measurement measurement1 = null;
+        Measurement measurement2 = null;
+        if(assetRuleDAO.getAssetId() != null)
+            asset = assetRepository.findById(assetRuleDAO.getAssetId()).orElseThrow(() -> new NotFoundException("Asset id not found."));
+        if(assetRuleDAO.getMeasurement1Id() != null)
+            measurement1 = measurementRepository.findById(assetRuleDAO.getMeasurement1Id()).orElseThrow(() -> new NotFoundException("Measurement1 id not found."));
+        if(assetRuleDAO.getMeasurement2Id() != null)
+            measurement2 = measurementRepository.findById(assetRuleDAO.getMeasurement2Id()).orElseThrow(() -> new NotFoundException("Measurement2 id not found."));
+        AssetRule assetRule = assetRuleDAO.mapToEntity(asset, measurement1, measurement2);
+        assetRuleValidator.validate(assetRule);
+        return assetRule;
     }
 }

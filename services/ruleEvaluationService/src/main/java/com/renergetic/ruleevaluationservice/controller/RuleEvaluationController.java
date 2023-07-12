@@ -52,7 +52,7 @@ public class RuleEvaluationController {
 			@ApiResponse(responseCode = "500", description = "Error saving alert")
 		}
 	)
-	@GetMapping(path = "asset/{id}", produces = "application/json", consumes = "application/json")
+	@GetMapping(path = "asset/{id}", produces = "application/json")
 	public ResponseEntity<List<EvaluationResult>> triggerAllAssetRules (@PathVariable Long id) {
 		//TODO: Add a parameter to allow to return at the same time the data used for computation.
 		return new ResponseEntity<>(ruleEvaluationService.retrieveAndExecuteAllRulesForAssetId(id), HttpStatus.OK);

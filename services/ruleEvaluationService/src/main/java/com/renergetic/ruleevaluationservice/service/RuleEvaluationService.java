@@ -78,7 +78,7 @@ public class RuleEvaluationService {
 
     public EvaluationResult executeRule(AssetRule assetRule){
         EvaluationResult evaluationResult = new EvaluationResult();
-        if(assetRule.isActive()){
+        if(!assetRule.isActive()){
             evaluationResult.setExecutedString("inactive");
             return evaluationResult;
         }
@@ -118,7 +118,8 @@ public class RuleEvaluationService {
             notificationSchedule.setDefinition(nd);
             notificationSchedule.setMeasurement(assetRule.getMeasurement1());
             notificationSchedule.setNotificationTimestamp(LocalDateTime.now());
-            notificationScheduleRepository.save(notificationSchedule);
+            notificationSchedule = notificationScheduleRepository.save(notificationSchedule);
+            evaluationResult.setNotificationSchedule(notificationSchedule);
         }
 
         return evaluationResult;
@@ -135,7 +136,7 @@ public class RuleEvaluationService {
                 assetRule.getTimeRangeMeasurement1(), TimeUtils.offsetCurrentInstantOfAtLeast3Hours(assetRule.getTimeRangeMeasurement1()).toEpochMilli(),
                 Optional.empty());
 
-        if(dataMS1 == null || dataMS1.getDataUsedForComparison() == null || dataMS1.getRawResult() == null || dataMS1.getRawResult().length() == 0)
+        if(dataMS1 == null || dataMS1.getDataUsedForComparison() == null || dataMS1.getRawResult() == null || dataMS1.getRawResult().size() == 0)
             throw new RuleEvaluationException("Measurement 1 data could not be retrieved.");
 
         evaluationResult.setDataResponseMeasurement1(dataMS1);
@@ -146,7 +147,7 @@ public class RuleEvaluationService {
                     assetRule.getTimeRangeMeasurement2(), TimeUtils.offsetCurrentInstantOfAtLeast3Hours(assetRule.getTimeRangeMeasurement2()).toEpochMilli(),
                     Optional.empty());
 
-            if(dataMS2 == null || dataMS2.getDataUsedForComparison() == null || dataMS2.getRawResult() == null || dataMS2.getRawResult().length() == 0)
+            if(dataMS2 == null || dataMS2.getDataUsedForComparison() == null || dataMS2.getRawResult() == null || dataMS2.getRawResult().size() == 0)
                 throw new RuleEvaluationException("Measurement 2 data could not be retrieved.");
 
             evaluationResult.setDataResponseMeasurement2(dataMS2);
