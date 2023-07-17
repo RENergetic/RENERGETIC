@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.repository;
 
 import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
+import com.renergetic.hdrapi.model.details.MeasurementTags;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -120,4 +121,8 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " JOIN tileMeasurement.measurement measurement" +
             "  WHERE measurement.id = :measurementId")
     public List<InformationPanel> getLinkedPanels(Long measurementId);
+    @Query("SELECT tag FROM MeasurementTags tag " +
+            " JOIN tag.measurements measurement " +
+            "  WHERE measurement.id = :measurementId")
+    public List<MeasurementTags> getTags(Long measurementId);
 }

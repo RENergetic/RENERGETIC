@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.renergetic.hdrapi.dao.InformationPanelDAO;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
+import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
 import com.renergetic.hdrapi.dao.projection.ResourceDAO;
 import com.renergetic.hdrapi.model.Details;
@@ -296,7 +297,16 @@ public class MeasurementController {
 
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
+    @Operation(summary = "Get measurement tags")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "{id}/tags", produces = "application/json")
+    public ResponseEntity<List<MeasurementTagsDAO>> getAllTags(@PathVariable Long id) {
+        List<MeasurementTagsDAO> tags = new ArrayList<>();
 
+        tags = measurementSv.getMeasurementTags(id);
+
+        return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
     @Operation(summary = "Insert tags")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Tag saved correctly"),

@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import com.renergetic.hdrapi.dao.*;
+import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
 import com.renergetic.hdrapi.dao.projection.ResourceDAO;
 import com.renergetic.hdrapi.model.*;
@@ -251,6 +252,12 @@ public class MeasurementService {
         else throw new NotFoundException("No tags found");
     }
 
+    public List<MeasurementTagsDAO> getMeasurementTags(Long measurementId) {
+        List<MeasurementTags> tags = measurementRepository.getTags(measurementId);
+        return tags.stream().map(it -> MeasurementTagsDAO.create(it, measurementId)).collect(Collectors.toList());
+
+    }
+
     public MeasurementTags getTagById(Long id) {
         return measurementTagsRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("No tags with id " + id + " found"));
@@ -325,7 +332,7 @@ public class MeasurementService {
 
     public List<ResourceDAO> listLinkedPanels(Long id) {
         return measurementRepository.getLinkedPanels(id).stream().map(
-                it-> ResourceDAOImpl.create(it.getId(),it.getName(),it.getLabel())
+                it -> ResourceDAOImpl.create(it.getId(), it.getName(), it.getLabel())
         ).collect(Collectors.toList());
     }
 }
