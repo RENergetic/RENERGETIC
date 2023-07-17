@@ -15,7 +15,7 @@ spec:
       containers:
         - name: kpi-api
           image: kpi-api:latest
-          imagePullPolicy: Always
+          imagePullPolicy: Never
           ports:
             - containerPort: 8082
           resources:

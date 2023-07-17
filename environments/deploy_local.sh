@@ -14,6 +14,7 @@ postgreSQL=$(grep -ioP "(postgreSQL\s*=\s*)\K.+" _installers.properties)
 influxDB=$(grep -ioP "(influxDB\s*=\s*)\K.+" _installers.properties)
 # APIs
 hdr=$(grep -ioP "(hdr\s*=\s*)\K.+" _installers.properties)
+kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 # Others
@@ -124,9 +125,9 @@ then
     then
         cd "${apisPath}/kpiAPI"
         mvn clean package -Dmaven.test.skip
-        cp "./target/"*.jar "${current}/docker_config/APIs/kpi-api/api.jar"
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/kpi-api/api.jar"
 
-        cd "${current}/docker_config/APIs/kpi-api"
+        cd "${current}/docker_config_local/APIs/kpi-api"
         # API INSTALLATION
         # set environment variables
         eval $(minikube docker-env)
