@@ -1,0 +1,43 @@
+# Nexus StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nexus
+spec:
+  serviceName: nexus-sv
+  selector:
+    matchLabels:
+      app: nexus
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nexus
+    spec:
+      containers:
+        - name: nexus
+          image: docker-registry.default.svc:5000/ren-prototype-devops/nexus:latest
+          imagePullPolicy: Never
+          env:
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: -Xms2048m -Xmx2048m -XX:MaxDirectMemorySize=2048m
+          volumeMounts:
+            - name: nexus-disk
+              mountPath: /nexus-data
+              subPath: nexus-data
+          resources:
+            requests:
+              cpu: 450m
+              memory: 1550Mi
+            limits:
+              cpu: '1'
+              memory: 2Gi
+  # Volume Claim
+  volumeClaimTemplates:
+    - metadata:
+        name: nexus-disk
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
