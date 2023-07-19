@@ -18,16 +18,16 @@
 	</properties>
 	<repositories>
 		<repository>
-			<id>renergetic-release</id>
-			<name>Local Nexus</name>
-			<url>http://localhost:8079/repository/renergetic-release/</url>
+			<id>remote-renergetic-release</id>
+			<name>Remote Nexus</name>
+			<url>https://nexus-ren-prototype-devops.apps.paas-dev.psnc.pl/repository/renergetic-release/</url>
 		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>com.renergetic</groupId>
 			<artifactId>common</artifactId>
-			<version>1.1.3</version>
+			<version>1.1.9</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-keycloak-admin-client -->
 <!--		<dependency>-->
