@@ -30,6 +30,7 @@ keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
 grafana=$(grep -ioP "(grafana\s*=\s*)\K.+" _installers.properties)
 nifi=$(grep -ioP "(nifi\s*=\s*)\K.+" _installers.properties)
 wso2=$(grep -ioP "(wso2\s*=\s*)\K.+" _installers.properties)
+nexus=$(grep -ioP "(nexus\s*=\s*)\K.+" _installers.properties)
 
 rm -rf ~/.kube
 
@@ -194,6 +195,26 @@ then
         # create kubernetes resources
         envsubst '$PROJECT' < wso2-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f wso2-service.yaml
+    fi
+# DEPLOY NEXUS API MANAGER
+
+    if [[ $nexus = 'true' ]]
+    then
+        cd "${current}/docker_config/Devops/nexus"
+        # NEXUS INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete statefulsets/nexus --namespace=ren-prototype-devops
+        kubectl delete services/nexus-sv --namespace=ren-prototype-devops
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype-devops/nexus:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/ren-prototype-devops/nexus:latest
+
+        # create kubernetes resources
+        kubectl apply --force=true -f nexus-statefulset.yaml --namespace=ren-prototype-devops
+        kubectl apply -f nexus-service.yaml --namespace=ren-prototype-devops
     fi
 # DEPLOY GRAFANA
 
