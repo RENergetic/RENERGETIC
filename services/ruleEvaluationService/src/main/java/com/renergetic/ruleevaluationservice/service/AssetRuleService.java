@@ -12,8 +12,9 @@ import com.renergetic.ruleevaluationservice.validator.AssetRuleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,18 @@ public class AssetRuleService {
     public List<AssetRuleDAO> updateAndCreateBatchAssetRule(List<AssetRuleDAO> assetRuleDAOs){
         return assetRuleRepository.saveAll(
                         assetRuleDAOs.stream().map(this::extractEntityWithDependencies).collect(Collectors.toList()))
+                .stream().map(AssetRuleDAO::fromEntity).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<AssetRuleDAO> updateAndCreateBatchAssetRuleForAssetId(Long assetId, List<AssetRuleDAO> assetRuleDAOs){
+        List<AssetRule> assetRules = assetRuleRepository.findByAssetId(assetId);
+        List<AssetRule> assetRulesFromClient = assetRuleDAOs.stream().map(this::extractEntityWithDependencies).collect(Collectors.toList());
+        List<Long> existingIds = assetRulesFromClient.stream().map(AssetRule::getId).filter(Objects::nonNull).collect(Collectors.toList());
+        assetRules = assetRules.stream().filter(x -> !existingIds.contains(x.getId())).collect(Collectors.toList());
+        assetRuleRepository.deleteAll(assetRules);
+
+        return assetRuleRepository.saveAll(assetRulesFromClient)
                 .stream().map(AssetRuleDAO::fromEntity).collect(Collectors.toList());
     }
 
