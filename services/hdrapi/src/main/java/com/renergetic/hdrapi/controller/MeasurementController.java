@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.renergetic.hdrapi.dao.InformationPanelDAO;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
+import com.renergetic.hdrapi.dao.details.TagDAO;
 import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
 import com.renergetic.hdrapi.dao.projection.ResourceDAO;
 import com.renergetic.hdrapi.model.Details;
@@ -289,11 +290,11 @@ public class MeasurementController {
     @Operation(summary = "Get All Tags")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "tags", produces = "application/json")
-    public ResponseEntity<List<MeasurementTags>> getAllTags(@RequestParam(required = false) Optional<Long> offset,
-                                                            @RequestParam(required = false) Optional<Integer> limit) {
-        List<MeasurementTags> tags = new ArrayList<>();
+    public ResponseEntity<List<TagDAO>> getAllTags(@RequestParam(required = false) Optional<Long> offset,
+                                                   @RequestParam(required = false) Optional<Integer> limit) {
+        List<TagDAO> tags = new ArrayList<>();
 
-        tags = measurementSv.getTags(null, offset.orElse(0L), limit.orElse(20));
+        tags = measurementSv.getTags(null, offset.orElse(0L), limit.orElse(500));
 
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
@@ -316,6 +317,19 @@ public class MeasurementController {
     public ResponseEntity<MeasurementTags> insertTag(@RequestBody MeasurementTags tag) {
         MeasurementTags _tag = measurementSv.saveTag(tag);
         return new ResponseEntity<>(_tag, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Insert Tags for Measurement")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "{id}/tags", produces = "application/json")
+    public ResponseEntity<Boolean> setTags(
+            @PathVariable(name = "id") Long measurementId,
+            @RequestBody Map<String, String> tags) {
+//TODO check privileges
+
+        boolean res = measurementSv.setTags(measurementId, tags);
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Update tags")

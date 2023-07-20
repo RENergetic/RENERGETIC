@@ -115,7 +115,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     public List<MeasurementDAO> report(long offset, long limit);
 
 
-    @Query("SELECT informationPanel FROM InformationPanel informationPanel " +
+    @Query("SELECT DISTINCT informationPanel FROM InformationPanel informationPanel " +
             " JOIN informationPanel.tiles tile " +
             " JOIN tile.informationTileMeasurements tileMeasurement " +
             " JOIN tileMeasurement.measurement measurement" +

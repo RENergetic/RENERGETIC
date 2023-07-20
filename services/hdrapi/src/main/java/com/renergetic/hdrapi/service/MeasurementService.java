@@ -12,6 +12,7 @@ import javax.persistence.PersistenceContext;
 
 import com.renergetic.hdrapi.dao.*;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
+import com.renergetic.hdrapi.dao.details.TagDAO;
 import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
 import com.renergetic.hdrapi.dao.projection.ResourceDAO;
 import com.renergetic.hdrapi.model.*;
@@ -218,6 +219,27 @@ public class MeasurementService {
         return measurementTagsRepository.save(tag);
     }
 
+    public boolean setTags(Long measurementId, Map<String, String> tags) {
+        Measurement m = this.getById(measurementId);//check is exists
+        List<MeasurementTags> tagList = tags.entrySet().stream().map(it -> {
+            var l = measurementTagsRepository.findByKeyAndValue(it.getKey(), it.getValue());
+            if (l.size() == 0) {
+                throw new InvalidNonExistingIdException(
+                        "No tag with key " + it.getKey() + " and value: " + it.getValue());
+            }
+            return l.get(0);
+        }).collect(Collectors.toList());
+        measurementTagsRepository.clearTags(measurementId);
+        Optional<Boolean> hasFail =
+                tagList.stream().map(it -> measurementTagsRepository.setTag(it.getId(), measurementId)==0).filter(
+                        it -> it ).findAny();
+        if(hasFail.isPresent()){
+            //todo: rallback
+        }
+        return true;
+    }
+
+
     public MeasurementTags updateTag(MeasurementTags tag, Long id) {
         if (id != null && measurementTagsRepository.existsById(id)) {
             tag.setId(id);
@@ -232,12 +254,12 @@ public class MeasurementService {
         } else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
     }
 
-    public List<MeasurementTags> getTags(Map<String, String> filters, long offset, int limit) {
+    public List<TagDAO> getTags(Map<String, String> filters, long offset, int limit) {
         Page<MeasurementTags> tags = measurementTagsRepository.findAll(new OffSetPaging(offset, limit));
         Stream<MeasurementTags> stream = tags.stream();
 
         if (filters != null)
-            stream.filter(Detail -> {
+            stream = stream.filter(Detail -> {
                 boolean equals = true;
 
                 if (filters.containsKey("key"))
@@ -245,11 +267,9 @@ public class MeasurementService {
 
                 return equals;
             });
-        List<MeasurementTags> list = stream.collect(Collectors.toList());
+        return stream.map(it -> new TagDAO(it.getKey(), it.getValue())).collect(Collectors.toList());
 
-        if (list != null && list.size() > 0)
-            return list;
-        else throw new NotFoundException("No tags found");
+
     }
 
     public List<MeasurementTagsDAO> getMeasurementTags(Long measurementId) {
