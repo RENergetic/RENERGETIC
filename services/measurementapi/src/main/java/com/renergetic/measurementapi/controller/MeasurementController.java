@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.renergetic.common.model.InfluxFunction;
 import com.renergetic.measurementapi.service.ConvertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.measurementapi.dao.MeasurementDAORequest;
 import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
-import com.renergetic.measurementapi.model.InfluxFunction;
 import com.renergetic.measurementapi.service.MeasurementService;
 
 import org.springframework.web.bind.annotation.RequestBody;

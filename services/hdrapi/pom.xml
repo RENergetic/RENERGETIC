@@ -16,7 +16,19 @@
 	<properties>
 		<java.version>11</java.version>
 	</properties>
+	<repositories>
+		<repository>
+			<id>remote-renergetic-release</id>
+			<name>Remote Nexus</name>
+			<url>https://nexus-ren-prototype-devops.apps.paas-dev.psnc.pl/repository/renergetic-release/</url>
+		</repository>
+	</repositories>
 	<dependencies>
+		<dependency>
+			<groupId>com.renergetic</groupId>
+			<artifactId>common</artifactId>
+			<version>1.1.9</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-keycloak-admin-client -->
 <!--		<dependency>-->
 <!--			<groupId>io.quarkus</groupId>-->

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.renergetic.hdrapi.model.details.AssetDetails;
+import com.renergetic.common.model.details.AssetDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.renergetic.hdrapi.dao.MeasurementDAORequest;
-import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
-import com.renergetic.hdrapi.model.Measurement;
-import com.renergetic.hdrapi.model.MeasurementType;
-import com.renergetic.hdrapi.model.details.MeasurementDetails;
-import com.renergetic.hdrapi.model.details.MeasurementTags;
-import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
+import com.renergetic.common.dao.MeasurementDAORequest;
+import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.model.Measurement;
+import com.renergetic.common.model.MeasurementType;
+import com.renergetic.common.model.details.MeasurementDetails;
+import com.renergetic.common.model.details.MeasurementTags;
+import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.service.MeasurementService;
 
 import io.swagger.v3.oas.annotations.Operation;

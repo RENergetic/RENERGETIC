@@ -11,15 +11,15 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-//import com.renergetic.hdrapi.dao.InformationTileMeasurementDAORequest;
-//import com.renergetic.hdrapi.dao.InformationTileMeasurementDAOResponse;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.InformationTileMeasurement;
-import com.renergetic.hdrapi.repository.HeatmapRepository;
-import com.renergetic.hdrapi.repository.InformationTileMeasurementRepository;
-import com.renergetic.hdrapi.repository.UuidRepository;
+//import com.renergetic.common.dao.InformationTileMeasurementDAORequest;
+//import com.renergetic.common.dao.InformationTileMeasurementDAOResponse;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.InformationTileMeasurement;
+import com.renergetic.common.repository.HeatmapRepository;
+import com.renergetic.common.repository.InformationTileMeasurementRepository;
+import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 @Service

@@ -11,14 +11,14 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.hdrapi.dao.HeatmapDAO;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.Heatmap;
-import com.renergetic.hdrapi.model.UUID;
-import com.renergetic.hdrapi.repository.HeatmapRepository;
-import com.renergetic.hdrapi.repository.UuidRepository;
+import com.renergetic.common.dao.HeatmapDAO;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.Heatmap;
+import com.renergetic.common.model.UUID;
+import com.renergetic.common.repository.HeatmapRepository;
+import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 @Service

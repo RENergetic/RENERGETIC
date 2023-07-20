@@ -1,8 +1,8 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.AssetCategoryDAO;
-import com.renergetic.hdrapi.dao.AssetDAOResponse;
-import com.renergetic.hdrapi.model.Asset;
+import com.renergetic.common.dao.AssetCategoryDAO;
+import com.renergetic.common.dao.AssetDAOResponse;
+import com.renergetic.common.model.Asset;
 import com.renergetic.hdrapi.service.AssetCategoryService;
 import com.renergetic.hdrapi.service.AssetService;
 

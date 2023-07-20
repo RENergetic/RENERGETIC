@@ -1,7 +1,7 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.DataWrapperDAO;
-import com.renergetic.hdrapi.dao.TimeseriesDAO;
+import com.renergetic.common.dao.DataWrapperDAO;
+import com.renergetic.common.dao.TimeseriesDAO;
 import com.renergetic.hdrapi.service.DataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

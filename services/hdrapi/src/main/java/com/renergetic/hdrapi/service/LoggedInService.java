@@ -1,12 +1,12 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.exception.UnauthorizedAccessException;
-import com.renergetic.hdrapi.model.User;
-import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
-import com.renergetic.hdrapi.model.security.KeycloakRole;
-import com.renergetic.hdrapi.model.security.KeycloakUser;
-import com.renergetic.hdrapi.repository.UserRepository;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.exception.UnauthorizedAccessException;
+import com.renergetic.common.model.User;
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
+import com.renergetic.common.model.security.KeycloakRole;
+import com.renergetic.common.model.security.KeycloakUser;
+import com.renergetic.common.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

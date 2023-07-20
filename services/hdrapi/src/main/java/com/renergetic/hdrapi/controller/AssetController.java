@@ -1,16 +1,16 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.AssetCategoryDAO;
-import com.renergetic.hdrapi.dao.AssetConnectionDAORequest;
-import com.renergetic.hdrapi.dao.AssetDAORequest;
-import com.renergetic.hdrapi.dao.AssetDAOResponse;
-import com.renergetic.hdrapi.dao.MeasurementDAOResponse;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.AssetType;
-import com.renergetic.hdrapi.model.ConnectionType;
-import com.renergetic.hdrapi.model.details.AssetDetails;
-import com.renergetic.hdrapi.repository.AssetRepository;
-import com.renergetic.hdrapi.repository.information.AssetDetailsRepository;
+import com.renergetic.common.dao.AssetCategoryDAO;
+import com.renergetic.common.dao.AssetConnectionDAORequest;
+import com.renergetic.common.dao.AssetDAORequest;
+import com.renergetic.common.dao.AssetDAOResponse;
+import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.AssetType;
+import com.renergetic.common.model.ConnectionType;
+import com.renergetic.common.model.details.AssetDetails;
+import com.renergetic.common.repository.AssetRepository;
+import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.hdrapi.service.AssetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.renergetic.hdrapi.dao.DemandDefinitionDAO;
-import com.renergetic.hdrapi.dao.DemandScheduleDAO;
+import com.renergetic.common.dao.DemandDefinitionDAO;
+import com.renergetic.common.dao.DemandScheduleDAO;
 import com.renergetic.hdrapi.service.DemandRequestService;
 
 import java.util.List;

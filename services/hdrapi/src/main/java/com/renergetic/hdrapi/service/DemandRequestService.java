@@ -1,18 +1,18 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.service.utils.DateConverter;
+import com.renergetic.common.utilities.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.hdrapi.dao.DemandDefinitionDAO;
-import com.renergetic.hdrapi.dao.DemandScheduleDAO;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.DemandDefinition;
-import com.renergetic.hdrapi.model.DemandSchedule;
-import com.renergetic.hdrapi.repository.DemandDefinitionRepository;
-import com.renergetic.hdrapi.repository.DemandScheduleRepository;
+import com.renergetic.common.dao.DemandDefinitionDAO;
+import com.renergetic.common.dao.DemandScheduleDAO;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.DemandDefinition;
+import com.renergetic.common.model.DemandSchedule;
+import com.renergetic.common.repository.DemandDefinitionRepository;
+import com.renergetic.common.repository.DemandScheduleRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 import java.time.LocalDateTime;

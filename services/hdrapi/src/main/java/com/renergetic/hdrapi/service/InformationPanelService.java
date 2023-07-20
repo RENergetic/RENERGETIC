@@ -1,15 +1,15 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.mapper.InformationPanelMapper;
-import com.renergetic.hdrapi.model.*;
-import com.renergetic.hdrapi.model.UUID;
-import com.renergetic.hdrapi.model.details.MeasurementDetails;
-import com.renergetic.hdrapi.repository.*;
-import com.renergetic.hdrapi.repository.information.MeasurementDetailsRepository;
+import com.renergetic.common.dao.*;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.mapper.InformationPanelMapper;
+import com.renergetic.common.model.*;
+import com.renergetic.common.model.UUID;
+import com.renergetic.common.model.details.MeasurementDetails;
+import com.renergetic.common.repository.*;
+import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

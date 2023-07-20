@@ -1,27 +1,26 @@
 package com.renergetic.hdrapi.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.renergetic.hdrapi.repository.AssetRepository;
-import com.renergetic.hdrapi.service.utils.DateConverter;
+import com.renergetic.common.repository.AssetRepository;
+import com.renergetic.common.utilities.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.hdrapi.dao.NotificationDefinitionDAO;
-import com.renergetic.hdrapi.dao.NotificationScheduleDAO;
-import com.renergetic.hdrapi.exception.InvalidArgumentException;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.NotificationDefinition;
-import com.renergetic.hdrapi.model.NotificationSchedule;
-import com.renergetic.hdrapi.repository.NotificationDefinitionRepository;
-import com.renergetic.hdrapi.repository.NotificationScheduleRepository;
+import com.renergetic.common.dao.NotificationDefinitionDAO;
+import com.renergetic.common.dao.NotificationScheduleDAO;
+import com.renergetic.common.exception.InvalidArgumentException;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.NotificationDefinition;
+import com.renergetic.common.model.NotificationSchedule;
+import com.renergetic.common.repository.NotificationDefinitionRepository;
+import com.renergetic.common.repository.NotificationScheduleRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 @Service

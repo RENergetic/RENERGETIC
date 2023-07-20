@@ -1,8 +1,8 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.dao.UserDAORequest;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.security.KeycloakRole;
+import com.renergetic.common.dao.UserDAORequest;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.security.KeycloakRole;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.keycloak.admin.client.Keycloak;

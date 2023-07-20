@@ -8,21 +8,21 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.renergetic.hdrapi.model.MeasurementType;
-import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
+import com.renergetic.common.model.MeasurementType;
+import com.renergetic.common.repository.MeasurementTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.hdrapi.dao.DashboardDAO;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.Dashboard;
-import com.renergetic.hdrapi.model.UUID;
-import com.renergetic.hdrapi.model.User;
-import com.renergetic.hdrapi.repository.DashboardRepository;
-import com.renergetic.hdrapi.repository.UserRepository;
-import com.renergetic.hdrapi.repository.UuidRepository;
+import com.renergetic.common.dao.DashboardDAO;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.Dashboard;
+import com.renergetic.common.model.UUID;
+import com.renergetic.common.model.User;
+import com.renergetic.common.repository.DashboardRepository;
+import com.renergetic.common.repository.UserRepository;
+import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 @Service

@@ -1,12 +1,12 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.exception.UnauthorizedAccessException;
-import com.renergetic.hdrapi.model.ConnectionType;
-import com.renergetic.hdrapi.model.User;
-import com.renergetic.hdrapi.model.security.KeycloakRole;
-import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
+import com.renergetic.common.dao.*;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.exception.UnauthorizedAccessException;
+import com.renergetic.common.model.ConnectionType;
+import com.renergetic.common.model.User;
+import com.renergetic.common.model.security.KeycloakRole;
+import com.renergetic.common.repository.MeasurementTypeRepository;
 import com.renergetic.hdrapi.service.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
