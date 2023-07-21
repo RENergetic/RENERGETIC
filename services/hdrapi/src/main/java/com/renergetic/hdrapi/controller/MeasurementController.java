@@ -109,10 +109,11 @@ public class MeasurementController {
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
+
     @Operation(summary = "Get linked panels for given measurement")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/{id}/panels", produces = "application/json")
-    public ResponseEntity<List<ResourceDAO>> listLinkedPanels(@PathVariable Long id ) {
+    public ResponseEntity<List<ResourceDAO>> listLinkedPanels(@PathVariable Long id) {
         List<ResourceDAO> l = measurementSv.listLinkedPanels(id);
         return new ResponseEntity<>(l, HttpStatus.OK);
     }
@@ -161,28 +162,6 @@ public class MeasurementController {
         return new ResponseEntity<>(type, type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    @Operation(summary = "Get Measurement Timeseries from InfluxDB")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
-            @ApiResponse(responseCode = "404", description = "No measurement values found with this id")
-    })
-    @GetMapping(path = "/{measurement_id}/values", produces = "application/json")
-    public ResponseEntity<String> getMeasurementsValues(@PathVariable Long measurement_id,
-                                                        @RequestParam Map<String, String> tags) {
-        String url = "http://backinflux-sv:8082/api/";
-        url += measurementSv.getById(measurement_id).getName();
-
-        if (tags != null && tags.size() > 0)
-            url += "?" + String.join("&",
-                    tags.keySet().stream()
-                            .map(key -> key + "=" + tags.get(key))
-                            .collect(Collectors.toList()));
-
-        RestTemplate apiInflux = new RestTemplate();
-        String data = apiInflux.getForObject(url, String.class);
-
-        return new ResponseEntity<>(data, data != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-    }
 
 //=== INFO REQUESTS ===================================================================================
 
@@ -208,12 +187,13 @@ public class MeasurementController {
             @ApiResponse(responseCode = "404", description = "Measurements havent details or doesn't exists")
     })
     @GetMapping(path = "{measurement_id}/properties", produces = "application/json")
-    public ResponseEntity<Map<String, String>> getInformationMeasurementProperties(@PathVariable("measurement_id") Long id) {
+    public ResponseEntity<Map<String, String>> getInformationMeasurementProperties(
+            @PathVariable("measurement_id") Long id) {
         Map<String, String> info = null;
 
         info = measurementSv.getDetailsByMeasurementId(id).stream()
                 .collect(Collectors.toMap(MeasurementDetails::getKey, Details::getValue));
-        return new ResponseEntity< >(info, HttpStatus.OK);
+        return new ResponseEntity<>(info, HttpStatus.OK);
     }
 
     @Operation(summary = "Insert measurement detail's property")
@@ -287,75 +267,7 @@ public class MeasurementController {
     }
     //=== TAGS REQUESTS ===================================================================================
 
-    @Operation(summary = "Get All Tags")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "tags", produces = "application/json")
-    public ResponseEntity<List<TagDAO>> getAllTags(@RequestParam(required = false) Optional<Long> offset,
-                                                   @RequestParam(required = false) Optional<Integer> limit) {
-        List<TagDAO> tags = new ArrayList<>();
 
-        tags = measurementSv.getTags(null, offset.orElse(0L), limit.orElse(500));
-
-        return new ResponseEntity<>(tags, HttpStatus.OK);
-    }
-    @Operation(summary = "Get measurement tags")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "{id}/tags", produces = "application/json")
-    public ResponseEntity<List<MeasurementTagsDAO>> getAllTags(@PathVariable Long id) {
-        List<MeasurementTagsDAO> tags = new ArrayList<>();
-
-        tags = measurementSv.getMeasurementTags(id);
-
-        return new ResponseEntity<>(tags, HttpStatus.OK);
-    }
-    @Operation(summary = "Insert tags")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tag saved correctly"),
-            @ApiResponse(responseCode = "500", description = "Error saving tag")
-    })
-    @PostMapping(path = "tags", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<MeasurementTags> insertTag(@RequestBody MeasurementTags tag) {
-        MeasurementTags _tag = measurementSv.saveTag(tag);
-        return new ResponseEntity<>(_tag, HttpStatus.CREATED);
-    }
-
-    @Operation(summary = "Insert Tags for Measurement")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PutMapping(path = "{id}/tags", produces = "application/json")
-    public ResponseEntity<Boolean> setTags(
-            @PathVariable(name = "id") Long measurementId,
-            @RequestBody Map<String, String> tags) {
-//TODO check privileges
-
-        boolean res = measurementSv.setTags(measurementId, tags);
-
-        return new ResponseEntity<>(res, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Update tags")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tag saved correctly"),
-            @ApiResponse(responseCode = "400", description = "Path isn't valid"),
-            @ApiResponse(responseCode = "404", description = "Tag not exist"),
-            @ApiResponse(responseCode = "500", description = "Error saving information")
-    })
-    @PutMapping(path = "tags/{tag_id}", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<MeasurementTags> updateTag(@RequestBody MeasurementTags tag, @PathVariable Long tag_id) {
-        MeasurementTags _tag = measurementSv.updateTag(tag, tag_id);
-        return new ResponseEntity<>(_tag, _tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-    }
-
-    @Operation(summary = "Delete tags")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Tag deleted"),
-            @ApiResponse(responseCode = "500", description = "Error deleting tag")
-    })
-    @DeleteMapping(path = "tags/{tag_id}")
-    public ResponseEntity<MeasurementDetails> deleteInformation(@PathVariable Long tag_id) {
-        measurementSv.deleteTagById(tag_id);
-
-        return ResponseEntity.noContent().build();
-    }
 //=== POST REQUESTS ===================================================================================
 
     @Operation(summary = "Create a new Measurement")
@@ -458,4 +370,113 @@ public class MeasurementController {
 
         return ResponseEntity.noContent().build();
     }
+    //region tags
+
+    @Operation(summary = "Get All Tags")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "tags", produces = "application/json")
+    public ResponseEntity<List<TagDAO>> getAllTags(@RequestParam(required = false) Optional<Long> offset,
+                                                   @RequestParam(required = false) Optional<Integer> limit) {
+        List<TagDAO> tags = new ArrayList<>();
+        tags = measurementSv.getTags(null, offset.orElse(0L), limit.orElse(500));
+        return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get measurement tags")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "{id}/tags", produces = "application/json")
+    public ResponseEntity<List<MeasurementTagsDAO>> getAllTags(@PathVariable Long id) {
+        List<MeasurementTagsDAO> tags = new ArrayList<>();
+
+        tags = measurementSv.getMeasurementTags(id);
+
+        return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Insert tags")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tag saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving tag")
+    })
+    @PostMapping(path = "tags", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<MeasurementTags> insertTag(@RequestBody MeasurementTags tag) {
+        MeasurementTags _tag = measurementSv.saveTag(tag);
+        return new ResponseEntity<>(_tag, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Get Measurement Timeseries from InfluxDB")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "404", description = "No measurement values found with this id")
+    })
+    @GetMapping(path = "/{measurement_id}/values", produces = "application/json")
+    public ResponseEntity<String> getMeasurementsValues(@PathVariable Long measurement_id,
+                                                        @RequestParam Map<String, String> tags) {
+        String url = "http://backinflux-sv:8082/api/";
+        url += measurementSv.getById(measurement_id).getName();
+
+        if (tags != null && tags.size() > 0)
+            url += "?" + String.join("&",
+                    tags.keySet().stream()
+                            .map(key -> key + "=" + tags.get(key))
+                            .collect(Collectors.toList()));
+
+        RestTemplate apiInflux = new RestTemplate();
+        String data = apiInflux.getForObject(url, String.class);
+
+        return new ResponseEntity<>(data, data != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+
+    @Operation(summary = "Insert Tags for Measurement")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "{id}/tags", produces = "application/json")
+    public ResponseEntity<Boolean> setTags(
+            @PathVariable(name = "id") Long measurementId,
+            @RequestBody Map<String, String> tags) {
+//TODO check privileges
+
+        boolean res = measurementSv.setTags(measurementId, tags);
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Delete tag")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tag deleted"),
+            @ApiResponse(responseCode = "500", description = "Error deleting tag")
+    })
+    @DeleteMapping(path = "tags/key/{key}/value/{value}")
+    public ResponseEntity<MeasurementDetails> deleteInformation(@PathVariable String key, @PathVariable String value) {
+        measurementSv.deleteTag(key, value);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @Operation(summary = "Update tags")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tag saved correctly"),
+            @ApiResponse(responseCode = "400", description = "Path isn't valid"),
+            @ApiResponse(responseCode = "404", description = "Tag not exist"),
+            @ApiResponse(responseCode = "500", description = "Error saving information")
+    })
+    @PutMapping(path = "tags/{tag_id}", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<MeasurementTags> updateTag(@RequestBody MeasurementTags tag, @PathVariable Long tag_id) {
+        MeasurementTags _tag = measurementSv.updateTag(tag, tag_id);
+        return new ResponseEntity<>(_tag, _tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "Delete tags")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tag deleted"),
+            @ApiResponse(responseCode = "500", description = "Error deleting tag")
+    })
+    @DeleteMapping(path = "tags/{tag_id}")
+    public ResponseEntity<MeasurementDetails> deleteInformation(@PathVariable Long tag_id) {
+        measurementSv.deleteTagById(tag_id);
+
+        return ResponseEntity.noContent().build();
+    }
+    //endregion
 }

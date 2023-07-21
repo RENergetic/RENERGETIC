@@ -231,9 +231,9 @@ public class MeasurementService {
         }).collect(Collectors.toList());
         measurementTagsRepository.clearTags(measurementId);
         Optional<Boolean> hasFail =
-                tagList.stream().map(it -> measurementTagsRepository.setTag(it.getId(), measurementId)==0).filter(
-                        it -> it ).findAny();
-        if(hasFail.isPresent()){
+                tagList.stream().map(it -> measurementTagsRepository.setTag(it.getId(), measurementId) == 0).filter(
+                        it -> it).findAny();
+        if (hasFail.isPresent()) {
             //todo: rallback
         }
         return true;
@@ -252,6 +252,15 @@ public class MeasurementService {
             measurementTagsRepository.deleteById(id);
             return true;
         } else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
+    }
+
+    public void deleteTag(String key, String value) {
+        List<MeasurementTags> l = measurementTagsRepository.findByKeyAndValue(key, value);
+        if (l.isEmpty())
+            throw new InvalidNonExistingIdException("Tag " + key + ":" + value + " not found");
+        l.forEach(it -> measurementTagsRepository.delete(it));
+
+
     }
 
     public List<TagDAO> getTags(Map<String, String> filters, long offset, int limit) {
@@ -355,4 +364,5 @@ public class MeasurementService {
                 it -> ResourceDAOImpl.create(it.getId(), it.getName(), it.getLabel())
         ).collect(Collectors.toList());
     }
+
 }

@@ -22,10 +22,10 @@ public interface MeasurementTagsRepository extends JpaRepository<MeasurementTags
             "WHERE connection.measurement_id = :measurementId", nativeQuery = true)
     List<MeasurementTags> findByMeasurementId(Long measurementId);
 
-    @Query(value = "SELECT mt " +
-            "FROM tags" +
-            "WHERE mt.value=key and mt.value =:value ")
-    List<MeasurementTags> findByKeyAndValue(String key, String value);
+    @Query(value = "SELECT mt.* " +
+            " FROM tags mt " +
+            " WHERE mt.key=:key and mt.value =:value ", nativeQuery = true)
+    List<MeasurementTags> findByKeyAndValue(@Param("key") String key,@Param("value") String value);
 
 
     @Modifying
