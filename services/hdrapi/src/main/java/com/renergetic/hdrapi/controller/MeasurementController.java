@@ -447,7 +447,7 @@ public class MeasurementController {
             @ApiResponse(responseCode = "500", description = "Error deleting tag")
     })
     @DeleteMapping(path = "tags/key/{key}/value/{value}")
-    public ResponseEntity<MeasurementDetails> deleteInformation(@PathVariable String key, @PathVariable String value) {
+    public ResponseEntity<Boolean> deleteTag(@PathVariable String key, @PathVariable String value) {
         measurementSv.deleteTag(key, value);
 
         return ResponseEntity.noContent().build();

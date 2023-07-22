@@ -16,6 +16,7 @@ import com.renergetic.hdrapi.dao.details.TagDAO;
 import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
 import com.renergetic.hdrapi.dao.projection.ResourceDAO;
 import com.renergetic.hdrapi.model.*;
+import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -256,9 +257,16 @@ public class MeasurementService {
 
     public void deleteTag(String key, String value) {
         List<MeasurementTags> l = measurementTagsRepository.findByKeyAndValue(key, value);
-        if (l.isEmpty())
-            throw new InvalidNonExistingIdException("Tag " + key + ":" + value + " not found");
-        l.forEach(it -> measurementTagsRepository.delete(it));
+        if (l.size() == 0) {
+            throw new InvalidNonExistingIdException("No tag with key " + key + " and value: " + value);
+        }
+        MeasurementTags t = l.get(0);
+        List<Measurement> m =
+                measurementTagsRepository.getMeasurementByTagId(t.getId(), 0L, 1L);
+        if (!m.isEmpty())
+            throw new InvalidNonExistingIdException("Tag " + key + ":" + value + "  is used ");
+
+        measurementTagsRepository.delete(t);
 
 
     }
