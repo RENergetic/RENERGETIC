@@ -19,7 +19,8 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     Measurement save(Measurement measurement);
 
     List<Measurement> findByAsset(Asset assetId);
-
+    @Query(value = "SELECT m FROM Measurement m WHERE m.id in :ids" )
+    public List<Measurement> findByIds(List<Long> ids);
     @Query(value = "SELECT measurement.* " +
             "FROM (measurement " +
             "INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +

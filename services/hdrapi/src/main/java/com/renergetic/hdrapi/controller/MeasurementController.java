@@ -449,8 +449,7 @@ public class MeasurementController {
     @DeleteMapping(path = "tags/key/{key}/value/{value}")
     public ResponseEntity<Boolean> deleteTag(@PathVariable String key, @PathVariable String value) {
         measurementSv.deleteTag(key, value);
-
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
 
