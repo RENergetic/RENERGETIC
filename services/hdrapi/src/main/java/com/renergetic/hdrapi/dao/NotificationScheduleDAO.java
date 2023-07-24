@@ -32,7 +32,7 @@ public class NotificationScheduleDAO {
     @JsonProperty(value = "date_from", required = true)
     private Long dateFrom;
 
-    @JsonProperty(value = "notification_timestamp", required = true)
+    @JsonProperty(value = "notification_timestamp", required = false)
     private Long notificationTimestamp;
     @JsonProperty(value = "timestamp", required = true)
     private Long predictionDate;
