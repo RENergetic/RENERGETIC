@@ -36,13 +36,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-        	System.err.println("AUTHORIZATION FILTER");
+        	log.debug("AUTHORIZATION FILTER");
             String jwtToken = request.getHeader("Authorization");
             if (StringUtils.hasText(jwtToken)) {
                 KeycloakAuthenticationToken authenticationToken = this.getAuthenticationToken(jwtToken);
 
             	SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            	System.err.println(authenticationToken);
+            	log.debug(authenticationToken.toString());
             }
         } catch (Exception ex) {
             log.error("Could not set user authentication in security context", ex);
