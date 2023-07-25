@@ -130,4 +130,28 @@ public class AbstractMeterController {
 		
 		return ResponseEntity.ok(amDataSv.getAggregated(name, domain, InfluxFunction.obtain(operation), from.orElse(null), to.orElse(null), group));
 	}
+	
+    @Operation(summary = "Create data for an Abstract meter")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@PostMapping(path = "{domain}/{meter_name}/data", produces = "application/json")
+	public ResponseEntity<AbstractMeterDataDAO> insertAbstractMeterData(
+			@PathVariable("domain") Domain domain,
+			@PathVariable("meter_name") String name,
+			@RequestParam(name = "from", required = false) Optional<Long> from,
+			@RequestParam(name = "to", required = false) Optional<Long> to,
+			@RequestParam(name = "time", required = false) Optional<Long> time) {
+		
+		return ResponseEntity.ok(amDataSv.calculateAndInsert(name, domain, from.orElse(null), to.orElse(null), time.orElse(null)));
+	}
+	
+    @Operation(summary = "Create data for all configured Abstract meters")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@PostMapping(path = "/data", produces = "application/json")
+	public ResponseEntity<List<AbstractMeterDataDAO>> insertAllAbstractMeterData(
+			@RequestParam(name = "from", required = false) Optional<Long> from,
+			@RequestParam(name = "to", required = false) Optional<Long> to,
+			@RequestParam(name = "time", required = false) Optional<Long> time) {
+		
+		return ResponseEntity.ok(amDataSv.calculateAndInsertAll(from.orElse(null), to.orElse(null), time.orElse(null)));
+	}
 }
