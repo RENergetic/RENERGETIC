@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -37,10 +39,10 @@ public class DataController {
             @PathVariable Long panelId,
             @RequestParam("from") Optional<Long> from,
             @RequestParam("to") Optional<Long> to) {
-    	// GET INSTANT TO FIRST DAY OF THE CURRENT 
+        // GET INSTANT TO FIRST DAY OF THE CURRENT
 
-		Long fromInstant = null;
-    	
+        Long fromInstant = null;
+
         if (from.isEmpty()) {
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.MILLISECOND, 0);
@@ -70,16 +72,27 @@ public class DataController {
                 dataSv.getPanelData(panelId, assetId, from.orElse((new Date()).getTime() - 3600000), to);
         return new ResponseEntity<>(panelData, HttpStatus.OK);
     }
+
     @GetMapping(path = "/timeseries/tile/{tileId}", produces = "application/json")
     public ResponseEntity<TimeseriesDAO> getTileTimeseries(
             @PathVariable Long tileId,
             @RequestParam("from") Optional<Long> from,
             @RequestParam("to") Optional<Long> to) {
         TimeseriesDAO tileTimeseries =
-                dataSv.getTileTimeseries(  tileId, null, from.orElse((new Date()).getTime() - 3600000), to);
+                dataSv.getTileTimeseries(tileId, null, from.orElse((new Date()).getTime() - 3600000), to);
         return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
     }
 
+    @GetMapping(path = "/timeseries/measurements/{measurements}", produces = "application/json")
+    public ResponseEntity<TimeseriesDAO> getMeasurementsTimeseries(
+            @PathVariable List<String> measurements,
+            @RequestParam("from") Optional<Long> from,
+            @RequestParam("to") Optional<Long> to) {
+        //todo only manager
+        List<Long> m = measurements.stream().map(Long::valueOf).collect(Collectors.toList());
+        TimeseriesDAO timeseries =                dataSv.getMeasurementTimeseries(m, from.orElse((new Date()).getTime() - 3600000), to);
+        return new ResponseEntity<>(timeseries, HttpStatus.OK);
+    }
 
 
     @GetMapping(path = "/timeseries/tile/{tileId}/asset/{assetId}", produces = "application/json")
@@ -89,7 +102,7 @@ public class DataController {
             @RequestParam("from") Optional<Long> from,
             @RequestParam("to") Optional<Long> to) {
         TimeseriesDAO tileTimeseries =
-                dataSv.getTileTimeseries( tileId, assetId, from.orElse((new Date()).getTime() - 3600000), to);
+                dataSv.getTileTimeseries(tileId, assetId, from.orElse((new Date()).getTime() - 3600000), to);
         return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
     }
     //TODO:

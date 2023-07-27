@@ -39,6 +39,8 @@ public class DataService {
     @Autowired
     private AssetRepository assetRepository;
     @Autowired
+    private MeasurementRepository measurementRepository;
+    @Autowired
     private DummyDataGenerator dummyDataGenerator;
     @Autowired
     private MeasurementTagsRepository measurementTagsRepository;
@@ -88,8 +90,17 @@ public class DataService {
 
     }
 
-    public TimeseriesDAO getTileTimeseries(Long tileId, Long assetId, Long from, Optional<Long> to) {
+    public TimeseriesDAO getTileTimeseries( Long  tileId,Long assetId, Long from, Optional<Long> to) {
         List<Measurement> measurements = informationPanelService.getTileMeasurements(tileId, assetId, null);
+        TimeseriesDAO res = this.getTimeseries(measurements, from, to);
+        return res;
+
+
+    }
+
+    public TimeseriesDAO getMeasurementTimeseries(List<Long> measurementIds,Long from, Optional<Long> to) {
+        List<Measurement> measurements = measurementRepository.findByIds(measurementIds);
+
         TimeseriesDAO res = this.getTimeseries(measurements, from, to);
         return res;
 

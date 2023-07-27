@@ -32,7 +32,7 @@ public class MeasurementTags extends Details{
 			joinColumns = @JoinColumn(name = "tag_id", nullable = true, insertable = true, updatable = true),
 			inverseJoinColumns = @JoinColumn(name = "measurement_id"))
 	@JsonIgnore()
-	private List<Measurement> measurements;
+	private   List<Measurement> measurements;
 
 	public MeasurementTags(String key, String value) {
 		super(key, value);

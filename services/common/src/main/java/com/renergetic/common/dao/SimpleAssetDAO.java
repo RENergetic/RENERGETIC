@@ -19,7 +19,7 @@ public class SimpleAssetDAO {
 
     @JsonProperty()
     private String name;
-//    @JsonProperty()
+    //    @JsonProperty()
 //    private SimpleAssetDAO parent;
 //    @JsonProperty()
     //TODO:? name can be discussed :)
@@ -39,7 +39,7 @@ public class SimpleAssetDAO {
     private String geoLocation;
 
     public static SimpleAssetDAO create(Asset asset) {
-        if(asset==null)
+        if (asset == null)
             return null;
         SimpleAssetDAO dao = new SimpleAssetDAO();
 
@@ -67,7 +67,8 @@ public class SimpleAssetDAO {
         Asset asset = new Asset();
         asset.setId(id);
         asset.setName(name);
-        asset.setType(type.mapToEntity());
+        if (type != null)
+            asset.setType(type.mapToEntity());
         asset.setLabel(label);
         //asset.setDescription(description);
         asset.setLocation(geoLocation);

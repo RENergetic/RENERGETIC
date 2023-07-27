@@ -59,8 +59,7 @@ public class NotificationController {
             //TODO: remove this API later
             notifications =
                     notificationSv.get(offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
-        }
-        else  {
+        } else {
             //TODO: remove this API later
             notifications =
                     notificationSv.get(dateFrom.orElse(DateConverter.currentMonth()), dateTo.orElse(null),
@@ -130,8 +129,11 @@ public class NotificationController {
     public ResponseEntity<NotificationScheduleDAO> createNotification(
             @RequestBody NotificationScheduleDAO notification) {
         notification.setId(null);
-        long creationDate = (DateConverter.toEpoch(LocalDateTime.now()));
-        notification.setNotificationTimestamp(creationDate);
+
+        if (notification.getNotificationTimestamp() == null) {
+            long creationDate = (DateConverter.toEpoch(LocalDateTime.now()));
+            notification.setNotificationTimestamp(creationDate);
+        }
         NotificationScheduleDAO _notification = notificationSv.save(notification);
 
         return new ResponseEntity<>(_notification, HttpStatus.CREATED);

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Setter
 @RequiredArgsConstructor
 @ToString
-public class InformationPanelDAOResponse {
+public class InformationPanelDAOResponse implements ResourceDAO {
     @JsonProperty()
     private Long id;
 
