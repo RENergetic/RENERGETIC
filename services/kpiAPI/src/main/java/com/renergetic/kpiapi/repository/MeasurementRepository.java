@@ -1,7 +1,5 @@
 package com.renergetic.kpiapi.repository;
 
-import com.renergetic.hdrapi.dao.projection.MeasurementDAO;
-import com.renergetic.hdrapi.model.details.MeasurementTags;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,15 +17,13 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     Measurement save(Measurement measurement);
 
     List<Measurement> findByAsset(Asset assetId);
-    @Query(value = "SELECT m FROM Measurement m WHERE m.id in :ids" )
-    public List<Measurement> findByIds(List<Long> ids);
+
     @Query(value = "SELECT measurement.* " +
             "FROM (measurement " +
             "INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
             "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
             "INNER JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId) ", nativeQuery = true)
     public List<Measurement> findByUserId(Long userId);
-
 
     @Query(value = "SELECT measurement.* " +
             "FROM (measurement " +
@@ -97,33 +93,4 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " (:measurement_id, :key, :value )  ON CONFLICT (measurement_id,key) " +
             "   DO UPDATE SET value =  :value ; ", nativeQuery = true)
     public int setProperty(@Param("measurement_id") Long measurementId,@Param("key")  String key, @Param("value") String value );
-
-
-    @Query(value = "SELECT " +
-            " me.id, me.direction, me.domain, me.label, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
-            " me.measurement_type_id as typeId," +
-            " mt.name as typeName, mt.label as typeLabel,mt.unit, mt.physical_name as physicalName," +
-            " me.asset_id as assetId, asset.name as assetName, asset.label as assetLabel," +
-            " sum(CASE WHEN it.id is not null THEN 1 ELSE 0 END)  as panelCount " +
-            " FROM public.measurement me " +
-            " JOIN measurement_type mt on mt.id = me.measurement_type_id " +
-            " LEFT JOIN asset on asset.id= me.asset_id " +
-            " LEFT JOIN information_tile_measurement itm on itm.measurement_id = me.id " +
-            " LEFT JOIN information_tile it on it.id = itm.information_tile_id " +
-            " GROUP by me.id, mt.id,asset.id  " +
-            " order by me.id asc " +
-            " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
-    public List<MeasurementDAO> report(long offset, long limit);
-
-
-    @Query("SELECT DISTINCT informationPanel FROM InformationPanel informationPanel " +
-            " JOIN informationPanel.tiles tile " +
-            " JOIN tile.informationTileMeasurements tileMeasurement " +
-            " JOIN tileMeasurement.measurement measurement" +
-            "  WHERE measurement.id = :measurementId")
-    public List<InformationPanel> getLinkedPanels(Long measurementId);
-    @Query("SELECT tag FROM MeasurementTags tag " +
-            " JOIN tag.measurements measurement " +
-            "  WHERE measurement.id = :measurementId")
-    public List<MeasurementTags> getTags(Long measurementId);
 }
