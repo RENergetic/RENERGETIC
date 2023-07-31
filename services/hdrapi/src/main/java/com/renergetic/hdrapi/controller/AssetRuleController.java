@@ -1,8 +1,8 @@
-package com.renergetic.ruleevaluationservice.controller;
+package com.renergetic.hdrapi.controller;
 
+import com.renergetic.common.dao.AssetRuleDAO;
 import com.renergetic.common.exception.NotFoundException;
-import com.renergetic.ruleevaluationservice.dao.AssetRuleDAO;
-import com.renergetic.ruleevaluationservice.service.AssetRuleService;
+import com.renergetic.hdrapi.service.AssetRuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

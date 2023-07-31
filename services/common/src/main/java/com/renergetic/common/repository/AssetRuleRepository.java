@@ -1,6 +1,6 @@
-package com.renergetic.ruleevaluationservice.repository;
+package com.renergetic.common.repository;
 
-import com.renergetic.ruleevaluationservice.model.AssetRule;
+import com.renergetic.common.model.AssetRule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

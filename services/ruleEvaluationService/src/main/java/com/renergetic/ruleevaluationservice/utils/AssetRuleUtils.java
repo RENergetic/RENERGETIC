@@ -1,7 +1,7 @@
 package com.renergetic.ruleevaluationservice.utils;
 
 import com.renergetic.common.model.details.AssetDetails;
-import com.renergetic.ruleevaluationservice.model.AssetRule;
+import com.renergetic.common.model.AssetRule;
 
 public class AssetRuleUtils {
     public static String transformRuleToReadableName(AssetRule assetRule){

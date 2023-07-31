@@ -1,8 +1,8 @@
-package com.renergetic.ruleevaluationservice.dao;
+package com.renergetic.common.dao;
 
 import com.renergetic.common.model.Asset;
 import com.renergetic.common.model.Measurement;
-import com.renergetic.ruleevaluationservice.model.AssetRule;
+import com.renergetic.common.model.AssetRule;
 import lombok.Getter;
 import lombok.Setter;
 

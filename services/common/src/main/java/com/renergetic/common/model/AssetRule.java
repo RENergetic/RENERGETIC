@@ -1,7 +1,5 @@
-package com.renergetic.ruleevaluationservice.model;
+package com.renergetic.common.model;
 
-import com.renergetic.common.model.Asset;
-import com.renergetic.common.model.Measurement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

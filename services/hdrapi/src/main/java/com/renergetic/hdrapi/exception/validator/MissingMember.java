@@ -1,4 +1,4 @@
-package com.renergetic.ruleevaluationservice.exception.validator;
+package com.renergetic.hdrapi.exception.validator;
 
 public class MissingMember extends ValidatorException{
     public MissingMember(String message) {

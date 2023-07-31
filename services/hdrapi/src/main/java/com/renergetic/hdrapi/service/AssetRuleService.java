@@ -1,14 +1,14 @@
-package com.renergetic.ruleevaluationservice.service;
+package com.renergetic.hdrapi.service;
 
+import com.renergetic.common.dao.AssetRuleDAO;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.Asset;
+import com.renergetic.common.model.AssetRule;
 import com.renergetic.common.model.Measurement;
 import com.renergetic.common.repository.AssetRepository;
+import com.renergetic.common.repository.AssetRuleRepository;
 import com.renergetic.common.repository.MeasurementRepository;
-import com.renergetic.ruleevaluationservice.dao.AssetRuleDAO;
-import com.renergetic.ruleevaluationservice.model.AssetRule;
-import com.renergetic.ruleevaluationservice.repository.AssetRuleRepository;
-import com.renergetic.ruleevaluationservice.validator.AssetRuleValidator;
+import com.renergetic.hdrapi.validator.AssetRuleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

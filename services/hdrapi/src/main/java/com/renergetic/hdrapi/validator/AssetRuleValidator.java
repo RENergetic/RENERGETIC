@@ -1,9 +1,9 @@
-package com.renergetic.ruleevaluationservice.validator;
+package com.renergetic.hdrapi.validator;
 
+import com.renergetic.common.model.AssetRule;
 import com.renergetic.common.model.details.AssetDetails;
-import com.renergetic.ruleevaluationservice.exception.validator.MissingMember;
-import com.renergetic.ruleevaluationservice.exception.validator.ValidatorException;
-import com.renergetic.ruleevaluationservice.model.AssetRule;
+import com.renergetic.hdrapi.exception.validator.MissingMember;
+import com.renergetic.hdrapi.exception.validator.ValidatorException;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
