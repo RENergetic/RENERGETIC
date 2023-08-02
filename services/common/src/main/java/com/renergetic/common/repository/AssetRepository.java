@@ -1,6 +1,7 @@
 package com.renergetic.common.repository;
 
 import com.renergetic.common.model.Asset;
+import com.renergetic.common.model.AssetType;
 import com.renergetic.common.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,8 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     public Asset save(Asset asset);
 
     public List<Asset> findByParentAsset(Asset parentAsset);
+
+    public List<Asset> findByType(AssetType assetType);
 
     public Optional<Asset> findByName(String name);
 
