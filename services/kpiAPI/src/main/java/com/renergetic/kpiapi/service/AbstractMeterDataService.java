@@ -198,6 +198,12 @@ public class AbstractMeterDataService {
 		if (meters.size() == 0) 
 			throw new NotFoundException("There aren't abstract meters configured");
 
+		meters.sort(
+				(m1, m2) -> 
+				m1.getDomain().equals(m2.getDomain())?
+						0 : m1.getDomain().equals(Domain.electricity)?
+								-1 : 1);
+		
 		for (AbstractMeterConfig meter : meters) {
 			MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
 			
@@ -216,5 +222,10 @@ public class AbstractMeterDataService {
 			} else log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %s", meter.getName().meter, meter.getDomain().toString(), response.body()));
 		}
 		return configuredMeters;
+	}
+	
+	private class AbstractMeterComparator<AbstractMeterConfig> {
+		
+		
 	}
 }
