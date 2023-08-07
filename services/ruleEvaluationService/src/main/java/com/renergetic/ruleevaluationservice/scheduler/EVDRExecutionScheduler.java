@@ -20,7 +20,7 @@ public class EVDRExecutionScheduler {
     @Autowired
     EVDRService evdrService;
     @Scheduled(cron = "${ev-dr.executionCRON}")
-    @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
+    @Transactional(propagation= Propagation.REQUIRED)
     public void executeRules() throws ConfigurationError {
         evdrService.evaluateEVDR();
     }

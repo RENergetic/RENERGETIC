@@ -22,7 +22,7 @@ public class RuleExecutionScheduler {
 
     //@Scheduled(cron = "0 * * * * *")
     @Scheduled(cron = "${rule.executionCRON}")
-    @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
+    @Transactional(propagation= Propagation.REQUIRED)
     public void executeRules(){
         ruleEvaluationService.retrieveAndExecuteAllRules();
     }

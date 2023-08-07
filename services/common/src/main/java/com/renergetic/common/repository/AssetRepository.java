@@ -2,6 +2,7 @@ package com.renergetic.common.repository;
 
 import com.renergetic.common.model.Asset;
 import com.renergetic.common.model.AssetType;
+import com.renergetic.common.model.ConnectionType;
 import com.renergetic.common.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -91,4 +92,8 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     List<Asset> findByAssetCategoryId(Long categoryId, Pageable pageable);
 
     List<Asset> findByAssetCategoryId(Long categoryId);
+
+    List<Asset> findByConnectionsConnectionTypeAndConnectionsConnectedAssetTypeName(ConnectionType connectionType, String assetTypeName);
+
+    List<Asset> findDistinctByConnectionsConnectionTypeAndTypeName(ConnectionType connectionType, String assetTypeName);
 }

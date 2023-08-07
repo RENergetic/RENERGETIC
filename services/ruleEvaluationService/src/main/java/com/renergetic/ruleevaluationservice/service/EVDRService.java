@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EVDRService {
@@ -43,8 +45,9 @@ public class EVDRService {
     private DemandScheduleRepository demandScheduleRepository;
 
     public void evaluateEVDR() throws ConfigurationError {
-        AssetType assetType = getAssetType();
-        List<Asset> assets = getAssetMatchingType(assetType);
+        //List<Asset> assetsTest = assetRepository.findByConnectionsConnectionTypeAndConnectionsConnectedAssetTypeName(ConnectionType.va_grouping, "pv_virtual_asset_group");
+
+        List<Asset> assets = assetRepository.findDistinctByConnectionsConnectionTypeAndTypeName(ConnectionType.va_grouping, "pv_virtual_asset_group");
 
         LocalDateTime currentTime = LocalDateTime.now();
 
@@ -54,14 +57,12 @@ public class EVDRService {
         for(Asset assetPVGroup : assets){
             try{
                 double threshold = getThresholdFromAssetDetails(assetPVGroup);
-                List<Asset> pvs = getAssetsLinkingParentAsset(assetPVGroup);
+                List<Asset> pvs = assetPVGroup.getConnections().stream().map(AssetConnection::getConnectedAsset).collect(Collectors.toList());
 
                 double totalGeneration = getTotalGenerationValueFromAssets(pvs);
 
                 if(totalGeneration >= threshold){
                     Asset asset = getAssetFromAssetDetailsToAssignRecommendation(assetPVGroup);
-                    //TODO: Get Demand definition by actionType, action and message
-                    //TODO: Get the existing demand schedule (linked to demand definition) (or create)
                     DemandDefinition dd = demandDefinitionRepository.findByActionTypeAndActionAndMessage(
                             DemandDefinitionActionType.START, DemandDefinitionAction.CHARGE_EV, "").orElseGet(() ->{
                         DemandDefinition demandDefinition = new DemandDefinition();
@@ -75,7 +76,7 @@ public class EVDRService {
                         demandDefinitionRepository.save(dd);
                         demandScheduleRepository.save(demandSchedule);
                     } else {
-                        DemandSchedule demandSchedule = demandScheduleRepository.findByAssetIdAndDemandId(asset.getId(), dd.getId()).orElseGet(DemandSchedule::new);
+                        DemandSchedule demandSchedule = demandScheduleRepository.findByAssetIdAndDemandDefinitionId(asset.getId(), dd.getId()).orElseGet(DemandSchedule::new);
                         demandSchedule = configureDemandSchedule(demandSchedule, dd, currentTime, nextExecution, asset);
                         demandScheduleRepository.save(demandSchedule);
                     }
@@ -129,7 +130,7 @@ public class EVDRService {
             Measurement measurement = measurementRepository.findByAsset(asset).stream()
                     .filter(x -> (x.getDirection() != null && x.getDirection().equals(Direction.out) &&
                             x.getDomain() != null && x.getDomain().equals(Domain.electricity) &&
-                            x.getSensorName() != null && !x.getSensorName().equals("pv")))
+                            x.getSensorName() != null && x.getSensorName().equals("pv")))
                     .findFirst().orElse(null);
 
             if(measurement != null){
