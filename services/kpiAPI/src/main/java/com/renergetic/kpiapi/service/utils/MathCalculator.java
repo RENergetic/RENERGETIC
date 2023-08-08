@@ -8,8 +8,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.renergetic.kpiapi.exception.InvalidArgumentException;
+import com.renergetic.kpiapi.model.Asset;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,23 +47,56 @@ public class MathCalculator {
 	
 	@Autowired
 	HttpAPIs httpAPIs;
-	
-	public BigDecimal calculateEquation(String equation, Long from, Long to) {
+
+	/**
+	 * Validates a mathematical formula.
+	 *
+	 * @param  formula  string containing the formula to be validated
+	 * @return          true if the formula is valid and all its parenthesis are closed, false otherwise
+	 */
+	public boolean validateFormula(String formula) {
+		// Regex to validate a mathematical formula
+		Pattern pattern = Pattern.compile("\\(*((\\d+(\\.\\d+)?)|(\\[\\d+\\]))([+*^\\/-]\\(*((\\d+(\\.\\d+)?)|(\\[\\d+\\]))\\)*)*");
+
+		// Check if the formula close all its parenthesis
+		if (formula != null && pattern.matcher(formula).matches())
+			return formula.chars().filter(ch -> ch == '(').count() == formula.chars().filter(ch -> ch == ')').count();
+		return false;
+	}
+
+	/**
+	 * Validates condition composed of two mathematical formulas.
+	 *
+	 * @param  formula  string containing the condition to be validated
+	 * @return          An Array with the mathematical formulas that compose the condition, null otherwise
+	 */
+	public String[] validateCondition(String formula) {
+		String comparator = extractComparator(formula);
+
+		if (comparator != null) {
+			String[] formulas = formula.split(comparator);
+
+			return formulas.length == 2 && validateFormula(formulas[0]) || validateFormula(formulas[1])?
+					formulas : null;
+		}
+		return null;
+	}
+
+	public BigDecimal calculateFormula(String formula, Long from, Long to) {
 		
 		Stack<BigDecimal> numbers = new Stack<>();
 		Stack<Character> operators = new Stack<>();
 		
-		for (int i = 0; i < equation.length(); i++) {
-			char c = equation.charAt(i);
+		for (int i = 0; i < formula.length(); i++) {
+			char c = formula.charAt(i);
 			log.debug("Read character: " + c);
 			log.debug("Number list:   " + numbers.toString());
 			log.debug("Operator list: " + operators.toString());
 			
 			if (Character.isDigit(c)) {
-				
 				StringBuilder number = new StringBuilder();
-				while (i < equation.length() && (Character.isDigit(equation.charAt(i)) || equation.charAt(i) == '.')) {
-					number.append(equation.charAt(i));
+				while (i < formula.length() && (Character.isDigit(formula.charAt(i)) || formula.charAt(i) == '.')) {
+					number.append(formula.charAt(i));
 					i++;
 				}
 				i--;
@@ -89,34 +126,54 @@ public class MathCalculator {
 
         return numbers.pop();
 	}
+
+	public boolean compare(String formula, Long from, Long to) {
+		String comparator = extractComparator(formula);
+		String[] formulas = validateCondition(formula);
+
+
+		if (formulas == null)
+			throw new InvalidArgumentException("%s isn't a comparation", formula);
+		else{
+			return switch (comparator) {
+				case ">=" -> calculateFormula(formulas[0], from, to).doubleValue() >= calculateFormula(formulas[1], from, to).doubleValue();
+				case "<=" -> calculateFormula(formulas[0], from, to).doubleValue() <= calculateFormula(formulas[1], from, to).doubleValue();
+				case ">" -> calculateFormula(formulas[0], from, to).doubleValue() > calculateFormula(formulas[1], from, to).doubleValue();
+				case "<" -> calculateFormula(formulas[0], from, to).doubleValue() < calculateFormula(formulas[1], from, to).doubleValue();
+				case "=" -> calculateFormula(formulas[0], from, to).doubleValue() == calculateFormula(formulas[1], from, to).doubleValue();
+				case "!=" -> calculateFormula(formulas[0], from, to).doubleValue() != calculateFormula(formulas[1], from, to).doubleValue();
+				default -> false;
+			};
+		}
+	}
+
+	private String extractComparator(String formula) {
+		Pattern pattern = Pattern.compile("(!=|>=|>|<=|<|=)");
+		Matcher matcher = pattern.matcher(formula);
+		if (matcher.find())
+		{
+			String comparator = matcher.group(1);
+			log.debug("Comparator: " + comparator);
+			return comparator;
+		}
+		return null;
+	}
 	
 	private void calculate(Stack<BigDecimal> numbers, Stack<Character> operators) {
 		BigDecimal num2 = numbers.pop();
 		BigDecimal num1 = numbers.pop();
 		char operator = operators.pop();
-		BigDecimal result;
-		
-		switch (operator) {
-			case '+':
-				result = num1.add(num2);
-				break;
-			case '-':
-				result = num1.subtract(num2);
-				break;
-			case '*':
-				result = num1.multiply(num2);
-				break;
-			case '/':
-				result = num1.divide(num2, MathContext.DECIMAL128);
-				break;
-			case '^':
-				result = num1.pow(num2.intValue());
-				break;
-			default:
-				throw new IllegalArgumentException("Invalid Operator: " + operator);
-		}
-		
-		numbers.push(result);
+
+		BigDecimal result = switch (operator) {
+            case '+' -> num1.add(num2);
+            case '-' -> num1.subtract(num2);
+            case '*' -> num1.multiply(num2);
+            case '/' -> num1.divide(num2, MathContext.DECIMAL128);
+            case '^' -> num1.pow(num2.intValue());
+            default -> throw new IllegalArgumentException("Invalid Operator: " + operator);
+        };
+
+        numbers.push(result);
 	}
 	
 	private void getValueFromMeasurement(Stack<BigDecimal> numbers, Long from, Long to) {
@@ -153,7 +210,7 @@ public class MathCalculator {
 	            assetNames.add(measurement.getAsset().getName());
 	        if (measurement.getAssetCategory() != null)
 	            assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
-	                    .stream().map(asset -> asset.getName()).collect(Collectors.toList()));
+	                    .stream().map(Asset::getName).collect(Collectors.toList()));
 	
 	        // GET MEASUREMENT TAGS
 	        List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
@@ -173,8 +230,8 @@ public class MathCalculator {
 	            params.put("direction", measurement.getDirection().name());
 	        if (measurement.getDomain() != null)
 	            params.put("domain", measurement.getDomain().name());
-	        if (assetNames != null && !assetNames.isEmpty())
-	            params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
+	        if (!assetNames.isEmpty())
+	            params.put("asset_name", String.join(",", assetNames));
 	        if (tags != null && !tags.isEmpty())
 	            params.putAll(tags.stream()
 	                    .filter(tag -> !params.containsKey(tag.getValue()))
@@ -197,11 +254,10 @@ public class MathCalculator {
 	
 	        if (response.statusCode() < 300) {
 	            JSONArray array = new JSONArray(response.body());
-	            if (array.length() > 0)
+	            if (!array.isEmpty())
 	                for (Object obj : array) {
-	                    if (obj instanceof JSONObject) {
-	                        JSONObject json = (JSONObject) obj;
-	                        if (json.has("measurement"))
+	                    if (obj instanceof JSONObject json) {
+							if (json.has("measurement"))
 	                            ret = BigDecimal.valueOf(Double.parseDouble(json.getJSONObject("fields").getString(function)));
 	                    }
 	                }

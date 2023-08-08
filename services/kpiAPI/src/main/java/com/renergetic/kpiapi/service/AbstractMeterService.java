@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.renergetic.kpiapi.dao.AbstractMeterDAO;
+import com.renergetic.kpiapi.service.utils.MathCalculator;
 import com.renergetic.kpiapi.exception.IdAlreadyDefinedException;
 import com.renergetic.kpiapi.exception.IdNoDefinedException;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
@@ -27,6 +27,9 @@ public class AbstractMeterService {
 	
 	@Autowired
 	private AbstractMeterRepository amRepo;
+
+	@Autowired
+	private MathCalculator calculator;
 	
 	/**
 	 * Returns a map of meter names and their descriptions.
@@ -91,8 +94,11 @@ public class AbstractMeterService {
 	 * @throws InvalidArgumentException if the given formula is not a valid mathematical formula
 	 */
 	public AbstractMeterDAO create(AbstractMeterDAO meter) {
-		if (!validateFormula(meter.getFormula())) 
+		if (!calculator.validateFormula(meter.getFormula()))
 			throw new InvalidArgumentException("%s isn't a valid mathematical formula", meter.getFormula());
+
+		if (meter.getCondition() != null && calculator.validateCondition(meter.getCondition()) == null)
+			throw new InvalidArgumentException("%s isn't a valid condition", meter.getCondition());
 
 		if( !amRepo.existsByNameAndDomain(AbstractMeter.obtain(meter.getName()), meter.getDomain())) {
 			meter.setId(null);
@@ -110,8 +116,11 @@ public class AbstractMeterService {
 	 * @throws       	InvalidArgumentException if the given formula is not a valid mathematical formula
 	 */
 	public AbstractMeterDAO update(AbstractMeterDAO meter) {
-		if (!validateFormula(meter.getFormula())) 
+		if (!calculator.validateFormula(meter.getFormula()))
 			throw new InvalidArgumentException("%s isn't a valid mathematical formula", meter.getFormula());
+
+		if (meter.getCondition() != null && calculator.validateCondition(meter.getCondition()) == null)
+			throw new InvalidArgumentException("%s isn't a valid condition", meter.getCondition());
 
 		Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(AbstractMeter.obtain(meter.getName()), meter.getDomain());
 		if(previousConfig.isPresent()) {
@@ -155,21 +164,5 @@ public class AbstractMeterService {
 			return AbstractMeterDAO.create(previousConfig.get());
 		}
 		else throw new IdNoDefinedException("The abstract meter with name %s and domain %s isn't configured", meter.getName(), meter.getDomain());
-	}
-
-	/**
-	 * Validates a mathematical formula.
-	 *
-	 * @param  formula  string containing the formula to be validated
-	 * @return          true if the formula is valid and all its parenthesis are closed, false otherwise
-	 */
-	public boolean validateFormula(String formula) {
-		// Regex to validate a mathematical formula
-		Pattern pattern = Pattern.compile("\\(*((\\d+(\\.\\d+)?)|(\\[\\d+\\]))([+*^\\/-]\\(*((\\d+(\\.\\d+)?)|(\\[\\d+\\]))\\)*)*");
-
-		// Check if the formula close all its parenthesis
-		if (pattern.matcher(formula).matches())
-			return formula.chars().filter(ch -> ch == '(').count() == formula.chars().filter(ch -> ch == ')').count();
-		return false;
 	}
 }

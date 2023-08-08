@@ -80,7 +80,7 @@ public class AbstractMeterDataService {
 		if (response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
-			if (data.length() > 0) {
+			if (data.isEmpty()) {
 				data.forEach((obj) -> {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");
@@ -140,7 +140,7 @@ public class AbstractMeterDataService {
 		if (response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
-			if (data.length() > 0) {
+			if (data.isEmpty()) {
 				data.forEach((obj) -> {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");
@@ -178,7 +178,7 @@ public class AbstractMeterDataService {
 		if (time != null)
 			influxRequest.getFields().put("time", DateConverter.toString(time));
 		
-		BigDecimal value = calculator.calculateEquation(meter.getFormula(), from, to);
+		BigDecimal value = calculator.calculateFormula(meter.getFormula(), from, to);
 		influxRequest.getFields().put("value", value.toPlainString());
 		
 		HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
@@ -195,7 +195,7 @@ public class AbstractMeterDataService {
 		
 		List<AbstractMeterDataDAO> configuredMeters = new LinkedList<>();
 		List<AbstractMeterConfig> meters = abstractMeterRepository.findAll();
-		if (meters.size() == 0) 
+		if (meters.isEmpty())
 			throw new NotFoundException("There aren't abstract meters configured");
 
 		meters.sort(
@@ -209,8 +209,11 @@ public class AbstractMeterDataService {
 			
 			if (time != null)
 				influxRequest.getFields().put("time", DateConverter.toString(time));
-			
-			BigDecimal value = calculator.calculateEquation(meter.getFormula(), from, to);
+
+			BigDecimal value = null;
+			if (meter.getCondition() != null && calculator.compare(meter.getCondition(), from, to))
+				value = calculator.calculateFormula(meter.getFormula(), from, to);
+			else value = new BigDecimal(0);
 			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
 			
 			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
@@ -222,10 +225,5 @@ public class AbstractMeterDataService {
 			} else log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %s", meter.getName().meter, meter.getDomain().toString(), response.body()));
 		}
 		return configuredMeters;
-	}
-	
-	private class AbstractMeterComparator<AbstractMeterConfig> {
-		
-		
 	}
 }
