@@ -130,8 +130,9 @@ public class AbstractMeterController {
 		
 		return ResponseEntity.ok(amDataSv.getAggregated(name, domain, InfluxFunction.obtain(operation), from.orElse(null), to.orElse(null), group));
 	}
-	
-    @Operation(summary = "Create data for an Abstract meter")
+
+	@Deprecated
+	@Operation(summary = "Create data for an Abstract meter, it doesn't check the condition for does the calculation")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@PostMapping(path = "{domain}/{meter_name}/data", produces = "application/json")
 	public ResponseEntity<AbstractMeterDataDAO> insertAbstractMeterData(
@@ -143,8 +144,9 @@ public class AbstractMeterController {
 		
 		return ResponseEntity.ok(amDataSv.calculateAndInsert(name, domain, from.orElse(null), to.orElse(null), time.orElse(null)));
 	}
-	
-    @Operation(summary = "Create data for all configured Abstract meters")
+
+	@Deprecated
+    @Operation(summary = "Create data for all configured Abstract meters, this method is executed periodically so its use isn't recommended")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@PostMapping(path = "/data", produces = "application/json")
 	public ResponseEntity<List<AbstractMeterDataDAO>> insertAllAbstractMeterData(
