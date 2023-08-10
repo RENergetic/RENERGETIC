@@ -1,5 +1,23 @@
 package com.renergetic.kpiapi.service;
 
+import com.renergetic.kpiapi.dao.AbstractMeterDataDAO;
+import com.renergetic.kpiapi.dao.KPIDataDAO;
+import com.renergetic.kpiapi.dao.MeasurementDAORequest;
+import com.renergetic.kpiapi.exception.HttpRuntimeException;
+import com.renergetic.kpiapi.exception.InvalidArgumentException;
+import com.renergetic.kpiapi.exception.NotFoundException;
+import com.renergetic.kpiapi.model.*;
+import com.renergetic.kpiapi.repository.AbstractMeterRepository;
+import com.renergetic.kpiapi.service.utils.DateConverter;
+import com.renergetic.kpiapi.service.utils.HttpAPIs;
+import com.renergetic.kpiapi.service.utils.MathCalculator;
+import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.net.http.HttpResponse;
 import java.time.Instant;
@@ -8,37 +26,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import com.renergetic.kpiapi.dao.MeasurementDAORequest;
-import com.renergetic.kpiapi.dao.AbstractMeterDataDAO;
-import com.renergetic.kpiapi.exception.HttpRuntimeException;
-import com.renergetic.kpiapi.exception.InvalidArgumentException;
-import com.renergetic.kpiapi.exception.NotFoundException;
-import com.renergetic.kpiapi.model.AbstractMeter;
-import com.renergetic.kpiapi.model.AbstractMeterConfig;
-import com.renergetic.kpiapi.model.Domain;
-import com.renergetic.kpiapi.model.InfluxFunction;
-import com.renergetic.kpiapi.repository.AbstractMeterRepository;
-import com.renergetic.kpiapi.service.utils.DateConverter;
-import com.renergetic.kpiapi.service.utils.HttpAPIs;
-import com.renergetic.kpiapi.service.utils.MathCalculator;
-
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @Service
-public class AbstractMeterDataService {
+public class KPIService {
 
 	@Value("${influx.api.url}")
 	private String influxURL;
-	
-	@Autowired
-	private AbstractMeterRepository abstractMeterRepository;
 
 	@Autowired
 	private HttpAPIs httpAPIs;
@@ -47,19 +40,19 @@ public class AbstractMeterDataService {
 	private MathCalculator calculator;
 	
 	/**
-	 * Retrieves the meter data DAO for the given name, domain, and time range.
+	 * Retrieves the kpi data DAO for the given name, domain, and time range.
 	 *
 	 * @param  name   the name of the meter data
 	 * @param  domain the domain of the meter data
 	 * @param  from   the start time of the meter data (null for all time)
 	 * @param  to     the end time of the meter data (null for all time)
-	 * @return        the AbstractMeterDataDAO object containing the requested data
+	 * @return        the KPIDataDAO object containing the requested data
 	 */
-	public AbstractMeterDataDAO get(String name, Domain domain, Long from, Long to) {
-		
-		AbstractMeterDataDAO ret = new AbstractMeterDataDAO();
+	public KPIDataDAO get(String name, Domain domain, Long from, Long to) {
 
-		ret.setName(AbstractMeter.obtain(name));
+		KPIDataDAO ret = new KPIDataDAO();
+
+		ret.setName(KPI.obtain(name));
 		ret.setDomain(domain);
 
 		Map<String, String> params = new HashMap<>();
@@ -102,7 +95,7 @@ public class AbstractMeterDataService {
     }
 	
 	/**
-	 * Returns an AbstractMeterDataDAO object after performing an
+	 * Returns an KPIDataDAO object after performing an
 	 * Influx API request for aggregated data.
 	 *
 	 * @param  name     the name of the measurement
@@ -111,13 +104,13 @@ public class AbstractMeterDataService {
 	 * @param  from     the starting timestamp of the data to retrieve (optional)
 	 * @param  to       the ending timestamp of the data to retrieve (optional)
 	 * @param  group    the group parameter to be sent to Influx API (optional)
-	 * @return          an AbstractMeterDataDAO object containing the retrieved data
+	 * @return          an KPIDataDAO object containing the retrieved data
 	 */
-	public AbstractMeterDataDAO getAggregated(String name, Domain domain, InfluxFunction operation, Long from, Long to, String group) {
-		
-		AbstractMeterDataDAO ret = new AbstractMeterDataDAO();
+	public KPIDataDAO getAggregated(String name, Domain domain, InfluxFunction operation, Long from, Long to, String group) {
 
-		ret.setName(AbstractMeter.obtain(name));
+		KPIDataDAO ret = new KPIDataDAO();
+
+		ret.setName(KPI.obtain(name));
 		ret.setDomain(domain);
 
 		Map<String, String> params = new HashMap<>();
@@ -166,63 +159,28 @@ public class AbstractMeterDataService {
 		return ret;
     }
 	
-	public AbstractMeterDataDAO calculateAndInsert(String name, Domain domain, Long from, Long to, Long time) {
+	public List<KPIDataDAO> calculateAndInsertAll(Domain domain, Long from, Long to, Long time) {
 		Map<String, String> headers = Map.of("Content-Type", "application/json");
 		
-		AbstractMeterConfig meter = abstractMeterRepository.findByNameAndDomain(AbstractMeter.obtain(name), domain)
-				.orElseThrow(() -> new NotFoundException("The abstract meter with name %s and domain %s isn't configured", name, domain));
-
-		AbstractMeterDataDAO ret = AbstractMeterDataDAO.create(meter);
-		MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
+		List<KPIDataDAO> configuredMeters = new LinkedList<>();
 		
-		if (time != null)
-			influxRequest.getFields().put("time", DateConverter.toString(time));
-		
-		BigDecimal value = calculator.calculateFormula(meter.getFormula(), from, to);
-		influxRequest.getFields().put("value", value.toPlainString());
-		
-		HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
-		
-		if (response.statusCode() < 300) {
-			ret.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
-		} else throw new HttpRuntimeException("Influx request failed with status code %d", response.statusCode());
-		
-		return ret;
-	}
-	
-	public List<AbstractMeterDataDAO> calculateAndInsertAll(Long from, Long to, Long time) {
-		Map<String, String> headers = Map.of("Content-Type", "application/json");
-		
-		List<AbstractMeterDataDAO> configuredMeters = new LinkedList<>();
-		List<AbstractMeterConfig> meters = abstractMeterRepository.findAll();
-		if (meters.isEmpty())
-			throw new NotFoundException("There aren't abstract meters configured");
-
-		meters.sort(
-				(m1, m2) -> 
-				m1.getDomain().equals(m2.getDomain())?
-						0 : m1.getDomain().equals(Domain.electricity)?
-								-1 : 1);
-		
-		for (AbstractMeterConfig meter : meters) {
-			MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
+		for (KPI kpi : KPI.values()) {
+			MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
 			
 			if (time != null)
 				influxRequest.getFields().put("time", DateConverter.toString(time));
 
 			BigDecimal value = null;
-			if (meter.getCondition() != null && calculator.compare(meter.getCondition(), from, to))
-				value = calculator.calculateFormula(meter.getFormula(), from, to);
-			else value = new BigDecimal(0);
-			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
+
+			// TODO: CALCULATE KPI VALUE
 			
 			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 			
 			if (response.statusCode() < 300) {
-				AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
-				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+				KPIDataDAO data = KPIDataDAO.create(kpi, domain);
+				data.getData().put(Instant.now().getEpochSecond() * 1000, 0.);// TODO: PUT INSERTED VALUE
 				configuredMeters.add(data);
-			} else log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %s", meter.getName().meter, meter.getDomain().toString(), response.body()));
+			} else log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.description, domain.toString(), response.body()));
 		}
 		return configuredMeters;
 	}
