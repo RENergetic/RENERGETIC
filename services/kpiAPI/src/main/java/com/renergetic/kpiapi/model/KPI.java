@@ -3,15 +3,14 @@ package com.renergetic.kpiapi.model;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
 
 public enum KPI {
-	LRS ("ESS", "Energy Self Sufficiency"),
-	LNS ("EP", "Energy Potency"),
-	ERS ("EE", "Energy Efficiency"),
-	ENS ("ES", "Energy Saving"),
-	LOSSES ("Losses", "Energy losses"),
-	LOAD ("SRES", "Share of RES"),
-	EXCESS ("SNES", "Share of non-RES"),
-	STORAGE ("CO2", "CO2 Intensity"),
-	RES ("PEAK", "Peak value");
+	ESS ("ESS", "Energy Self Sufficiency"),
+	EP ("EP", "Energy Potency"),
+	EE ("EE", "Energy Efficiency"),
+	ES ("ES", "Energy Saving"),
+	SRES ("SRES", "Share of RES"),
+	SNES ("SNES", "Share of non-RES"),
+	CO2 ("CO2", "CO2 Intensity"),
+	PEAK ("PEAK", "Peak value");
 
 	public final String kpi;
 	public final String description;
