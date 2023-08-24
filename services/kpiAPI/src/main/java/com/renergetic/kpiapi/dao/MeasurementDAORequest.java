@@ -27,6 +27,8 @@ public class MeasurementDAORequest {
 		dao.fields = new HashMap<>();
 		dao.tags = new HashMap<>();
 		dao.tags.put("domain", config.getDomain().name());
+		dao.tags.put("type_data", "calculated");
+		dao.tags.put("measurement_type", config.getName().name().toLowerCase());
 		
 		return dao;
 	}
@@ -38,6 +40,8 @@ public class MeasurementDAORequest {
 		dao.fields = new HashMap<>();
 		dao.tags = new HashMap<>();
 		dao.tags.put("domain", domain.name());
+		dao.tags.put("type_data", "calculated");
+		dao.tags.put("measurement_type", kpi.name().toLowerCase());
 
 		return dao;
 	}
