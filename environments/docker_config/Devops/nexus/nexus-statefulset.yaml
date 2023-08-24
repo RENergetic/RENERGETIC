@@ -17,7 +17,7 @@ spec:
       containers:
         - name: nexus
           image: docker-registry.default.svc:5000/ren-prototype-devops/nexus:latest
-          imagePullPolicy: Never
+          imagePullPolicy: Always
           env:
             - name: INSTALL4J_ADD_VM_PARAMS
               value: -Xms2048m -Xmx2048m -XX:MaxDirectMemorySize=2048m
