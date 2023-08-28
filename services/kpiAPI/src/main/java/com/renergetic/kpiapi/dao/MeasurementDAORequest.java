@@ -23,7 +23,7 @@ public class MeasurementDAORequest {
 	public static MeasurementDAORequest create(AbstractMeterConfig config) {
 		MeasurementDAORequest dao = new MeasurementDAORequest();
 		
-		dao.measurement = config.getName().name();
+		dao.measurement = "abstract_meter";
 		dao.fields = new HashMap<>();
 		dao.tags = new HashMap<>();
 		dao.tags.put("domain", config.getDomain().name());
@@ -36,7 +36,7 @@ public class MeasurementDAORequest {
 	public static MeasurementDAORequest create(KPI kpi, Domain domain) {
 		MeasurementDAORequest dao = new MeasurementDAORequest();
 
-		dao.measurement = kpi.name();
+		dao.measurement = "kpi";
 		dao.fields = new HashMap<>();
 		dao.tags = new HashMap<>();
 		dao.tags.put("domain", domain.name());

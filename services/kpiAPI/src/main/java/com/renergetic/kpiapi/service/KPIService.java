@@ -57,7 +57,8 @@ public class KPIService {
 		Map<String, String> params = new HashMap<>();
 
 		// Set parameters to Influx API request
-		params.put("measurements", ret.getName().name());
+		params.put("measurements", "kpi");
+		params.put("measurement_type", ret.getName().name().toLowerCase());
 		params.put("domain", domain.name());
 		if (from != null)
 			params.put("from", from.toString());
@@ -115,7 +116,8 @@ public class KPIService {
 		Map<String, String> params = new HashMap<>();
 
 		// Set parameters to Influx API request
-		params.put("measurements", ret.getName().name());
+		params.put("measurements", "kpi");
+		params.put("measurement_type", ret.getName().name().toLowerCase());
 		params.put("domain", domain.name());
 		if (from != null)
 			params.put("from", from.toString());
@@ -159,34 +161,6 @@ public class KPIService {
     }
 	
 	public List<KPIDataDAO> calculateAndInsertAll(Domain domain, Long from, Long to, Long time) {
-		Map<String, String> headers = Map.of("Content-Type", "application/json");
-		
-		List<KPIDataDAO> configuredMeters = new LinkedList<>();
-		
-		for (KPI kpi : KPI.values()) {
-			MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
-			
-			if (time != null)
-				influxRequest.getFields().put("time", DateConverter.toString(time));
-
-			BigDecimal value = calculateKPI(kpi, domain, from, to);
-			
-			log.info("KPI value: " + value);
-
-			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
-			
-			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
-			
-			if (response.statusCode() < 300) {
-				KPIDataDAO data = KPIDataDAO.create(kpi, domain);
-				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
-				configuredMeters.add(data);
-			} else log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.description, domain.toString(), response.body()));
-		}
-		return configuredMeters;
-	}
-	
-	public BigDecimal calculateKPI(KPI kpi, Domain domain, Long from, Long to) {
 
 		// Prepare Abstract meter needed values
         Set<Thread> threads = new HashSet<>();
@@ -236,6 +210,34 @@ public class KPIService {
                 e.printStackTrace();
             }
         });
+		
+		Map<String, String> headers = Map.of("Content-Type", "application/json");
+		
+		List<KPIDataDAO> configuredMeters = new LinkedList<>();
+		
+		// Calculate and save each KPI
+		for (KPI kpi : KPI.values()) {
+			MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
+			
+			if (time != null)
+				influxRequest.getFields().put("time", DateConverter.toString(time));
+
+			BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
+
+			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
+			
+			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
+			
+			if (response.statusCode() < 300) {
+				KPIDataDAO data = KPIDataDAO.create(kpi, domain);
+				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+				configuredMeters.add(data);
+			} else log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.description, domain.toString(), response.body()));
+		}
+		return configuredMeters;
+	}
+	
+	public BigDecimal calculateKPI(KPI kpi, Domain domain, Long from, Long to, Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previousValues, Map<AbstractMeter, Double> maxValues) {
 		
 		// Calculate each KPI with the values retrieved before
 		return switch (kpi) {
@@ -338,7 +340,8 @@ public class KPIService {
 		Map<String, String> params = new HashMap<>();
 
 		// Set parameters to Influx API request
-		params.put("measurements", meter.name());
+		params.put("measurements", "abstract_meter");
+		params.put("measurement_type", meter.name().toLowerCase());
 		params.put("domain", domain.name());
 		if (from != null)
 			params.put("from", from.toString());
