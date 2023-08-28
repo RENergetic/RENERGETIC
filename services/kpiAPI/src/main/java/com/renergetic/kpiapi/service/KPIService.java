@@ -57,7 +57,8 @@ public class KPIService {
 		Map<String, String> params = new HashMap<>();
 
 		// Set parameters to Influx API request
-		params.put("measurements", ret.getName().name());
+		params.put("measurements", "kpi");
+		params.put("measurement_type", ret.getName().name().toLowerCase());
 		params.put("domain", domain.name());
 		if (from != null)
 			params.put("from", from.toString());
@@ -115,7 +116,8 @@ public class KPIService {
 		Map<String, String> params = new HashMap<>();
 
 		// Set parameters to Influx API request
-		params.put("measurements", ret.getName().name());
+		params.put("measurements", "kpi");
+		params.put("measurement_type", ret.getName().name().toLowerCase());
 		params.put("domain", domain.name());
 		if (from != null)
 			params.put("from", from.toString());
@@ -159,32 +161,6 @@ public class KPIService {
     }
 	
 	public List<KPIDataDAO> calculateAndInsertAll(Domain domain, Long from, Long to, Long time) {
-		Map<String, String> headers = Map.of("Content-Type", "application/json");
-		
-		List<KPIDataDAO> configuredMeters = new LinkedList<>();
-		
-		for (KPI kpi : KPI.values()) {
-			MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
-			
-			if (time != null)
-				influxRequest.getFields().put("time", DateConverter.toString(time));
-
-			BigDecimal value = calculateKPI(kpi, domain, from, to);
-
-			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
-			
-			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
-			
-			if (response.statusCode() < 300) {
-				KPIDataDAO data = KPIDataDAO.create(kpi, domain);
-				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
-				configuredMeters.add(data);
-			} else log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.description, domain.toString(), response.body()));
-		}
-		return configuredMeters;
-	}
-	
-	public BigDecimal calculateKPI(KPI kpi, Domain domain, Long from, Long to) {
 
 		// Prepare Abstract meter needed values
         Set<Thread> threads = new HashSet<>();
@@ -235,94 +211,139 @@ public class KPIService {
             }
         });
 		
-		// Calculate each KPI with the values retrieved before
-		switch (kpi) {
-			case ESS:
-				this.calculateESS(values);
-				break;
-			case EP:
-				this.calculateEP(values);
-				break;
-			case EE:
-				this.calculateEE(values);
-				break;
-			case ES:
-				this.calculateES(values, previousValues);
-				break;
-			case SRES:
-				this.calculateSRES(values);
-				break;
-			case SNES:
-				this.calculateSNES(values);
-				break;
-			case CO2:
-				this.calculateCO2(values);
-				break;
-			case PEAK:
-				this.calculatePEAK(maxValues);
-				break;
-		}
+		Map<String, String> headers = Map.of("Content-Type", "application/json");
 		
-		return null;
+		List<KPIDataDAO> configuredMeters = new LinkedList<>();
+		
+		// Calculate and save each KPI
+		for (KPI kpi : KPI.values()) {
+			MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
+			
+			if (time != null)
+				influxRequest.getFields().put("time", DateConverter.toString(time));
+
+			BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
+
+			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
+			
+			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
+			
+			if (response.statusCode() < 300) {
+				KPIDataDAO data = KPIDataDAO.create(kpi, domain);
+				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+				configuredMeters.add(data);
+			} else log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.description, domain.toString(), response.body()));
+		}
+		return configuredMeters;
+	}
+	
+	public BigDecimal calculateKPI(KPI kpi, Domain domain, Long from, Long to, Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previousValues, Map<AbstractMeter, Double> maxValues) {
+		
+		// Calculate each KPI with the values retrieved before
+		return switch (kpi) {
+			case ESS -> this.calculateESS(values);
+			case EP -> this.calculateEP(values);
+			case EE -> this.calculateEE(values);
+			case ES -> this.calculateES(values, previousValues);
+			case SRES -> this.calculateSRES(values);
+			case SNES -> this.calculateSNES(values);
+			case CO2 -> this.calculateCO2(values);
+			case PEAK -> this.calculatePEAK(maxValues);
+		};
 	}
 	
 	public BigDecimal calculateESS(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf((values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) - 
+		Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) - 
 				(values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+		
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateEP(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf((values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) + 
+		Double result = (values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) + 
 				(values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateEE(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf(1 - (values.get(AbstractMeter.LOSSES) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))));
+		Double result = 1 - (values.get(AbstractMeter.LOSSES) / 
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateES(Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previousValues) {
 		
-		return BigDecimal.valueOf(((previousValues.get(AbstractMeter.LOAD) + previousValues.get(AbstractMeter.LOSSES) + previousValues.get(AbstractMeter.STORAGE)) - 
+		Double result = ((previousValues.get(AbstractMeter.LOAD) + previousValues.get(AbstractMeter.LOSSES) + previousValues.get(AbstractMeter.STORAGE)) - 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateSRES(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)));
+		Double result = (values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateSNES(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf(1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES))));
+		Double result = 1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateCO2(Map<AbstractMeter, Double> values) {
 		KPIConstant c = constantRepository.findAll().stream().findFirst().orElse(new KPIConstant(1L, 1., 1., 1., 1.));
 		
-		return BigDecimal.valueOf(((c.getAlpha() * values.get(AbstractMeter.LRS) + c.getBeta() * values.get(AbstractMeter.ERS) + 
+		log.debug(String.format("Constants: a -> %.2f | b -> %.2f | g -> %.2f | d -> %.2f", c.getAlpha(), c.getBeta(), c.getGamma(), c.getDelta()));
+		
+		Double result = ((c.getAlpha() * values.get(AbstractMeter.LRS) + c.getBeta() * values.get(AbstractMeter.ERS) + 
 				c.getGamma() * values.get(AbstractMeter.ENS) + c.getDelta() * values.get(AbstractMeter.LNS))) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculatePEAK(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+		Double result = values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE);
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	private Double getAbstractMeterData(AbstractMeter meter, Domain domain, Long from, Long to, InfluxFunction operation) {
 		Map<String, String> params = new HashMap<>();
 
 		// Set parameters to Influx API request
-		params.put("measurements", meter.name());
+		params.put("measurements", "abstract_meter");
+		params.put("measurement_type", meter.name().toLowerCase());
 		params.put("domain", domain.name());
 		if (from != null)
 			params.put("from", from.toString());

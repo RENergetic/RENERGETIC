@@ -65,7 +65,8 @@ public class AbstractMeterDataService {
 		Map<String, String> params = new HashMap<>();
 
 		// Set parameters to Influx API request
-		params.put("measurements", ret.getName().name());
+		params.put("measurements", "abstract_meter");
+		params.put("measurement_type", ret.getName().name().toLowerCase());
 		params.put("domain", domain.name());
 		if (from != null)
 			params.put("from", from.toString());
@@ -123,7 +124,8 @@ public class AbstractMeterDataService {
 		Map<String, String> params = new HashMap<>();
 
 		// Set parameters to Influx API request
-		params.put("measurements", ret.getName().name());
+		params.put("measurements", "abstract_meter");
+		params.put("measurement_type", ret.getName().name().toLowerCase());
 		params.put("domain", domain.name());
 		if (from != null)
 			params.put("from", from.toString());

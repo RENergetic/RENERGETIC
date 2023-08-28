@@ -36,7 +36,7 @@ public class ScheduledProcesses {
 
         log.info("Abstract meters calculated");
         data.forEach(obj -> obj.getData().forEach((time, value) ->
-                log.info(String.format(" - %s for domain %s: %f.2 at %d", obj.getName(), obj.getDomain(), value, time))
+                log.info(String.format(" - %s for domain %s: %.2f at %d", obj.getName(), obj.getDomain(), value, time))
             )
         );
     }
@@ -52,12 +52,12 @@ public class ScheduledProcesses {
 
         log.info("Electricity KPIs calculated");
         electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
-                log.info(String.format(" - %s for domain %s: %f.2 at %d", obj.getName(), obj.getDomain(), value, time))
+                log.info(String.format(" - %s for domain %s: %.2f at %d", obj.getName(), obj.getDomain(), value, time))
             )
         );
         log.info("Heat KPIs calculated");
         heatData.forEach(obj -> obj.getData().forEach((time, value) ->
-                log.info(String.format(" - %s for domain %s: %f.2 at %d", obj.getName(), obj.getDomain(), value, time))
+                log.info(String.format(" - %s for domain %s: %.2f at %d", obj.getName(), obj.getDomain(), value, time))
             )
         );
     }
