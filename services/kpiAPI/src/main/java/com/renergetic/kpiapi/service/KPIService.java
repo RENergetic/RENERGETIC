@@ -170,6 +170,8 @@ public class KPIService {
 				influxRequest.getFields().put("time", DateConverter.toString(time));
 
 			BigDecimal value = calculateKPI(kpi, domain, from, to);
+			
+			log.info("KPI value: " + value);
 
 			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
 			
@@ -236,86 +238,100 @@ public class KPIService {
         });
 		
 		// Calculate each KPI with the values retrieved before
-		switch (kpi) {
-			case ESS:
-				this.calculateESS(values);
-				break;
-			case EP:
-				this.calculateEP(values);
-				break;
-			case EE:
-				this.calculateEE(values);
-				break;
-			case ES:
-				this.calculateES(values, previousValues);
-				break;
-			case SRES:
-				this.calculateSRES(values);
-				break;
-			case SNES:
-				this.calculateSNES(values);
-				break;
-			case CO2:
-				this.calculateCO2(values);
-				break;
-			case PEAK:
-				this.calculatePEAK(maxValues);
-				break;
-		}
-		
-		return null;
+		return switch (kpi) {
+			case ESS -> this.calculateESS(values);
+			case EP -> this.calculateEP(values);
+			case EE -> this.calculateEE(values);
+			case ES -> this.calculateES(values, previousValues);
+			case SRES -> this.calculateSRES(values);
+			case SNES -> this.calculateSNES(values);
+			case CO2 -> this.calculateCO2(values);
+			case PEAK -> this.calculatePEAK(maxValues);
+		};
 	}
 	
 	public BigDecimal calculateESS(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf((values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) - 
+		Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) - 
 				(values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+		
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateEP(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf((values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) + 
+		Double result = (values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) + 
 				(values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateEE(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf(1 - (values.get(AbstractMeter.LOSSES) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))));
+		Double result = 1 - (values.get(AbstractMeter.LOSSES) / 
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateES(Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previousValues) {
 		
-		return BigDecimal.valueOf(((previousValues.get(AbstractMeter.LOAD) + previousValues.get(AbstractMeter.LOSSES) + previousValues.get(AbstractMeter.STORAGE)) - 
+		Double result = ((previousValues.get(AbstractMeter.LOAD) + previousValues.get(AbstractMeter.LOSSES) + previousValues.get(AbstractMeter.STORAGE)) - 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateSRES(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)));
+		Double result = (values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateSNES(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf(1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES))));
+		Double result = 1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculateCO2(Map<AbstractMeter, Double> values) {
 		KPIConstant c = constantRepository.findAll().stream().findFirst().orElse(new KPIConstant(1L, 1., 1., 1., 1.));
 		
-		return BigDecimal.valueOf(((c.getAlpha() * values.get(AbstractMeter.LRS) + c.getBeta() * values.get(AbstractMeter.ERS) + 
+		Double result = ((c.getAlpha() * values.get(AbstractMeter.LRS) + c.getBeta() * values.get(AbstractMeter.ERS) + 
 				c.getGamma() * values.get(AbstractMeter.ENS) + c.getDelta() * values.get(AbstractMeter.LNS))) / 
-				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	public BigDecimal calculatePEAK(Map<AbstractMeter, Double> values) {
 		
-		return BigDecimal.valueOf(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+		Double result = values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE);
+
+		if (!Double.isNaN(result))
+			return BigDecimal.valueOf(result);
+		else return new BigDecimal(0);
 	}
 	
 	private Double getAbstractMeterData(AbstractMeter meter, Domain domain, Long from, Long to, InfluxFunction operation) {
