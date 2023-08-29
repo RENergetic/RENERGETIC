@@ -19,4 +19,5 @@ INSERT INTO measurement_type ( id, name, physical_name, label, base_unit, unit, 
 	 ( 18, 'mass_kg', 'mass', 'Mass [kg]', 'kg', 'kg', 1, '#4CAF50'),
 	 ( 19, 'energy_price', 'price', 'Price [€/MWh]', '€/MWh', '€/Wh', 0.000001, '#4CAF50'),
 	 ( 20, 'energy_price_wh', 'price', 'Price [€/Wh]', '€/Wh', '€/Wh', 1, '#4CAF50'),
-	 ( 21, 'energy_price_kwh', 'price', 'Price [€/kWh]', '€/kWh', '€/Wh', 0.001, '#4CAF50');
+	 ( 21, 'energy_price_kwh', 'price', 'Price [€/kWh]', '€/kWh', '€/Wh', 0.001, '#4CAF50'),
+	 ( 22, 'value', 'value', 'Value', 'any', 'any', 1, '#4CAF50');
