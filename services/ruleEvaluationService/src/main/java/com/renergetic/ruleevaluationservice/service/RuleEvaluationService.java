@@ -95,7 +95,7 @@ public class RuleEvaluationService {
             evaluationResult.setErrorMessage("evaluation failed.");
         }
 
-        if(evaluationResult.getErrorMessage() != null && evaluationResult.getExecutionResult().equals("true")){
+        if(evaluationResult.getExecutionResult() != null && evaluationResult.getExecutionResult().equals("true")){
             Optional<NotificationDefinition> ndo = notificationDefinitionRepository.findByCode(evaluationResult.getExecutedReadableString());
             NotificationDefinition nd;
             if(ndo.isEmpty()){
