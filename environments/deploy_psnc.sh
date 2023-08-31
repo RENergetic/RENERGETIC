@@ -24,6 +24,7 @@ hdr=$(grep -ioP "(hdr\s*=\s*)\K.+" _installers.properties)
 kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
+rules=$(grep -ioP "(rules\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -176,6 +177,30 @@ then
         envsubst '$PROJECT' < ingestion-api-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f ingestion-api-service.yaml
     fi
+
+    if [[ $rules = 'true' ]]
+    then
+        cd "${apisPath}/ruleEvaluationService"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
+
+        cd "${current}/docker_config/APIs/rules-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/rules-api
+        kubectl delete services/rules-api-sv
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/rules-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/rules-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply --force=true -f -
+        kubectl apply -f rules-api-service.yaml
+    fi
+
 # DEPLOY WSO2 API MANAGER
 
     if [[ $wso2 = 'true' ]]

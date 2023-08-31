@@ -1,6 +1,5 @@
 package com.renergetic.kpiapi.dao;
 
-import com.renergetic.kpiapi.model.AbstractMeterConfig;
 import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.model.KPI;
 

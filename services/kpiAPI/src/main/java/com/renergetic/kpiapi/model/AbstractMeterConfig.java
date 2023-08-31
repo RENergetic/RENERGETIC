@@ -34,6 +34,7 @@ public class AbstractMeterConfig {
 	@Column(name = "condition", nullable = true, insertable = true, updatable = true, unique = false)
 	private String condition;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "domain", nullable = false, insertable = true, updatable = true, unique = false)
 	private Domain domain;
 }

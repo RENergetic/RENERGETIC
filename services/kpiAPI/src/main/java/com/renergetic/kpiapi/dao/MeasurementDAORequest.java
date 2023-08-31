@@ -23,10 +23,12 @@ public class MeasurementDAORequest {
 	public static MeasurementDAORequest create(AbstractMeterConfig config) {
 		MeasurementDAORequest dao = new MeasurementDAORequest();
 		
-		dao.measurement = config.getName().name();
+		dao.measurement = "abstract_meter";
 		dao.fields = new HashMap<>();
 		dao.tags = new HashMap<>();
 		dao.tags.put("domain", config.getDomain().name());
+		dao.tags.put("type_data", "calculated");
+		dao.tags.put("measurement_type", config.getName().name().toLowerCase());
 		
 		return dao;
 	}
@@ -34,10 +36,12 @@ public class MeasurementDAORequest {
 	public static MeasurementDAORequest create(KPI kpi, Domain domain) {
 		MeasurementDAORequest dao = new MeasurementDAORequest();
 
-		dao.measurement = kpi.name();
+		dao.measurement = "kpi";
 		dao.fields = new HashMap<>();
 		dao.tags = new HashMap<>();
 		dao.tags.put("domain", domain.name());
+		dao.tags.put("type_data", "calculated");
+		dao.tags.put("measurement_type", kpi.name().toLowerCase());
 
 		return dao;
 	}
