@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rules-api
+spec:
+  selector:
+      matchLabels:
+        app: rules-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rules-api
+    spec:
+      containers:
+        - name: rules-api
+          image: docker-registry.default.svc:5000/${PROJECT}/rules-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+          resources:
+            requests:
+              cpu: 200m
+              memory: 275Mi
+            limits:
+              cpu: 300m
+              memory: 550Mi
+          readinessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 60
+            periodSeconds: 120
+            successThreshold: 1
+            timeoutSeconds: 1
+      restartPolicy: Always
