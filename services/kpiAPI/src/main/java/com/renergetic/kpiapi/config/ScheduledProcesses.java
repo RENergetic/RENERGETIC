@@ -29,10 +29,10 @@ public class ScheduledProcesses {
     KPIService kpiService;
 
     @Async
-    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
+    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.DAYS)
     public void calculateMeters() {
         List<AbstractMeterDataDAO> data = meterService
-                .calculateAndInsertAll(Instant.now().toEpochMilli() - 3600000, Instant.now().toEpochMilli(), null);
+                .calculateAndInsertAll(Instant.now().toEpochMilli() - 86400000, Instant.now().toEpochMilli(), null);
 
         log.info("Abstract meters calculated");
         data.forEach(obj -> obj.getData().forEach((time, value) ->
@@ -42,13 +42,13 @@ public class ScheduledProcesses {
     }
 
     @Async
-    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
+    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.DAYS)
     public void calculateKpis() {
         List<KPIDataDAO> electricityData = kpiService
-                .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - 3600000, Instant.now().toEpochMilli(), null);
+                .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - 86400000, Instant.now().toEpochMilli(), null);
 
         List<KPIDataDAO> heatData = kpiService
-                .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - 3600000, Instant.now().toEpochMilli(), null);
+                .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - 86400000, Instant.now().toEpochMilli(), null);
 
         log.info("Electricity KPIs calculated");
         electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
