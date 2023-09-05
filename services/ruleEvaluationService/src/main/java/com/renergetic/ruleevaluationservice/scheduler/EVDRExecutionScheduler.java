@@ -1,5 +1,7 @@
 package com.renergetic.ruleevaluationservice.scheduler;
 
+import com.renergetic.ruleevaluationservice.exception.ConfigurationError;
+import com.renergetic.ruleevaluationservice.service.EVDRService;
 import com.renergetic.ruleevaluationservice.service.RuleEvaluationService;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,24 +15,14 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 
 @Component
-public class RuleExecutionScheduler {
+public class EVDRExecutionScheduler {
 
     @Autowired
-    RuleEvaluationService ruleEvaluationService;
-
-    private HashMap<String, RuleEvaluationResult> evaluationResultHashMap = new HashMap<>();
-
-    //@Scheduled(cron = "0 * * * * *")
-    @Scheduled(cron = "${rule.executionCRON}")
+    EVDRService evdrService;
+    @Scheduled(cron = "${ev-dr.executionCRON}")
     @Transactional(propagation= Propagation.REQUIRED)
-    public void executeRules(){
-        ruleEvaluationService.retrieveAndExecuteAllRules();
+    public void executeRules() throws ConfigurationError {
+        evdrService.evaluateEVDR();
     }
 
-    @Getter
-    @Setter
-    public class RuleEvaluationResult {
-        private String result;
-        private LocalDateTime execution;
-    }
 }
