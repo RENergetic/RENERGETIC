@@ -213,7 +213,7 @@ public class AbstractMeterDataService {
 				influxRequest.getFields().put("time", DateConverter.toString(time));
 
 			BigDecimal value = null;
-			if (meter.getCondition() != null && calculator.compare(meter.getCondition(), from, to))
+			if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to))
 				value = calculator.calculateFormula(meter.getFormula(), from, to);
 			else value = new BigDecimal(0);
 			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
