@@ -224,7 +224,7 @@ public class AbstractMeterDataService {
 				AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
 				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
 				configuredMeters.add(data);
-			} else log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %s", meter.getName().meter, meter.getDomain().toString(), response.body()));
+			} else log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meter, meter.getDomain().toString(), response.statusCode()));
 		}
 		return configuredMeters;
 	}

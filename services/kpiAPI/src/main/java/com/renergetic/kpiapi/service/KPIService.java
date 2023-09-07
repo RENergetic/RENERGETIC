@@ -232,7 +232,7 @@ public class KPIService {
 				KPIDataDAO data = KPIDataDAO.create(kpi, domain);
 				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
 				configuredMeters.add(data);
-			} else log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.description, domain.toString(), response.body()));
+			} else log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.description, domain.toString(), response.statusCode()));
 		}
 		return configuredMeters;
 	}

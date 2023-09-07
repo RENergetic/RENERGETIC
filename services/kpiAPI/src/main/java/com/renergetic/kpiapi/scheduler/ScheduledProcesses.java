@@ -1,4 +1,4 @@
-package com.renergetic.kpiapi.config;
+package com.renergetic.kpiapi.scheduler;
 
 import com.renergetic.kpiapi.dao.AbstractMeterDataDAO;
 import com.renergetic.kpiapi.dao.KPIDataDAO;
@@ -8,6 +8,7 @@ import com.renergetic.kpiapi.service.KPIService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -23,18 +24,24 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledProcesses {
 
     @Autowired
-    AbstractMeterDataService meterService;
+    private AbstractMeterDataService meterService;
     
     @Autowired
-    KPIService kpiService;
+    private KPIService kpiService;
+    
+    @Value("${scheduled.abstrac-meter.period}")
+    private Integer meterPeriod;
+    
+    @Value("${scheduled.kpi.period}")
+    private Integer kpiPeriod;
 
     @Async
-    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.DAYS)
+    @Scheduled(fixedDelayString = "${scheduled.abstrac-meter.period}", timeUnit = TimeUnit.MINUTES)
     public void calculateMeters() {
         List<AbstractMeterDataDAO> data = meterService
-                .calculateAndInsertAll(Instant.now().toEpochMilli() - 86400000, Instant.now().toEpochMilli(), null);
+                .calculateAndInsertAll(Instant.now().toEpochMilli() - (60000 * meterPeriod), Instant.now().toEpochMilli(), null);
 
-        log.info("Abstract meters calculated");
+        log.info(String.format("Abtract meters calculated (Period: %d minutes)", meterPeriod));
         data.forEach(obj -> obj.getData().forEach((time, value) ->
                 log.info(String.format(" - %s for domain %s: %.2f at %d", obj.getName(), obj.getDomain(), value, time))
             )
@@ -42,15 +49,15 @@ public class ScheduledProcesses {
     }
 
     @Async
-    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.DAYS)
+    @Scheduled(fixedDelayString = "${scheduled.kpi.period}", timeUnit = TimeUnit.MINUTES)
     public void calculateKpis() {
         List<KPIDataDAO> electricityData = kpiService
-                .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - 86400000, Instant.now().toEpochMilli(), null);
+                .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - (60000 * kpiPeriod), Instant.now().toEpochMilli(), null);
 
         List<KPIDataDAO> heatData = kpiService
-                .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - 86400000, Instant.now().toEpochMilli(), null);
+                .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - (60000 * kpiPeriod), Instant.now().toEpochMilli(), null);
 
-        log.info("Electricity KPIs calculated");
+        log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", kpiPeriod));
         electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
                 log.info(String.format(" - %s for domain %s: %.2f at %d", obj.getName(), obj.getDomain(), value, time))
             )
