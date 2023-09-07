@@ -81,7 +81,7 @@ public class AbstractMeterDataService {
 		if (response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
-			if (data.isEmpty()) {
+			if (!data.isEmpty()) {
 				data.forEach((obj) -> {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");
@@ -142,7 +142,7 @@ public class AbstractMeterDataService {
 		if (response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
-			if (data.isEmpty()) {
+			if (!data.isEmpty()) {
 				data.forEach((obj) -> {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");

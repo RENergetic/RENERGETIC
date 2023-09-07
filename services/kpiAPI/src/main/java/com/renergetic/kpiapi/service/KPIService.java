@@ -73,7 +73,7 @@ public class KPIService {
 		if (response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
-			if (data.isEmpty()) {
+			if (!data.isEmpty()) {
 				data.forEach((obj) -> {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");
@@ -134,7 +134,7 @@ public class KPIService {
 		if (response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
-			if (data.isEmpty()) {
+			if (!data.isEmpty()) {
 				data.forEach(obj -> {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");
@@ -358,7 +358,7 @@ public class KPIService {
 		if (response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
-			if (data.isEmpty()) {
+			if (!data.isEmpty()) {
 				for (Object obj : data) {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");
