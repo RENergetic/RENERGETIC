@@ -222,7 +222,10 @@ public class KPIService {
 			if (time != null)
 				influxRequest.getFields().put("time", DateConverter.toString(time));
 
-			BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
+			Double value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues).doubleValue();
+			if (!Double.isNaN(value))
+				influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
+			else influxRequest.getFields().put("value", "0.0");
 
 			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
 			

@@ -167,14 +167,20 @@ public class MathCalculator {
 		BigDecimal num1 = numbers.pop();
 		char operator = operators.pop();
 
-		BigDecimal result = switch (operator) {
-            case '+' -> num1.add(num2);
-            case '-' -> num1.subtract(num2);
-            case '*' -> num1.multiply(num2);
-            case '/' -> num1.divide(num2, MathContext.DECIMAL128);
-            case '^' -> num1.pow(num2.intValue());
-            default -> throw new IllegalArgumentException("Invalid Operator: " + operator);
-        };
+		BigDecimal result;
+		try {
+			result = switch (operator) {
+	            case '+' -> num1.add(num2);
+	            case '-' -> num1.subtract(num2);
+	            case '*' -> num1.multiply(num2);
+	            case '/' -> num1.divide(num2, MathContext.DECIMAL128);
+	            case '^' -> num1.pow(num2.intValue());
+	            default -> throw new IllegalArgumentException("Invalid Operator: " + operator);
+	        };
+		} catch(ArithmeticException e) {
+			result = new BigDecimal(0);
+			log.warn(String.format("Error executing (%.2f %c %.2f): " + e.getMessage(), num1, operator, num2));
+		}
 
         numbers.push(result);
 	}
