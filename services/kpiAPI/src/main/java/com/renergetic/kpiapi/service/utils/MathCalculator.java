@@ -55,6 +55,8 @@ public class MathCalculator {
 	 * @return          true if the formula is valid and all its parenthesis are closed, false otherwise
 	 */
 	public boolean validateFormula(String formula) {
+		formula = removeWhiteSpaces(formula);
+		
 		// Regex to validate a mathematical formula
 		Pattern pattern = Pattern.compile("\\(*((\\d+(\\.\\d+)?)|(\\[\\d+\\]))([+*^\\/-]\\(*((\\d+(\\.\\d+)?)|(\\[\\d+\\]))\\)*)*");
 
@@ -83,6 +85,7 @@ public class MathCalculator {
 	}
 
 	public BigDecimal calculateFormula(String formula, Long from, Long to) {
+		formula = removeWhiteSpaces(formula);
 		
 		Stack<BigDecimal> numbers = new Stack<>();
 		Stack<Character> operators = new Stack<>();
@@ -266,5 +269,9 @@ public class MathCalculator {
 		log.debug(String.format("Value for measurement %d: %s", id, ret));
 		
 		return ret;
+	}
+	
+	private String removeWhiteSpaces(String formula) {
+		return formula.replace(" ", "");
 	}
 }
