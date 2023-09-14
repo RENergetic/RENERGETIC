@@ -31,7 +31,7 @@ INSERT INTO public.asset(
 	(1105, 'de-nieuwe-dokken-watertreatment', NULL, 'Energy demand of the water treatment plant at De Nieuwe Dokken', 3, 1000, 28, NULL, 1),
 	(1106, 'de-nieuwe-dokken-gas-christeyns', NULL, 'Thermal energy production of the gas boilers installed at Christyens and delivering heat to De Nieuwe Dokken', NULL, 1000, 5, NULL, 1),
 	(1107, 'de-nieuwe-dokken-wasteheat-christeyns', NULL, 'Waste heat thermal energy production at Christeyns and delivered to De Nieuwe Dokken', NULL, 1000, 5, NULL, 1),
-	-- (1108, 'de-nieuwe-dokken-total-heat-christeyns', NULL, 'de Nieuwe Dokken Total Heat Christeyns', NULL, 1000, 5, NULL, 1),
+	(1108, 'de-nieuwe-dokken-total-heat-christeyns', NULL, 'de Nieuwe Dokken Total Heat Christeyns', NULL, 1000, 5, NULL, 1),
 	(1109, 'de-nieuwe-dokken-total-heat', NULL, 'Total thermal energy demand at De Nieuwe Dokken', 1, 1000, 28, NULL, 1),
 	(1110, 'de-nieuwe-dokken-pv-017A-xxxxx9A1', NULL, 'PV power produced by the PV field with installation code 017A-xxxxx9A1 at De Nieuwe Dokken', NULL, 1003, 10, NULL, 1),
 	(1111, 'de-nieuwe-dokken-pv-0198-xxxxx4B4', NULL, 'PV power produced by the PV field with installation code 0198-xxxxx4B4 at De Nieuwe Dokken', NULL, 1003, 10, NULL, 1),

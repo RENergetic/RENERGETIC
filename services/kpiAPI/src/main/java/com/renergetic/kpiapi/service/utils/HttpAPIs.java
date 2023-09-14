@@ -30,7 +30,7 @@ public class HttpAPIs {
             String parseParams = mapParams(params);
             parseParams = parseParams.isBlank() ? parseParams : '?' + parseParams;
             URI uri = URI.create(url + parseParams);
-            log.debug(uri.toString());
+            log.info(uri.toString());
             // Prepare Request
             ObjectMapper mapper = new ObjectMapper();
             HttpRequest.Builder builder = HttpRequest.newBuilder(uri);

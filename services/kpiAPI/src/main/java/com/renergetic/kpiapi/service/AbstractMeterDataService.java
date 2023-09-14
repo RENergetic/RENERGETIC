@@ -1,6 +1,5 @@
 package com.renergetic.kpiapi.service;
 
-import java.math.BigDecimal;
 import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.HashMap;
@@ -81,7 +80,7 @@ public class AbstractMeterDataService {
 		if (response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
-			if (data.isEmpty()) {
+			if (!data.isEmpty()) {
 				data.forEach((obj) -> {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");
@@ -142,7 +141,7 @@ public class AbstractMeterDataService {
 		if (response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
-			if (data.isEmpty()) {
+			if (!data.isEmpty()) {
 				data.forEach((obj) -> {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");
@@ -180,8 +179,10 @@ public class AbstractMeterDataService {
 		if (time != null)
 			influxRequest.getFields().put("time", DateConverter.toString(time));
 		
-		BigDecimal value = calculator.calculateFormula(meter.getFormula(), from, to);
-		influxRequest.getFields().put("value", value.toPlainString());
+		Double value = calculator.calculateFormula(meter.getFormula(), from, to).doubleValue();
+		if (!Double.isNaN(value))
+			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
+		else influxRequest.getFields().put("value", "0.0");
 		
 		HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 		
@@ -212,11 +213,13 @@ public class AbstractMeterDataService {
 			if (time != null)
 				influxRequest.getFields().put("time", DateConverter.toString(time));
 
-			BigDecimal value = null;
-			if (meter.getCondition() != null && calculator.compare(meter.getCondition(), from, to))
-				value = calculator.calculateFormula(meter.getFormula(), from, to);
-			else value = new BigDecimal(0);
-			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
+			Double value = null;
+			if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to))
+				value = calculator.calculateFormula(meter.getFormula(), from, to).doubleValue();
+			else value = 0.;
+			if (!Double.isNaN(value))
+				influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
+			else influxRequest.getFields().put("value", "0.0");
 			
 			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 			
@@ -224,7 +227,7 @@ public class AbstractMeterDataService {
 				AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
 				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
 				configuredMeters.add(data);
-			} else log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %s", meter.getName().meter, meter.getDomain().toString(), response.body()));
+			} else log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meter, meter.getDomain().toString(), response.statusCode()));
 		}
 		return configuredMeters;
 	}
