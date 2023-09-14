@@ -55,6 +55,8 @@ public class MathCalculator {
 	 * @return          true if the formula is valid and all its parenthesis are closed, false otherwise
 	 */
 	public boolean validateFormula(String formula) {
+		formula = removeWhiteSpaces(formula);
+		
 		// Regex to validate a mathematical formula
 		Pattern pattern = Pattern.compile("\\(*((\\d+(\\.\\d+)?)|(\\[\\d+\\]))([+*^\\/-]\\(*((\\d+(\\.\\d+)?)|(\\[\\d+\\]))\\)*)*");
 
@@ -83,6 +85,7 @@ public class MathCalculator {
 	}
 
 	public BigDecimal calculateFormula(String formula, Long from, Long to) {
+		formula = removeWhiteSpaces(formula);
 		
 		Stack<BigDecimal> numbers = new Stack<>();
 		Stack<Character> operators = new Stack<>();
@@ -164,14 +167,20 @@ public class MathCalculator {
 		BigDecimal num1 = numbers.pop();
 		char operator = operators.pop();
 
-		BigDecimal result = switch (operator) {
-            case '+' -> num1.add(num2);
-            case '-' -> num1.subtract(num2);
-            case '*' -> num1.multiply(num2);
-            case '/' -> num1.divide(num2, MathContext.DECIMAL128);
-            case '^' -> num1.pow(num2.intValue());
-            default -> throw new IllegalArgumentException("Invalid Operator: " + operator);
-        };
+		BigDecimal result;
+		try {
+			result = switch (operator) {
+	            case '+' -> num1.add(num2);
+	            case '-' -> num1.subtract(num2);
+	            case '*' -> num1.multiply(num2);
+	            case '/' -> num1.divide(num2, MathContext.DECIMAL128);
+	            case '^' -> num1.pow(num2.intValue());
+	            default -> throw new IllegalArgumentException("Invalid Operator: " + operator);
+	        };
+		} catch(ArithmeticException e) {
+			result = new BigDecimal(0);
+			log.warn(String.format("Error executing (%.2f %c %.2f): " + e.getMessage(), num1, operator, num2));
+		}
 
         numbers.push(result);
 	}
@@ -266,5 +275,9 @@ public class MathCalculator {
 		log.debug(String.format("Value for measurement %d: %s", id, ret));
 		
 		return ret;
+	}
+	
+	private String removeWhiteSpaces(String formula) {
+		return formula.replace(" ", "");
 	}
 }
