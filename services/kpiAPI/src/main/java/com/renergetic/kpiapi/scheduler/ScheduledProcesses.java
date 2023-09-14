@@ -55,7 +55,7 @@ public class ScheduledProcesses {
                 .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - (60000 * kpiPeriod), Instant.now().toEpochMilli(), null);
 
         List<KPIDataDAO> heatData = kpiService
-                .calculateAndInsertAll(Domain.electricity, Instant.now().toEpochMilli() - (60000 * kpiPeriod), Instant.now().toEpochMilli(), null);
+                .calculateAndInsertAll(Domain.heat, Instant.now().toEpochMilli() - (60000 * kpiPeriod), Instant.now().toEpochMilli(), null);
 
         log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", kpiPeriod));
         electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
