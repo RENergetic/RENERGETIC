@@ -20,4 +20,11 @@ INSERT INTO measurement_type ( id, name, physical_name, label, base_unit, unit, 
 	 ( 19, 'energy_price', 'price', 'Price [€/MWh]', '€/MWh', '€/Wh', 0.000001, '#4CAF50'),
 	 ( 20, 'energy_price_wh', 'price', 'Price [€/Wh]', '€/Wh', '€/Wh', 1, '#4CAF50'),
 	 ( 21, 'energy_price_kwh', 'price', 'Price [€/kWh]', '€/kWh', '€/Wh', 0.001, '#4CAF50'),
-	 ( 22, 'value', 'value', 'Value', 'any', 'any', 1, '#4CAF50');
+     ( 22, 'humidity', 'humidity', 'Humidity [%]', '%', '%', 1, '#4CAF50'),
+	 ( 23, 'radiation', 'radiation', 'Radiation [W/m2]', 'W/m2', 'W/m2', 1, '#4CAF50'),
+	 ( 24, 'speed', 'speed', 'Speed [m/s]', 'm/s', 'm/s', 1, '#4CAF50'),
+	 ( 25, 'wind_direction', 'wind_direction', 'Wind direction [°]', '°', '°', 1, '#4CAF50'),
+	 ( 26, 'precipitation', 'precipitation', 'Precipitation [mm]', 'mm', 'mm', 1, '#4CAF50'),
+	 ( 27, 'pressure', 'pressure', 'Pressure [hPa]', 'hPa', 'hPa', 1, '#4CAF50'),
+	 ( 28, 'moisture', 'moisture', 'Moisture [cb]', 'cb', 'cb', 1, '#4CAF50'),
+	 ( 29, 'value', 'value', 'Value', 'any', 'any', 1, '#4CAF50');
