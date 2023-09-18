@@ -239,6 +239,8 @@ public class MathCalculator {
 	            params.put("direction", measurement.getDirection().name());
 	        if (measurement.getDomain() != null)
 	            params.put("domain", measurement.getDomain().name());
+			if (measurement.getSensorId() != null)
+				params.put("sensor_id", measurement.getSensorId());
 	        if (!assetNames.isEmpty())
 	            params.put("asset_name", String.join(",", assetNames));
 	        if (tags != null && !tags.isEmpty())
