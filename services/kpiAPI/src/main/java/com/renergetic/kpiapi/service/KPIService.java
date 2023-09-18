@@ -363,8 +363,8 @@ public class KPIService {
 					if (obj instanceof JSONObject) {
 						JSONObject json = ((JSONObject) obj).getJSONObject("fields");
 
-						if (json.has("value")) {
-							return json.getDouble("value");
+						if (json.has(operation.name().toLowerCase())) {
+							return json.getDouble(operation.name().toLowerCase());
 						}
 					}
 				}
