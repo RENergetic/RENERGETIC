@@ -153,6 +153,8 @@ public class DataService {
                         params.put("direction", measurement.getDirection().name());
                     if (measurement.getDomain() != null)
                         params.put("domain", measurement.getDomain().name());
+                    if (measurement.getSensorId() != null)
+                        params.put("sensor_id", measurement.getSensorId());
                     if (assetNames != null && !assetNames.isEmpty())
                         params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
                     if (tags != null && !tags.isEmpty())
@@ -250,6 +252,8 @@ public class DataService {
                         params.put("direction", measurement.getDirection().name());
                     if (measurement.getDomain() != null)
                         params.put("domain", measurement.getDomain().name());
+                    if (measurement.getSensorId() != null)
+                        params.put("sensor_id", measurement.getSensorId());
                     if (assetNames != null && !assetNames.isEmpty())
                         params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
                     if (tags != null && !tags.isEmpty())
