@@ -79,7 +79,7 @@ public class MeasurementService {
     			registry);
 	}
 
-	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, Boolean performDecumulation) {
+	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, Boolean performDecumulation, Boolean getTags) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -118,10 +118,10 @@ public class MeasurementService {
 
 		log.info("Flux query: \n" + flux);
 		List<FluxTable> tables = query.query(flux);
-		return MeasurementMapper.fromFlux(tables);
+		return MeasurementMapper.fromFlux(tables, getTags);
 	}
 
-	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement, Boolean toFloat, Boolean performDecumulation) {
+	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement, Boolean toFloat, Boolean performDecumulation, Boolean getTags) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -177,7 +177,7 @@ public class MeasurementService {
 
 		log.info("Flux query: \n" + flux);
 		List<FluxTable> tables = query.query(flux);
-		return MeasurementMapper.fromFlux(tables);
+		return MeasurementMapper.fromFlux(tables, getTags);
 	}
 
 	/**
