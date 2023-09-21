@@ -12,43 +12,53 @@ import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
 import com.renergetic.measurementapi.service.utils.FieldsFormat;
 
 public abstract class MeasurementMapper {
+
+	private MeasurementMapper() {}
+
+	/**
+	 * Converts a list of FluxTable objects into a list of MeasurementDAOResponse objects.
+	 *
+	 * @param  tables  the list of FluxTable objects to convert
+	 * @return         the list of MeasurementDAOResponse objects converted from the FluxTable objects
+	 */
 	public static List<MeasurementDAOResponse> fromFlux(List<FluxTable> tables) {
 		ArrayList<MeasurementDAOResponse> resp = new ArrayList<>();
 		
 		int i = 0;
 		for(FluxTable table: tables) {
 			MeasurementDAOResponse measurement;
-			for(FluxRecord record : table.getRecords()) {
+			for(FluxRecord fluxRecord : table.getRecords()) {
 				if(resp.size() <= i) {
 					// Initialize measurement and add it to map
 					measurement = new MeasurementDAOResponse();
-					measurement.setFields(new HashMap<>());
-					measurement.setTags(new HashMap<>());
-					measurement.setMeasurement(record.getMeasurement());
+					measurement.setMeasurement(fluxRecord.getMeasurement());
 					resp.add(measurement); 
 					
 					// Set time field
-					Entry<String, String> field = FieldsFormat.parseSeries("time", record.getTime());
+					Entry<String, String> field = FieldsFormat.parseSeries("time", fluxRecord.getTime());
 					measurement.getFields().put(field.getKey(), field.getValue());
 				} else measurement = resp.get(i);
 				// Add other fields
-				if (record.getField() != null) {
-					Entry<String, String> field = FieldsFormat.parseSeries(record.getField(), record.getValue());
+				if (fluxRecord.getField() != null) {
+					Entry<String, String> field = FieldsFormat.parseSeries(fluxRecord.getField(), fluxRecord.getValue());
 					measurement.getFields().put(field.getKey(), field.getValue());
 				}
 				// Add tags
-				if (measurement.getTags() == null) measurement.setTags(new HashMap<String, String>());
-				for(String key : record.getValues().keySet()) {
-					if (key != null && !(key.startsWith("_") || key.equalsIgnoreCase("table") || key.equalsIgnoreCase("result"))) {
-						@SuppressWarnings("null")
-						String value = record.getValueByKey(key) != null? record.getValueByKey(key).toString() : null;
-						measurement.getTags().put(key, value);
-					}
-				}
+				setTags(measurement, fluxRecord);
 				i++;
 			}
 		}
 		
 		return new ArrayList<>(resp);
+	}
+
+	private static void setTags(MeasurementDAOResponse measurement, FluxRecord fluxRecord) {
+		if (measurement.getTags() == null) measurement.setTags(new HashMap<>());
+		for(String key : fluxRecord.getValues().keySet()) {
+			if (key != null && !(key.startsWith("_") || key.equalsIgnoreCase("table") || key.equalsIgnoreCase("result"))) {
+				String value = fluxRecord.getValueByKey(key) != null? fluxRecord.getValueByKey(key).toString() : null;
+				measurement.getTags().put(key, value);
+			}
+		}		
 	}
 }
