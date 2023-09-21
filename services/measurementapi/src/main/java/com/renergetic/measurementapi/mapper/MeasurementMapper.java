@@ -22,6 +22,10 @@ public abstract class MeasurementMapper {
 	 * @return         the list of MeasurementDAOResponse objects converted from the FluxTable objects
 	 */
 	public static List<MeasurementDAOResponse> fromFlux(List<FluxTable> tables) {
+		return fromFlux(tables, true);
+	}
+
+	public static List<MeasurementDAOResponse> fromFlux(List<FluxTable> tables, boolean mapTags) {
 		ArrayList<MeasurementDAOResponse> resp = new ArrayList<>();
 		
 		int i = 0;
@@ -44,12 +48,12 @@ public abstract class MeasurementMapper {
 					measurement.getFields().put(field.getKey(), field.getValue());
 				}
 				// Add tags
-				setTags(measurement, fluxRecord);
+				if (mapTags) setTags(measurement, fluxRecord);
 				i++;
 			}
 		}
 		
-		return new ArrayList<>(resp);
+		return new ArrayList<>(resp);		
 	}
 
 	private static void setTags(MeasurementDAOResponse measurement, FluxRecord fluxRecord) {
