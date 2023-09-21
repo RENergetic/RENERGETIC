@@ -77,7 +77,7 @@ public class AbstractMeterDataService {
 				httpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
 
 		// Parse response with status code smaller than 300
-		if (response.statusCode() < 300) {
+		if (response != null && response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
 			if (!data.isEmpty()) {
@@ -138,7 +138,7 @@ public class AbstractMeterDataService {
 				httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
 
 		// Parse response with status code smaller than 300
-		if (response.statusCode() < 300) {
+		if (response != null && response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
 			if (!data.isEmpty()) {
@@ -186,7 +186,7 @@ public class AbstractMeterDataService {
 		
 		HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 		
-		if (response.statusCode() < 300) {
+		if (response != null && response.statusCode() < 300) {
 			ret.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
 		} else throw new HttpRuntimeException("Influx request failed with status code %d", response.statusCode());
 		
@@ -223,7 +223,7 @@ public class AbstractMeterDataService {
 			
 			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 			
-			if (response.statusCode() < 300) {
+			if (response != null && response.statusCode() < 300) {
 				AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
 				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
 				configuredMeters.add(data);
