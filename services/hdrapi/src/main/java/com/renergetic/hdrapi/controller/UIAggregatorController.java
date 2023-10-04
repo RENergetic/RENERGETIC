@@ -1,11 +1,12 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.*;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.exception.UnauthorizedAccessException;
-import com.renergetic.hdrapi.model.User;
-import com.renergetic.hdrapi.model.security.KeycloakRole;
-import com.renergetic.hdrapi.repository.MeasurementTypeRepository;
+import com.renergetic.common.dao.*;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.exception.UnauthorizedAccessException;
+import com.renergetic.common.model.ConnectionType;
+import com.renergetic.common.model.User;
+import com.renergetic.common.model.security.KeycloakRole;
+import com.renergetic.common.repository.MeasurementTypeRepository;
 import com.renergetic.hdrapi.service.*;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -84,12 +85,12 @@ public class UIAggregatorController {
 
         if (body.getCalls().getAssets() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getAssets();
-            wrapperResponseDAO.setAssets(getSimpleAssets(userId, Optional.ofNullable(data.getOffset()),
+            wrapperResponseDAO.setAssets(getOwnerAssets(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
         }
         if (body.getCalls().getAssetPanels() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getAssetPanels();
-            wrapperResponseDAO.setAssetPanels(getAssetPanels(userId, Optional.ofNullable(data.getOffset()),
+            wrapperResponseDAO.setAssetPanels(getPrivateAssetPanels(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
         }
         if (body.getCalls().getMeasurementTypes() != null) {
@@ -107,8 +108,7 @@ public class UIAggregatorController {
         if (body.getCalls().getPanels() != null) {
             //also called public dashboards
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getPanels();
-            wrapperResponseDAO.setPanels(
-                    getPanels(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit())));
+            wrapperResponseDAO.setPanels(                    getPublicPanels( Optional.ofNullable(data.getLimit())));
         }
         if (body.getCalls().getDashboards() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getDashboards();
@@ -155,9 +155,9 @@ public class UIAggregatorController {
         return wrapperResponseDAO;
     }
 
-    private List<SimpleAssetDAO> getSimpleAssets(Long userId, Optional<Long> offset, Optional<Integer> limit) {
+    private List<SimpleAssetDAO> getOwnerAssets(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
-            return assetService.findSimpleByUserId(userId, offset.orElse(0L), limit.orElse(20));
+            return assetService.findSimpleByUserId(userId, List.of(ConnectionType.owner), offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
@@ -171,17 +171,24 @@ public class UIAggregatorController {
         }
     }
 
-    private List<InformationPanelDAOResponse> getPanels(Long userId, Optional<Long> offset, Optional<Integer> limit) {
+    private List<InformationPanelDAOResponse> getPublicPanels(Optional<Integer> limit) {
         try {
-            return informationPanelService.findByUserId(userId, offset.orElse(0L), limit.orElse(20));
+            return informationPanelService.findFeatured(false,Math.min(50, limit.orElse(20)));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
     }
 
-    private List<AssetPanelDAO> getAssetPanels(Long userId, Optional<Long> offset, Optional<Integer> limit) {
+    /**
+     * private dashboards
+     * @param userId
+     * @param offset
+     * @param limit
+     * @return
+     */
+    private List<AssetPanelDAO> getPrivateAssetPanels(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
-            return assetService.findAssetsPanelsByUserId(userId, offset.orElse(0L), limit.orElse(20));
+            return assetService.findAssetsPanelsByUserId(userId, List.of(ConnectionType.owner, ConnectionType.resident), offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }

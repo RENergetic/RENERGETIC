@@ -2,6 +2,8 @@ package com.renergetic.ingestionapi.dao;
 
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;

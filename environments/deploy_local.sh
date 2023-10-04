@@ -14,6 +14,7 @@ postgreSQL=$(grep -ioP "(postgreSQL\s*=\s*)\K.+" _installers.properties)
 influxDB=$(grep -ioP "(influxDB\s*=\s*)\K.+" _installers.properties)
 # APIs
 hdr=$(grep -ioP "(hdr\s*=\s*)\K.+" _installers.properties)
+kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 # Others
@@ -118,6 +119,28 @@ then
         # create kubernetes resources
         kubectl apply -f influx-api-deployment.yaml --force=true --namespace=$project
         kubectl apply -f influx-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $kpi = 'true' ]]
+    then
+        cd "${apisPath}/kpiAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/kpi-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/kpi-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/kpi-api --namespace=$project
+        kubectl delete services/kpi-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=kpi-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f kpi-api-deployment.yaml --namespace=$project
+        kubectl apply -f kpi-api-service.yaml --namespace=$project
     fi
 
     if [[ $ingestion = 'true' ]]

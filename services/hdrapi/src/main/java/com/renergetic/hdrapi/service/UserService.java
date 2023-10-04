@@ -1,15 +1,15 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.hdrapi.dao.AssetDAOResponse;
-import com.renergetic.hdrapi.dao.UserDAORequest;
-import com.renergetic.hdrapi.dao.UserDAOResponse;
-import com.renergetic.hdrapi.dao.UserSettingsDAO;
-import com.renergetic.hdrapi.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.hdrapi.exception.InvalidNonExistingIdException;
-import com.renergetic.hdrapi.exception.NotFoundException;
-import com.renergetic.hdrapi.model.*;
-import com.renergetic.hdrapi.repository.*;
-import com.renergetic.hdrapi.repository.information.AssetDetailsRepository;
+import com.renergetic.common.dao.AssetDAOResponse;
+import com.renergetic.common.dao.UserDAORequest;
+import com.renergetic.common.dao.UserDAOResponse;
+import com.renergetic.common.dao.UserSettingsDAO;
+import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
+import com.renergetic.common.exception.InvalidNonExistingIdException;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.*;
+import com.renergetic.common.repository.*;
+import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;

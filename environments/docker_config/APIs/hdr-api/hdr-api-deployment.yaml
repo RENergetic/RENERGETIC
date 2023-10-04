@@ -24,7 +24,7 @@ spec:
               memory: 275Mi
             limits:
               cpu: 300m
-              memory: 600Mi
+              memory: 550Mi
           readinessProbe:
             failureThreshold: 3
             tcpSocket:

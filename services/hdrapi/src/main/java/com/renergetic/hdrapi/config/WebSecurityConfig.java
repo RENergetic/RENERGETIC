@@ -1,7 +1,7 @@
 package com.renergetic.hdrapi.config;
 
-import com.renergetic.hdrapi.model.security.KeycloakAuthenticationToken;
-import com.renergetic.hdrapi.model.security.KeycloakRole;
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
+import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.hdrapi.service.CustomAccessDeniedHandler;
 
 import lombok.RequiredArgsConstructor;

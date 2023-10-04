@@ -21,14 +21,17 @@ postgreSQL=$(grep -ioP "(postgreSQL\s*=\s*)\K.+" _installers.properties)
 influxDB=$(grep -ioP "(influxDB\s*=\s*)\K.+" _installers.properties)
 # APIs
 hdr=$(grep -ioP "(hdr\s*=\s*)\K.+" _installers.properties)
+kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
+rules=$(grep -ioP "(rules\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
 grafana=$(grep -ioP "(grafana\s*=\s*)\K.+" _installers.properties)
 nifi=$(grep -ioP "(nifi\s*=\s*)\K.+" _installers.properties)
 wso2=$(grep -ioP "(wso2\s*=\s*)\K.+" _installers.properties)
+nexus=$(grep -ioP "(nexus\s*=\s*)\K.+" _installers.properties)
 
 rm -rf ~/.kube
 
@@ -129,6 +132,29 @@ then
         kubectl apply -f influx-api-service.yaml
     fi
 
+    if [[ $kpi = 'true' ]]
+    then
+        cd "${apisPath}/kpiAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/kpi-api/api.jar"
+
+        cd "${current}/docker_config/APIs/kpi-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/kpi-api
+        kubectl delete services/kpi-api-sv
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/kpi-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/kpi-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < kpi-api-deployment.yaml | kubectl apply --force=true -f -
+        kubectl apply -f kpi-api-service.yaml
+    fi
+
     if [[ $ingestion = 'true' ]]
     then
         cd "${apisPath}/ingestionAPI"
@@ -151,6 +177,30 @@ then
         envsubst '$PROJECT' < ingestion-api-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f ingestion-api-service.yaml
     fi
+
+    if [[ $rules = 'true' ]]
+    then
+        cd "${apisPath}/ruleEvaluationService"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
+
+        cd "${current}/docker_config/APIs/rules-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/rules-api
+        kubectl delete services/rules-api-sv
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/rules-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/rules-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply --force=true -f -
+        kubectl apply -f rules-api-service.yaml
+    fi
+
 # DEPLOY WSO2 API MANAGER
 
     if [[ $wso2 = 'true' ]]
@@ -170,6 +220,26 @@ then
         # create kubernetes resources
         envsubst '$PROJECT' < wso2-deployment.yaml | kubectl apply --force=true -f -
         kubectl apply -f wso2-service.yaml
+    fi
+# DEPLOY NEXUS API MANAGER
+
+    if [[ $nexus = 'true' ]]
+    then
+        cd "${current}/docker_config/Devops/nexus"
+        # NEXUS INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete statefulsets/nexus --namespace=ren-prototype-devops
+        kubectl delete services/nexus-sv --namespace=ren-prototype-devops
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype-devops/nexus:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/ren-prototype-devops/nexus:latest
+
+        # create kubernetes resources
+        kubectl apply --force=true -f nexus-statefulset.yaml --namespace=ren-prototype-devops
+        kubectl apply -f nexus-service.yaml --namespace=ren-prototype-devops
     fi
 # DEPLOY GRAFANA
 

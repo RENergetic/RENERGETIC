@@ -1,10 +1,9 @@
 package com.renergetic.measurementapi.service;
 
 import com.google.gson.Gson;
-import com.renergetic.measurementapi.model.Dashboard;
-import com.renergetic.measurementapi.model.DashboardExt;
-import com.renergetic.measurementapi.model.MeasurementType;
-import com.renergetic.measurementapi.repository.DashboardRepository;
+import com.renergetic.common.model.Dashboard;
+import com.renergetic.common.model.MeasurementType;
+import com.renergetic.common.repository.DashboardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

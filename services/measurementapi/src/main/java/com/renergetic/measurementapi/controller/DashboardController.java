@@ -1,6 +1,6 @@
 package com.renergetic.measurementapi.controller;
 
-import com.renergetic.measurementapi.model.MeasurementType;
+import com.renergetic.common.model.MeasurementType;
 import com.renergetic.measurementapi.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

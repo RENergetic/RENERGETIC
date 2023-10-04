@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.hdrapi.dao.DataWrapperDAO;
+import com.renergetic.common.dao.DataWrapperDAO;
+import com.renergetic.common.dao.TimeseriesDAO;
 import com.renergetic.hdrapi.service.DataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,13 +14,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Data Controller", description = "Allows collect data about Influx measurement")
 @RequestMapping("/api/data")
 public class DataController {
+    //TODO: predictions
 
     @Autowired
     DataService dataSv;
@@ -35,10 +39,10 @@ public class DataController {
             @PathVariable Long panelId,
             @RequestParam("from") Optional<Long> from,
             @RequestParam("to") Optional<Long> to) {
-    	// GET INSTANT TO FIRST DAY OF THE CURRENT 
+        // GET INSTANT TO FIRST DAY OF THE CURRENT
 
-		Long fromInstant = null;
-    	
+        Long fromInstant = null;
+
         if (from.isEmpty()) {
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.MILLISECOND, 0);
@@ -69,4 +73,55 @@ public class DataController {
         return new ResponseEntity<>(panelData, HttpStatus.OK);
     }
 
+    @GetMapping(path = "/timeseries/tile/{tileId}", produces = "application/json")
+    public ResponseEntity<TimeseriesDAO> getTileTimeseries(
+            @PathVariable Long tileId,
+            @RequestParam("from") Optional<Long> from,
+            @RequestParam("to") Optional<Long> to) {
+        TimeseriesDAO tileTimeseries =
+                dataSv.getTileTimeseries(tileId, null, from.orElse((new Date()).getTime() - 3600000), to);
+        return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/timeseries/measurements/{measurements}", produces = "application/json")
+    public ResponseEntity<TimeseriesDAO> getMeasurementsTimeseries(
+            @PathVariable List<String> measurements,
+            @RequestParam("from") Optional<Long> from,
+            @RequestParam("to") Optional<Long> to) {
+        //todo only manager
+        List<Long> m = measurements.stream().map(Long::valueOf).collect(Collectors.toList());
+        TimeseriesDAO timeseries =                dataSv.getMeasurementTimeseries(m, from.orElse((new Date()).getTime() - 3600000), to);
+        return new ResponseEntity<>(timeseries, HttpStatus.OK);
+    }
+
+
+    @GetMapping(path = "/timeseries/tile/{tileId}/asset/{assetId}", produces = "application/json")
+    public ResponseEntity<TimeseriesDAO> getTileAssetTimeseries(
+            @PathVariable Long tileId,
+            @PathVariable Long assetId,
+            @RequestParam("from") Optional<Long> from,
+            @RequestParam("to") Optional<Long> to) {
+        TimeseriesDAO tileTimeseries =
+                dataSv.getTileTimeseries(tileId, assetId, from.orElse((new Date()).getTime() - 3600000), to);
+        return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
+    }
+    //TODO:
+//    @GetMapping(path = "/timeseries/panel/{panelId}", produces = "application/json")
+//    public ResponseEntity<TimeseriesDAO> getTileTimeseries(
+//            @PathVariable Long panelId,
+//            @RequestParam("from") Optional<Long> from,
+//            @RequestParam("to") Optional<Long> to) {
+//        TimeseriesDAO tileTimeseries =
+//                dataSv.getTileTimeseries(  tileId, null, from.orElse((new Date()).getTime() - 3600000), to);
+//        return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
+//    } @GetMapping(path = "/timeseries/panel/{panelId}/asset/{assetId}", produces = "application/json")
+//    public ResponseEntity<TimeseriesDAO> getTileAssetTimeseries(
+//            @PathVariable Long panelId,
+//            @PathVariable Long assetId,
+//            @RequestParam("from") Optional<Long> from,
+//            @RequestParam("to") Optional<Long> to) {
+//        TimeseriesDAO tileTimeseries =
+//                dataSv.getTileTimeseries(panelId,tileId, assetId, from.orElse((new Date()).getTime() - 3600000), to);
+//        return new ResponseEntity<>(tileTimeseries, HttpStatus.OK);
+//    }
 }

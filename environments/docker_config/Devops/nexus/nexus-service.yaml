@@ -1,0 +1,13 @@
+# PostgreSQL StatefulSet Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-sv
+spec:
+  selector:
+    app: nexus
+  type: NodePort
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
