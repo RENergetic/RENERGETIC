@@ -1,18 +1,29 @@
 package com.renergetic.common.model;
 
 import com.renergetic.common.dao.MeasurementDAOResponse;
-import lombok.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.Getter;
+import lombok.AccessLevel;
+
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import javax.persistence.*;
-
 @Entity
 @Table(name = "information_tile_measurement")
-@RequiredArgsConstructor
-@Getter
-@Setter
-@ToString
+@Data
 public class InformationTileMeasurement {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
