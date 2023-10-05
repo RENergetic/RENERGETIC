@@ -13,6 +13,8 @@ public final class DateConverter {
     //TODO: Raul set date format as you wish :)
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    private DateConverter() {}
+
     private static ZoneId getTimezone() {
         return ZoneId.systemDefault();
     }
@@ -40,8 +42,6 @@ public final class DateConverter {
     public static Date toDate(Long epoch) {
         return new Date(epoch);
     }
-
-
 
     public static String toString(long epoch) {
         return dateFormat.format(new Date(epoch));

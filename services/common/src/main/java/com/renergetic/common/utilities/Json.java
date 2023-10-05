@@ -22,6 +22,8 @@ public class Json {
 //        return new JSONObject(json);
 //    }
 
+    private Json() {}
+
     public static JSONObject parse(Object json) throws ParseException {
     	String jsonStr;
     	
@@ -41,12 +43,13 @@ public class Json {
         return parse(json).toMap();
     }
 
-    //    public static String toJson(JSONObject json) {
+//    public static String toJson(JSONObject json) {
 //        if (json != null) {
 //            return json.toString();
 //        }
 //        return "{}";
 //    }
+
     public static String toJson(Object obj) {
 
         if (obj != null)
