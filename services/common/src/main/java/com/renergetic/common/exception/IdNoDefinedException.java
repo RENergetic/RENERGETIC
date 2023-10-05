@@ -2,24 +2,24 @@ package com.renergetic.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class NotFoundException extends HttpRuntimeException{
+public class IdNoDefinedException extends HttpRuntimeException{
 
 	private static final long serialVersionUID = -3547042448040107613L;
 
-	public NotFoundException() {
+	public IdNoDefinedException() {
 		super();
 	}
 
-	public NotFoundException(String formatString, Object... parameters) {
+	public IdNoDefinedException(String formatString, Object... parameters) {
 		super(formatString, parameters);
 	}
 
-	public NotFoundException(String message) {
+	public IdNoDefinedException(String message) {
 		super(message);
 	}
 	
 	@Override
 	public HttpStatus getHttpStatus() {
-		return HttpStatus.NOT_FOUND;
+		return HttpStatus.NO_CONTENT;
 	}
 }

@@ -1,18 +1,25 @@
 package com.renergetic.common.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
-public class UnauthorizedAccessException extends RuntimeException{
+public class UnauthorizedAccessException extends HttpRuntimeException{
 
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = -3547042448040107613L;
+
 	public UnauthorizedAccessException() {
-		super ();
+		super();
+	}
+
+	public UnauthorizedAccessException(String formatString, Object... parameters) {
+		super(formatString, parameters);
+	}
+
+	public UnauthorizedAccessException(String message) {
+		super(message);
 	}
 	
-	public UnauthorizedAccessException(String message) {
-		super (message);
+	@Override
+	public HttpStatus getHttpStatus() {
+		return HttpStatus.FORBIDDEN;
 	}
 }
