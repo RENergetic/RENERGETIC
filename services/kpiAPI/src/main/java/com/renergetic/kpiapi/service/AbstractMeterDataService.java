@@ -148,7 +148,9 @@ public class AbstractMeterDataService {
 
 						Long timestamp = null;
 						try {
-							timestamp = DateConverter.toEpoch(json.getString("time"));
+							if(json.has("time") && !json.isNull("time")) {
+								timestamp = DateConverter.toEpoch(json.getString("time"));
+							}
 						} catch (InvalidArgumentException e) {
 							log.warn(e.getMessage());
 						}
