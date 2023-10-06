@@ -2,8 +2,6 @@ package com.renergetic.measurementapi.model;
 
 import java.util.Map;
 
-import javax.persistence.Entity;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
