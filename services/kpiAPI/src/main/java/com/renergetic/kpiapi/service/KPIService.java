@@ -224,12 +224,9 @@ public class KPIService {
 			if (time != null)
 				influxRequest.getFields().put("time", DateConverter.toString(time));
 
-			Double value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues).doubleValue();
-			if (!Double.isNaN(value))
-				influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
-			else influxRequest.getFields().put("value", "0.0");
+			BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
 
-			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
+			influxRequest.getFields().put("value", value.toPlainString());
 			
 			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 			
@@ -263,7 +260,7 @@ public class KPIService {
 				(values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 		
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -273,8 +270,8 @@ public class KPIService {
 		Double result = (values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) + 
 				(values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
-
-		if (!Double.isNaN(result))
+		
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -284,7 +281,7 @@ public class KPIService {
 		Double result = 1 - (values.get(AbstractMeter.LOSSES) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -295,7 +292,7 @@ public class KPIService {
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -305,7 +302,7 @@ public class KPIService {
 		Double result = (values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -315,7 +312,7 @@ public class KPIService {
 		Double result = 1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -329,7 +326,7 @@ public class KPIService {
 				c.getGamma() * values.get(AbstractMeter.ENS) + c.getDelta() * values.get(AbstractMeter.LNS))) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -338,7 +335,7 @@ public class KPIService {
 		
 		Double result = values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE);
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}

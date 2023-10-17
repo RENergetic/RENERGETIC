@@ -1,5 +1,6 @@
 package com.renergetic.kpiapi.service;
 
+import java.math.BigDecimal;
 import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.HashMap;
@@ -215,13 +216,11 @@ public class AbstractMeterDataService {
 			if (time != null)
 				influxRequest.getFields().put("time", DateConverter.toString(time));
 
-			Double value = null;
+			BigDecimal value = null;
 			if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to))
-				value = calculator.calculateFormula(meter.getFormula(), from, to).doubleValue();
-			else value = 0.;
-			if (!Double.isNaN(value))
-				influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
-			else influxRequest.getFields().put("value", "0.0");
+				value = calculator.calculateFormula(meter.getFormula(), from, to);
+			else value = BigDecimal.valueOf(0.);
+			influxRequest.getFields().put("value", value.toPlainString());
 			
 			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 			
