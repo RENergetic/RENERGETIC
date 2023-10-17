@@ -1,39 +1,31 @@
 package com.renergetic.ruleevaluationservice.service;
 
+import com.google.gson.Gson;
 import com.renergetic.common.model.*;
 import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.common.repository.*;
-import com.renergetic.ruleevaluationservice.dao.DataResponse;
 import com.renergetic.ruleevaluationservice.exception.ConfigurationError;
-import com.renergetic.ruleevaluationservice.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class EVDRService {
-    @Value("${ev-dr.asset-type-name}")
-    private String assetTypePvPanelGroup;
 
     @Value("${ev-dr.executionCRON}")
     private String executionCRON;
 
     @Autowired
-    private DataService dataService;
-
-    @Autowired
-    private AssetTypeRepository assetTypeRepository;
-
-    @Autowired
     private AssetRepository assetRepository;
+
+    @Autowired
+    private AssetCategoryRepository assetCategoryRepository;
 
     @Autowired
     private MeasurementRepository measurementRepository;
@@ -44,9 +36,17 @@ public class EVDRService {
     @Autowired
     private DemandScheduleRepository demandScheduleRepository;
 
-    public void evaluateEVDR() throws ConfigurationError {
-        //List<Asset> assetsTest = assetRepository.findByConnectionsConnectionTypeAndConnectionsConnectedAssetTypeName(ConnectionType.va_grouping, "pv_virtual_asset_group");
+    @Autowired
+    private NotificationScheduleRepository notificationScheduleRepository;
 
+    @Autowired
+    private MeasurementAggregationService measurementAggregationService;
+
+    private final Gson gson = new Gson();
+
+    public void evaluateEVDR() throws ConfigurationError {
+
+        //TODO: Replace this call later by the new asset type for VA GROUPING asset.
         List<Asset> assets = assetRepository.findDistinctByConnectionsConnectionTypeAndTypeName(ConnectionType.va_grouping, "pv_virtual_asset_group");
 
         LocalDateTime currentTime = LocalDateTime.now();
@@ -56,12 +56,35 @@ public class EVDRService {
 
         for(Asset assetPVGroup : assets){
             try{
-                double threshold = getThresholdFromAssetDetails(assetPVGroup);
-                List<Asset> pvs = assetPVGroup.getConnections().stream().map(AssetConnection::getConnectedAsset).collect(Collectors.toList());
 
-                double totalGeneration = getTotalGenerationValueFromAssets(pvs);
+                // Getting ids of all the measurements
+                // TODO: Should use a strict by name instead
+                List<Long> pvIds = assetRepository.findByAssetCategoryId(
+                        assetCategoryRepository.findByNameContaining("pv").stream().findFirst().get().getId())
+                        .stream().map(Asset::getId).sorted().collect(Collectors.toList());
+                // Looking for a measurement that contains all pvIds in details.
+                List<Measurement> measurements = measurementRepository.findByAsset(assetPVGroup);
+                Optional<Measurement> measurement = Optional.empty();
+                for(Measurement ms : measurements){
+                    if(ms.getDetails()
+                            .stream().anyMatch(x -> x.getKey().equals("aggregation_ids") &&
+                                    Stream.of(gson.fromJson(x.getValue(), Long[].class)).sorted()
+                                            .collect(Collectors.toList()).equals(pvIds))){
+                        measurement = Optional.of(ms);
+                        break;
+                    }
+                }
+                if(measurement.isEmpty())
+                    return;
 
-                if(totalGeneration >= threshold){
+                Measurement finalMeasurement = measurement.get();
+                //TODO: Evaluate the aggregation first.
+                measurementAggregationService.aggregateOne(finalMeasurement);
+
+                List<NotificationSchedule> ns = notificationScheduleRepository.findByAssetId(assetPVGroup.getId());
+                if(ns.stream().anyMatch(s -> s.getDateFrom().isBefore(LocalDateTime.now()) &&
+                        s.getDateTo().isAfter(LocalDateTime.now()) &&
+                        s.getMeasurement().getId().equals(finalMeasurement.getId()))){
                     Asset asset = getAssetFromAssetDetailsToAssignRecommendation(assetPVGroup);
                     DemandDefinition dd = demandDefinitionRepository.findByActionTypeAndActionAndMessage(
                             DemandDefinitionActionType.START, DemandDefinitionAction.CHARGE_EV, "").orElseGet(() ->{
@@ -77,7 +100,7 @@ public class EVDRService {
                         demandScheduleRepository.save(demandSchedule);
                     } else {
                         DemandSchedule demandSchedule = demandScheduleRepository.findByAssetIdAndDemandDefinitionId(asset.getId(), dd.getId()).orElseGet(DemandSchedule::new);
-                        demandSchedule = configureDemandSchedule(demandSchedule, dd, currentTime, nextExecution, asset);
+                        configureDemandSchedule(demandSchedule, dd, currentTime, nextExecution, asset);
                         demandScheduleRepository.save(demandSchedule);
                     }
                 }
@@ -94,64 +117,6 @@ public class EVDRService {
         demandSchedule.setAsset(asset);
         demandSchedule.setUpdate(start);
         return demandSchedule;
-    }
-
-    private AssetType getAssetType() throws ConfigurationError {
-        AssetType assetType = assetTypeRepository.findByName(assetTypePvPanelGroup).orElse(null);
-        if(assetType == null)
-            throw new ConfigurationError("Could not find an asset type with name: "+assetTypePvPanelGroup);
-        return assetType;
-    }
-
-    private List<Asset> getAssetMatchingType(AssetType assetType){
-        return assetRepository.findByType(assetType);
-    }
-
-    private double getThresholdFromAssetDetails(Asset asset) throws ConfigurationError {
-        AssetDetails assetDetails = asset.getDetails().stream().filter(x -> x.getKey().equals("ev-dr-threshold")).findFirst().orElse(null);
-        if(assetDetails == null)
-            throw new ConfigurationError("Could not find an asset detail with 'ev-dr-threshold' key for asset: "+asset.getName());
-        try{
-            return Double.parseDouble(assetDetails.getValue());
-        } catch (NumberFormatException nfe){
-            throw new ConfigurationError("Asset detail with 'ev-dr-threshold' key is an invalid number for asset: "+asset.getName());
-        }
-    }
-
-    private List<Asset> getAssetsLinkingParentAsset(Asset asset) {
-        return assetRepository.findByParentAsset(asset);
-    }
-
-    private Double getTotalGenerationValueFromAssets(List<Asset> assets){
-        List<Double> values = new ArrayList<>();
-        Set<Thread> threads = new HashSet<>();
-        for(Asset asset : assets){
-            //TODO: Check that the correct value is fetch !
-            Measurement measurement = measurementRepository.findByAsset(asset).stream()
-                    .filter(x -> (x.getDirection() != null && x.getDirection().equals(Direction.out) &&
-                            x.getDomain() != null && x.getDomain().equals(Domain.electricity) &&
-                            x.getSensorName() != null && x.getSensorName().equals("pv")))
-                    .findFirst().orElse(null);
-
-            if(measurement != null){
-                Thread thread = new Thread(() -> {
-                    DataResponse dataResponse = dataService.getData(measurement, "last", "3h",
-                            Instant.now().minus(3, ChronoUnit.HOURS).toEpochMilli(), Optional.empty());
-
-                    values.add(Double.parseDouble(dataResponse.getDataUsedForComparison().getValue()));
-                });
-                thread.start();
-                threads.add(thread);
-            }
-        }
-        threads.forEach(thread -> {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        return values.stream().reduce(0.0, Double::sum);
     }
 
     private Asset getAssetFromAssetDetailsToAssignRecommendation(Asset asset) throws ConfigurationError {
