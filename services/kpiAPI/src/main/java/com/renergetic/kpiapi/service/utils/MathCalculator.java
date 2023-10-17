@@ -124,7 +124,7 @@ public class MathCalculator {
 		}
 		
 		 while (!operators.empty()) {
-	            calculate(numbers, operators);
+			calculate(numbers, operators);
 	     }
 
         return numbers.pop();
@@ -179,7 +179,7 @@ public class MathCalculator {
 	        };
 		} catch(ArithmeticException e) {
 			result = new BigDecimal(0);
-			log.warn(String.format("Error executing (%.2f %c %.2f): " + e.getMessage(), num1, operator, num2));
+			log.warn(String.format("Error executing (%.2f %c %.2f): %s%n", num1, operator, num2, e.getMessage()));
 		}
 
         numbers.push(result);
@@ -267,9 +267,8 @@ public class MathCalculator {
 	            JSONArray array = new JSONArray(response.body());
 	            if (!array.isEmpty())
 	                for (Object obj : array) {
-	                    if (obj instanceof JSONObject json) {
-							if (json.has("measurement"))
-	                            ret = BigDecimal.valueOf(Double.parseDouble(json.getJSONObject("fields").getString(function)));
+	                    if (obj instanceof JSONObject json && (json.has("measurement")))
+	                            {ret = BigDecimal.valueOf(Double.parseDouble(json.getJSONObject("fields").getString(function)));
 	                    }
 	                }
 	        } else ret = new BigDecimal(0);
