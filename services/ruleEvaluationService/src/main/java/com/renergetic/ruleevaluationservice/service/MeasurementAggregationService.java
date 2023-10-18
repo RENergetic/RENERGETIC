@@ -8,10 +8,14 @@ import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.ruleevaluationservice.dao.MeasurementAggregationDataDAO;
 import com.renergetic.ruleevaluationservice.dao.MeasurementSimplifiedDAO;
+import com.renergetic.ruleevaluationservice.service.utils.HttpAPIs;
 import com.renergetic.ruleevaluationservice.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.http.HttpResponse;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class MeasurementAggregationService {
+    @Value("${ingestion.api.url}")
+    String ingestionAPI;
     @Autowired
     private MeasurementRepository measurementRepository;
     @Autowired
@@ -76,12 +82,21 @@ public class MeasurementAggregationService {
         }
 
         List<Measurement> children = retrieveChildrenMeasurements(mad.getAggregationIds());
-        Long from = mad.getTimeMin().contains("now-") ?
-                TimeUtils.offsetNegativeCurrentInstant(mad.getTimeMin()).toEpochMilli() :
-                TimeUtils.offsetPositiveCurrentInstant(mad.getTimeMin()).toEpochMilli();
-        Optional<Long> to = Optional.of(mad.getTimeMax().contains("now-") ?
-                TimeUtils.offsetNegativeCurrentInstant(mad.getTimeMax()).toEpochMilli() :
-                TimeUtils.offsetPositiveCurrentInstant(mad.getTimeMax()).toEpochMilli());
+        Long from = null;
+        if(mad.getTimeMin().equals("now"))
+            from = Instant.now().toEpochMilli();
+        else if(mad.getTimeMin().contains("now-"))
+            from = TimeUtils.offsetNegativeCurrentInstant(mad.getTimeMin().substring(4)).toEpochMilli();
+        else if(mad.getTimeMin().contains("now+"))
+            from = TimeUtils.offsetPositiveCurrentInstant(mad.getTimeMin().substring(4)).toEpochMilli();
+        Optional<Long> to = Optional.empty();
+        if(mad.getTimeMax().equals("now"))
+            to = Optional.of(Instant.now().toEpochMilli());
+        else if(mad.getTimeMax().contains("now-"))
+            to = Optional.of(TimeUtils.offsetNegativeCurrentInstant(mad.getTimeMax().substring(4)).toEpochMilli());
+        else if(mad.getTimeMax().contains("now+"))
+            to = Optional.of(TimeUtils.offsetPositiveCurrentInstant(mad.getTimeMax().substring(4)).toEpochMilli());
+
         List<MeasurementSimplifiedDAO> msd = dataService.getData(children, mad.getAggregationType(), mad.getTimeRange(), from, to);
 
         //Retrieving the original tags
@@ -109,5 +124,8 @@ public class MeasurementAggregationService {
         // The idea is that from time to time, we may have data missing, so we have to check that the
         // Ingestion API is effectively overwriting existing time point in the timeseries if you add it again,
         // this way this fixes the problem.
+        HttpResponse<String> response =
+                HttpAPIs.sendRequest(ingestionAPI + "/api/ingest", "POST", null, aggregated,
+                        null);
     }
 }

@@ -25,7 +25,7 @@ public class EVDRService {
     private AssetRepository assetRepository;
 
     @Autowired
-    private AssetCategoryRepository assetCategoryRepository;
+    private AssetTypeRepository assetTypeRepository;
 
     @Autowired
     private MeasurementRepository measurementRepository;
@@ -42,6 +42,9 @@ public class EVDRService {
     @Autowired
     private MeasurementAggregationService measurementAggregationService;
 
+    @Autowired
+    private RuleEvaluationService ruleEvaluationService;
+
     private final Gson gson = new Gson();
 
     public void evaluateEVDR() throws ConfigurationError {
@@ -57,29 +60,39 @@ public class EVDRService {
         for(Asset assetPVGroup : assets){
             try{
 
-                // Getting ids of all the measurements
-                // TODO: Should use a strict by name instead
-                List<Long> pvIds = assetRepository.findByAssetCategoryId(
-                        assetCategoryRepository.findByNameContaining("pv").stream().findFirst().get().getId())
-                        .stream().map(Asset::getId).sorted().collect(Collectors.toList());
+                /*
+                    TODO:
+                    For now this is fine as there is only one for the PMB !
+                    Later, should define a way to uniquely retrieve the aggregation for the EV-DR
+                 */
                 // Looking for a measurement that contains all pvIds in details.
                 List<Measurement> measurements = measurementRepository.findByAsset(assetPVGroup);
                 Optional<Measurement> measurement = Optional.empty();
-                for(Measurement ms : measurements){
+                if(measurements.size() == 1)
+                    measurement = Optional.of(measurements.get(0));
+                /*for(Measurement ms : measurements){
                     if(ms.getDetails()
-                            .stream().anyMatch(x -> x.getKey().equals("aggregation_ids") &&
-                                    Stream.of(gson.fromJson(x.getValue(), Long[].class)).sorted()
-                                            .collect(Collectors.toList()).equals(pvIds))){
+                            .stream().anyMatch(x -> {
+                                boolean a = x.getKey().equals("aggregation_ids");
+                                String value = x.getValue();
+                                List<Long> test = Stream.of(gson.fromJson(x.getValue(), Long[].class)).sorted()
+                                        .collect(Collectors.toList());
+                                boolean b = Stream.of(gson.fromJson(x.getValue(), Long[].class)).sorted()
+                                        .collect(Collectors.toList()).equals(pvIds);
+                                    return a && b;
+                            })){
                         measurement = Optional.of(ms);
                         break;
                     }
-                }
+                }*/
                 if(measurement.isEmpty())
                     return;
 
                 Measurement finalMeasurement = measurement.get();
-                //TODO: Evaluate the aggregation first.
+
+                //TODO: Evaluate the aggregation first. Take decision here on timing to run it in the scheduler.
                 measurementAggregationService.aggregateOne(finalMeasurement);
+                ruleEvaluationService.retrieveAndExecuteAllRulesForAssetId(assetPVGroup.getId());
 
                 List<NotificationSchedule> ns = notificationScheduleRepository.findByAssetId(assetPVGroup.getId());
                 if(ns.stream().anyMatch(s -> s.getDateFrom().isBefore(LocalDateTime.now()) &&

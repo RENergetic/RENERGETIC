@@ -24,7 +24,7 @@ public class RuleExecutionScheduler {
     @Scheduled(cron = "${rule.executionCRON}")
     @Transactional(propagation= Propagation.REQUIRED)
     public void executeRules(){
-        ruleEvaluationService.retrieveAndExecuteAllRules();
+        //ruleEvaluationService.retrieveAndExecuteAllRules();
     }
 
     @Getter
