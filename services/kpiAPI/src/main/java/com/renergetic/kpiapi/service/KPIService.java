@@ -2,11 +2,14 @@ package com.renergetic.kpiapi.service;
 
 import com.renergetic.kpiapi.dao.KPIDataDAO;
 import com.renergetic.kpiapi.dao.MeasurementDAORequest;
+import com.renergetic.kpiapi.exception.HttpRuntimeException;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
 import com.renergetic.kpiapi.model.*;
 import com.renergetic.kpiapi.repository.KPIConstantRepository;
 import com.renergetic.kpiapi.service.utils.DateConverter;
 import com.renergetic.kpiapi.service.utils.HttpAPIs;
+import com.renergetic.kpiapi.service.utils.MathCalculator;
+
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,6 +40,9 @@ public class KPIService {
 	
 	@Autowired
 	private KPIConstantRepository constantRepository;
+
+	@Autowired
+	private MathCalculator calculator;
 	
 	/**
 	 * Retrieves the kpi data DAO for the given name, domain, and time range.
@@ -89,7 +95,8 @@ public class KPIService {
 					}
 				});
 			}
-		}
+		} else if (response != null ) throw new HttpRuntimeException(String.format("Error retrieving data from Influx for KPI %s with domain %s: %s", ret.getName(), domain.toString(), response.statusCode()));
+		else throw new HttpRuntimeException(String.format("Error retrieving data from Influx for KPI %s with domain %s: NULL response", ret.getName(), domain.toString()));
 
 		return ret;
     }
@@ -157,7 +164,8 @@ public class KPIService {
 					}
 				});
 			}
-		}
+		} else if (response != null) throw new HttpRuntimeException(String.format("Error retrieving data from Influx for KPI %s with domain %s: %s", ret.getName(), domain.toString(), response.statusCode()));
+		else throw new HttpRuntimeException(String.format("Error retrieving data from Influx for KPI %s with domain %s: NULL response", ret.getName(), domain.toString()));
 
 		return ret;
     }
@@ -226,7 +234,7 @@ public class KPIService {
 
 			BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
 
-			influxRequest.getFields().put("value", value.toPlainString());
+			influxRequest.getFields().put("value", calculator.bigDecimalToDoubleString(value));
 			
 			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 			
@@ -234,7 +242,8 @@ public class KPIService {
 				KPIDataDAO data = KPIDataDAO.create(kpi, domain);
 				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
 				configuredMeters.add(data);
-			} else log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.description, domain.toString(), response.statusCode()));
+			} else if (response != null)  log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.kpi, domain.toString(), response.statusCode()));
+			else log.error(String.format("Error retrieving data from Influx for KPI %s with domain %s: NULL response", kpi.kpi, domain.toString()));
 		}
 		return configuredMeters;
 	}
