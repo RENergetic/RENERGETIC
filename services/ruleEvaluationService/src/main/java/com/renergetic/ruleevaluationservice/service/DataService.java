@@ -28,6 +28,8 @@ public class DataService {
     private AssetRepository assetRepository;
     @Autowired
     private MeasurementTagsRepository measurementTagsRepository;
+    @Autowired
+    private HttpAPIs httpAPIs;
 
     private final Gson gson = new Gson();
 
@@ -107,7 +109,7 @@ public class DataService {
 
         // INFLUX API REQUEST
         HttpResponse<String> response =
-                HttpAPIs.sendRequest(influxURL + "/api/measurement/data/" + function, "GET", params, null,
+                httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + function, "GET", params, null,
                         null);
 
         if (response.statusCode() < 300) {

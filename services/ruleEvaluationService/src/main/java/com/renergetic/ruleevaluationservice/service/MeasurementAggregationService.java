@@ -34,6 +34,8 @@ public class MeasurementAggregationService {
     private MeasurementRepository measurementRepository;
     @Autowired
     private DataService dataService;
+    @Autowired
+    private HttpAPIs httpAPIs;
 
     private final Gson gson = new Gson();
 
@@ -129,7 +131,7 @@ private void publishAggregatedData(List<MeasurementSimplifiedDAO> aggregated) {
     // The idea is that from time to time, we may have data missing, so we have to check that the
     // Ingestion API is effectively overwriting existing time point in the timeseries if you add it again,
     // this way this fixes the problem.
-    HttpResponse<String> response = HttpAPIs.sendRequest(ingestionAPI + "/api/ingest", "POST", null, aggregated, null);
+    HttpResponse<String> response = httpAPIs.sendRequest(ingestionAPI + "/api/ingest", "POST", null, aggregated, null);
 
     if (response != null && response.statusCode() > 300) {
         log.error("Failed to insert data to " + ingestionAPI + "/api/ingest. Response: " + response.statusCode() + " " + response.body() + ". Body: " + aggregated);
