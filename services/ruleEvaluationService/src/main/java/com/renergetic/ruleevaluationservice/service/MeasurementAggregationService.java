@@ -111,6 +111,8 @@ public class MeasurementAggregationService {
         for(MeasurementTags dbTag : dbTags)
             mapTags.put(dbTag.getKey(), dbTag.getValue());
         mapTags.put("asset_name", measurement.getAsset().getName());
+        mapTags.put("direction", measurement.getDirection().toString());
+        mapTags.put("domain", measurement.getDomain().toString());
 
         return msd.stream()
                 //Replacing the tags with the original ones.
@@ -131,7 +133,9 @@ private void publishAggregatedData(List<MeasurementSimplifiedDAO> aggregated) {
     // The idea is that from time to time, we may have data missing, so we have to check that the
     // Ingestion API is effectively overwriting existing time point in the timeseries if you add it again,
     // this way this fixes the problem.
-    HttpResponse<String> response = httpAPIs.sendRequest(ingestionAPI + "/api/ingest", "POST", null, aggregated, null);
+    Map<String, String> headers = new HashMap<>();
+    headers.put("Content-type", "application/json");
+    HttpResponse<String> response = httpAPIs.sendRequest(ingestionAPI + "/api/ingest", "POST", null, aggregated, headers);
 
     if (response != null && response.statusCode() > 300) {
         log.error("Failed to insert data to " + ingestionAPI + "/api/ingest. Response: " + response.statusCode() + " " + response.body() + ". Body: " + aggregated);
