@@ -10,6 +10,9 @@ import com.renergetic.ruleevaluationservice.dao.MeasurementAggregationDataDAO;
 import com.renergetic.ruleevaluationservice.dao.MeasurementSimplifiedDAO;
 import com.renergetic.ruleevaluationservice.service.utils.HttpAPIs;
 import com.renergetic.ruleevaluationservice.utils.TimeUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class MeasurementAggregationService {
     @Value("${ingestion.api.url}")
@@ -120,13 +124,17 @@ public class MeasurementAggregationService {
                 .collect(Collectors.toList());
     }
 
-    private void publishAggregatedData(List<MeasurementSimplifiedDAO> aggregated){
-        // TODO: Send the data to the ingestion api, using the call
-        // The idea is that from time to time, we may have data missing, so we have to check that the
-        // Ingestion API is effectively overwriting existing time point in the timeseries if you add it again,
-        // this way this fixes the problem.
-        HttpResponse<String> response =
-                HttpAPIs.sendRequest(ingestionAPI + "/api/ingest", "POST", null, aggregated,
-                        null);
+private void publishAggregatedData(List<MeasurementSimplifiedDAO> aggregated) {
+    // TODO: Send the data to the ingestion api, using the call
+    // The idea is that from time to time, we may have data missing, so we have to check that the
+    // Ingestion API is effectively overwriting existing time point in the timeseries if you add it again,
+    // this way this fixes the problem.
+    HttpResponse<String> response = HttpAPIs.sendRequest(ingestionAPI + "/api/ingest", "POST", null, aggregated, null);
+
+    if (response != null && response.statusCode() > 300) {
+        log.error("Failed to insert data to " + ingestionAPI + "/api/ingest. Response: " + response.statusCode() + " " + response.body() + ". Body: " + aggregated);
+    } else if (response == null) {
+        log.error("Failed to insert data to " + ingestionAPI + "/api/ingest. Null response. Body: " + aggregated);
     }
+}
 }
