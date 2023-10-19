@@ -108,9 +108,10 @@ public class MeasurementAggregationService {
 
         return msd.stream()
                 //Replacing the tags with the original ones.
-                .peek(m -> m.setTags(mapTags))
                 //Replacing the field name with the original one.
                 .peek(m -> {
+                    m.setTags(mapTags);
+                    m.setMeasurement(measurement.getSensorName());
                     Map<String, String> fields = m.getFields();
                     fields.put(children.get(0).getType().getName(), fields.get(mad.getAggregationType()));
                     fields.remove(mad.getAggregationType());
