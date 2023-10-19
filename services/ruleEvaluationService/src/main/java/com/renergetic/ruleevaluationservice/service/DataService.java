@@ -102,6 +102,9 @@ public class DataService {
             params.put("performDecumulation", cumulative.getValue());
         }
 
+        if(group != null)
+            params.put("group", group);
+
         // INFLUX API REQUEST
         HttpResponse<String> response =
                 HttpAPIs.sendRequest(influxURL + "/api/measurement/data/" + function, "GET", params, null,
