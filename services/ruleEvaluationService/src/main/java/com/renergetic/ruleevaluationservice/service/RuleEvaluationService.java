@@ -80,6 +80,15 @@ public class RuleEvaluationService {
             evaluationResult.setExecutedString("inactive");
             return evaluationResult;
         }
+
+        //Temporary check: check if there is a space in the time literals and remove it. Just adding try catch to be sure to not break anything...
+        try{
+            assetRule.setTimeRangeMeasurement1(assetRule.getTimeRangeMeasurement1().replace(" ", ""));
+            assetRule.setTimeRangeMeasurement2(assetRule.getTimeRangeMeasurement2().replace(" ", ""));
+        } catch(Exception e){
+
+        }
+
         LocalDateTime currentTime = LocalDateTime.now();
         try{
             evaluationResult.setExecutedReadableString(AssetRuleUtils.transformRuleToReadableName(assetRule));
