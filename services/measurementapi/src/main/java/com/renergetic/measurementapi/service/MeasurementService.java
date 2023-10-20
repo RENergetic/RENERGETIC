@@ -30,8 +30,10 @@ import com.renergetic.measurementapi.mapper.MeasurementMapper;
 import com.renergetic.measurementapi.model.InfluxTimeUnit;
 import com.renergetic.measurementapi.service.utils.FieldsFormat;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
-@SuppressWarnings("null")
 public class MeasurementService {
 	@Autowired
     private InfluxDBClient influxDB;
@@ -77,23 +79,14 @@ public class MeasurementService {
     			registry);
 	}
 
-	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, Boolean performDecumulation) {
+	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, Boolean performDecumulation, Boolean getTags) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
 
 		if (timeVar.equals("time")) {
-			if (!from.isEmpty() && !from.matches("^\\d+$"))
-				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					from = from.replace(" ", "T")+'Z';
-				else from = "-" + InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
-			else if (!from.isEmpty()) from = String.valueOf(Long.parseLong(from)/1000);
-
-			if (!to.isEmpty() && !to.matches("^\\d+$"))
-				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					to = to.replace(" ", "T")+'Z';
-				else to = "-" + InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);	
-			else if (!to.isEmpty()) to = String.valueOf(Long.parseLong(to)/1000);
+			from = parseTime(from);
+			to = parseTime(to);
 		}
 		// ADD REQUEST BUCKET AND TIME RANGE
 		fluxQuery.add(String.format("from(bucket: \"%s\")", bucket));
@@ -118,38 +111,38 @@ public class MeasurementService {
 					.collect(Collectors.joining(" and "))) );
 		
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
-		if (performDecumulation)
+		if (Boolean.TRUE.equals(performDecumulation))
 			fluxQuery.add("difference(columns: [\"_value\"])");
 
 		String flux = fluxQuery.stream().collect(Collectors.joining(" |> "));
 
-		System.err.println(flux);
+		log.info("Flux query: \n" + flux);
 		List<FluxTable> tables = query.query(flux);
-		return MeasurementMapper.fromFlux(tables);
+		return MeasurementMapper.fromFlux(tables, getTags);
 	}
 
-	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement, Boolean toFloat, Boolean performDecumulation) {
+	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements,
+													  List<String> fields, Map<String, List<String>> tags, String from,
+													  String to, String timeVar, String group, Boolean byMeasurement,
+													  Boolean toFloat, Boolean performDecumulation, Boolean getTags,
+													  InfluxFunction functionOTF, String groupOTF) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
 
 		if (timeVar.equals("time")) {
-			if (!from.isEmpty() && !from.matches("^\\d+$"))
-				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					from = from.replace(" ", "T")+'Z';
-				else from = "-" + InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
-			else if (!from.isEmpty()) from = String.valueOf(Long.parseLong(from)/1000);
-
-			if (!to.isEmpty() && !to.matches("^\\d+$"))
-				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					to = to.replace(" ", "T")+'Z';
-				else to = "-" + InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);	
-			else if (!to.isEmpty()) to = String.valueOf(Long.parseLong(to)/1000);
+			from = parseTime(from);
+			to = parseTime(to);
 		}
-		
+
 		if (group != null && !group.isBlank()) {
 			group = InfluxTimeUnit.convert(group, InfluxTimeUnit.ms);
 		} else group = null;
+
+		if (groupOTF != null && !groupOTF.isBlank()) {
+			groupOTF = InfluxTimeUnit.convert(groupOTF, InfluxTimeUnit.ms);
+		} else groupOTF = null;
+
 		// ADD REQUEST BUCKET AND TIME RANGE
 		fluxQuery.add(String.format("from(bucket: \"%s\")", bucket));
 		fluxQuery.add(String.format("range(start: %s, stop: %s)", !from.isEmpty()? from : "0", !to.isEmpty()? to : "now()"));
@@ -173,27 +166,34 @@ public class MeasurementService {
 		fluxQuery.add("filter(fn: (r) => types.isType(v: r._value, type: \"float\") or types.isType(v: r._value, type: \"int\"))");
 
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
-		if (performDecumulation)
+		if (Boolean.TRUE.equals(performDecumulation))
 			fluxQuery.add("difference(columns: [\"_value\"])");
 		
 		// GROUP DATA
-		if (byMeasurement) 
+		if (Boolean.TRUE.equals(byMeasurement)) 
 			fluxQuery.add("group(columns: [\"_measurement\"])");
 		else fluxQuery.add("group()");
 		if (group != null)
 			fluxQuery.add(String.format("window(every: %1$s, period: %1$s, startColumn: \"_time\", stopColumn: \"_stop\", timeColumn: \"_time\")", group));
-		if (toFloat) fluxQuery.add("toFloat()");
+		if (Boolean.TRUE.equals(toFloat)) fluxQuery.add("toFloat()");
 		
 		// OPERATE DATA AND ADD FIELD NAME
 		fluxQuery.add(String.format("%s(column: \"_value\")", function.name().toLowerCase()));
 		fluxQuery.add("group()");
 		fluxQuery.add(String.format("set(key: \"_field\", value: \"%s\")", function.name().toLowerCase()));
+
+		// SECOND OPERATION FOR ON-THE-FLY AGGREGATION
+		if (groupOTF != null)
+			fluxQuery.add(String.format("window(every: %1$s, period: %1$s, startColumn: \"_time\", stopColumn: \"_stop\", timeColumn: \"_time\")", groupOTF));
+		fluxQuery.add(String.format("%s(column: \"_value\")", functionOTF.name().toLowerCase()));
+		fluxQuery.add("group()");
+		fluxQuery.add(String.format("set(key: \"_field\", value: \"%s\")", functionOTF.name().toLowerCase()));
 		
 		String flux = "import \"types\"" + fluxQuery.stream().collect(Collectors.joining(" |> "));
 
-		System.err.println(flux);
+		log.info("Flux query: \n" + flux);
 		List<FluxTable> tables = query.query(flux);
-		return MeasurementMapper.fromFlux(tables);
+		return MeasurementMapper.fromFlux(tables, getTags);
 	}
 
 	/**
@@ -229,7 +229,7 @@ public class MeasurementService {
 				+ "v1.tagKeys(bucket: \"%s\"%s)",
 				bucket, filterString.isBlank()? "" : ", predicate: (r) => " + filterString);
 
-		System.err.println(flux);
+		log.info("Flux query: \n" + flux);
 		FluxTable table = query.query(flux).get(0);
 		return table.getRecords()
 			.stream()
@@ -266,7 +266,7 @@ public class MeasurementService {
 				+ "v1.tagValues(bucket: \"%s\", tag: \"%s\"%s)",
 				bucket, tag, filterString.isBlank()? "" : ", predicate: (r) => " + filterString);
 
-		System.err.println(flux);
+		log.info("Flux query: \n" + flux);
 		FluxTable table = query.query(flux).get(0);
 		return table.getRecords()
 			.stream()
@@ -281,7 +281,7 @@ public class MeasurementService {
 				+ "v1.tagValues(bucket: \"%s\", tag: \"%s\"%s)",
 				bucket, tag, filter.isBlank()? "" : ", predicate: (r) => " + filter);
 
-		System.err.println(flux);
+		log.info("Flux query: \n" + flux);
 		FluxTable table = query.query(flux).get(0);
 		return table.getRecords()
 			.stream()
@@ -301,7 +301,7 @@ public class MeasurementService {
 				+ "schema.measurements(bucket: \"%s\", start: -30y)",
 				bucket);
 
-		System.err.println(flux);
+		log.info("Flux query: \n" + flux);
 		List<FluxTable> tables = query.query(flux);
 		return tables.get(0).getRecords()
 				.stream().map(row -> row.getValue().toString()).collect(Collectors.toList());
@@ -324,7 +324,7 @@ public class MeasurementService {
 			
 			delete.delete(request, measurement.getBucket(), "renergetic");
 		} catch(ParseException e) {
-			System.err.println("Date from or to dates haven't a valid format");
+			log.error("Date from or to dates haven't a valid format");
 		}
 	}
 
@@ -337,17 +337,8 @@ public class MeasurementService {
 			where = " |> filter(fn: (r) => " + String.join(" and ", measurement.getTags().keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, measurement.getTags().get(key))).collect(Collectors.toList())) + ')';
 		
 		if (timeVar.equals("time")) {
-			if (!from.isEmpty() && !from.matches("^\\d+$"))
-				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					from = from.replace(" ", "T")+'Z';
-				else from = "-" + InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
-			else if (!from.isEmpty()) from = String.valueOf(Long.parseLong(from)/1000);
-
-			if (!to.isEmpty() && !to.matches("^\\d+$"))
-				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					to = to.replace(" ", "T")+'Z';
-				else to = "-" + InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);	
-			else if (!to.isEmpty()) to = String.valueOf(Long.parseLong(to)/1000);
+			from = from.isEmpty()? "0" : from;
+			to = to.isEmpty()? "now()" : to;
 		}
 		
 		String flux = String.format(
@@ -360,12 +351,9 @@ public class MeasurementService {
 				measurement.getMeasurement(),
 				where != null? where : "");
 
-		System.err.println(flux);
+		log.info("Flux query: \n" + flux);
 		List<FluxTable> tables = query.query(flux);
 		return MeasurementMapper.fromFlux(tables);
-        //QueryResult queryResult = influxDB.query(query, TimeUnit.MILLISECONDS);
- 
-        //return MeasurementMapper.fromSeries(queryResult.getResults().get(0).getSeries().get(0));
 	}
 	
 	/**
@@ -385,17 +373,8 @@ public class MeasurementService {
 			where = "filter(fn: (r) => " + String.join(" and ", measurement.getTags().keySet().stream().map(key -> String.format("r[\"%s\"] == \"%s\"", key, measurement.getTags().get(key))).collect(Collectors.toList())) + ") |> ";
 
 		if (timeVar.equals("time")) {
-			if (!from.isEmpty() && !from.matches("^\\d+$"))
-				if (from.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					from = from.replace(" ", "T")+'Z';
-				else from = "-" + InfluxTimeUnit.convert(from, InfluxTimeUnit.ms);
-			else if (!from.isEmpty()) from = String.valueOf(Long.parseLong(from)/1000);
-
-			if (!to.isEmpty() && !to.matches("^\\d+$"))
-				if (to.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*"))
-					to = to.replace(" ", "T")+'Z';
-				else to = "-" + InfluxTimeUnit.convert(to, InfluxTimeUnit.ms);	
-			else if (!to.isEmpty()) to = String.valueOf(Long.parseLong(to)/1000);
+			from = parseTime(from);
+			to = parseTime(to);
 		}
 		
 		if (group != null && !group.isBlank()) {
@@ -420,9 +399,18 @@ public class MeasurementService {
 				function.name().toLowerCase(),
 				function.name().toLowerCase());
 
-		System.err.println(flux);
+		log.info("Flux query: \n" + flux);
 		List<FluxTable> tables = query.query(flux);
 		return MeasurementMapper.fromFlux(tables);
     }
     
+	private String parseTime(String time) {
+		if (!time.isEmpty() && !time.matches("^\\d+$")) {
+			if (time.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(.\\d)*")) {
+				time = time.replace(" ", "T")+'Z';
+			} else time = "-" + InfluxTimeUnit.convert(time, InfluxTimeUnit.ms);
+		} else if (!time.isEmpty()) time = String.valueOf(Long.parseLong(time)/1000);
+
+		return time;
+	}
 }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.renergetic.common.model.InfluxFunction;
@@ -51,9 +52,9 @@ public class MeasurementController {
 		
 		ret = service.list(bucket.orElse("renergetic"));
 
-		if (ret != null && ret.size() > 0)
+		if (ret != null && !ret.isEmpty())
 			return ResponseEntity.ok(ret);
-		else if (hideNotFound.isPresent() && hideNotFound.get())
+		else if (hideNotFound.isPresent() && Boolean.TRUE.equals(hideNotFound.get()))
 			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
@@ -76,16 +77,16 @@ public class MeasurementController {
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
 						Collectors.toMap(
-								entry -> entry.getKey(), 
+								Entry::getKey, 
 								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
 								)
 						); 
 		
 		ret = service.listTags(bucket.orElse("renergetic"), measurements, fields, parsedTags);
 
-		if (ret != null && ret.size() > 0)
+		if (ret != null && !ret.isEmpty())
 			return ResponseEntity.ok(ret);
-		else if (hideNotFound.isPresent() && hideNotFound.get())
+		else if (hideNotFound.isPresent() && Boolean.TRUE.equals(hideNotFound.get()))
 			return ResponseEntity.ok(Map.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
@@ -109,16 +110,16 @@ public class MeasurementController {
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
 						Collectors.toMap(
-								entry -> entry.getKey(), 
-								entry -> Arrays.stream(entry.getValue().split(",")).map(value -> value.trim()).collect(Collectors.toList())
+								Entry::getKey, 
+								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
 								)
 						); 
 		
 		ret.put(tagName, service.listTagValues(bucket.orElse("renergetic"), tagName, measurements, fields, parsedTags));
 
-		if (ret != null && ret.size() > 0)
+		if (!ret.isEmpty())
 			return ResponseEntity.ok(ret);
-		else if (hideNotFound.isPresent() && hideNotFound.get())
+		else if (hideNotFound.isPresent() && Boolean.TRUE.equals(hideNotFound.get()))
 			return ResponseEntity.ok(Map.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
@@ -134,7 +135,8 @@ public class MeasurementController {
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
 			@RequestParam(name = "dashboardId") Optional<String> dashboardId,
-			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation){
+			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation,
+			@RequestParam(name = "getTags") Optional<Boolean> getTags) {
 		
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -145,24 +147,25 @@ public class MeasurementController {
 		tags.remove("hideNotFound");
 		tags.remove("dashboardId");
 		tags.remove("performDecumulation");
+		tags.remove("getTags");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
 						Collectors.toMap(
-								entry -> entry.getKey(), 
-								entry -> Arrays.stream(entry.getValue().split(",")).map(value -> value.trim()).collect(Collectors.toList())
+								Entry::getKey, 
+								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
 								)
 						); 
 		
-		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", performDecumulation.orElse(false));
+		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", performDecumulation.orElse(false), getTags.orElse(true));
 
 		if(dashboardId.isPresent() && fields.size() == 1){
 			ret = convertService.convert(ret, dashboardId.get(), fields, null);
 		}
 
-		if (ret != null && ret.size() > 0)
+		if (ret != null && !ret.isEmpty())
 			return ResponseEntity.ok(ret);
-		else if (hideNotFound.isPresent() && hideNotFound.get())
+		else if (hideNotFound.isPresent() && Boolean.TRUE.equals(hideNotFound.get()))
 			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
@@ -170,19 +173,20 @@ public class MeasurementController {
 	@Operation(summary = "Get entries and operate it")
 	@GetMapping("/data/{function}")
 	public ResponseEntity<List<MeasurementDAOResponse>> getProcessedData(
-			@RequestParam("from") Optional<String> from, 
+			@RequestParam("from") Optional<String> from,
 			@RequestParam("to") Optional<String> to,
 			@RequestParam("bucket") Optional<String> bucket,
 			@RequestParam("group") Optional<String> group,
 			@RequestParam("by_measurement") Optional<Boolean> byMeasurement,
 			@RequestParam("to_float") Optional<Boolean> toFloat,
-			@RequestParam(name = "measurements", required = false) List<String> measurements, 
+			@RequestParam(name = "measurements", required = false) List<String> measurements,
 			@RequestParam(name = "fields", required = false) List<String> fields,
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
 			@PathVariable(name = "function") String function,
 			@RequestParam(name = "dashboardId") Optional<String> dashboardId,
-			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation){
+			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation,
+			@RequestParam(name = "getTags") Optional<Boolean> getTags) {
 
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -196,25 +200,88 @@ public class MeasurementController {
 		tags.remove("hideNotFound");
 		tags.remove("dashboardId");
 		tags.remove("performDecumulation");
-		
+		tags.remove("getTags");
+
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
 						Collectors.toMap(
-								entry -> entry.getKey(), 
-								entry -> Arrays.stream(entry.getValue().split(",")).map(value -> value.trim()).collect(Collectors.toList())
-								)
-						); 
+								Entry::getKey,
+								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
+						)
+				);
 
-		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""), byMeasurement.orElse(false), toFloat.orElse(false), performDecumulation.orElse(false));
+		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements,
+				fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""),
+				byMeasurement.orElse(false), toFloat.orElse(false), performDecumulation.orElse(false),
+				getTags.orElse(true), null, null);
 
 		//We only apply conversion if there is one field. as functions and grouping on multiple fields will cause issues.
 		if(dashboardId.isPresent() && fields.size() == 1){
 			ret = convertService.convert(ret, dashboardId.get(), fields, function);
 		}
 
-		if (ret != null && ret.size() > 0)
+		if (ret != null && !ret.isEmpty())
 			return ResponseEntity.ok(ret);
-		else if (hideNotFound.isPresent() && hideNotFound.get())
+		else if (hideNotFound.isPresent() && Boolean.TRUE.equals(hideNotFound.get()))
+			return ResponseEntity.ok(List.of());
+		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+
+	@Operation(summary = "Get entries and operate it")
+	@GetMapping("/data/{function}/{functionOTF}")
+	public ResponseEntity<List<MeasurementDAOResponse>> getProcessedDataOTF(
+			@RequestParam("from") Optional<String> from,
+			@RequestParam("to") Optional<String> to,
+			@RequestParam("bucket") Optional<String> bucket,
+			@RequestParam("group") Optional<String> group,
+			@RequestParam("groupOTF") Optional<String> groupOTF,
+			@RequestParam("by_measurement") Optional<Boolean> byMeasurement,
+			@RequestParam("to_float") Optional<Boolean> toFloat,
+			@RequestParam(name = "measurements", required = false) List<String> measurements,
+			@RequestParam(name = "fields", required = false) List<String> fields,
+			@RequestParam Map<String, String> tags,
+			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
+			@PathVariable(name = "function") String function,
+			@PathVariable(name = "functionOTF") String functionOTF,
+			@RequestParam(name = "dashboardId") Optional<String> dashboardId,
+			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation,
+			@RequestParam(name = "getTags") Optional<Boolean> getTags) {
+
+		List<MeasurementDAOResponse> ret;
+		tags.remove("measurements");
+		tags.remove("fields");
+		tags.remove("bucket");
+		tags.remove("group");
+		tags.remove("by_measurement");
+		tags.remove("to_float");
+		tags.remove("from");
+		tags.remove("to");
+		tags.remove("hideNotFound");
+		tags.remove("dashboardId");
+		tags.remove("performDecumulation");
+		tags.remove("getTags");
+
+		Map<String, List<String>> parsedTags = tags.entrySet().stream()
+				.collect(
+						Collectors.toMap(
+								Entry::getKey,
+								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
+						)
+				);
+
+		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements,
+				fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""),
+				byMeasurement.orElse(false), toFloat.orElse(false), performDecumulation.orElse(false),
+				getTags.orElse(true), InfluxFunction.obtain(functionOTF), groupOTF.orElse(""));
+
+		//We only apply conversion if there is one field. as functions and grouping on multiple fields will cause issues.
+		if(dashboardId.isPresent() && fields.size() == 1){
+			ret = convertService.convert(ret, dashboardId.get(), fields, function);
+		}
+
+		if (ret != null && !ret.isEmpty())
+			return ResponseEntity.ok(ret);
+		else if (hideNotFound.isPresent() && Boolean.TRUE.equals(hideNotFound.get()))
 			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
@@ -272,9 +339,9 @@ public class MeasurementController {
 		
 		ret = service.select(measurement, from.orElse(""), to.orElse(""), "time");
 
-		if (ret != null && ret.size() > 0)
+		if (ret != null && !ret.isEmpty())
 			return ResponseEntity.ok(ret);
-		else if (hideNotFound.isPresent() && hideNotFound.get())
+		else if (hideNotFound.isPresent() && Boolean.TRUE.equals(hideNotFound.get()))
 			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
@@ -308,9 +375,9 @@ public class MeasurementController {
 		
 		ret = service.operate(measurement, InfluxFunction.obtain(function), field, from.orElse(""), to.orElse(""), group.orElse(""), "time");
 		
-		if (ret != null && ret.size() > 0)
+		if (ret != null && !ret.isEmpty())
 			return ResponseEntity.ok(ret);
-		else if (hideNotFound.isPresent() && hideNotFound.get())
+		else if (hideNotFound.isPresent() && Boolean.TRUE.equals(hideNotFound.get()))
 			return ResponseEntity.ok(List.of());
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}

@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EvaluationResult {
-    private DataResponse dataResponseMeasurement1;
-    private DataResponse dataResponseMeasurement2;
+    private MeasurementSimplifiedDAO dataResponseMeasurement1;
+    private MeasurementSimplifiedDAO dataResponseMeasurement2;
     private String executedReadableString;
     private String executedString;
     private String executionResult;

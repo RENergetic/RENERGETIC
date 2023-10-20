@@ -1,6 +1,5 @@
 package com.renergetic.measurementapi.service;
 
-import com.google.gson.Gson;
 import com.renergetic.common.model.Dashboard;
 import com.renergetic.common.model.MeasurementType;
 import com.renergetic.common.repository.DashboardRepository;
@@ -15,8 +14,6 @@ public class DashboardService {
 
 	@Autowired
 	MeasurementTypeService measurementTypeService;
-
-	private final Gson gson = new Gson();
 	
 	public Dashboard getByGrafanaId(String grafanaId) {
 		return dashboardRepository.findByGrafanaId(grafanaId);

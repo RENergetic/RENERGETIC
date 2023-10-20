@@ -37,7 +37,8 @@ INSERT INTO public.asset(
 	(1111, 'de-nieuwe-dokken-pv-0198-xxxxx4B4', NULL, 'PV power produced by the PV field with installation code 0198-xxxxx4B4 at De Nieuwe Dokken', NULL, 1003, 10, NULL, 1),
 	(1112, 'de-nieuwe-dokken-pv-0198-xxxxx853', NULL, 'PV power produced by the PV field with installation code 0198-xxxxx853 at De Nieuwe Dokken', NULL, 1003, 10, NULL, 1),
 	(1113, 'de-nieuwe-dokken-pv-0198-xxxxx9C0', NULL, 'PV power produced by the PV field with installation code 0198-xxxxx9C0 at De Nieuwe Dokken', NULL, 1003, 10, NULL, 1),
-	(1114, 'Battery', NULL, 'Battery Straoge', NULL, 1000, 29, NULL, 1);
+	(1114, 'de-nieuwe-dokken-battery', NULL, 'Battery Storage', NULL, 1000, 29, NULL, 1),
+	(1115, 'de-nieuwe-dokken-biogas', NULL, 'Thermal energy production of the de-nieuwe-dokken-biogas', NULL, 1000, 5, NULL, 1);
 
 
 INSERT INTO public.asset_details(

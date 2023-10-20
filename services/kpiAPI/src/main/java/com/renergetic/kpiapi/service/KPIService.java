@@ -2,11 +2,14 @@ package com.renergetic.kpiapi.service;
 
 import com.renergetic.kpiapi.dao.KPIDataDAO;
 import com.renergetic.kpiapi.dao.MeasurementDAORequest;
+import com.renergetic.kpiapi.exception.HttpRuntimeException;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
 import com.renergetic.kpiapi.model.*;
 import com.renergetic.kpiapi.repository.KPIConstantRepository;
 import com.renergetic.kpiapi.service.utils.DateConverter;
 import com.renergetic.kpiapi.service.utils.HttpAPIs;
+import com.renergetic.kpiapi.service.utils.MathCalculator;
+
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,6 +40,9 @@ public class KPIService {
 	
 	@Autowired
 	private KPIConstantRepository constantRepository;
+
+	@Autowired
+	private MathCalculator calculator;
 	
 	/**
 	 * Retrieves the kpi data DAO for the given name, domain, and time range.
@@ -70,7 +76,7 @@ public class KPIService {
 				httpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
 
 		// Parse response with status code smaller than 300
-		if (response.statusCode() < 300) {
+		if (response != null && response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
 			if (!data.isEmpty()) {
@@ -89,7 +95,8 @@ public class KPIService {
 					}
 				});
 			}
-		}
+		} else if (response != null ) throw new HttpRuntimeException(String.format("Error retrieving data from Influx for KPI %s with domain %s: %s", ret.getName(), domain.toString(), response.statusCode()));
+		else throw new HttpRuntimeException(String.format("Error retrieving data from Influx for KPI %s with domain %s: NULL response", ret.getName(), domain.toString()));
 
 		return ret;
     }
@@ -131,7 +138,7 @@ public class KPIService {
 				httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
 
 		// Parse response with status code smaller than 300
-		if (response.statusCode() < 300) {
+		if (response != null && response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
 			if (!data.isEmpty()) {
@@ -141,7 +148,9 @@ public class KPIService {
 
 						Long timestamp = null;
 						try {
-							timestamp = DateConverter.toEpoch(json.getString("time"));
+							if(json.has("time") && !json.isNull("time")) {
+								timestamp = DateConverter.toEpoch(json.getString("time"));
+							}
 						} catch (InvalidArgumentException e) {
 							log.warn(e.getMessage());
 						}
@@ -155,7 +164,8 @@ public class KPIService {
 					}
 				});
 			}
-		}
+		} else if (response != null) throw new HttpRuntimeException(String.format("Error retrieving data from Influx for KPI %s with domain %s: %s", ret.getName(), domain.toString(), response.statusCode()));
+		else throw new HttpRuntimeException(String.format("Error retrieving data from Influx for KPI %s with domain %s: NULL response", ret.getName(), domain.toString()));
 
 		return ret;
     }
@@ -222,20 +232,18 @@ public class KPIService {
 			if (time != null)
 				influxRequest.getFields().put("time", DateConverter.toString(time));
 
-			Double value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues).doubleValue();
-			if (!Double.isNaN(value))
-				influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
-			else influxRequest.getFields().put("value", "0.0");
+			BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
 
-			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
+			influxRequest.getFields().put("value", calculator.bigDecimalToDoubleString(value));
 			
 			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 			
-			if (response.statusCode() < 300) {
+			if (response != null && response.statusCode() < 300) {
 				KPIDataDAO data = KPIDataDAO.create(kpi, domain);
 				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
 				configuredMeters.add(data);
-			} else log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.description, domain.toString(), response.statusCode()));
+			} else if (response != null)  log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.kpi, domain.toString(), response.statusCode()));
+			else log.error(String.format("Error retrieving data from Influx for KPI %s with domain %s: NULL response", kpi.kpi, domain.toString()));
 		}
 		return configuredMeters;
 	}
@@ -261,7 +269,7 @@ public class KPIService {
 				(values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 		
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -271,8 +279,8 @@ public class KPIService {
 		Double result = (values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) + 
 				(values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
-
-		if (!Double.isNaN(result))
+		
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -282,7 +290,7 @@ public class KPIService {
 		Double result = 1 - (values.get(AbstractMeter.LOSSES) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -293,7 +301,7 @@ public class KPIService {
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -303,7 +311,7 @@ public class KPIService {
 		Double result = (values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -313,7 +321,7 @@ public class KPIService {
 		Double result = 1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -327,7 +335,7 @@ public class KPIService {
 				c.getGamma() * values.get(AbstractMeter.ENS) + c.getDelta() * values.get(AbstractMeter.LNS))) / 
 				(values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -336,7 +344,7 @@ public class KPIService {
 		
 		Double result = values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE);
 
-		if (!Double.isNaN(result))
+		if (!Double.isNaN(result) && !Double.isInfinite(result))
 			return BigDecimal.valueOf(result);
 		else return new BigDecimal(0);
 	}
@@ -358,7 +366,7 @@ public class KPIService {
 				httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
 
 		// Parse response with status code smaller than 300
-		if (response.statusCode() < 300) {
+		if (response != null && response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
 			if (!data.isEmpty()) {

@@ -53,7 +53,7 @@ INSERT INTO abstract_meter ( id, name, domain, formula, condition) VALUES
 (15, 'RES', 'heat', '0', NULL),
 (16, 'NONRES', 'heat', '0', NULL),
 (17, 'LRS', 'heat', '[4017]-([4004]*(([4012]+[4012]-[4014])/([4015]+[4016]))*([4017]/(5+([4015]-[4001])))', NULL), /*Load(heat) - HPel * Share_non_RES(el) * Load(heat) / (5 + Load(el) - PV)*/
-(18, 'LNS', 'heat', '[4004]*(([4012]+[4012]-[4014])/([4015]+[4016]))*([4017]/(5+([4015]-[4001]))', NULL), /*HPel * Share_non_RES(el) * Load(heat) / (5 + Load(el) - PV)*/
+(18, 'LNS', 'heat', '[4004]*(([4012]+[4012]-[4014])/([4015]+[4016]))*([4017]/(5+([4015]-[4001])))', NULL), /*HPel * Share_non_RES(el) * Load(heat) / (5 + Load(el) - PV)*/
 (19, 'ERS', 'heat', '0', NULL),
 (20, 'ENS', 'heat', '[4003]', NULL); /* Energy supply (Veolia) */
 

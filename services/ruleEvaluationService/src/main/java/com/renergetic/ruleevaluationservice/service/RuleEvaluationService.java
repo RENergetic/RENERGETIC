@@ -1,14 +1,12 @@
 package com.renergetic.ruleevaluationservice.service;
 
-import com.renergetic.common.model.NotificationDefinition;
-import com.renergetic.common.model.NotificationSchedule;
-import com.renergetic.common.model.NotificationType;
+import com.renergetic.common.model.*;
 import com.renergetic.common.repository.NotificationDefinitionRepository;
 import com.renergetic.common.repository.NotificationScheduleRepository;
 import com.renergetic.ruleevaluationservice.dao.DataResponse;
 import com.renergetic.ruleevaluationservice.dao.EvaluationResult;
+import com.renergetic.ruleevaluationservice.dao.MeasurementSimplifiedDAO;
 import com.renergetic.ruleevaluationservice.exception.RuleEvaluationException;
-import com.renergetic.common.model.AssetRule;
 import com.renergetic.common.repository.AssetRuleRepository;
 import com.renergetic.ruleevaluationservice.utils.AssetRuleUtils;
 import com.renergetic.ruleevaluationservice.utils.TimeUtils;
@@ -82,6 +80,15 @@ public class RuleEvaluationService {
             evaluationResult.setExecutedString("inactive");
             return evaluationResult;
         }
+
+        //Temporary check: check if there is a space in the time literals and remove it. Just adding try catch to be sure to not break anything...
+        try{
+            assetRule.setTimeRangeMeasurement1(assetRule.getTimeRangeMeasurement1().replace(" ", ""));
+            assetRule.setTimeRangeMeasurement2(assetRule.getTimeRangeMeasurement2().replace(" ", ""));
+        } catch(Exception e){
+
+        }
+
         LocalDateTime currentTime = LocalDateTime.now();
         try{
             evaluationResult.setExecutedReadableString(AssetRuleUtils.transformRuleToReadableName(assetRule));
@@ -132,26 +139,31 @@ public class RuleEvaluationService {
     }
 
     private void setEvaluationStringAndData(AssetRule assetRule, EvaluationResult evaluationResult) throws RuleEvaluationException {
-        DataResponse dataMS1 = dataService.getData(assetRule.getMeasurement1(), assetRule.getFunctionMeasurement1(),
+        List<MeasurementSimplifiedDAO> dataMS1 = dataService.getData(assetRule.getMeasurement1(), assetRule.getFunctionMeasurement1(),
                 assetRule.getTimeRangeMeasurement1(), TimeUtils.offsetCurrentInstantOfAtLeast3Hours(assetRule.getTimeRangeMeasurement1()).toEpochMilli(),
                 Optional.empty());
 
-        if(dataMS1 == null || dataMS1.getDataUsedForComparison() == null || dataMS1.getRawResult() == null || dataMS1.getRawResult().size() == 0)
+        Optional<MeasurementSimplifiedDAO> latestMS1 = getLatestMeasurement(dataMS1);
+        if(latestMS1.isEmpty())
             throw new RuleEvaluationException("Measurement 1 data could not be retrieved.");
 
-        evaluationResult.setDataResponseMeasurement1(dataMS1);
+        evaluationResult.setDataResponseMeasurement1(latestMS1.get());
 
         String expression;
         if(assetRule.getMeasurement2() != null){
-            DataResponse dataMS2 = dataService.getData(assetRule.getMeasurement2(), assetRule.getFunctionMeasurement2(),
+            List<MeasurementSimplifiedDAO> dataMS2 = dataService.getData(assetRule.getMeasurement2(), assetRule.getFunctionMeasurement2(),
                     assetRule.getTimeRangeMeasurement2(), TimeUtils.offsetCurrentInstantOfAtLeast3Hours(assetRule.getTimeRangeMeasurement2()).toEpochMilli(),
                     Optional.empty());
 
-            if(dataMS2 == null || dataMS2.getDataUsedForComparison() == null || dataMS2.getRawResult() == null || dataMS2.getRawResult().size() == 0)
+            Optional<MeasurementSimplifiedDAO> latestMS2 = getLatestMeasurement(dataMS1);
+            if(latestMS2.isEmpty())
                 throw new RuleEvaluationException("Measurement 2 data could not be retrieved.");
 
-            evaluationResult.setDataResponseMeasurement2(dataMS2);
-            evaluationResult.setExecutedString(dataMS1.getDataUsedForComparison().getValue()+assetRule.getComparator()+dataMS2.getDataUsedForComparison().getValue());
+            evaluationResult.setDataResponseMeasurement2(latestMS2.get());
+            evaluationResult.setExecutedString(
+                    latestMS1.get().getFields().get(assetRule.getFunctionMeasurement1())
+                    +assetRule.getComparator()
+                    +latestMS2.get().getFields().get(assetRule.getFunctionMeasurement1()));
         } else {
             String threshold = assetRule.isCompareToConfigThreshold() ?
                     assetRule.getAsset().getDetails().stream().filter(ad -> ad.getKey().equals("rule_threshold")).findFirst().orElseThrow().getValue()
@@ -162,8 +174,14 @@ public class RuleEvaluationService {
                 throw new RuleEvaluationException("Asset rule configuration missing a threshold value.");
 
             evaluationResult.setDataResponseMeasurement2(null);
-            evaluationResult.setExecutedString(dataMS1.getDataUsedForComparison().getValue()+assetRule.getComparator()+threshold);
+            evaluationResult.setExecutedString(
+                    latestMS1.get().getFields().get(assetRule.getFunctionMeasurement1())
+                            +assetRule.getComparator()
+                            +threshold);
         }
+    }
 
+    private Optional<MeasurementSimplifiedDAO> getLatestMeasurement(List<MeasurementSimplifiedDAO> msd){
+        return msd.stream().max(Comparator.comparing(m -> m.getFields().get("time")));
     }
 }

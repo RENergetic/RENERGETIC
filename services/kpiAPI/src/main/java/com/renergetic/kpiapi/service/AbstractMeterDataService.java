@@ -1,5 +1,6 @@
 package com.renergetic.kpiapi.service;
 
+import java.math.BigDecimal;
 import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.HashMap;
@@ -77,7 +78,7 @@ public class AbstractMeterDataService {
 				httpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
 
 		// Parse response with status code smaller than 300
-		if (response.statusCode() < 300) {
+		if (response != null && response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
 			if (!data.isEmpty()) {
@@ -96,7 +97,8 @@ public class AbstractMeterDataService {
 					}
 				});
 			}
-		}
+		} else if (response != null) throw new HttpRuntimeException(String.format("Error retrieving data from Influx for Abtract meter %s with domain %s: %s", ret.getName(), domain.toString(), response.statusCode()));
+		else throw new HttpRuntimeException(String.format("Error retrieving data from Influx for Abtract meter %s with domain %s: NULL response", ret.getName(), domain.toString()));
 
 		return ret;
     }
@@ -138,7 +140,7 @@ public class AbstractMeterDataService {
 				httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
 
 		// Parse response with status code smaller than 300
-		if (response.statusCode() < 300) {
+		if (response != null && response.statusCode() < 300) {
 			JSONArray data = new JSONArray(response.body());
 
 			if (!data.isEmpty()) {
@@ -148,7 +150,9 @@ public class AbstractMeterDataService {
 
 						Long timestamp = null;
 						try {
-							timestamp = DateConverter.toEpoch(json.getString("time"));
+							if(json.has("time") && !json.isNull("time")) {
+								timestamp = DateConverter.toEpoch(json.getString("time"));
+							}
 						} catch (InvalidArgumentException e) {
 							log.warn(e.getMessage());
 						}
@@ -162,7 +166,8 @@ public class AbstractMeterDataService {
 					}
 				});
 			}
-		}
+		} else if (response != null) throw new HttpRuntimeException(String.format("Error retrieving data from Influx for Abtract meter %s with domain %s: %s", ret.getName(), domain.toString(), response.statusCode()));
+		else throw new HttpRuntimeException(String.format("Error retrieving data from Influx for Abtract meter %s with domain %s: NULL response", ret.getName(), domain.toString()));
 
 		return ret;
     }
@@ -179,16 +184,15 @@ public class AbstractMeterDataService {
 		if (time != null)
 			influxRequest.getFields().put("time", DateConverter.toString(time));
 		
-		Double value = calculator.calculateFormula(meter.getFormula(), from, to).doubleValue();
-		if (!Double.isNaN(value))
-			influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
-		else influxRequest.getFields().put("value", "0.0");
+		BigDecimal value = calculator.calculateFormula(meter.getFormula(), from, to);
+		influxRequest.getFields().put("value", calculator.bigDecimalToDoubleString(value));
 		
 		HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 		
-		if (response.statusCode() < 300) {
+		if (response != null && response.statusCode() < 300) {
 			ret.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
-		} else throw new HttpRuntimeException("Influx request failed with status code %d", response.statusCode());
+		} else if (response != null) throw new HttpRuntimeException("Influx request failed with status code %d", response.statusCode());
+		else throw new HttpRuntimeException("Influx request failed with NULL response");
 		
 		return ret;
 	}
@@ -213,21 +217,20 @@ public class AbstractMeterDataService {
 			if (time != null)
 				influxRequest.getFields().put("time", DateConverter.toString(time));
 
-			Double value = null;
+			BigDecimal value = new BigDecimal(0);
 			if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to))
-				value = calculator.calculateFormula(meter.getFormula(), from, to).doubleValue();
-			else value = 0.;
-			if (!Double.isNaN(value))
-				influxRequest.getFields().put("value", String.valueOf(value.doubleValue()));
-			else influxRequest.getFields().put("value", "0.0");
+				value = calculator.calculateFormula(meter.getFormula(), from, to);
+				
+			influxRequest.getFields().put("value", calculator.bigDecimalToDoubleString(value));
 			
 			HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 			
-			if (response.statusCode() < 300) {
+			if (response != null && response.statusCode() < 300) {
 				AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
 				data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
 				configuredMeters.add(data);
-			} else log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meter, meter.getDomain().toString(), response.statusCode()));
+			} else if (response != null) log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meter, meter.getDomain().toString(), response.statusCode()));
+			else log.error(String.format("Error retrieving data from Influx for abstract meter %s with domain %s: NULL response", meter.getName().meter, meter.getDomain().toString()));
 		}
 		return configuredMeters;
 	}
