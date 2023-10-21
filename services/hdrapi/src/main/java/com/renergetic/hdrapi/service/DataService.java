@@ -39,6 +39,8 @@ public class DataService {
     @Autowired
     private AssetRepository assetRepository;
     @Autowired
+    AssetCategoryRepository assetCategoryRepository;
+    @Autowired
     private MeasurementRepository measurementRepository;
     @Autowired
     private DummyDataGenerator dummyDataGenerator;
@@ -74,23 +76,29 @@ public class DataService {
             ).flatMap(List::stream);
             Collection<MeasurementDAOResponse> values =
                     measurementDAOResponseStream.collect(
-                            Collectors.toMap(MeasurementDAOResponse::getId, Function.identity(),
+                            Collectors.toMap(m -> m.getFunction() + "_" + m.getId(), Function.identity(),
                                     (m1, m2) -> m1)).values();
+//            DataDAO res =
+//                    this.getData(values.stream().map(v -> v.mapToEntity(measurementDetailsRepository.findByMeasurementId(v.getId()))).collect(Collectors.toList()), from, to);
             DataDAO res =
-                    this.getData(values.stream().map(v -> v.mapToEntity(measurementDetailsRepository.findByMeasurementId(v.getId()))).collect(Collectors.toList()), from, to);
+                    this.getData(values, from, to);
+
             //we need to return template with filled measurements for the given assetId
             return new DataWrapperDAO(res, assetTemplate);
         } else {
             //TODO: TOMEK/or someone else - check : if asset is null and panel is an template - raise exception  - bad request
-            List<Measurement> measurements =
+            List<InformationTileMeasurement> measurements =
                     informationPanelService.getPanelMeasurements(panelId);
-            DataDAO res = this.getData(measurements, from, to);
+            List<MeasurementDAOResponse> measurementDAOResponseList = measurements.stream().map(it ->
+                    MeasurementDAOResponse.create(it.getMeasurement(), it.getMeasurement().getDetails(),
+                            it.getFunction())).collect(Collectors.toList());
+            DataDAO res = this.getData(measurementDAOResponseList, from, to);
             return new DataWrapperDAO(res);
         }
 
     }
 
-    public TimeseriesDAO getTileTimeseries( Long  tileId,Long assetId, Long from, Optional<Long> to) {
+    public TimeseriesDAO getTileTimeseries(Long tileId, Long assetId, Long from, Optional<Long> to) {
         List<Measurement> measurements = informationPanelService.getTileMeasurements(tileId, assetId, null);
         TimeseriesDAO res = this.getTimeseries(measurements, from, to);
         return res;
@@ -98,7 +106,7 @@ public class DataService {
 
     }
 
-    public TimeseriesDAO getMeasurementTimeseries(List<Long> measurementIds,Long from, Optional<Long> to) {
+    public TimeseriesDAO getMeasurementTimeseries(List<Long> measurementIds, Long from, Optional<Long> to) {
         List<Measurement> measurements = measurementRepository.findByIds(measurementIds);
 
         TimeseriesDAO res = this.getTimeseries(measurements, from, to);
@@ -107,34 +115,39 @@ public class DataService {
 
     }
 
-    public DataDAO getData(Collection<Measurement> measurements, Long from, Optional<Long> to) {
+    public DataDAO getData(Collection<MeasurementDAOResponse> measurements, Long from, Optional<Long> to) {
         if (generateDummy) {
-            return dummyDataGenerator.getData(
-                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null,
-                                    m.getFunction() != null ? m.getFunction() : "last"))
-                            .collect(Collectors.toList()));
+//            return dummyDataGenerator.getData(
+//                    measurements.stream().map(m -> MeasurementDAOResponse.create(m, null,
+//                                    m.getFunction() != null ? m.getFunction() : "last"))
+//                            .collect(Collectors.toList()));
+            return dummyDataGenerator.getData(measurements);
         } else {
             DataDAO ret = new DataDAO();
             Set<Thread> threads = new HashSet<>();
 
-            for (final Measurement measurement : measurements) {
+            for (final MeasurementDAOResponse measurement : measurements) {
                 Thread thread = new Thread(() -> {
+                    Measurement m = measurementRepository.findById(measurement.getId()).get();
                     Map<String, String> params = new HashMap<>();
                     List<String> assetNames = new LinkedList<>();
-                    String function = measurement.getFunction() != null ? measurement.getFunction() : "last";
+                    String function = measurement.getFunction() != null ? measurement.getFunction().name() : "last";
 
                     // SET DEFAULT VALUES TO THE MEASUREMENT
                     ret.putCurrent(function, measurement.getId().toString(), null);
 
                     // GET ASSETS RELATED WITH THE MEASUREMENT (If the assets is a energy island and there isn't category it doesn't filter by asset)
 
-                    if (measurement.getAsset() != null && measurement.getAsset().getType() != null && 
-                        !measurement.getAsset().getType().getName().equalsIgnoreCase("energy_island"))
+                    if (measurement.getAsset() != null && measurement.getAsset().getType() != null &&
+                            !measurement.getAsset().getType().getName().equalsIgnoreCase("energy_island"))
                         assetNames.add(measurement.getAsset().getName());
-                    if (measurement.getAssetCategory() != null)
-                        assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
-                                .stream().map(asset -> asset.getName()).collect(Collectors.toList()));
-
+                    if (measurement.getCategory() != null) {
+                        Optional<AssetCategory> first = assetCategoryRepository.findByNameContaining(
+                                measurement.getCategory()).stream().findFirst();
+                        if (first.isPresent())
+                            assetNames.addAll(assetRepository.findByAssetCategoryId(first.get().getId())
+                                    .stream().map(asset -> asset.getName()).collect(Collectors.toList()));
+                    }
                     // GET MEASUREMENT TAGS
                     List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
 
@@ -153,8 +166,8 @@ public class DataService {
                         params.put("direction", measurement.getDirection().name());
                     if (measurement.getDomain() != null)
                         params.put("domain", measurement.getDomain().name());
-                    if (measurement.getSensorId() != null)
-                        params.put("sensor_id", measurement.getSensorId());
+                    if (m.getSensorId() != null)
+                        params.put("sensor_id", m.getSensorId());
                     if (assetNames != null && !assetNames.isEmpty())
                         params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
                     if (tags != null && !tags.isEmpty())
@@ -164,9 +177,10 @@ public class DataService {
 
                     // PARSE TO NON CUMULATIVE DATA IF THE MEASUREMENT IS CUMULATIVE
                     MeasurementDetails cumulative = null;
-                    if (measurement.getDetails() != null)
-                        cumulative = measurement.getDetails().stream().filter(
-                            details -> details.getKey().equalsIgnoreCase("cumulative")).findFirst().orElse(null);
+
+                    if (m.getDetails() != null)
+                    cumulative = m.getDetails().stream().filter(
+                                details -> details.getKey().equalsIgnoreCase("cumulative")).findFirst().orElse(null);
 
                     if (cumulative == null && cumulativeTypes.contains(measurement.getType().getPhysicalName())) {
                         params.put("performDecumulation", "true");

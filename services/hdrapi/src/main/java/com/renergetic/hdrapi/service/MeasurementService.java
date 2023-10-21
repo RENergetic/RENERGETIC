@@ -109,7 +109,14 @@ public class MeasurementService {
 
     public List<MeasurementDAOImpl> list(Long offset, Integer limit) {
         return measurementRepository.report(offset, limit)
-                .stream().map(MeasurementDAOImpl::create).collect(Collectors.toList());
+                .stream().map((it) ->
+                {
+//                    var  mt =measurementTypeRepository.findById(it.getTypeId()).orElseThrow();
+//                    return MeasurementDAOImpl.create(it,mt);
+                    return MeasurementDAOImpl.create(it );
+                }
+
+                 ).collect(Collectors.toList());
     }
 
     public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {

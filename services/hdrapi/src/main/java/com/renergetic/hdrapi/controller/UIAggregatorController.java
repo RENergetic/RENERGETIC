@@ -56,7 +56,7 @@ public class UIAggregatorController {
     public ResponseEntity<WrapperResponseDAO> apiWrapper(@RequestBody WrapperRequestDAO wrapperRequestBodyDAO) {
         User user = loggedInService.getLoggedInUser();
         if (user == null) {
-        	throw new UnauthorizedAccessException("Invalid user, an authenticated user is required");
+            throw new UnauthorizedAccessException("Invalid user, an authenticated user is required");
         }
         Long userId = user.getId();
 
@@ -68,12 +68,12 @@ public class UIAggregatorController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = "/wrapper/{userId}", produces = "application/json")
     public ResponseEntity<WrapperResponseDAO> apiWrapperAdmin(@PathVariable(required = true) Long userId,
-                                                         @RequestBody WrapperRequestDAO wrapperRequestBodyDAO) {
+                                                              @RequestBody WrapperRequestDAO wrapperRequestBodyDAO) {
         User user = loggedInService.getLoggedInUser();
         if (user == null) {
-        	throw new UnauthorizedAccessException("Invalid user, an authenticated user is required");
+            throw new UnauthorizedAccessException("Invalid user, an authenticated user is required");
         } else if (!loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask))
-        	throw new UnauthorizedAccessException("Unauthorized user, you should have admin privileges");
+            throw new UnauthorizedAccessException("Unauthorized user, you should have admin privileges");
 
         WrapperResponseDAO wrapperResponseDAO = createWrapperResponse(userId, wrapperRequestBodyDAO);
         return new ResponseEntity<>(wrapperResponseDAO, HttpStatus.OK);
@@ -108,7 +108,7 @@ public class UIAggregatorController {
         if (body.getCalls().getPanels() != null) {
             //also called public dashboards
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getPanels();
-            wrapperResponseDAO.setPanels(                    getPublicPanels( Optional.ofNullable(data.getLimit())));
+            wrapperResponseDAO.setPanels(getPublicPanels(Optional.ofNullable(data.getLimit())));
         }
         if (body.getCalls().getDashboards() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getDashboards();
@@ -143,9 +143,10 @@ public class UIAggregatorController {
                                     it -> it.getDemandDefinition().getTile() != null
                             ).flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
                             .collect(Collectors.toList());
-            DataDAO demandData = dataService.getData(
-                    measurements.stream().map(MeasurementDAOResponse::mapToEntity).collect(Collectors.toList()), null,
-                    Optional.empty());
+//            DataDAO demandData = dataService.getData(
+//                    measurements.stream().map(MeasurementDAOResponse::mapToEntity).collect(Collectors.toList()), null,
+//                    Optional.empty());
+            DataDAO demandData = dataService.getData(measurements, null, Optional.empty());
             //TODO: here there might be issue with presenting the data and choosing appropriate time interval - this should be discused
             //probably data required for the demand demand should be stored as static  DataDAO JSON in RDBMS
             //if the user chooses interval it wouldnt make sense from the demand/request perspective
@@ -157,7 +158,8 @@ public class UIAggregatorController {
 
     private List<SimpleAssetDAO> getOwnerAssets(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
-            return assetService.findSimpleByUserId(userId, List.of(ConnectionType.owner), offset.orElse(0L), limit.orElse(20));
+            return assetService.findSimpleByUserId(userId, List.of(ConnectionType.owner), offset.orElse(0L),
+                    limit.orElse(20));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
@@ -173,7 +175,7 @@ public class UIAggregatorController {
 
     private List<InformationPanelDAOResponse> getPublicPanels(Optional<Integer> limit) {
         try {
-            return informationPanelService.findFeatured(false,Math.min(50, limit.orElse(20)));
+            return informationPanelService.findFeatured(false, Math.min(50, limit.orElse(20)));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
@@ -181,6 +183,7 @@ public class UIAggregatorController {
 
     /**
      * private dashboards
+     *
      * @param userId
      * @param offset
      * @param limit
@@ -188,7 +191,8 @@ public class UIAggregatorController {
      */
     private List<AssetPanelDAO> getPrivateAssetPanels(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         try {
-            return assetService.findAssetsPanelsByUserId(userId, List.of(ConnectionType.owner, ConnectionType.resident), offset.orElse(0L), limit.orElse(20));
+            return assetService.findAssetsPanelsByUserId(userId, List.of(ConnectionType.owner, ConnectionType.resident),
+                    offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             return new ArrayList<>();
         }
