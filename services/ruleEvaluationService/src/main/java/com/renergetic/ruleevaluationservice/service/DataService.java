@@ -54,7 +54,7 @@ public class DataService {
         Map<String, String> params = new HashMap<>();
         List<String> assetNames = new LinkedList<>();
         //TODO: Could use the function from aggregator measurement
-        function = function != null ? function : "last";
+        function = function != null ? function.toLowerCase() : "last";
 
         // GET ASSETS RELATED WITH THE MEASUREMENT (If the assets is a energy island and there isn't category it doesn't filter by asset)
 
