@@ -81,14 +81,6 @@ public class RuleEvaluationService {
             return evaluationResult;
         }
 
-        //Temporary check: check if there is a space in the time literals and remove it. Just adding try catch to be sure to not break anything...
-        try{
-            assetRule.setTimeRangeMeasurement1(assetRule.getTimeRangeMeasurement1().replace(" ", ""));
-            assetRule.setTimeRangeMeasurement2(assetRule.getTimeRangeMeasurement2().replace(" ", ""));
-        } catch(Exception e){
-
-        }
-
         LocalDateTime currentTime = LocalDateTime.now();
         try{
             evaluationResult.setExecutedReadableString(AssetRuleUtils.transformRuleToReadableName(assetRule));
@@ -155,15 +147,15 @@ public class RuleEvaluationService {
                     assetRule.getTimeRangeMeasurement2(), TimeUtils.offsetCurrentInstantOfAtLeast3Hours(assetRule.getTimeRangeMeasurement2()).toEpochMilli(),
                     Optional.empty());
 
-            Optional<MeasurementSimplifiedDAO> latestMS2 = getLatestMeasurement(dataMS1);
+            Optional<MeasurementSimplifiedDAO> latestMS2 = getLatestMeasurement(dataMS2);
             if(latestMS2.isEmpty())
                 throw new RuleEvaluationException("Measurement 2 data could not be retrieved.");
 
             evaluationResult.setDataResponseMeasurement2(latestMS2.get());
             evaluationResult.setExecutedString(
-                    latestMS1.get().getFields().get(assetRule.getFunctionMeasurement1())
+                    latestMS1.get().getFields().get(assetRule.getFunctionMeasurement1().toLowerCase())
                     +assetRule.getComparator()
-                    +latestMS2.get().getFields().get(assetRule.getFunctionMeasurement1()));
+                    +latestMS2.get().getFields().get(assetRule.getFunctionMeasurement2().toLowerCase()));
         } else {
             String threshold = assetRule.isCompareToConfigThreshold() ?
                     assetRule.getAsset().getDetails().stream().filter(ad -> ad.getKey().equals("rule_threshold")).findFirst().orElseThrow().getValue()
@@ -175,7 +167,7 @@ public class RuleEvaluationService {
 
             evaluationResult.setDataResponseMeasurement2(null);
             evaluationResult.setExecutedString(
-                    latestMS1.get().getFields().get(assetRule.getFunctionMeasurement1())
+                    latestMS1.get().getFields().get(assetRule.getFunctionMeasurement1().toLowerCase())
                             +assetRule.getComparator()
                             +threshold);
         }
