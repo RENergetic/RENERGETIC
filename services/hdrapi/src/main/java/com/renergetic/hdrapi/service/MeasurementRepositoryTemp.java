@@ -14,9 +14,9 @@ import java.util.List;
 public interface MeasurementRepositoryTemp  extends JpaRepository<Measurement, Long> {
 //TODO: move to MeasurementRepository
     @Query(
-            value = "SELECT _m.* FROM  easurement _m " +
+            value = "SELECT _m.* FROM  measurement _m " +
                     " WHERE  COALESCE(_m.name like CONCAT('%', :name, '%'),:name is null ) " +
-                    " AND COALESCE(_m.label like CONCAT('%', :label,'%'),TRUE )  " +
+                    " or COALESCE(_m.label like CONCAT('%', :label,'%'),TRUE ) order by _m.id asc" +
                     " LIMIT :limit OFFSET :offset ;",
             nativeQuery = true
     )

@@ -45,6 +45,8 @@ public class MeasurementService {
 
     @Autowired
     MeasurementRepository measurementRepository;
+
+    @Autowired
     MeasurementRepositoryTemp measurementRepository2;
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;

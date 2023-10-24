@@ -91,7 +91,7 @@ public class MeasurementController {
         if (direction.isPresent()) filters.put("direction", direction.get());
         if (domain.isPresent()) filters.put("domain", domain.get());
         if(filters.size()==1 && filters.containsKey("name")){
-            measurementSv.find(filters, offset.orElse(0L), limit.orElse(20));
+            measurements =  measurementSv.find(filters, offset.orElse(0L), limit.orElse(20));
         }
         else{
             measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20)); //-> old method
