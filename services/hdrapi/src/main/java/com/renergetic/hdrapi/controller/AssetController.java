@@ -53,15 +53,15 @@ public class AssetController {
         List<AssetDAOResponse> assets = new ArrayList<AssetDAOResponse>();
         HashMap<String, String> filters = new HashMap<>();
 
-        if (category.isPresent()&&!category.get().isEmpty( )) filters.put("category", category.get().toString());
-        if (type.isPresent()&&!type.get().isEmpty( )) filters.put("type", type.get());
-        if (name.isPresent()&&name.get().length()>2) filters.put("name", name.get());
-        if (label.isPresent()&&label.get().length()>2) filters.put("label", label.get());
+        if (category.isPresent() && !category.get().isEmpty()) filters.put("category", category.get().toString());
+        if (type.isPresent() && !type.get().isEmpty()) filters.put("type", type.get());
+        if (name.isPresent() && name.get().length() > 2) filters.put("name", name.get());
+        if (label.isPresent() && label.get().length() > 2) filters.put("label", label.get());
         owner_id.ifPresent(aLong -> filters.put("owner", aLong.toString()));
         parent_id.ifPresent(aLong -> filters.put("parent", aLong.toString()));
 
         try {
-            assets = assetSv.get(filters  , offset.orElse(0L), limit.orElse(20));
+            assets = assetSv.get(filters, offset.orElse(0L), limit.orElse(20));
         } catch (NotFoundException ex) {
             assets = Collections.emptyList();
         }
@@ -175,7 +175,8 @@ public class AssetController {
             @ApiResponse(responseCode = "500", description = "Error saving information")
     })
     @PutMapping(path = "{asset_id}/info/{info_id}", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<AssetDetails> updateInformation(@RequestBody AssetDetails detail, @PathVariable("asset_id") Long assetId,
+    public ResponseEntity<AssetDetails> updateInformation(@RequestBody AssetDetails detail,
+                                                          @PathVariable("asset_id") Long assetId,
                                                           @PathVariable("info_id") Long infoId) {
         detail.setId(infoId);
         AssetDetails _detail = assetSv.updateDetail(detail, infoId, assetId);
@@ -190,7 +191,8 @@ public class AssetController {
             @ApiResponse(responseCode = "500", description = "Error saving information")
     })
     @PutMapping(path = "{asset_id}/info", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<AssetDetails> updateInformationByKey(@RequestBody AssetDetails detail, @PathVariable("asset_id") Long assetId) {
+    public ResponseEntity<AssetDetails> updateInformationByKey(@RequestBody AssetDetails detail,
+                                                               @PathVariable("asset_id") Long assetId) {
         AssetDetails _detail = assetSv.updateDetailByKey(detail, assetId);
         return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
@@ -202,7 +204,7 @@ public class AssetController {
     })
     @DeleteMapping(path = "{asset_id}/info/{info_id}")
     public ResponseEntity<AssetDetails> deleteInformation(@PathVariable("asset_id") Long assetId,
-            @PathVariable("info_id") Long infoId) {
+                                                          @PathVariable("info_id") Long infoId) {
         assetSv.deleteDetailById(infoId, assetId);
 
         return ResponseEntity.noContent().build();
@@ -215,7 +217,7 @@ public class AssetController {
     })
     @DeleteMapping(path = "{asset_id}/info/{key}")
     public ResponseEntity<AssetDetails> deleteInformationByKey(@PathVariable("asset_id") Long assetId,
-            @PathVariable("key") String key) {
+                                                               @PathVariable("key") String key) {
         assetSv.deleteDetailByKey(key, assetId);
 
         return ResponseEntity.noContent().build();
@@ -274,8 +276,8 @@ public class AssetController {
     }
     )
     @PutMapping(path = "/connect/{id}", produces = "application/json")
-    public ResponseEntity<AssetDAOResponse> connectAssets(@PathVariable  Long id,
-    													  @RequestParam("connect_to") Long connectId,
+    public ResponseEntity<AssetDAOResponse> connectAssets(@PathVariable Long id,
+                                                          @RequestParam("connect_to") Long connectId,
                                                           @RequestParam(value = "type", required = false) Optional<ConnectionType> type) {
         AssetConnectionDAORequest connection = new AssetConnectionDAORequest();
         connection.setAssetId(id);
@@ -295,7 +297,35 @@ public class AssetController {
     @PutMapping(path = "/measurement", produces = "application/json")
     public ResponseEntity<MeasurementDAOResponse> addMeasurement(@RequestParam("asset_id") Long assetId,
                                                                  @RequestParam("measurement_id") Long measurementId) {
-        MeasurementDAOResponse _measurement = assetSv.addMeasurement(assetId, measurementId);
+        MeasurementDAOResponse _measurement = assetSv.assignMeasurement(assetId, measurementId);
+        return new ResponseEntity<>(_measurement, _measurement != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "Add existing measurement to existing Asset")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Measurement connected to asset correctly"),
+            @ApiResponse(responseCode = "404", description = "Asset or measurement does not exist"),
+            @ApiResponse(responseCode = "500", description = "Error connecting measurement")
+    }
+    )
+    @PutMapping(path = "{assetId}/measurement/{measurementId}", produces = "application/json")
+    public ResponseEntity<MeasurementDAOResponse> assignMeasurement(@PathVariable Long assetId,
+                                                                    @PathVariable Long measurementId) {
+        MeasurementDAOResponse _measurement = assetSv.assignMeasurement(assetId, measurementId);
+        return new ResponseEntity<>(_measurement, _measurement != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "Add existing measurement to existing Asset")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Measurement connected to asset correctly"),
+            @ApiResponse(responseCode = "404", description = "Asset or measurement does not exist"),
+            @ApiResponse(responseCode = "500", description = "Error connecting measurement")
+    }
+    )
+    @DeleteMapping(path = "{assetId}/measurement/{measurementId}", produces = "application/json")
+    public ResponseEntity<MeasurementDAOResponse> revokeMeasurement(@PathVariable Long assetId,
+                                                                    @PathVariable Long measurementId) {
+        MeasurementDAOResponse _measurement = assetSv.revokeMeasurement(assetId, measurementId);
         return new ResponseEntity<>(_measurement, _measurement != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
@@ -322,11 +352,12 @@ public class AssetController {
     }
     )
     @PutMapping(path = "/{id}/category")
-    public ResponseEntity<AssetDAOResponse> connectAssetToCategory(@PathVariable Long id, @RequestBody AssetCategoryDAO connectCategory ) {
-    	AssetDAOResponse assetDAOupdate = assetService.updateAssetCategory(connectCategory, id);
-    	return new ResponseEntity<>(assetDAOupdate, HttpStatus.OK);
+    public ResponseEntity<AssetDAOResponse> connectAssetToCategory(@PathVariable Long id,
+                                                                   @RequestBody AssetCategoryDAO connectCategory) {
+        AssetDAOResponse assetDAOupdate = assetService.updateAssetCategory(connectCategory, id);
+        return new ResponseEntity<>(assetDAOupdate, HttpStatus.OK);
     }
-    
+
     //=== DELETE REQUESTS ================================================================================
     @DeleteMapping(path = "/connect/{id}", produces = "application/json")
     public ResponseEntity<?> connectAssets(@PathVariable Long id, @RequestParam("connected_asset_id") Long connectId) {
@@ -359,8 +390,8 @@ public class AssetController {
         assetSv.deleteTypeById(id);
 
         return ResponseEntity.noContent().build();
-    } 
-    
+    }
+
     @Operation(summary = "Delete a connection between an asset an its category", hidden = false)
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Connection deleted correctly"),
@@ -369,7 +400,7 @@ public class AssetController {
     )
     @DeleteMapping(path = "/{id}/category")
     public ResponseEntity<?> deleteConnectionAssetToCategory(@PathVariable Long id) {
-    	assetService.deleteAssetCategory(id);
+        assetService.deleteAssetCategory(id);
         return ResponseEntity.noContent().build();
     }
 }

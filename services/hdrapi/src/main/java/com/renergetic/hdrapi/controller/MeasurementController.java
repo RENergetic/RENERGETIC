@@ -89,9 +89,14 @@ public class MeasurementController {
         if (name.isPresent()) filters.put("name", name.get());
         if (type.isPresent()) filters.put("type", type.get());
         if (direction.isPresent()) filters.put("direction", direction.get());
-        if (domain.isPresent()) filters.put("parent", domain.get());
+        if (domain.isPresent()) filters.put("domain", domain.get());
+        if(filters.size()==1 && filters.containsKey("name")){
+            measurementSv.find(filters, offset.orElse(0L), limit.orElse(20));
+        }
+        else{
+            measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20)); //-> old method
 
-        measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20));
+        }
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
