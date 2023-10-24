@@ -268,6 +268,19 @@ public class AssetController {
         return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+
+    @PutMapping(path = "/{id}/parent/{parentId}", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<AssetDAOResponse> revokeParent(@PathVariable Long id, @PathVariable Long parentId) {
+        assetSv.assignParent(id, parentId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/{id}/parent", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<AssetDAOResponse> assignParent(@PathVariable Long id) {
+        assetSv.revokeParent(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @Operation(summary = "Connect two existing Asset")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Asset connected correctly"),

@@ -224,6 +224,27 @@ public class AssetService {
         } else throw new InvalidNonExistingIdException("No asset type found with id " + id);
     }
 
+    public boolean assignParent(Long assetId, Long parentId) {
+        if (Objects.equals(assetId, parentId)) {
+            throw new InvalidNonExistingIdException("Asset can't be it's own parent ");
+        }
+        Asset a = assetRepository.findById(assetId).orElseThrow(
+                () -> new NotFoundException("Asset " + assetId + " not found."));
+        Asset p = assetRepository.findById(assetId).orElseThrow(
+                () -> new NotFoundException("Parent Asset " + parentId + " not found."));
+        a.setParentAsset(p);
+        assetRepository.save(a);
+        return true;
+    }
+
+    public boolean revokeParent(Long assetId) {
+        Asset a = assetRepository.findById(assetId).orElseThrow(
+                () -> new NotFoundException("Asset " + assetId + " not found."));
+        a.setParentAsset(null);
+        assetRepository.save(a);
+        return true;
+    }
+
     public boolean deleteTypeById(Long id) {
         if (id != null && assetTypeRepository.existsById(id)) {
             assetTypeRepository.deleteById(id);
