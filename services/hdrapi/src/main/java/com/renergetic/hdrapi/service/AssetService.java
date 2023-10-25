@@ -230,7 +230,7 @@ public class AssetService {
         }
         Asset a = assetRepository.findById(assetId).orElseThrow(
                 () -> new NotFoundException("Asset " + assetId + " not found."));
-        Asset p = assetRepository.findById(assetId).orElseThrow(
+        Asset p = assetRepository.findById(parentId).orElseThrow(
                 () -> new NotFoundException("Parent Asset " + parentId + " not found."));
         a.setParentAsset(p);
         assetRepository.save(a);

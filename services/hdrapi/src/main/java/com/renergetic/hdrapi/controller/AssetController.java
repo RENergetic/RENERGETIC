@@ -268,15 +268,29 @@ public class AssetController {
         return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-
-    @PutMapping(path = "/{id}/parent/{parentId}", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<AssetDAOResponse> revokeParent(@PathVariable Long id, @PathVariable Long parentId) {
+    @Operation(summary = "Assign parent to an existing Asset")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Asset saved correctly"),
+            @ApiResponse(responseCode = "404", description = "Asset not exist"),
+            @ApiResponse(responseCode = "422", description = "Type isn's valid"),
+            @ApiResponse(responseCode = "500", description = "Error assigning parent")
+    }
+    )
+    @PutMapping(path = "/{id}/parent/{parentId}" )
+    public ResponseEntity  assignParent(@PathVariable Long id, @PathVariable Long parentId) {
         assetSv.assignParent(id, parentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    @DeleteMapping(path = "/{id}/parent", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<AssetDAOResponse> assignParent(@PathVariable Long id) {
+    @Operation(summary = "Delete parent from  an existing Asset")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Asset saved correctly"),
+            @ApiResponse(responseCode = "404", description = "Asset not exist"),
+            @ApiResponse(responseCode = "422", description = "Type isn's valid"),
+            @ApiResponse(responseCode = "500", description = "Error revoking parent")
+    }
+    )
+    @DeleteMapping(path = "/{id}/parent" )
+    public ResponseEntity revokeParent(@PathVariable Long id) {
         assetSv.revokeParent(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
