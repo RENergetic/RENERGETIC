@@ -121,11 +121,7 @@ public class MeasurementService {
 		return MeasurementMapper.fromFlux(tables, getTags);
 	}
 
-	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements,
-													  List<String> fields, Map<String, List<String>> tags, String from,
-													  String to, String timeVar, String group, Boolean byMeasurement,
-													  Boolean toFloat, Boolean performDecumulation, Boolean getTags,
-													  InfluxFunction functionOTF, String groupOTF) {
+	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement, Boolean toFloat, Boolean performDecumulation, Boolean getTags) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -134,15 +130,10 @@ public class MeasurementService {
 			from = parseTime(from);
 			to = parseTime(to);
 		}
-
+		
 		if (group != null && !group.isBlank()) {
 			group = InfluxTimeUnit.convert(group, InfluxTimeUnit.ms);
 		} else group = null;
-
-		if (groupOTF != null && !groupOTF.isBlank()) {
-			groupOTF = InfluxTimeUnit.convert(groupOTF, InfluxTimeUnit.ms);
-		} else groupOTF = null;
-
 		// ADD REQUEST BUCKET AND TIME RANGE
 		fluxQuery.add(String.format("from(bucket: \"%s\")", bucket));
 		fluxQuery.add(String.format("range(start: %s, stop: %s)", !from.isEmpty()? from : "0", !to.isEmpty()? to : "now()"));
@@ -181,13 +172,6 @@ public class MeasurementService {
 		fluxQuery.add(String.format("%s(column: \"_value\")", function.name().toLowerCase()));
 		fluxQuery.add("group()");
 		fluxQuery.add(String.format("set(key: \"_field\", value: \"%s\")", function.name().toLowerCase()));
-
-		// SECOND OPERATION FOR ON-THE-FLY AGGREGATION
-		if (groupOTF != null)
-			fluxQuery.add(String.format("window(every: %1$s, period: %1$s, startColumn: \"_time\", stopColumn: \"_stop\", timeColumn: \"_time\")", groupOTF));
-		fluxQuery.add(String.format("%s(column: \"_value\")", functionOTF.name().toLowerCase()));
-		fluxQuery.add("group()");
-		fluxQuery.add(String.format("set(key: \"_field\", value: \"%s\")", functionOTF.name().toLowerCase()));
 		
 		String flux = "import \"types\"" + fluxQuery.stream().collect(Collectors.joining(" |> "));
 
