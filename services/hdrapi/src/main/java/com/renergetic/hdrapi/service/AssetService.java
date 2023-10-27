@@ -6,24 +6,25 @@ import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.common.exception.InvalidNonExistingIdException;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.*;
+import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@Slf4j
 public class AssetService {
     @PersistenceContext
     EntityManager entityManager;
@@ -78,10 +79,24 @@ public class AssetService {
                 : "The asset to update doesn't exists");
     }
 
-    public AssetDAOResponse connect(AssetConnectionDAORequest connection) {
-        boolean assetExists = connection.getAssetId() != null && assetRepository.existsById(connection.getAssetId());
+    private boolean isUser(Asset asset) {
+        if (asset.getType() == null) {
+            return true;
+        }
+        Optional<AssetType> assetType = assetTypeRepository.findByName("user");
+        if (assetType.isPresent()) {
+            return asset.getType().getId().equals(assetType.get().getId());
+        }
+        log.error("asset type: 'user' doesn't exists");
+        return false;
+    }
 
-        if (assetExists && assetRepository.existsById(connection.getAssetConnectedId())) {
+    public AssetDAOResponse connect(AssetConnectionDAORequest connection) {
+        Asset asset = assetRepository.getById(connection.getAssetId());
+        if(connection.getType()==ConnectionType.owner && !isUser(asset)){
+            throw new InvalidArgumentException("Non user assets cannot be owners");
+        }
+        if (assetRepository.existsById(connection.getAssetConnectedId())) {
             assetConnectionRepository.save(connection.mapToEntity());
             return AssetDAOResponse.create(assetRepository.findById(connection.getAssetId()).orElse(null), null, null);
         } else throw new InvalidNonExistingIdException("The assets to connect don't exists");
@@ -92,7 +107,7 @@ public class AssetService {
                 measurementId != null && measurementRepository.existsById(measurementId)) {
             Measurement measurement = measurementRepository.findById(measurementId).get();
 
-            return MeasurementDAOResponse.create(measurementRepository.save(measurement), null,null);
+            return MeasurementDAOResponse.create(measurementRepository.save(measurement), null, null);
 
         } else throw new InvalidNonExistingIdException(
                 assetRepository.existsById(assetId) ? "The measurement doesn't exists" : "The asset doesn't exists");
@@ -171,7 +186,7 @@ public class AssetService {
             if (measurements != null && measurements.size() > 0)
                 return measurements.stream()
                         .map(obj -> MeasurementDAOResponse.create(obj,
-                                measurementDetailsRepository.findByMeasurementId(obj.getId()),null))
+                                measurementDetailsRepository.findByMeasurementId(obj.getId()), null))
                         .collect(Collectors.toList());
             else return new ArrayList<>();
         }
@@ -259,7 +274,8 @@ public class AssetService {
                 assetRepository.findByUserIdConnectionTypes(userId,
                                 connectionTypes.stream().map(ConnectionType::toString).collect(Collectors.toList()),
                                 offset, limit).stream()
-                        .map(x -> x.getInformationPanels().stream().filter(InformationPanel::getFeatured).map(y -> AssetPanelDAO.fromEntities(x, y)).collect(
+                        .map(x -> x.getInformationPanels().stream().filter(InformationPanel::getFeatured).map(
+                                y -> AssetPanelDAO.fromEntities(x, y)).collect(
                                 Collectors.toList()))
                         .flatMap(List::stream).collect(Collectors.toList());
 
@@ -305,25 +321,25 @@ public class AssetService {
                 "No asset detail with key " + detail.getKey() + " related with " + assetId + " found");
     }
 
-    public AssetDAOResponse updateAssetCategory(AssetCategoryDAO category,Long assetId) {
-    	Asset asset = assetRepository.findById(assetId).orElse(null);
-    	AssetCategory assetCategory = assetCategoryRepository.getById(category.getId());
-    	if (asset!=null && assetCategory != null) {
-    		asset.setAssetCategory(assetCategory);
-    		return AssetDAOResponse.create(assetRepository.save(asset),null);
-    	} else throw new InvalidNonExistingIdException(asset == null
-    		? "The asset to update doens´t exist" 
-    		:"The assetcategory to update doesn't exist");
+    public AssetDAOResponse updateAssetCategory(AssetCategoryDAO category, Long assetId) {
+        Asset asset = assetRepository.findById(assetId).orElse(null);
+        AssetCategory assetCategory = assetCategoryRepository.getById(category.getId());
+        if (asset != null && assetCategory != null) {
+            asset.setAssetCategory(assetCategory);
+            return AssetDAOResponse.create(assetRepository.save(asset), null);
+        } else throw new InvalidNonExistingIdException(asset == null
+                ? "The asset to update doens´t exist"
+                : "The assetcategory to update doesn't exist");
     }
-    
+
     public AssetDAOResponse deleteAssetCategory(Long assetId) {
-    	Asset asset = assetRepository.findById(assetId).orElse(null);
-    	if (asset!=null) {
-    		asset.setAssetCategory(null);
-    		return AssetDAOResponse.create(assetRepository.save(asset),null);
-    	} else throw new InvalidNonExistingIdException("The asset to update doesn't exists");
+        Asset asset = assetRepository.findById(assetId).orElse(null);
+        if (asset != null) {
+            asset.setAssetCategory(null);
+            return AssetDAOResponse.create(assetRepository.save(asset), null);
+        } else throw new InvalidNonExistingIdException("The asset to update doesn't exists");
     }
-    
+
     public boolean deleteDetailById(Long id, Long assetId) {
         if (id != null && assetDetailsRepository.existsByIdAndAssetId(id, assetId)) {
             assetDetailsRepository.deleteById(id);

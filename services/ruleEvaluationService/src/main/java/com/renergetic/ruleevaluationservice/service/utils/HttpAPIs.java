@@ -3,6 +3,8 @@ package com.renergetic.ruleevaluationservice.service.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -13,9 +15,13 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.stereotype.Service;
+
+@Slf4j
+@Service
 public class HttpAPIs {
 
-    static public HttpResponse<String> sendRequest(String url, String HttpMethod, Map<String, String> params,
+    public HttpResponse<String> sendRequest(String url, String httpMethod, Map<String, String> params,
                                                    Object body, Map<String, String> headers) {
         try {
             // Create client
@@ -24,7 +30,7 @@ public class HttpAPIs {
             String parseParams = mapParams(params);
             parseParams = parseParams.isBlank() ? parseParams : '?' + parseParams;
             URI uri = URI.create(url + parseParams);
-            System.err.println(uri.toString());
+            log.info(uri.toString());
             // Prepare Request
             ObjectMapper mapper = new ObjectMapper();
             HttpRequest.Builder builder = HttpRequest.newBuilder(uri);
@@ -34,30 +40,29 @@ public class HttpAPIs {
                     builder = builder.header(header.getKey(), header.getValue());
                 }
             if (body == null)
-                builder.method(HttpMethod, HttpRequest.BodyPublishers.noBody());
+                builder.method(httpMethod, HttpRequest.BodyPublishers.noBody());
             else
-                builder.method(HttpMethod, HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)));
+                builder.method(httpMethod, HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)));
             // Send request
-            HttpResponse<String> ret = client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-
-            return ret;
+            return client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
 
         } catch (IllegalArgumentException e) {
-            System.err.println("Check that the URL is valid and  the HTTP Method is allowed");
+            log.error("Check that the URL is valid and  the HTTP Method is allowed");
         } catch (JsonProcessingException e) {
-            System.err.println("Can't parse body to a JSON");
+            log.error("Can't parse body to a JSON");
         } catch (InterruptedException e) {
-            System.err.println("The connection with server has been interrupted");
+            log.error("The connection with server has been interrupted");
+            Thread.currentThread().interrupt();
         } catch (IOException e) {
-            System.err.println("Can't get connection with the URL");
+            log.error("Can't get connection with the URL");
         } catch (Exception e) {
-        	System.err.println("Unknow exception");
+        	log.error("Unknow exception");
         	e.printStackTrace();
         }
         return null;
     }
 
-    static public String mapParams(Map<String, String> params) {
+    public String mapParams(Map<String, String> params) {
         StringBuilder result = new StringBuilder();
 
         if (params != null)
@@ -68,7 +73,7 @@ public class HttpAPIs {
                     result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
                     result.append("&");
                 } catch (UnsupportedEncodingException e) {
-                    System.err.println("Parameter with key " + entry.getKey() + " can't be encoded to UTF8");
+                    log.error("Parameter with key " + entry.getKey() + " can't be encoded to UTF8");
                 }
             }
 
@@ -77,6 +82,5 @@ public class HttpAPIs {
                 ? resultString.substring(0, resultString.length() - 1)
                 : resultString;
     }
-
 
 }

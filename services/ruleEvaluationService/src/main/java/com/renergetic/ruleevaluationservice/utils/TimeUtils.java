@@ -5,7 +5,22 @@ import java.time.temporal.ChronoUnit;
 
 public class TimeUtils {
 
+    public static Instant offsetNegativeCurrentInstant(String durationLiteral){
+        durationLiteral = durationLiteral.replace(" ", "");
+        Instant now = Instant.now();
+        Instant offset = Instant.now().minus(TimeUtils.extractValue(durationLiteral), TimeUtils.extractUnit(durationLiteral));
+        return offset;
+    }
+
+    public static Instant offsetPositiveCurrentInstant(String durationLiteral){
+        durationLiteral = durationLiteral.replace(" ", "");
+        Instant now = Instant.now();
+        Instant offset = Instant.now().plus(TimeUtils.extractValue(durationLiteral), TimeUtils.extractUnit(durationLiteral));
+        return offset;
+    }
+
     public static Instant offsetCurrentInstantOfAtLeast3Hours(String durationLiteral){
+        durationLiteral = durationLiteral.replace(" ", "");
         Instant now = Instant.now();
         Instant offset = Instant.now().minus(TimeUtils.extractValue(durationLiteral), TimeUtils.extractUnit(durationLiteral));
         if(ChronoUnit.HOURS.between(offset, now) < 3)

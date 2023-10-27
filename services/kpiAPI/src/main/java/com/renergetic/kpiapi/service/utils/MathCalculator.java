@@ -123,11 +123,12 @@ public class MathCalculator {
 			}
 		}
 		
-		 while (!operators.empty()) {
-			calculate(numbers, operators);
-	     }
+		while (!operators.empty()) {
+		calculate(numbers, operators);
+		}
 
-        return numbers.pop();
+		BigDecimal ret = numbers.pop();
+        return ret != null ? ret : new BigDecimal(0);
 	}
 
 	public boolean compare(String formula, Long from, Long to) {
@@ -280,5 +281,15 @@ public class MathCalculator {
 	
 	private String removeWhiteSpaces(String formula) {
 		return formula.replace(" ", "");
+	}
+
+	public String bigDecimalToDoubleString(BigDecimal number) {
+		if (number == null || Double.isNaN(number.doubleValue()) || Double.isInfinite(number.doubleValue()))
+			return "0.0";
+
+		String text = number.toPlainString();
+		if (text.contains("."))
+			return text;
+		else return text + ".0";
 	}
 }
