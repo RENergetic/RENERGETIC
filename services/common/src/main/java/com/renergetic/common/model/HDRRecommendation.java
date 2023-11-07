@@ -24,6 +24,9 @@ import java.util.List;
 public class HDRRecommendation {
 
     //todo: unique key: name-asset-sensor-type-direction
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     @Column(nullable = false)
     private LocalDateTime timestamp;
     @OneToOne(cascade = CascadeType.REFRESH, mappedBy = "hdr_recommendation")
