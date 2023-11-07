@@ -1,11 +1,14 @@
 package com.renergetic.hdrapi.dao.temp;
 
+import com.renergetic.common.model.details.MeasurementTags;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -25,12 +28,11 @@ public class HDRRecommendation {
     private Long id;
     @Column(nullable = false)
     private LocalDateTime timestamp;
-    @OneToOne(cascade = CascadeType.REFRESH, mappedBy = "hdr_recommendation")
-    @NotFound(action = NotFoundAction.IGNORE)
-
-    private MeasurementTags tag;
+    @ManyToOne(cascade = CascadeType.REFRESH, optional = false)
+    @JoinColumn(name = "tag_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private MeasurementTagss tag;
     @Column(name = "label")
     private String label;
-
 
 }

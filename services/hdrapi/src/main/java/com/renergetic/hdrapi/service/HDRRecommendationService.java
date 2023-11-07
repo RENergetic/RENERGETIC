@@ -18,6 +18,9 @@ import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
+import com.renergetic.hdrapi.dao.temp.HDRRecommendation;
+import com.renergetic.hdrapi.dao.temp.HDRRecommendationDAO;
+import com.renergetic.hdrapi.dao.temp.RecommendationRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -49,10 +52,12 @@ public class HDRRecommendationService {
     @Autowired
     MeasurementTagsRepository measurementTagsRepository;
     @Autowired
+    RecommendationRepository recommendationRepository;
+    @Autowired
     UuidRepository uuidRepository;
 
     // ASSET CRUD OPERATIONS
-    public MeasurementDAOResponse save(MeasurementDAORequest measurement) {
+    public MeasurementDAOResponse save(HDRRecommendationDAO recommendation) {
         if (measurement.getId() != null && measurementRepository.existsById(measurement.getId()))
             throw new InvalidCreationIdAlreadyDefinedException(
                     "Already exists a measurement with ID " + measurement.getId());
