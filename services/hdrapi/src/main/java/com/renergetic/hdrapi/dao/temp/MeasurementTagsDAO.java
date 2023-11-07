@@ -1,7 +1,6 @@
 package com.renergetic.hdrapi.dao.temp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.common.model.details.MeasurementTags;
 
 
 public class MeasurementTagsDAO extends DetailsDAO {

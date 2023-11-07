@@ -1,6 +1,5 @@
 package com.renergetic.hdrapi.dao.temp;
 
-import com.renergetic.common.model.details.MeasurementTags;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
