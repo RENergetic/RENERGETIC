@@ -25,7 +25,6 @@ public interface RecommendationRepository extends JpaRepository<HDRRecommendatio
     @Query("SELECT hdr FROM HDRRecommendation hdr WHERE hdr.timestamp = :timestamp ")
     List<HDRRecommendation> findByTimestamp(LocalDateTime timestamp);
 
-    @Query("SELECT hdr FROM HDRRecommendation hdr WHERE hdr.timestamp = :timestamp and hdr.tag.id = :tagId ")
-    List<HDRRecommendation> findByTimestampTag(LocalDateTime timestamp, Long tagId);
-
+    @Query("SELECT hdr FROM HDRRecommendation hdr WHERE hdr.timestamp = :timestamp and hdr.tag.key = :tagId ")
+    Optional<HDRRecommendation> findByTimestampTag(LocalDateTime timestamp, Long tagId);
 }
