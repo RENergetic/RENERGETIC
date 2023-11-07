@@ -1,8 +1,11 @@
 package com.renergetic.hdrapi.dao.temp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
-
+@Setter
+@Getter
 public class MeasurementTagsDAO extends DetailsDAO {
     @JsonProperty(value = "tag_id", required = true)
     Long tagId;

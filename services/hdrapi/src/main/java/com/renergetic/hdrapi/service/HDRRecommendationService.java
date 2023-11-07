@@ -58,7 +58,8 @@ public class HDRRecommendationService {
 
     // ASSET CRUD OPERATIONS
     public MeasurementDAOResponse save(HDRRecommendationDAO recommendation) {
-        if (measurement.getId() != null && measurementRepository.existsById(measurement.getId()))
+        if (recommendationRepository.findByTimestampTag(recommendation.getTimestamp(),
+                recommendation.getTag().getTagId()).isEmpty())
             throw new InvalidCreationIdAlreadyDefinedException(
                     "Already exists a measurement with ID " + measurement.getId());
 
