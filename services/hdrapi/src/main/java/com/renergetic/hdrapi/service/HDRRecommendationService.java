@@ -3,6 +3,7 @@ package com.renergetic.hdrapi.service;
 import com.renergetic.common.dao.MeasurementDAORequest;
 import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.dao.ResourceDAO;
+import com.renergetic.common.exception.InvalidArgumentException;
 import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.common.exception.InvalidNonExistingIdException;
 import com.renergetic.common.exception.NotFoundException;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +59,7 @@ public class HDRRecommendationService {
     UuidRepository uuidRepository;
 
     // ASSET CRUD OPERATIONS
-    public HDRRecommendationDAO save(HDRRecommendationDAO recommendationDAO) {
+    private HDRRecommendationDAO save(HDRRecommendationDAO recommendationDAO) {
         var r = recommendationRepository.findByTimestampTag(recommendationDAO.getTimestamp(),
                 recommendationDAO.getTag().getTagId());
         if (r.isPresent()) {
@@ -70,47 +72,26 @@ public class HDRRecommendationService {
 
     }
 
-    public boolean deleteById(Long id) {
-        if (id != null && measurementRepository.existsById(id)) {
-            var m = measurementRepository.getById(id);
-            m.getDetails().forEach((it) -> measurementDetailsRepository.delete(it));
-            measurementTagsRepository.findByMeasurementId(m.getId()).forEach(
-                    (it) -> measurementTagsRepository.delete(it));
-            measurementRepository.deleteById(id);
-            return true;
-        } else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
+    private Boolean save(LocalDateTime timestamp, List<HDRRecommendationDAO> recommendations) {
+        var differentTimestamp = recommendations.stream().filter(it -> it.getTimestamp() != timestamp).findAny();
+        if (differentTimestamp.isPresent()) {
+            throw new InvalidArgumentException("Recommendation has different timestamp");
+        }
+        try {
+            recommendations.forEach(this::save);
+        } catch (Exception ex) {
+            deleteByTimestamp(timestamp);
+            // todo: more logging details?
+            return false;
+        }
+        return true;
+
     }
 
-    public MeasurementDAOResponse update(MeasurementDAORequest measurement, Long id) {
-        if (id != null && measurementRepository.existsById(id)) {
-            measurement.setId(id);
-            return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null, null);
-        } else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
+    public void deleteByTimestamp(LocalDateTime t) {
+        recommendationRepository.deleteByTimestamp(t);
     }
 
-    public boolean setProperty(Long measurementId, MeasurementDetails details) {
-
-        return measurementRepository.setProperty(measurementId, details.getKey(), details.getValue()) == 1;
-    }
-
-    public boolean setProperties(Long measurementId, Map<String, String> properties) {
-        this.getById(measurementId);//check is exists
-        Optional<Boolean> any = properties.entrySet().stream().map(it ->
-                measurementRepository.setProperty(measurementId, it.getKey(), it.getValue()) != 1
-        ).filter(it -> it).findAny();
-        return any.isEmpty();
-    }
-
-    public List<MeasurementDAOResponse> getByProperty(String key, String value, long offset, long limit) {
-        List<Measurement> measurements = measurementRepository.getByProperty(key, value, offset, limit);
-        Stream<Measurement> stream = measurements.stream();
-        List<MeasurementDAOResponse> list;
-        list = stream
-                .map(measurement -> MeasurementDAOResponse.create(measurement,
-                        measurementDetailsRepository.findByMeasurementId(measurement.getId()), null))
-                .collect(Collectors.toList());
-        return list;
-    }
 
     public List<MeasurementDAOImpl> list(Long offset, Integer limit) {
         return measurementRepository.report(offset, limit)

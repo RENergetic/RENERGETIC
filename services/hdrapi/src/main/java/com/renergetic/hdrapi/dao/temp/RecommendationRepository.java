@@ -18,7 +18,7 @@ public interface RecommendationRepository extends JpaRepository<HDRRecommendatio
     Optional<LocalDateTime> getRecentRecommendation();
 
     @Query(value = "DELETE hdr_recommendation   WHERE hdr_recommendation.timestamp = :timestamp ", nativeQuery = true)
-    Optional<LocalDateTime> deleteByTimestamp(LocalDateTime timestamp);
+   void deleteByTimestamp(LocalDateTime timestamp);
 
     @Query("SELECT hdr FROM HDRRecommendation hdr   WHERE hdr.timestamp = :timestamp ")
     List<HDRRecommendation> findByTimestamp(LocalDateTime timestamp);
