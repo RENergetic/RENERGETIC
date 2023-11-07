@@ -57,15 +57,17 @@ public class HDRRecommendationService {
     UuidRepository uuidRepository;
 
     // ASSET CRUD OPERATIONS
-    public MeasurementDAOResponse save(HDRRecommendationDAO recommendation) {
-        if (recommendationRepository.findByTimestampTag(recommendation.getTimestamp(),
-                recommendation.getTag().getTagId()).isEmpty())
-            throw new InvalidCreationIdAlreadyDefinedException(
-                    "Already exists a measurement with ID " + measurement.getId());
+    public HDRRecommendationDAO save(HDRRecommendationDAO recommendationDAO) {
+        var r = recommendationRepository.findByTimestampTag(recommendationDAO.getTimestamp(),
+                recommendationDAO.getTag().getTagId());
+        if (r.isPresent()) {
+            var recommendation = r.get();
+            recommendation.setLabel(recommendationDAO.getLabel());
+            return HDRRecommendationDAO.create(recommendationRepository.save(recommendation));
+        } else {
+            return HDRRecommendationDAO.create(recommendationRepository.save(recommendationDAO.mapToEntity()));
+        }
 
-        Measurement measurementEntity = measurement.mapToEntity();
-        measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null, null);
     }
 
     public boolean deleteById(Long id) {
