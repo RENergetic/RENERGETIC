@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -22,16 +24,14 @@ import java.util.List;
 @Setter
 @ToString
 public class HDRRecommendation {
-
-    //todo: unique key: name-asset-sensor-type-direction
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(nullable = false)
     private LocalDateTime timestamp;
-    @OneToOne(cascade = CascadeType.REFRESH, mappedBy = "hdr_recommendation")
-    @NotFound(action = NotFoundAction.IGNORE)
-
+    @ManyToOne(cascade = CascadeType.REFRESH, optional = false)
+    @JoinColumn(name = "tag_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private MeasurementTags tag;
     @Column(name = "label")
     private String label;
