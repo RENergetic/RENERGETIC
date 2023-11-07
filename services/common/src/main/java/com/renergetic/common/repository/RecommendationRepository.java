@@ -19,12 +19,17 @@ public interface RecommendationRepository extends JpaRepository<HDRRecommendatio
     @Query(value = "SELECT max(`timestamp`) as `timestamp` from hdr_recommendation", nativeQuery = true)
     Optional<LocalDateTime> getRecentRecommendation();
 
+    @Query(value = "SELECT DISTINCT `timestamp`  from hdr_recommendation where COALESCE(`timestamp` >= :timestamp, TRUE) order by `timestamp` desc", nativeQuery = true)
+    List<LocalDateTime> listRecentRecommendations(LocalDateTime timestamp);
+
     @Query(value = "DELETE hdr_recommendation WHERE hdr_recommendation.timestamp = :timestamp ", nativeQuery = true)
-    Optional<LocalDateTime> deleteByTimestamp(LocalDateTime timestamp);
+    void deleteByTimestamp(LocalDateTime timestamp);
 
     @Query("SELECT hdr FROM HDRRecommendation hdr WHERE hdr.timestamp = :timestamp ")
     List<HDRRecommendation> findByTimestamp(LocalDateTime timestamp);
 
     @Query("SELECT hdr FROM HDRRecommendation hdr WHERE hdr.timestamp = :timestamp and hdr.tag.key = :tagId ")
     Optional<HDRRecommendation> findByTimestampTag(LocalDateTime timestamp, Long tagId);
+
+
 }
