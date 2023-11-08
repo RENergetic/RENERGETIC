@@ -45,6 +45,9 @@ public class MeasurementService {
 
     @Autowired
     MeasurementRepository measurementRepository;
+
+    @Autowired
+    MeasurementRepositoryTemp measurementRepository2;
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;
     @Autowired
@@ -109,11 +112,19 @@ public class MeasurementService {
 
     public List<MeasurementDAOImpl> list(Long offset, Integer limit) {
         return measurementRepository.report(offset, limit)
-                .stream().map(MeasurementDAOImpl::create).collect(Collectors.toList());
+                .stream().map((it) ->
+                        {
+//                    var  mt =measurementTypeRepository.findById(it.getTypeId()).orElseThrow();
+//                    return MeasurementDAOImpl.create(it,mt);
+                            return MeasurementDAOImpl.create(it);
+                        }
+
+                ).collect(Collectors.toList());
     }
 
     public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {
         Page<Measurement> measurements = measurementRepository.findAll(new OffSetPaging(offset, limit));
+
         Stream<Measurement> stream = measurements.stream();
         List<MeasurementDAOResponse> list;
 
@@ -147,6 +158,17 @@ public class MeasurementService {
         if (list != null && list.size() > 0)
             return list;
         else throw new NotFoundException("No measurements found");
+    }
+
+    public List<MeasurementDAOResponse> find(Map<String, String> filters, long offset, int limit) {
+        //TODO: more filtering options
+        String s = filters.getOrDefault("name", null);
+        List<Measurement> list = measurementRepository2.filterMeasurement(s, s, offset, limit);
+        if (list.size() > 0)
+            return list.stream().map(it -> MeasurementDAOResponse.create(it,
+                            measurementDetailsRepository.findByMeasurementId(it.getId()), null))
+                    .collect(Collectors.toList());
+        return Collections.emptyList();
     }
 
     public Measurement getById(Long id) {

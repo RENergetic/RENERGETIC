@@ -47,7 +47,7 @@ public class MeasurementDAOImpl {
 //    private HashMap<String, ?> measurementDetails;
 
 
-    public static MeasurementDAOImpl create(MeasurementDAO measurement) {
+    public static MeasurementDAOImpl create(MeasurementDAO measurement ) {
         MeasurementDAOImpl dao = null;
 
         if (measurement != null) {
@@ -62,7 +62,7 @@ public class MeasurementDAOImpl {
             var mt = new MeasurementType();
             mt.setId(measurement.getTypeId());
             mt.setLabel(measurement.getTypeLabel());
-            mt.setName(measurement.getName());
+            mt.setName(measurement.getTypeName());
             mt.setPhysicalName(measurement.getPhysicalName());
             mt.setUnit(measurement.getUnit());
             dao.setType(mt);
