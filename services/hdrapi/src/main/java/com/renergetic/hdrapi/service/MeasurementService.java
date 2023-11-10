@@ -47,8 +47,6 @@ public class MeasurementService {
     MeasurementRepository measurementRepository;
 
     @Autowired
-    MeasurementRepositoryTemp measurementRepository2;
-    @Autowired
     MeasurementTypeRepository measurementTypeRepository;
     @Autowired
     MeasurementDetailsRepository measurementDetailsRepository;
@@ -163,7 +161,7 @@ public class MeasurementService {
     public List<MeasurementDAOResponse> find(Map<String, String> filters, long offset, int limit) {
         //TODO: more filtering options
         String s = filters.getOrDefault("name", null);
-        List<Measurement> list = measurementRepository2.filterMeasurement(s, s, offset, limit);
+        List<Measurement> list = measurementRepository.filterMeasurement(s, s, offset, limit);
         if (list.size() > 0)
             return list.stream().map(it -> MeasurementDAOResponse.create(it,
                             measurementDetailsRepository.findByMeasurementId(it.getId()), null))

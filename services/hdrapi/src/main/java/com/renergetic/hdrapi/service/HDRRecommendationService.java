@@ -1,41 +1,22 @@
 package com.renergetic.hdrapi.service;
 
-import com.renergetic.common.dao.MeasurementDAORequest;
+import com.renergetic.common.dao.HDRRecommendationDAO;
 import com.renergetic.common.dao.MeasurementDAOResponse;
-import com.renergetic.common.dao.ResourceDAO;
 import com.renergetic.common.exception.InvalidArgumentException;
-import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
-import com.renergetic.common.exception.InvalidNonExistingIdException;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.*;
-import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.model.details.MeasurementTags;
-import com.renergetic.common.repository.MeasurementRepository;
-import com.renergetic.common.repository.MeasurementTagsRepository;
-import com.renergetic.common.repository.MeasurementTypeRepository;
-import com.renergetic.common.repository.UuidRepository;
+import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
-import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
-import com.renergetic.hdrapi.dao.ResourceDAOImpl;
-import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
-import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.hdrapi.dao.temp.HDRRecommendation;
-import com.renergetic.hdrapi.dao.temp.HDRRecommendationDAO;
-import com.renergetic.hdrapi.dao.temp.RecommendationRepository;
-import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class HDRRecommendationService {
@@ -45,8 +26,6 @@ public class HDRRecommendationService {
     @Autowired
     MeasurementRepository measurementRepository;
 
-    @Autowired
-    MeasurementRepositoryTemp measurementRepository2;
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;
     @Autowired
@@ -72,7 +51,7 @@ public class HDRRecommendationService {
 
     }
 
-    private Boolean save(LocalDateTime timestamp, List<HDRRecommendationDAO> recommendations) {
+    public Boolean save(LocalDateTime timestamp, List<HDRRecommendationDAO> recommendations) {
         var differentTimestamp = recommendations.stream().filter(it -> it.getTimestamp() != timestamp).findAny();
         if (differentTimestamp.isPresent()) {
             throw new InvalidArgumentException("Recommendation has different timestamp");
@@ -113,17 +92,24 @@ public class HDRRecommendationService {
                 Collectors.toList());
     }
 
-    public List<MeasurementDAOResponse> getMeasurements(HDRRecommendationDAO r) {
-        recommendationRepository.findByTimestampTag(r.getTimestamp(), r.getTag().getTagId()).orElseThrow(
+    public List<MeasurementDAOResponse> getMeasurements(HDRRecommendation r) {
+        recommendationRepository.findByTimestampTag(r.getTimestamp(), r.getTag().getId()).orElseThrow(
                 () -> new NotFoundException(
-                        "HDRRecommendation at: " + r.getTimestamp() + " and tag id: " + r.getTag().getTagId() + "not exists"));
+                        "HDRRecommendation at: " + r.getTimestamp() + " and tag id: " + r.getTag().getId() + "not exists"));
         ;
-        var tagId = r.getTag().getTagId();
+        var tagId = r.getTag().getId();
         MeasurementTags tag = measurementTagsRepository.findById(tagId).orElseThrow(
                 () -> new NotFoundException("Tag with id: " + tagId + " not exists"));
         List<Measurement> measurements = measurementTagsRepository.getMeasurementByTagId(tag.getId(), 0L, 100L);
         return measurements.stream().map(it -> MeasurementDAOResponse.create(it, null, null)).collect(
                 Collectors.toList());
+
+    }
+
+    public List<MeasurementDAOResponse> getMeasurements(Long HDRRecommendationId) {
+        var r = recommendationRepository.findById(HDRRecommendationId).orElseThrow(() -> new NotFoundException(
+                "HDRRecommendationId with an id " + HDRRecommendationId + "does not exists"));
+        return this.getMeasurements(r);
 
     }
 
