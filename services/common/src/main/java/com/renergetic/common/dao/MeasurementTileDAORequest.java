@@ -27,6 +27,7 @@ public class MeasurementTileDAORequest {
     private String sensorName;
 
 
+    //TODO: consider to remove this field
     @JsonProperty(required = false)
     private String icon;
 
@@ -46,27 +47,30 @@ public class MeasurementTileDAORequest {
     @JsonProperty(value = "aggregation_function", required = false)
     private String function;
 
-//	public static MeasurementTileDAORequest create(Measurement measurement) {
-//		MeasurementTileDAORequest dao = null;
-//
-//		if (measurement != null) {
-//			dao = new MeasurementTileDAORequest();
-//
-//			dao.setId(measurement.getId());
-//			dao.setName(measurement.getName());
-//			dao.setSensorName(measurement.getSensorName());
-//			if (measurement.getType() != null)
-//				dao.setType(measurement.getType().getId());
-//			dao.setLabel(measurement.getLabel());
-//			//dao.setDescription(measurement.getDescription());
-//			//dao.setIcon(measurement.getIcon());
-//			dao.setDomain(measurement.getDomain());
-//			dao.setDirection(measurement.getDirection());
-//			if (measurement.getAsset() != null)
-//				dao.setAssetId(measurement.getAsset().getId());
-//		}
-//		return dao;
-//	}
+    public static MeasurementTileDAORequest create(Measurement measurement) {
+        return MeasurementTileDAORequest.create(measurement, null, null);
+    }
+
+    public static MeasurementTileDAORequest create(Measurement measurement, String function, Map<String, ?> props) {
+        MeasurementTileDAORequest dao = null;
+        if (measurement != null) {
+            dao = new MeasurementTileDAORequest();
+
+            dao.setId(measurement.getId());
+            dao.setName(measurement.getName());
+            dao.setSensorName(measurement.getSensorName());
+            if (measurement.getType() != null)
+                dao.setType(MeasurementTypeDAORequest.create(measurement.getType()));
+
+            //dao.setDescription(measurement.getDescription());
+            //dao.setIcon(measurement.getIcon());
+            dao.setDomain(measurement.getDomain());
+            dao.setDirection(measurement.getDirection());
+            dao.setProps(props);
+            dao.setFunction(function);
+        }
+        return dao;
+    }
 
     public InformationTileMeasurement mapToEntity() {
         InformationTileMeasurement entity = new InformationTileMeasurement();
