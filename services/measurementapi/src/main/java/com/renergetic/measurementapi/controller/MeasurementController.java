@@ -136,7 +136,8 @@ public class MeasurementController {
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound,
 			@RequestParam(name = "dashboardId") Optional<String> dashboardId,
 			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation,
-			@RequestParam(name = "getTags") Optional<Boolean> getTags) {
+			@RequestParam(name = "getTags") Optional<Boolean> getTags,
+			@RequestParam(name = "onlyLastestPrediction") Optional<Boolean> onlyLastestPrediction) {
 		
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -148,6 +149,7 @@ public class MeasurementController {
 		tags.remove("dashboardId");
 		tags.remove("performDecumulation");
 		tags.remove("getTags");
+		tags.remove("onlyLastestPrediction");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -157,7 +159,7 @@ public class MeasurementController {
 								)
 						); 
 		
-		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", performDecumulation.orElse(false), getTags.orElse(true));
+		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", performDecumulation.orElse(false), getTags.orElse(true), onlyLastestPrediction.orElse(false));
 
 		if(dashboardId.isPresent() && fields.size() == 1){
 			ret = convertService.convert(ret, dashboardId.get(), fields, null);
