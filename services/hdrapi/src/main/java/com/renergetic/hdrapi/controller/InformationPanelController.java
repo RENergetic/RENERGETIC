@@ -32,6 +32,20 @@ public class InformationPanelController {
         return new ResponseEntity<>(informationPanelService.getAll(offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
     }
 
+    @Operation(summary = "Infer a measurements for Information Panel")
+    @ApiResponses({
+            @ApiResponse(responseCode = "20o", description = "Panel with filled measurements"),
+            @ApiResponse(responseCode = "500", description = "Error getting measurements")
+    })
+    @PostMapping(path = "/infermeasurements", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<InformationPanelDAO> inferMeasurementsForPanel(
+            @PathVariable("name") String name, @RequestBody InformationPanelDAO informationPanelDAORequest) {
+
+
+        return new ResponseEntity<>(informationPanelService.inferMeasurements(informationPanelDAORequest),
+                HttpStatus.OK);
+    }
+
     @Operation(summary = "Get All Panels by owner id")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/owner/{ownerId}", produces = "application/json")
@@ -44,7 +58,7 @@ public class InformationPanelController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "panel not found")
     })
-    @GetMapping(path = "/{id}", produces = "application/json")
+    @GetMapping(path = "/id/{id}", produces = "application/json")
     public ResponseEntity<InformationPanelDAOResponse> getById(@PathVariable Long id) {
         return new ResponseEntity<>(informationPanelService.getById(id, true), HttpStatus.OK);
     }
@@ -154,4 +168,6 @@ public class InformationPanelController {
     public ResponseEntity<Boolean> deleteByName(@PathVariable Long id) {
         return new ResponseEntity<>(informationPanelService.deleteById(id), HttpStatus.OK);
     }
+
+
 }

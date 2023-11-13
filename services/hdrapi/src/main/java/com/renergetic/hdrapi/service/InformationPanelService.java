@@ -10,6 +10,8 @@ import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
+import com.renergetic.hdrapi.dao.temp.TempMeasurementTileDAORequest;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,7 @@ public class InformationPanelService {
 
     @Autowired
     private MeasurementRepository measurementRepository;
+    private MeasurementRepositoryTemp measurementRepository2;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
         List<InformationPanelDAOResponse> list = informationPanelRepository.findAll(new OffSetPaging(offset, limit))
@@ -110,6 +113,19 @@ public class InformationPanelService {
         informationPanelRepository.save(infoPanelEntity);
         this.saveTiles(infoPanelEntity);
         return informationPanelMapper.toDTO(infoPanelEntity);
+    }
+
+    public InformationPanelDAO inferMeasurements(InformationPanelDAO informationPanel) {
+        var tiles = informationPanel.getTiles();
+
+        tiles.forEach(tile -> {
+            List<MeasurementTileDAORequest> collect = tile.getMeasurements()
+                    .stream().filter((t)->t.getId()==null).map(
+                            tileM -> new ArrayList<>(getInferredMeasurements(tileM)))
+                    .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList());
+            tile.setMeasurements(collect);
+        });
+       return informationPanel;
     }
 
     private void saveTiles(InformationPanel infoPanelEntity) {
@@ -279,7 +295,7 @@ public class InformationPanelService {
                                             tileM -> tileM.getMeasurement() == null
                                                     && panel.get().getIsTemplate() && assetId != null
                                                     && tileM.getAssetCategory() == null ?
-                                                    getInferredMeasurements(tileM, assetId,  tileM.getFunction())
+                                                    getInferredMeasurements(tileM, assetId, tileM.getFunction())
                                                     : Collections.singletonList(getMeasurementFromTileMeasurement(tileM)))
                                     .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList())
                     )).collect(Collectors.toList())
@@ -326,23 +342,38 @@ public class InformationPanelService {
         throw new NotFoundException("No tile found related with tile id: " + tileId);
     }
 
+    private List<MeasurementTileDAORequest> getInferredMeasurements(MeasurementTileDAORequest tileM) {
+        List<MeasurementTileDAORequest> list = measurementRepository2
+                .inferMeasurement(null,
+                        tileM.getName(),
+                        tileM.getSensorName(),
+                        tileM.getDomain() != null ? tileM.getDomain().name() : null,
+                        tileM.getDirection() != null ? tileM.getDirection().name() : null,
+                        tileM.getType() != null ? tileM.getType().getId() : null,
+                        tileM.getType() != null ? tileM.getType().getPhysicalName() : null)
+                .stream().map(TempMeasurementTileDAORequest::create)
+                .collect(Collectors.toList());
+        return list;
+    }
+
     private List<MeasurementDAOResponse> getInferredMeasurements(InformationTileMeasurement tileM,
                                                                  Long assetId, String func) {
 
-        List<MeasurementDAOResponse> list = measurementRepository
-                .findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(assetId,
+
+        List<MeasurementDAOResponse> list = measurementRepository2
+                .inferMeasurement(assetId,
                         tileM.getMeasurementName(),
                         tileM.getSensorName(),
                         tileM.getDomain() != null ? tileM.getDomain().name() : null,
                         tileM.getDirection() != null ? tileM.getDirection().name() : null,
-                        tileM.getType()!=null?tileM.getType().getId():null,
+                        tileM.getType() != null ? tileM.getType().getId() : null,
                         tileM.getPhysicalName())
                 .stream().map(x -> MeasurementDAOResponse.create(x,
-                        measurementDetailsRepository.findByMeasurementId(x.getId()),func))
+                        measurementDetailsRepository.findByMeasurementId(x.getId()), func))
                 .collect(Collectors.toList());
 //TODO: throw some exception code to the UI - so the users know that not all measurements are not available for this asset
 //        if (list.size() > 0)
-            return list;
+        return list;
 //        else throw new NotFoundException(
 //                "No measurements related with the user:" + (userId != null ? userId.toString() : " N/A ") + " and  asset " + assetId + "with the tile data found");
     }
@@ -352,7 +383,8 @@ public class InformationPanelService {
         if (tileM.getMeasurement() == null) {
             return null;
         }
-        List<MeasurementDetails>  details = measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId());
+        List<MeasurementDetails> details =
+                measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId());
         return MeasurementDAOResponse.create(tileM.getMeasurement(), details, tileM.getFunction());
     }
 
