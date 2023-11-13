@@ -188,7 +188,8 @@ public class MeasurementController {
 			@PathVariable(name = "function") String function,
 			@RequestParam(name = "dashboardId") Optional<String> dashboardId,
 			@RequestParam(name = "performDecumulation") Optional<Boolean> performDecumulation,
-			@RequestParam(name = "getTags") Optional<Boolean> getTags) {
+			@RequestParam(name = "getTags") Optional<Boolean> getTags,
+			@RequestParam(name = "onlyLastestPrediction") Optional<Boolean> onlyLastestPrediction) {
 
 		List<MeasurementDAOResponse> ret;
 		tags.remove("measurements");
@@ -203,6 +204,7 @@ public class MeasurementController {
 		tags.remove("dashboardId");
 		tags.remove("performDecumulation");
 		tags.remove("getTags");
+		tags.remove("onlyLastestPrediction");
 		
 		Map<String, List<String>> parsedTags = tags.entrySet().stream()
 				.collect(
@@ -212,7 +214,7 @@ public class MeasurementController {
 								)
 						); 
 
-		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""), byMeasurement.orElse(false), toFloat.orElse(false), performDecumulation.orElse(false), getTags.orElse(true));
+		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""), byMeasurement.orElse(false), toFloat.orElse(false), performDecumulation.orElse(false), getTags.orElse(true), onlyLastestPrediction.orElse(false));
 
 		//We only apply conversion if there is one field. as functions and grouping on multiple fields will cause issues.
 		if(dashboardId.isPresent() && fields.size() == 1){
