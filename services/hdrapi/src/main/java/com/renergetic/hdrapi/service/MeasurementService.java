@@ -38,6 +38,9 @@ import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class MeasurementService {
     @PersistenceContext
@@ -87,16 +90,26 @@ public class MeasurementService {
     }
 
     public boolean setProperty(Long measurementId, MeasurementDetails details) {
+        details.setMeasurement(new Measurement(measurementId, null, null, null, null, null, null, null));
 
-        return measurementRepository.setProperty(measurementId, details.getKey(), details.getValue()) == 1;
+        log.warn(String.format("Saving %s %s", details.getKey(), details.getValue()));
+        MeasurementDetails previousDetails = measurementDetailsRepository.findByKeyAndMeasurementId(details.getKey(), details.getMeasurement().getId()).orElse(null);
+        if (previousDetails != null) {
+            previousDetails.setValue(details.getValue());
+            return measurementDetailsRepository.save(previousDetails) != null;
+        }
+
+        return measurementDetailsRepository.save(details) != null;
+
+        //return measurementRepository.setProperty(measurementId, details.getKey(), details.getValue()) == 1;
     }
 
     public boolean setProperties(Long measurementId, Map<String, String> properties) {
         this.getById(measurementId);//check is exists
-        Optional<Boolean> any = properties.entrySet().stream().map(it ->
-                measurementRepository.setProperty(measurementId, it.getKey(), it.getValue()) != 1
-        ).filter(it -> it).findAny();
-        return any.isEmpty();
+        properties.forEach((k, v) -> log.error("Sent: " + k + " " + v));
+        return properties.entrySet().stream().map(it ->
+                this.setProperty(measurementId, new MeasurementDetails(it.getKey(), it.getValue(), measurementId))
+        ).filter(it -> it).allMatch(it -> it);
     }
 
     public List<MeasurementDAOResponse> getByProperty(String key, String value, long offset, long limit) {
