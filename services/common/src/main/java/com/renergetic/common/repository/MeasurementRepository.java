@@ -150,7 +150,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " AND COALESCE(measurement.direction = CAST(:direction AS text)  ,TRUE) " +
             " AND COALESCE(measurement_type.physical_name = CAST(:physicalName AS text) ,TRUE) " +
             " AND COALESCE(measurement.measurement_type_id  = CAST ( CAST(:type AS text ) as bigint ) ,TRUE) " +
-            " LIMIT 0,50 " , nativeQuery = true)
+            " LIMIT 50 " , nativeQuery = true)
     //some fields aren't optional because there would be no sense to mix them -> can be discussed
     public List<Measurement> inferMeasurement(
             Long assetId, String measurementName, String sensorName, String domain, String direction, Long type,String physicalName);
