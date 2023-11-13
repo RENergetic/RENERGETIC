@@ -6,6 +6,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "information_tile_measurement")
@@ -57,7 +58,10 @@ public class InformationTileMeasurement {
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "measurement_id", nullable = true, insertable = true, updatable = true)
     private Measurement measurement;
-
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "asset_id")
+    private Asset asset;
 
     @ManyToOne(optional = false, cascade = CascadeType.REFRESH)
     @NotFound(action = NotFoundAction.IGNORE)
@@ -75,7 +79,7 @@ public class InformationTileMeasurement {
     public MeasurementDAOResponse getMeasurementDAO() {
         if (measurement != null) {
             measurement.setFunction(function);
-            return MeasurementDAOResponse.create(measurement, measurement.getDetails(),function);
+            return MeasurementDAOResponse.create(measurement, measurement.getDetails(), function);
         }
         var dao = new MeasurementDAOResponse();
         dao.setId(null);

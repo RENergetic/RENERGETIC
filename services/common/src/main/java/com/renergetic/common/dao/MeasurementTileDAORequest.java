@@ -19,7 +19,8 @@ import java.util.Map;
 public class MeasurementTileDAORequest {
     @JsonProperty(required = false)
     private Long id;
-
+    @JsonProperty(required = false)
+    private SimpleAssetDAO asset;
     @JsonProperty(required = true)
     private String name;
 
@@ -61,6 +62,8 @@ public class MeasurementTileDAORequest {
             dao.setSensorName(measurement.getSensorName());
             if (measurement.getType() != null)
                 dao.setType(MeasurementTypeDAORequest.create(measurement.getType()));
+            if (measurement.getAsset() != null)
+                dao.setAsset(SimpleAssetDAO.create(measurement.getAsset()));
 
             //dao.setDescription(measurement.getDescription());
             //dao.setIcon(measurement.getIcon());
@@ -91,8 +94,9 @@ public class MeasurementTileDAORequest {
                 } else {
                     entity.setPhysicalName(type.getPhysicalName());
                 }
-
-
+            }
+            if (asset != null) {
+                entity.setAsset(this.asset.mapToEntity());
             }
             entity.setDirection(direction);
             entity.setDomain(domain);
