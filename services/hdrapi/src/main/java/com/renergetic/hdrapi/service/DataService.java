@@ -176,16 +176,15 @@ public class DataService {
                                 .collect(Collectors.toMap(Details::getKey, Details::getValue)));
 
                     // PARSE TO NON CUMULATIVE DATA IF THE MEASUREMENT IS CUMULATIVE
-                    MeasurementDetails cumulative = null;
+                    String cumulative = null;
 
-                    if (m.getDetails() != null)
-                    cumulative = m.getDetails().stream().filter(
-                                details -> details.getKey().equalsIgnoreCase("cumulative")).findFirst().orElse(null);
+                    if (measurement.getMeasurementDetails() != null && measurement.getMeasurementDetails().containsKey("cumulative"))
+                        cumulative = measurement.getMeasurementDetails().get("cumulative").toString();
 
                     if (cumulative == null && cumulativeTypes.contains(measurement.getType().getPhysicalName())) {
                         params.put("performDecumulation", "true");
                     } else if (cumulative != null) {
-                        params.put("performDecumulation", cumulative.getValue());
+                        params.put("performDecumulation", cumulative);
                     }
 
                     // INFLUX API REQUEST
