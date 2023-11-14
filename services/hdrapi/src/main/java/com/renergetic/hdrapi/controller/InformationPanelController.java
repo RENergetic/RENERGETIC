@@ -39,10 +39,10 @@ public class InformationPanelController {
     })
     @PostMapping(path = "/infermeasurements", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationPanelDAO> inferMeasurementsForPanel(
-            @PathVariable("name") String name, @RequestBody InformationPanelDAO informationPanelDAORequest) {
+             @RequestBody InformationPanelDAO informationPanelDAORequest) {
 
 
-        return new ResponseEntity<>(informationPanelService.inferMeasurements(informationPanelDAORequest),
+        return new ResponseEntity<>(informationPanelService.inferMeasurements(informationPanelDAORequest ),
                 HttpStatus.OK);
     }
 
@@ -164,7 +164,7 @@ public class InformationPanelController {
             @ApiResponse(responseCode = "404", description = "panel not found"),
             @ApiResponse(responseCode = "500", description = "Error deleting Information Panel")
     })
-    @DeleteMapping(path = "/{id}", produces = "application/json")
+    @DeleteMapping(path = "/id/{id}", produces = "application/json")
     public ResponseEntity<Boolean> deleteByName(@PathVariable Long id) {
         return new ResponseEntity<>(informationPanelService.deleteById(id), HttpStatus.OK);
     }

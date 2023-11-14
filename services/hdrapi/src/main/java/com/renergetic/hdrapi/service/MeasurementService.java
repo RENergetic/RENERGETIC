@@ -15,6 +15,7 @@ import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
 import com.renergetic.common.dao.ResourceDAO;
+import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,8 @@ public class MeasurementService {
 
     @Autowired
     MeasurementRepository measurementRepository;
+    @Autowired
+    MeasurementRepositoryTemp measurementRepository2;
 
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;
@@ -108,8 +111,12 @@ public class MeasurementService {
         return list;
     }
 
-    public List<MeasurementDAOImpl> list(Long offset, Integer limit) {
-        return measurementRepository.report(offset, limit)
+    public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction, String sensorName,
+                                         String assetName, Long typeId, String physicalTypeName, Long offset,
+                                         Integer limit) {
+        return measurementRepository2.findMeasurements(
+                        null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
+                        limit)
                 .stream().map((it) ->
                         {
 //                    var  mt =measurementTypeRepository.findById(it.getTypeId()).orElseThrow();

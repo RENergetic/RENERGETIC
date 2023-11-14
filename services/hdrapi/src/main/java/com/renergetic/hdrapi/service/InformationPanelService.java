@@ -41,6 +41,7 @@ public class InformationPanelService {
 
     @Autowired
     private MeasurementRepository measurementRepository;
+    @Autowired
     private MeasurementRepositoryTemp measurementRepository2;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
@@ -120,12 +121,13 @@ public class InformationPanelService {
 
         tiles.forEach(tile -> {
             List<MeasurementTileDAORequest> collect = tile.getMeasurements()
-                    .stream().filter((t)->t.getId()==null).map(
-                            tileM -> new ArrayList<>(getInferredMeasurements(tileM)))
+                    .stream().map(
+                            tileM -> tileM.getId() == null ? new ArrayList<>(
+                                    getInferredMeasurements(tileM)) : List.of(tileM))
                     .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList());
             tile.setMeasurements(collect);
         });
-       return informationPanel;
+        return informationPanel;
     }
 
     private void saveTiles(InformationPanel infoPanelEntity) {
@@ -345,6 +347,7 @@ public class InformationPanelService {
     private List<MeasurementTileDAORequest> getInferredMeasurements(MeasurementTileDAORequest tileM) {
         List<MeasurementTileDAORequest> list = measurementRepository2
                 .inferMeasurement(null,
+
                         tileM.getName(),
                         tileM.getSensorName(),
                         tileM.getDomain() != null ? tileM.getDomain().name() : null,

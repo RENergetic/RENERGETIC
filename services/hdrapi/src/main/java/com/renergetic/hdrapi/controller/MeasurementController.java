@@ -1,18 +1,13 @@
 package com.renergetic.hdrapi.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import com.renergetic.common.dao.InformationPanelDAO;
+import com.renergetic.common.dao.*;
+import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.common.dao.MeasurementDAO;
-import com.renergetic.common.dao.ResourceDAO;
 import com.renergetic.common.model.Details;
 import com.renergetic.common.model.details.AssetDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.renergetic.common.dao.MeasurementDAORequest;
-import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.model.Measurement;
 import com.renergetic.common.model.MeasurementType;
 import com.renergetic.common.model.details.MeasurementDetails;
@@ -90,10 +83,9 @@ public class MeasurementController {
         if (type.isPresent()) filters.put("type", type.get());
         if (direction.isPresent()) filters.put("direction", direction.get());
         if (domain.isPresent()) filters.put("domain", domain.get());
-        if(filters.size()==1 && filters.containsKey("name")){
-            measurements =  measurementSv.find(filters, offset.orElse(0L), limit.orElse(20));
-        }
-        else{
+        if (filters.size() == 1 && filters.containsKey("name")) {
+            measurements = measurementSv.find(filters, offset.orElse(0L), limit.orElse(20));
+        } else {
             measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20)); //-> old method
 
         }
@@ -106,11 +98,20 @@ public class MeasurementController {
     @GetMapping(path = "/report", produces = "application/json")
     public ResponseEntity<List<MeasurementDAOImpl>> listMeasurements(
             @RequestParam(required = false) Optional<Long> offset,
-            @RequestParam(required = false) Optional<Integer> limit) {
+            @RequestParam(required = false) Optional<Integer> limit,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String domain,
+            @RequestParam(required = false) String direction,
+            @RequestParam(required = false, name = "sensor_name") String sensorName,
+            @RequestParam(required = false, name = "asset_name") String assetName,
+            @RequestParam(required = false, name = "type_id") Long typeId,
+            @RequestParam(required = false, name = "type_physical_name") String physicalTypeName) {
+
 
         List<MeasurementDAOImpl> measurements = new ArrayList<>();
 
-        measurements = measurementSv.list(offset.orElse(0L), limit.orElse(1000));
+        measurements = measurementSv.findMeasurements(name, domain, direction, sensorName,
+                assetName, typeId, physicalTypeName, offset.orElse(0L), limit.orElse(1000));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
