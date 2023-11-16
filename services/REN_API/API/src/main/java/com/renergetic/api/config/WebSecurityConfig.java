@@ -15,6 +15,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.renergetic.common.config.JwtAuthenticationFilter;
+import com.renergetic.common.config.JwtAuthorizationManager;
+import com.renergetic.common.model.security.KeycloakRole;
+
 // import com.renergetic.api.model.security.KeycloakRole;
 
 import java.util.Arrays;
@@ -34,48 +38,48 @@ public class WebSecurityConfig {
     @Value("${api.cors.max-age}")
     Long maxAge;
 
-    // @Value(value = "${keycloak.client-id}")
-    // private String clientId;
+    @Value(value = "${keycloak.client-id}")
+    private String clientId;
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    	// JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
-        // filter.setClientId(clientId);
+    	JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
+        filter.setClientId(clientId);
 
         http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        // http.addFilterBefore(filter, AuthorizationFilter.class);
+        http.addFilterBefore(filter, AuthorizationFilter.class);
         
-        // Map<String, KeycloakRole[]> getUrls = new HashMap<>();
-        // Map<String, KeycloakRole[]> postUrls = new HashMap<>();
-        // Map<String, KeycloakRole[]> putUrls = new HashMap<>();
-        // Map<String, KeycloakRole[]> deleteUrls = new HashMap<>();
+        Map<String, KeycloakRole[]> getUrls = new HashMap<>();
+        Map<String, KeycloakRole[]> postUrls = new HashMap<>();
+        Map<String, KeycloakRole[]> putUrls = new HashMap<>();
+        Map<String, KeycloakRole[]> deleteUrls = new HashMap<>();
         
         
-        // getUrls.put("/api/endpoint/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        // getUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
         
-        // postUrls.put("/api/endpoint/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        // postUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
         
-        // putUrls.put("/api/endpoint/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        // putUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
         
-        // deleteUrls.put("/api/endpoint/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        // deleteUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
 
         http.authorizeHttpRequests(registry -> {
 	        
-	    //     getUrls.forEach((urlPattern, roles) -> {
-	    //     	registry.requestMatchers(HttpMethod.GET, urlPattern).access(new JwtAuthorizationManager(roles));
-	    //     });
+	        getUrls.forEach((urlPattern, roles) -> {
+	        	registry.requestMatchers(HttpMethod.GET, urlPattern).access(new JwtAuthorizationManager(roles));
+	        });
 	        
-	    //     postUrls.forEach((urlPattern, roles) -> {
-	    //     	registry.requestMatchers(HttpMethod.POST, urlPattern).access(new JwtAuthorizationManager(roles));
-	    //     });
+	        postUrls.forEach((urlPattern, roles) -> {
+	        	registry.requestMatchers(HttpMethod.POST, urlPattern).access(new JwtAuthorizationManager(roles));
+	        });
 	        
-	    //     putUrls.forEach((urlPattern, roles) -> {
-	    //     	registry.requestMatchers(HttpMethod.PUT, urlPattern).access(new JwtAuthorizationManager(roles));
-	    //     });
+	        putUrls.forEach((urlPattern, roles) -> {
+	        	registry.requestMatchers(HttpMethod.PUT, urlPattern).access(new JwtAuthorizationManager(roles));
+	        });
 	        
-	    //     deleteUrls.forEach((urlPattern, roles) -> {
-	    //     	registry.requestMatchers(HttpMethod.DELETE, urlPattern).access(new JwtAuthorizationManager(roles));
-	    //     });
+	        deleteUrls.forEach((urlPattern, roles) -> {
+	        	registry.requestMatchers(HttpMethod.DELETE, urlPattern).access(new JwtAuthorizationManager(roles));
+	        });
 	        
 	    //     registry.anyRequest().access(new JwtAuthorizationManager()); // Access to authenticated users 
                 registry.anyRequest().permitAll(); // Access to all users
