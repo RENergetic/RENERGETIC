@@ -19,8 +19,6 @@ import com.renergetic.common.config.JwtAuthenticationFilter;
 import com.renergetic.common.config.JwtAuthorizationManager;
 import com.renergetic.common.model.security.KeycloakRole;
 
-// import com.renergetic.api.model.security.KeycloakRole;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

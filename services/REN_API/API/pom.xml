@@ -8,7 +8,7 @@
 		<version>3.0.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.renergetic</groupId>
+	<groupId>com.renergetic.api</groupId>
 	<artifactId>API</artifactId>
 	<version>1.0.0</version>
 	<name>API</name>
@@ -21,7 +21,7 @@
         <repository>
             <id>remote-renergetic-release</id>
             <name>Remote Nexus</name>
-            <url>https://nexus-ren-prototype-devops.apps.paas-dev.psnc.pl//repository/renergetic-release/</url>
+            <url>https://nexus-ren-prototype-devops.apps.paas-dev.psnc.pl/repository/renergetic-release/</url>
         </repository>
     </repositories>
 	<dependencies>
