@@ -51,7 +51,7 @@ compileApp() {
 
     if [[ $influx = 'true' ]]
     then
-        cd "${apisPath}/influxAPI"
+        cd "${apisPath}/measurementapi"
         mvn clean package -Dmaven.test.skip
         cp "./target/"*.jar "${current}/docker_config/APIs/influx-api/api.jar"
     fi
