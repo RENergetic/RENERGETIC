@@ -24,11 +24,14 @@ import java.util.List;
 public class HDRRecommendationDAO {
 
     //todo: unique key: name-asset-sensor-type-direction
+    @JsonProperty(required = false)
+    private Long id;
     @JsonProperty(required = true)
     private LocalDateTime timestamp;
-    @JsonProperty(required = false)
+    @JsonProperty(required = true)
     private MeasurementTagsDAO tag;
-    @Column(name = "label")
+
+    @JsonProperty(required = false)
     private String label;
 
     public static HDRRecommendationDAO create(HDRRecommendation recommendation) {
@@ -40,6 +43,7 @@ public class HDRRecommendationDAO {
             dao.setTimestamp(recommendation.getTimestamp());
             dao.setLabel(recommendation.getLabel());
             dao.setTag(MeasurementTagsDAO.create(recommendation.getTag()));
+            dao.setId(recommendation.getId());
         }
         return dao;
     }
@@ -48,6 +52,8 @@ public class HDRRecommendationDAO {
         HDRRecommendation recommendation = new HDRRecommendation();
         recommendation.setTag(this.getTag().mapToEntity());
         recommendation.setLabel(this.getLabel());
+        if (this.id != null)
+            recommendation.setId(this.id);
         return recommendation;
     }
 
