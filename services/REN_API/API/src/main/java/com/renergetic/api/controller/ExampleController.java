@@ -32,7 +32,7 @@ public class ExampleController {
 	private ExampleService exampleService;
 	
 	@GetMapping("test")
-	public ResponseEntity<?> test() {
+	public ResponseEntity<Void> test() {
 		return ResponseEntity.ok(null);
 	}
 	
