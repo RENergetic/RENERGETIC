@@ -128,4 +128,13 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             "  WHERE measurement.id = :measurementId")
     public List<MeasurementTags> getTags(Long measurementId);
 
+    @Query(
+            value = "SELECT _m.* FROM  measurement _m " +
+                    " WHERE  (COALESCE(_m.name like CONCAT('%', :name, '%'),:name is null ) " +
+                    " or COALESCE(_m.label like CONCAT('%', :label,'%'),TRUE )) order by _m.id asc" +
+                    " LIMIT :limit OFFSET :offset ;",
+            nativeQuery = true
+    )
+    List<Measurement> filterMeasurement(@Param("name") String name, @Param("label") String label,     @Param("offset") long offset, @Param("limit") int limit);
+
 }

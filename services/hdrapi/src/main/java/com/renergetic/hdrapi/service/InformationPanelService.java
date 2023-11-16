@@ -14,7 +14,6 @@ import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -289,12 +288,12 @@ public class InformationPanelService {
     }
 
 
-    public List<Measurement> getPanelMeasurements(long id) {
+    public List<InformationTileMeasurement> getPanelMeasurements(long id) {
         InformationPanel panel = informationPanelRepository.findById(id).orElse(null);
 
         if (panel != null) {
             return panel.getTiles().stream().map(tile -> tile.getInformationTileMeasurements()
-                    .stream().map(InformationTileMeasurement::getMeasurement).filter(Objects::nonNull)
+                    .stream().filter(Objects::nonNull)
                     .collect(Collectors.toList())
             ).flatMap(List::stream).collect(Collectors.toList());
         }

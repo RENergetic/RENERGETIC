@@ -21,10 +21,10 @@ spec:
           resources:
             requests:
               cpu: 200m
-              memory: 275Mi
+              memory: 500Mi
             limits:
               cpu: 300m
-              memory: 600Mi
+              memory: 1100Mi
           readinessProbe:
             failureThreshold: 3
             httpGet:

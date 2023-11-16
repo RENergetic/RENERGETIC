@@ -38,6 +38,9 @@ import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class MeasurementService {
     @PersistenceContext
@@ -45,6 +48,9 @@ public class MeasurementService {
 
     @Autowired
     MeasurementRepository measurementRepository;
+
+    @Autowired
+    MeasurementRepositoryTemp measurementRepository2;
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;
     @Autowired
@@ -84,16 +90,26 @@ public class MeasurementService {
     }
 
     public boolean setProperty(Long measurementId, MeasurementDetails details) {
+        details.setMeasurement(new Measurement(measurementId, null, null, null, null, null, null, null));
 
-        return measurementRepository.setProperty(measurementId, details.getKey(), details.getValue()) == 1;
+        log.warn(String.format("Saving %s %s", details.getKey(), details.getValue()));
+        MeasurementDetails previousDetails = measurementDetailsRepository.findByKeyAndMeasurementId(details.getKey(), details.getMeasurement().getId()).orElse(null);
+        if (previousDetails != null) {
+            previousDetails.setValue(details.getValue());
+            return measurementDetailsRepository.save(previousDetails) != null;
+        }
+
+        return measurementDetailsRepository.save(details) != null;
+
+        //return measurementRepository.setProperty(measurementId, details.getKey(), details.getValue()) == 1;
     }
 
     public boolean setProperties(Long measurementId, Map<String, String> properties) {
         this.getById(measurementId);//check is exists
-        Optional<Boolean> any = properties.entrySet().stream().map(it ->
-                measurementRepository.setProperty(measurementId, it.getKey(), it.getValue()) != 1
-        ).filter(it -> it).findAny();
-        return any.isEmpty();
+        properties.forEach((k, v) -> log.error("Sent: " + k + " " + v));
+        return properties.entrySet().stream().map(it ->
+                this.setProperty(measurementId, new MeasurementDetails(it.getKey(), it.getValue(), measurementId))
+        ).filter(it -> it).allMatch(it -> it);
     }
 
     public List<MeasurementDAOResponse> getByProperty(String key, String value, long offset, long limit) {
@@ -109,11 +125,19 @@ public class MeasurementService {
 
     public List<MeasurementDAOImpl> list(Long offset, Integer limit) {
         return measurementRepository.report(offset, limit)
-                .stream().map(MeasurementDAOImpl::create).collect(Collectors.toList());
+                .stream().map((it) ->
+                        {
+//                    var  mt =measurementTypeRepository.findById(it.getTypeId()).orElseThrow();
+//                    return MeasurementDAOImpl.create(it,mt);
+                            return MeasurementDAOImpl.create(it);
+                        }
+
+                ).collect(Collectors.toList());
     }
 
     public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {
         Page<Measurement> measurements = measurementRepository.findAll(new OffSetPaging(offset, limit));
+
         Stream<Measurement> stream = measurements.stream();
         List<MeasurementDAOResponse> list;
 
@@ -147,6 +171,17 @@ public class MeasurementService {
         if (list != null && list.size() > 0)
             return list;
         else throw new NotFoundException("No measurements found");
+    }
+
+    public List<MeasurementDAOResponse> find(Map<String, String> filters, long offset, int limit) {
+        //TODO: more filtering options
+        String s = filters.getOrDefault("name", null);
+        List<Measurement> list = measurementRepository2.filterMeasurement(s, s, offset, limit);
+        if (list.size() > 0)
+            return list.stream().map(it -> MeasurementDAOResponse.create(it,
+                            measurementDetailsRepository.findByMeasurementId(it.getId()), null))
+                    .collect(Collectors.toList());
+        return Collections.emptyList();
     }
 
     public Measurement getById(Long id) {

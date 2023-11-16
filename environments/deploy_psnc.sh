@@ -9,8 +9,7 @@ uiPath=$(grep -ioP "(uiPath\s*=\s*)\K.+" _installers.properties)
 serverUrl=$(grep -ioP "(server\s*=\s*)\K.+" _credentials.properties)
 
 # Project name
-project=$(grep -ioP "(project\s*=\s*)\K.+" _installers.properties)
-export PROJECT=$project
+_project=$(grep -ioP "(project\s*=\s*)\K.+" _installers.properties)
 
 # Credentials
 user=$(grep -ioP "(user\s*=\s*)\K.+" _credentials.properties)
@@ -33,13 +32,63 @@ nifi=$(grep -ioP "(nifi\s*=\s*)\K.+" _installers.properties)
 wso2=$(grep -ioP "(wso2\s*=\s*)\K.+" _installers.properties)
 nexus=$(grep -ioP "(nexus\s*=\s*)\K.+" _installers.properties)
 
-rm -rf ~/.kube
+resetConnection() {
+    if oc whoami;
+    then
+        return 0;
+    else
+        return oc login $serverUrl --token=$token;
+    fi
+}
 
-# Connect to PSNC server and log in at Docker
-if oc login $serverUrl --token=$token;
-then
-    oc project $project
+compileApp() {
+    if [[ $hdr = 'true' ]]
+    then
+        cd "${apisPath}/hdrAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/hdr-api/api.jar"
+    fi
 
+    if [[ $influx = 'true' ]]
+    then
+        cd "${apisPath}/influxAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/influx-api/api.jar"
+    fi
+
+    if [[ $kpi = 'true' ]]
+    then
+        cd "${apisPath}/kpiAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/kpi-api/api.jar"
+    fi
+
+    if [[ $ingestion = 'true' ]]
+    then
+        cd "${apisPath}/ingestionAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/ingestion-api/api.jar"
+    fi
+
+    if [[ $rules = 'true' ]]
+    then
+        cd "${apisPath}/ruleEvaluationService"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
+    fi
+
+    if [[ $ui = 'true' ]]
+    then
+        cd "${uiPath}/renergetic_ui"
+        # cp -f "${current}/Others/renergetic-ui/.env" ".env"
+        npm install
+        npm run build --prod
+        rm -f -r "${current}/docker_config/Others/renergetic-ui/dist"
+        cp -f -r "./dist" "${current}/docker_config/Others/renergetic-ui"
+    fi
+}
+
+installPSNC() {
 # DEPLOY DATABASES
 
     if [[ $postgreSQL = 'true' ]]
@@ -48,17 +97,17 @@ then
         # POSTGRESQL INSTALLATION
         # set environment variables
 
-        kubectl delete configmaps/postgresql-db-config
-        kubectl delete statefulsets/postgresql-db
-        kubectl delete services/postgresql-db-sv
+        kubectl delete configmaps/postgresql-db-config --namespace=$project
+        kubectl delete statefulsets/postgresql-db --namespace=$project
+        kubectl delete services/postgresql-db-sv --namespace=$project
         
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/postgresql-db:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/postgresql-db:latest
         
-        kubectl apply -f postgresql-configmap.yaml
-        envsubst '$PROJECT' < postgresql-statefulset.yaml | kubectl apply -f -
-        kubectl apply -f postgresql-service.yaml
+        kubectl apply -f postgresql-configmap.yaml --namespace=$project
+        envsubst '$PROJECT' < postgresql-statefulset.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f postgresql-service.yaml --namespace=$project
         
         while [[ $(kubectl -n ${project} get pods -l app=postgresql-db -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; 
             do echo "Waiting to PostgreSQL pod to create databases" && sleep 5; 
@@ -72,133 +121,114 @@ then
         # INFLUXDB INSTALLATION
         # set environment variables
 
-        kubectl delete deployments/influx-db
-        kubectl delete services/influx-db-sv
+        kubectl delete deployments/influx-db --namespace=$project
+        kubectl delete services/influx-db-sv --namespace=$project
+        kubectl delete secrets/influxdb-secrets --namespace=$project
         
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/influx:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/influx:latest
         
-        kubectl apply -f influxdb-volume.yaml
-        kubectl apply -f influxdb-secrets.yaml
-        envsubst '$PROJECT' < influxdb-deployment.yaml | kubectl apply -f -
-        kubectl apply -f influxdb-service.yaml
+        kubectl apply -f influxdb-volume.yaml --namespace=$project
+        kubectl apply -f influxdb-secrets.yaml --namespace=$project
+        envsubst '$PROJECT' < influxdb-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f influxdb-service.yaml --namespace=$project
     fi
 # DEPLOY APIs
 
     if [[ $hdr = 'true' ]]
     then
-        cd "${apisPath}/hdrAPI"
-        mvn clean package -Dmaven.test.skip
-        cp "./target/"*.jar "${current}/docker_config/APIs/hdr-api/api.jar"
-
         cd "${current}/docker_config/APIs/hdr-api"
         # API INSTALLATION
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl delete deployments/hdr-api
-        kubectl delete services/hdr-api-sv
+        kubectl delete deployments/hdr-api --namespace=$project
+        kubectl delete services/hdr-api-sv --namespace=$project
 
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/hdr-api:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/hdr-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < hdr-api-deployment.yaml | kubectl apply --force=true -f -
-        kubectl apply -f hdr-api-service.yaml
+        envsubst '$PROJECT' < hdr-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f hdr-api-service.yaml --namespace=$project
     fi
 
     if [[ $influx = 'true' ]]
     then
-        cd "${apisPath}/measurementapi"
-        mvn clean package -Dmaven.test.skip
-        cp "./target/"*.jar "${current}/docker_config/APIs/influx-api/api.jar"
-
         cd "${current}/docker_config/APIs/influx-api"
         # API INSTALLATION
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl delete deployments/influx-api
-        kubectl delete services/influx-api-sv
+        kubectl delete deployments/influx-api --namespace=$project
+        kubectl delete services/influx-api-sv --namespace=$project
 
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/influx-api:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/influx-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < influx-api-deployment.yaml | kubectl apply --force=true -f -
-        kubectl apply -f influx-api-service.yaml
+        envsubst '$PROJECT' < influx-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f influx-api-service.yaml --namespace=$project
     fi
 
     if [[ $kpi = 'true' ]]
     then
-        cd "${apisPath}/kpiAPI"
-        mvn clean package -Dmaven.test.skip
-        cp "./target/"*.jar "${current}/docker_config/APIs/kpi-api/api.jar"
-
         cd "${current}/docker_config/APIs/kpi-api"
         # API INSTALLATION
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl delete deployments/kpi-api
-        kubectl delete services/kpi-api-sv
+        kubectl delete deployments/kpi-api --namespace=$project
+        kubectl delete services/kpi-api-sv --namespace=$project
 
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/kpi-api:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/kpi-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < kpi-api-deployment.yaml | kubectl apply --force=true -f -
-        kubectl apply -f kpi-api-service.yaml
+        envsubst '$PROJECT' < kpi-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f kpi-api-service.yaml --namespace=$project
     fi
 
     if [[ $ingestion = 'true' ]]
     then
-        cd "${apisPath}/ingestionAPI"
-        mvn clean package -Dmaven.test.skip
-        cp "./target/"*.jar "${current}/docker_config/APIs/ingestion-api/api.jar"
-
         cd "${current}/docker_config/APIs/ingestion-api"
         # API INSTALLATION
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl delete deployments/ingestion-api
-        kubectl delete services/ingestion-api-sv
+        kubectl delete deployments/ingestion-api --namespace=$project
+        kubectl delete services/ingestion-api-sv --namespace=$project
 
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/ingestion-api:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/ingestion-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < ingestion-api-deployment.yaml | kubectl apply --force=true -f -
-        kubectl apply -f ingestion-api-service.yaml
+        envsubst '$PROJECT' < ingestion-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f ingestion-api-service.yaml --namespace=$project
     fi
 
     if [[ $rules = 'true' ]]
     then
-        cd "${apisPath}/ruleEvaluationService"
-        mvn clean package -Dmaven.test.skip
-        cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
-
         cd "${current}/docker_config/APIs/rules-api"
         # API INSTALLATION
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl delete deployments/rules-api
-        kubectl delete services/rules-api-sv
+        kubectl delete deployments/rules-api --namespace=$project
+        kubectl delete services/rules-api-sv --namespace=$project
 
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/rules-api:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/rules-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply --force=true -f -
-        kubectl apply -f rules-api-service.yaml
+        envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f rules-api-service.yaml --namespace=$project
     fi
 
 # DEPLOY WSO2 API MANAGER
@@ -210,16 +240,16 @@ then
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl delete deployments/wso
-        kubectl delete services/wso-sv
+        kubectl delete deployments/wso --namespace=$project
+        kubectl delete services/wso-sv --namespace=$project
 
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/wso:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/wso:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < wso2-deployment.yaml | kubectl apply --force=true -f -
-        kubectl apply -f wso2-service.yaml
+        envsubst '$PROJECT' < wso2-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f wso2-service.yaml --namespace=$project
     fi
 # DEPLOY NEXUS API MANAGER
 
@@ -250,18 +280,18 @@ then
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl delete deployments/grafana
-        kubectl delete services/grafana-sv
+        kubectl delete deployments/grafana --namespace=$project
+        kubectl delete services/grafana-sv --namespace=$project
 
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/grafana:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/grafana:latest
 
         # create kubernetes resources
-        kubectl apply -f grafana-config.yaml
-        kubectl apply -f grafana-volume.yaml
-        envsubst '$PROJECT' < grafana-deployment.yaml | kubectl apply --force=true -f -
-        kubectl apply -f grafana-service.yaml
+        kubectl apply -f grafana-config.yaml --namespace=$project
+        kubectl apply -f grafana-volume.yaml --namespace=$project
+        envsubst '$PROJECT' < grafana-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f grafana-service.yaml --namespace=$project
     fi
 # DEPLOY UI AND KEYCLOAK
 
@@ -276,28 +306,21 @@ then
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl delete deployments/keycloak
-        kubectl delete services/keycloak-sv
+        kubectl delete deployments/keycloak --namespace=$project
+        kubectl delete services/keycloak-sv --namespace=$project
 
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/keycloak:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/keycloak:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < keycloak-deployment.yaml | kubectl apply --force=true -f -
-        kubectl apply -f keycloak-service.yaml
+        envsubst '$PROJECT' < keycloak-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f keycloak-service.yaml --namespace=$project
     fi
 
 
     if [[ $ui = 'true' ]]
-    then
-        cd "${uiPath}/renergetic_ui"
-#            cp -f "${current}/Others/renergetic-ui/.env" ".env"
-        npm install
-        npm run build --prod
-        rm -f -r "${current}/docker_config/Others/renergetic-uidist"
-        cp -f -r "./dist" "${current}/docker_config/Others/renergetic-ui"
-        
+    then        
         cd "${current}/docker_config/Others/renergetic-ui"
         # FRONT INSTALLATION
         # prepare SSL certificates
@@ -309,17 +332,49 @@ then
             cd "${current}/docker_config/Others/renergetic-ui"
         fi
         
-        delete kubernetes resources if exists
-        kubectl delete deployments/renergetic-ui
-        kubectl delete services/renergetic-ui-sv
+        # delete kubernetes resources if exists
+        kubectl delete deployments/renergetic-ui --namespace=$project
+        kubectl delete services/renergetic-ui-sv --namespace=$project
 
         docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/renergetic-ui:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/renergetic-ui:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < ui-deployment.yaml | kubectl apply --force=true -f -
-        kubectl apply -f ui-service.yaml
+        envsubst '$PROJECT' < ui-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f ui-service.yaml --namespace=$project
     fi
+}
 
+
+rm -rf ~/.kube
+
+# Connect to PSNC server and log in at Docker
+if oc login $serverUrl --token=$token;
+then
+    compileApp
+
+    if [[ $_project = 'all' ]]
+    then 
+        for project in 'ren-prototype' 'renergetic-wp4' 'renergetic-wp5' 'renergetic-wp6';
+        do
+            if resetConnection;
+            then
+                export PROJECT=$project
+                oc project $project
+
+                installPSNC
+            fi
+        done
+    else
+        project=$_project
+        export PROJECT=$project
+
+        if resetConnection;
+        then
+            oc project $project
+
+            installPSNC
+        fi
+    fi
 fi

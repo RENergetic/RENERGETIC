@@ -9,7 +9,7 @@ INSERT INTO asset ( id, name, label, asset_type_id, user_id, uuid, asset_categor
 /* PILOT CONFIGURATION */
 INSERT INTO asset(
     id, name, geo_location, label, asset_category_id, parent_asset_id, asset_type_id, user_id, uuid)
-    VALUES (1, 'psnc', NULL, 'PSNC', NULL, NULL, 3, NULL, '2'),
+    VALUES (1, 'psnc', NULL, 'PSNC', NULL, 8, 3, NULL, '2'),
     (2, 'datacenter', NULL, 'PSNC data center', NULL, 1, 23, NULL, '2'),
     (3, 'office', NULL, 'PSNC office', NULL, 1, 20, NULL, '2'),
     (4, 'hvac', NULL, 'PSNC HVAC systems', NULL, 3, 21, NULL, '2'),
@@ -31,7 +31,10 @@ INSERT INTO asset(
     (21, 'LPP', NULL, 'LPP PUT building', NULL, 9, 3, NULL, '2'),
     (22, 'WBMIZ', NULL, 'WBMIZ PUT building', NULL, 9, 3, NULL, '2'),
     (23, 'WE', NULL, 'WE PUT building', NULL, 9, 3, NULL, '2'),
-    (24, 'CMBIN', NULL, 'CMBIN PUT building', NULL, 9, 3, NULL, '2');
+    (24, 'CMBIN', NULL, 'CMBIN PUT building', NULL, 9, 3, NULL, '2'),
+    (25, 'put_offices', NULL, 'PUT offices', NULL, 9, 20, NULL, '2'),
+	(26, 'dormitories', NULL, 'PUT dormitories', NULL, 9, 3, NULL, '2'),
+	(27, 'heat_pumps_ppch', NULL, 'PPCH heat pumps', NULL, 11, 6, NULL, '2');
 
 INSERT INTO measurement(
     id, name, sensor_name, domain, direction, measurement_type_id, asset_id, sensor_id, label,
@@ -120,7 +123,19 @@ INSERT INTO measurement(
     (2335, 'solar_radiation', 'weather', NULL, NULL, 23, 19, 'PPHS:MPlt''WeatherSt''SunOper', NULL, NULL, NULL, '2'),
     (2336, 'outdoor_temperature', 'weather', NULL, NULL, 4, 19, 'PPHS:MPlt''WeatherSt''TOa', NULL, NULL, NULL, '2'),
     (2337, 'wind_speed', 'weather', NULL, NULL, 31, 19, 'PPHS:MPlt''WeatherSt''WindVel', NULL, NULL, NULL, '2'),
-    (2338, 'outdoor_air_temperature', 'weather', NULL, NULL, 4, 18, 'WCPP:B''DS6''HPlt''CO''TOa', NULL, NULL, NULL, '2');
+    (2338, 'outdoor_air_temperature', 'weather', NULL, NULL, 4, 18, 'WCPP:B''DS6''HPlt''CO''TOa', NULL, NULL, NULL, '2'),
+    (2339, 'cumulated_energy_of_cooling', 'heat_meter', 'heat', 'out', 17, 11, 'PPCH_LHS', NULL, NULL, NULL, '2'),
+    (2340, 'cumulated_energy_of_heating', 'heat_meter', 'heat', 'out', 17, 11, 'PPCH_LHS', NULL, NULL, NULL, '2'),
+    (2341, 'cumulated_energy', 'heat_meter', 'heat', 'out', 17, 27, 'PPCH:TPlt''SZSPC''ISP''Licz''ObCTodPC''CumEg', NULL, NULL, NULL, '2'),
+    (2342, 'cumulated_energy', 'heat_meter', 'heat', 'in', 17, 9, 'PUT_Heat_Load_CumEg', NULL, NULL, NULL, '2'),
+    (2343, 'cumulated_energy', 'heat_meter', 'heat', 'in', 17, 25, 'PUT_Offices_Heat_Load_CumEg', NULL, NULL, NULL, '2'),
+    (2344, 'cumulated_energy', 'heat_meter', 'heat', 'in', 17, 26, 'Dormitories_Heat_Load_CumEg', NULL, NULL, NULL, '2'),
+    (2345, 'cooling_power', 'heat_meter', 'heat', 'out', 30, 11, 'PPCH_LHS_Power', NULL, NULL, NULL, '2'),
+    (2346, 'heating_power', 'heat_meter', 'heat', 'out', 30, 11, 'PPCH_LHS_Power', NULL, NULL, NULL, '2'),
+    (2347, 'power', 'heat_meter', 'heat', 'out', 30, 27, 'PPCH:TPlt''SZSPC''ISP''Licz''ObCTodPC''Power', NULL, NULL, NULL, '2'),
+    (2348, 'power', 'heat_meter', 'heat', 'in', 30, 9, 'PUT_Heat_Load_Power', NULL, NULL, NULL, '2'),
+    (2349, 'power', 'heat_meter', 'heat', 'in', 30, 25, 'PUT_Offices_Heat_Load_Power', NULL, NULL, NULL, '2'),
+    (2350, 'power', 'heat_meter', 'heat', 'in', 30, 26, 'Dormitories_Heat_Load_Power', NULL, NULL, NULL, '2');
 
 INSERT INTO measurement_details(
     measurement_id, key, value)
@@ -148,7 +163,13 @@ INSERT INTO measurement_details(
     (2310, 'cumulative', 'true'),
     (2311, 'cumulative', 'true'),
     (2312, 'cumulative', 'true'),
-    (2313, 'cumulative', 'true');
+    (2313, 'cumulative', 'true'),
+    (2339, 'cumulative', 'true'),
+    (2340, 'cumulative', 'true'),
+    (2341, 'cumulative', 'true'),
+    (2342, 'cumulative', 'true'),
+    (2343, 'cumulative', 'true'),
+    (2344, 'cumulative', 'true');
     
 
     
@@ -246,6 +267,18 @@ INSERT INTO measurement_tags(
     (1000, 2336),
     (1000, 2337),
     (1000, 2338),
+    (1000, 2339),
+    (1000, 2340),
+    (1000, 2341),
+    (1000, 2342),
+    (1000, 2343),
+    (1000, 2344),
+    (1000, 2345),
+    (1000, 2346),
+    (1000, 2347),
+    (1000, 2348),
+    (1000, 2349),
+    (1000, 2350),
     (1001, 2000),
     (1001, 2002),
     (1001, 2004),

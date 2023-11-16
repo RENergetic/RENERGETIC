@@ -89,9 +89,14 @@ public class MeasurementController {
         if (name.isPresent()) filters.put("name", name.get());
         if (type.isPresent()) filters.put("type", type.get());
         if (direction.isPresent()) filters.put("direction", direction.get());
-        if (domain.isPresent()) filters.put("parent", domain.get());
+        if (domain.isPresent()) filters.put("domain", domain.get());
+        if(filters.size()==1 && filters.containsKey("name")){
+            measurements =  measurementSv.find(filters, offset.orElse(0L), limit.orElse(20));
+        }
+        else{
+            measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20)); //-> old method
 
-        measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20));
+        }
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
@@ -189,11 +194,10 @@ public class MeasurementController {
     @GetMapping(path = "{measurement_id}/properties", produces = "application/json")
     public ResponseEntity<Map<String, String>> getInformationMeasurementProperties(
             @PathVariable("measurement_id") Long id) {
-        Map<String, String> info = null;
+        Map<String, String> info = new HashMap<>();
 
-        info = measurementSv.getDetailsByMeasurementId(id).stream()
-                .collect(Collectors.toMap(MeasurementDetails::getKey, Details::getValue));
-        return new ResponseEntity<>(info, HttpStatus.OK);
+        measurementSv.getDetailsByMeasurementId(id).forEach(detail -> info.put(detail.getKey(), detail.getValue()));
+        return new ResponseEntity<>(info.size() > 0 ? info : null, HttpStatus.OK);
     }
 
     @Operation(summary = "Insert measurement detail's property")

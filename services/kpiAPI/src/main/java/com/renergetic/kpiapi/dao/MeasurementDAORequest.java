@@ -10,10 +10,12 @@ import com.renergetic.kpiapi.model.KPI;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
+@ToString
 public class MeasurementDAORequest {
 	String bucket;
 	String measurement;
