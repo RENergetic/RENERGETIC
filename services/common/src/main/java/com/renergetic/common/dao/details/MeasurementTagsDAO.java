@@ -1,7 +1,6 @@
 package com.renergetic.common.dao.details;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.model.details.MeasurementTags;
 import lombok.Getter;
 import lombok.Setter;
