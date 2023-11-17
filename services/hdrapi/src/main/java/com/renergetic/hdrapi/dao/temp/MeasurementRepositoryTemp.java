@@ -66,16 +66,16 @@ public interface MeasurementRepositoryTemp extends JpaRepository<Measurement, Lo
             " LEFT JOIN information_tile_measurement itm on itm.measurement_id = me.id " +
             " LEFT JOIN information_tile it on it.id = itm.information_tile_id " +
             " WHERE " +
-            " AND COALESCE(measurement.sensor_name like ('%'||  CAST(:sensorName AS text ) ||'%') ,TRUE) " +
-            " AND COALESCE(measurement.domain = CAST(:domain AS text) ,TRUE) " +
-            " AND COALESCE(measurement.name like ('%'||  CAST(:measurementName AS text ) ||'%') ,TRUE) " +
-            " AND COALESCE(measurement.asset_id  = CAST ( CAST(:assetId AS text ) as bigint ) ,TRUE) " +
+            "  COALESCE(me.sensor_name like ('%'||  CAST(:sensorName AS text ) ||'%') ,TRUE) " +
+            " AND COALESCE(me.domain = CAST(:domain AS text) ,TRUE) " +
+            " AND COALESCE(me.name like ('%'||  CAST(:measurementName AS text ) ||'%') ,TRUE) " +
+            " AND COALESCE(me.asset_id  = CAST ( CAST(:assetId AS text ) as bigint ) ,TRUE) " +
             " AND COALESCE(asset.name like ('%'||  CAST(:assetName AS text ) ||'%') ,TRUE) " +
-            " AND COALESCE(measurement.direction = CAST(:direction AS text)  ,TRUE) " +
-            " AND COALESCE(measurement_type.physical_name = CAST(:physicalName AS text) ,TRUE) " +
-            " AND COALESCE(measurement.measurement_type_id  = CAST ( CAST(:type AS text ) as bigint ) ,TRUE)" +
+            " AND COALESCE(me.direction = CAST(:direction AS text)  ,TRUE) " +
+            " AND COALESCE(mt.physical_name = CAST(:physicalName AS text) ,TRUE) " +
+            " AND COALESCE(me.measurement_type_id  = CAST ( CAST(:type AS text ) as bigint ) ,TRUE)" +
             " GROUP by me.id, mt.id,asset.id  " +
-            " order by  me.name, me.sensor_name, me.measurement_type_id, me.direction, me.domain  me.id, asc " +
+            " order by  me.asset_id,me.name, me.sensor_name, me.measurement_type_id, me.direction, me.domain, me.id asc " +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<MeasurementDAO> findMeasurements(Long assetId, String assetName, String measurementName,
                                                  String sensorName, String domain, String direction, Long type,

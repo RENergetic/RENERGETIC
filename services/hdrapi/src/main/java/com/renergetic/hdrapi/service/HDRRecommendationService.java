@@ -8,6 +8,9 @@ import com.renergetic.common.model.*;
 import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.dao.temp.HDRRequest;
+import com.renergetic.hdrapi.dao.temp.HDRRequestDAO;
+import com.renergetic.hdrapi.dao.temp.HDRRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,11 +32,11 @@ public class HDRRecommendationService {
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;
     @Autowired
-    MeasurementDetailsRepository measurementDetailsRepository;
-    @Autowired
     MeasurementTagsRepository measurementTagsRepository;
     @Autowired
     RecommendationRepository recommendationRepository;
+    @Autowired
+    HDRRequestRepository hdrRequestRepository;
     @Autowired
     UuidRepository uuidRepository;
 
@@ -47,6 +50,22 @@ public class HDRRecommendationService {
             return HDRRecommendationDAO.create(recommendationRepository.save(recommendation));
         } else {
             return HDRRecommendationDAO.create(recommendationRepository.save(recommendationDAO.mapToEntity()));
+        }
+
+    }
+
+    public HDRRequestDAO save(HDRRequestDAO requestDAO) {
+        var r = hdrRequestRepository.findRequestByTimestamp(requestDAO.getTimestamp());
+        if (r.isPresent()) {
+            throw new InvalidArgumentException("Request exists");
+        }
+        var recentRequestTimestamp = hdrRequestRepository.getRecentRequestTimestamp();
+        if (recentRequestTimestamp.isPresent() && requestDAO.getTimestamp().isBefore(recentRequestTimestamp.get())) {
+
+            throw new InvalidArgumentException("Request is outdated");
+        } else {
+            var request = hdrRequestRepository.save(requestDAO.mapToEntity());
+            return HDRRequestDAO.create(request);
         }
 
     }
@@ -70,6 +89,9 @@ public class HDRRecommendationService {
     public void deleteByTimestamp(LocalDateTime t) {
         recommendationRepository.deleteByTimestamp(t);
     }
+    public void deleteRequestByTimestamp(LocalDateTime t) {
+        hdrRequestRepository.deleteByTimestamp(t);
+    }
 
 
     public List<LocalDateTime> list(LocalDateTime t) {
@@ -80,15 +102,31 @@ public class HDRRecommendationService {
         var t = recommendationRepository.getRecentRecommendation();
         List<HDRRecommendationDAO> r = null;
         if (t.isPresent())
-            r = this.get(t.get());
+            r = this.getRecommendations(t.get());
         return Optional.ofNullable(r);
     }
 
-    public List<HDRRecommendationDAO> get(LocalDateTime t) {
+    public Optional<List<HDRRequestDAO>> getRecentRequest() {
+        var t = hdrRequestRepository.getRecentRequestTimestamp();
+        List<HDRRequestDAO> r = null;
+        if (t.isPresent())
+            r = this.getRequests(t.get());
+        return Optional.ofNullable(r);
+    }
+
+    public List<HDRRecommendationDAO> getRecommendations(LocalDateTime t) {
         if (t == null) {
             throw new InvalidArgumentException("Empty timestamp");
         }
         return recommendationRepository.findByTimestamp(t).stream().map(HDRRecommendationDAO::create).collect(
+                Collectors.toList());
+    }
+
+    public List<HDRRequestDAO> getRequests(LocalDateTime t) {
+        if (t == null) {
+            throw new InvalidArgumentException("Empty timestamp");
+        }
+        return hdrRequestRepository.findRequestByTimestamp(t).stream().map(HDRRequestDAO::create).collect(
                 Collectors.toList());
     }
 

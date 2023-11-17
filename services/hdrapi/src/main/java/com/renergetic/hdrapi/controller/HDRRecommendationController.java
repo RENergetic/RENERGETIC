@@ -14,6 +14,8 @@ import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
+import com.renergetic.hdrapi.dao.temp.HDRRequest;
+import com.renergetic.hdrapi.dao.temp.HDRRequestDAO;
 import com.renergetic.hdrapi.service.HDRRecommendationService;
 import com.renergetic.hdrapi.service.MeasurementService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,10 +43,10 @@ public class HDRRecommendationController {
 
 //=== GET REQUESTS====================================================================================
 
-    @Operation(summary = "list recommendations")
+    @Operation(summary = "list recent recommendations")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/recommendations", produces = "application/json")
-    public ResponseEntity<List<HDRRecommendationDAO>> getAllRecomendations(
+    @GetMapping(path = "/recommendations/recent", produces = "application/json")
+    public ResponseEntity<List<HDRRecommendationDAO>> getAllRecommendations(
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit) {
 
@@ -54,10 +56,34 @@ public class HDRRecommendationController {
         return new ResponseEntity<>(recommendations, HttpStatus.OK);
     }
 
+
     @Operation(summary = "Get All Measurements")
     @ApiResponse(responseCode = "200", description = "Get measurements related with recommendation by id ")
-    @GetMapping(path = "/recommendations/{id}", produces = "application/json")
+    @GetMapping(path = "/recommendations/id/{id}/measurements", produces = "application/json")
     public ResponseEntity<List<MeasurementDAOResponse>> listMeasurements(
+            @PathVariable Long id,
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit) {
+        var measurements = hdrService.getMeasurements(id);
+        return new ResponseEntity<>(measurements, HttpStatus.OK);
+    }
+
+    @Operation(summary = "list requests")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/requests/recent", produces = "application/json")
+    public ResponseEntity<List<HDRRequestDAO>> getAllRequests(
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit) {
+
+        List<HDRRequestDAO> recommendations;
+        recommendations = hdrService.getRecentRequest().orElse(new ArrayList<>());
+        return new ResponseEntity<>(recommendations, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get request by id")
+    @ApiResponse(responseCode = "200", description = "HDR request by id ")
+    @GetMapping(path = "/requests/id/{id}", produces = "application/json")
+    public ResponseEntity<List<MeasurementDAOResponse>> getRequest(
             @PathVariable Long id,
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit) {
@@ -71,7 +97,7 @@ public class HDRRecommendationController {
             @ApiResponse(responseCode = "200", description = "Recommendation saved correctly"),
             @ApiResponse(responseCode = "500", description = "Error saving recommendation")
     })
-    @PostMapping(path = "recommendations", produces = "application/json", consumes = "application/json")
+    @PostMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Long> saveRecommendations(@PathVariable(name = "t") Optional<Long> timestamp,
                                                     @RequestBody List<HDRRecommendationDAO> recommendations) {
         LocalDateTime t;
@@ -80,17 +106,59 @@ public class HDRRecommendationController {
         return new ResponseEntity<>(DateConverter.toEpoch(t), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Insert Recommendation")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Recommendation saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving recommendation")
+    })
+    @PutMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
+    public ResponseEntity saveRecommendation(@PathVariable(name = "t", required = true) Long timestamp,
+                                             @RequestBody List<HDRRecommendationDAO> recommendations) {
+        hdrService.save(DateConverter.toLocalDateTime(timestamp), recommendations);
+        return new ResponseEntity(ResponseEntity.noContent(), HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Insert request")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Recommendation saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving recommendation")
+    })
+    @PostMapping(path = "/requests", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<HDRRequestDAO> saveRequest(@RequestBody HDRRequestDAO request) {
+
+        HDRRequestDAO r = hdrService.save(request);
+        return new ResponseEntity<>(r, HttpStatus.CREATED);
+    }
+
     @Operation(summary = "Delete Recommendation batch")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Recommendations deleted correctly"),
             @ApiResponse(responseCode = "500", description = "Error deleting recommendations")
     })
-    @DeleteMapping(path = "recommendations", produces = "application/json", consumes = "application/json")
+    @DeleteMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
     public ResponseEntity<List<HDRRecommendationDAO>> deleteRecommendations(@PathVariable(name = "t") Long timestamp) {
         var dt = DateConverter.toLocalDateTime(timestamp);
-        var res = hdrService.get(dt);
+        var res = hdrService.getRecommendations(dt);
         hdrService.deleteByTimestamp(LocalDateTime.now());
-        if (hdrService.get(dt).isEmpty()) {
+        if (hdrService.getRecommendations(dt).isEmpty()) {
+            return new ResponseEntity<>(res, HttpStatus.OK);
+
+        }
+        return new ResponseEntity<>(res, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Operation(summary = "Delete Request")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Recommendations deleted correctly"),
+            @ApiResponse(responseCode = "500", description = "Error deleting recommendations")
+    })
+    @DeleteMapping(path = "/requests", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<List<HDRRequestDAO>> deleteRequest(@PathVariable(name = "t") Long timestamp) {
+        var dt = DateConverter.toLocalDateTime(timestamp);
+
+        var res = hdrService.getRequests(dt);
+        hdrService.deleteByTimestamp(LocalDateTime.now());
+        if (hdrService.getRequests(dt).isEmpty()) {
             return new ResponseEntity<>(res, HttpStatus.OK);
 
         }

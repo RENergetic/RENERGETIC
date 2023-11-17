@@ -69,6 +69,17 @@ public class MeasurementService {
         return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null, null);
     }
 
+    public MeasurementDAOResponse duplicate(Long id) {
+        var measurementToCopy  = measurementRepository.getById(id);
+//        measurementToCopy.setId(null);
+        var dao = MeasurementDAORequest.create(measurementToCopy);
+        dao.setId(null);
+        var measurementEntity = dao.mapToEntity();
+
+        measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+        return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null, null);
+    }
+
     public boolean deleteById(Long id) {
         if (id != null && measurementRepository.existsById(id)) {
             var m = measurementRepository.getById(id);
@@ -81,10 +92,10 @@ public class MeasurementService {
     }
 
     public MeasurementDAOResponse update(MeasurementDAORequest measurement, Long id) {
-        if (id != null && measurementRepository.existsById(id)) {
-            measurement.setId(id);
-            return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null, null);
-        } else throw new InvalidNonExistingIdException("No measurement with id " + id + " found");
+        requireMeasurement(id);
+        measurement.setId(id);
+        return MeasurementDAOResponse.create(measurementRepository.save(measurement.mapToEntity()), null, null);
+
     }
 
     public boolean setProperty(Long measurementId, MeasurementDetails details) {
@@ -111,9 +122,11 @@ public class MeasurementService {
         return list;
     }
 
-    public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction, String sensorName,
-                                         String assetName, Long typeId, String physicalTypeName, Long offset,
-                                         Integer limit) {
+    public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
+                                                     String sensorName,
+                                                     String assetName, Long typeId, String physicalTypeName,
+                                                     Long offset,
+                                                     Integer limit) {
         return measurementRepository2.findMeasurements(
                         null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
                         limit)
@@ -177,9 +190,10 @@ public class MeasurementService {
     }
 
     public Measurement getById(Long id) {
-        return measurementRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("No measurements with id " + id + " found"));
+        requireMeasurement(id);
+        return measurementRepository.getById(id);
     }
+
 
     // MEASUREMENTTYPE CRUD OPERATIONS
     public MeasurementType saveType(MeasurementType type) {
@@ -403,6 +417,12 @@ public class MeasurementService {
         return measurementRepository.getLinkedPanels(id).stream().map(
                 it -> ResourceDAOImpl.create(it.getId(), it.getName(), it.getLabel())
         ).collect(Collectors.toList());
+    }
+
+    private boolean requireMeasurement(Long id) {
+        if (!measurementRepository.existsById(id))
+            throw new InvalidNonExistingIdException("The measurement:" + id + " doesn't exists");
+        return true;
     }
 
 }
