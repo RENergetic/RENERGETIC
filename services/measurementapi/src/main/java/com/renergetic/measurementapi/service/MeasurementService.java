@@ -5,9 +5,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -79,7 +77,7 @@ public class MeasurementService {
     			registry);
 	}
 
-	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, Boolean performDecumulation, Boolean getTags) {
+	public List<MeasurementDAOResponse> data(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, Boolean performDecumulation, Boolean getTags, Boolean onlyLatestPrediction) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -103,12 +101,29 @@ public class MeasurementService {
 			fluxQuery.add( String.format("filter(fn: (r) => %s)",
 					fields.stream().map(field -> String.format("r[\"_field\"] == \"%s\"", field)).collect(Collectors.joining(" or "))) );
 
+		// IF ONLY FETCHING LATEST PREDICITON GENERATION
+		if (Boolean.TRUE.equals(onlyLatestPrediction)){
+			List<String> predictionValues = listTagValues(bucket, "time_prediction", measurements, fields, tags);
+			if(predictionValues != null && !predictionValues.isEmpty()){
+				String latest = null;
+				for(String predTime : predictionValues){
+					if(latest == null || latest.compareTo(predTime) < 0)
+						latest = predTime;
+				}
+				if(tags == null)
+					tags = new HashMap<>();
+				tags.put("time_prediction", List.of(latest));
+			}
+		}
+
 		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
-		if (tags != null && !tags.isEmpty())
+		if (tags != null && !tags.isEmpty()) {
+			Map<String, List<String>> finalTags = tags;
 			fluxQuery.add( String.format("filter(fn: (r) => %s)",
 					tags.keySet().stream()
-					.map(key -> '(' + tags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
+					.map(key -> '(' + finalTags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
 					.collect(Collectors.joining(" and "))) );
+		}
 		
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
 		if (Boolean.TRUE.equals(performDecumulation))
@@ -121,7 +136,7 @@ public class MeasurementService {
 		return MeasurementMapper.fromFlux(tables, getTags);
 	}
 
-	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement, Boolean toFloat, Boolean performDecumulation, Boolean getTags) {
+	public List<MeasurementDAOResponse> dataOperation(String bucket, InfluxFunction function, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to, String timeVar, String group, Boolean byMeasurement, Boolean toFloat, Boolean performDecumulation, Boolean getTags, Boolean onlyLatestPrediction) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> fluxQuery = new ArrayList<>();
@@ -148,12 +163,29 @@ public class MeasurementService {
 			fluxQuery.add( String.format("filter(fn: (r) => %s)",
 					fields.stream().map(field -> String.format("r[\"_field\"] == \"%s\"", field)).collect(Collectors.joining(" or "))) );
 
+		// IF ONLY FETCHING LATEST PREDICITON GENERATION
+		if (Boolean.TRUE.equals(onlyLatestPrediction)){
+			List<String> predictionValues = listTagValues(bucket, "time_prediction", measurements, fields, tags);
+			if(predictionValues != null && !predictionValues.isEmpty()){
+				String latest = null;
+				for(String predTime : predictionValues){
+					if(latest == null || latest.compareTo(predTime) < 0)
+						latest = predTime;
+				}
+				if(tags == null)
+					tags = new HashMap<>();
+				tags.put("time_prediction", List.of(latest));
+			}
+		}
+
 		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
-		if (tags != null && !tags.isEmpty())
+		if (tags != null && !tags.isEmpty()) {
+			Map<String, List<String>> finalTags = tags;
 			fluxQuery.add( String.format("filter(fn: (r) => %s)",
 					tags.keySet().stream()
-					.map(key -> '(' + tags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
+					.map(key -> '(' + finalTags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
 					.collect(Collectors.joining(" and "))) );
+		}
 		fluxQuery.add("filter(fn: (r) => types.isType(v: r._value, type: \"float\") or types.isType(v: r._value, type: \"int\"))");
 
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
@@ -234,7 +266,7 @@ public class MeasurementService {
 
 		// FILTER USING FIELD
 		if (fields != null && !fields.isEmpty())
-			filter.add( '(' + 
+			filter.add( '(' +
 					fields.stream().map(field -> String.format("r[\"_field\"] == \"%s\"", field)).collect(Collectors.joining(" or ")) + ')');
 
 		// FILTER USING TAGS AND ITS VALUES

@@ -74,7 +74,7 @@ compileApp() {
     then
         cd "${apisPath}/ruleEvaluationService"
         mvn clean package -Dmaven.test.skip
-        cp "./target/"*.jar "${current}/docker_config/APIs/rule-evaluation-service/api.jar"
+        cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
     fi
 
     if [[ $ui = 'true' ]]
@@ -106,7 +106,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/postgresql-db:latest
         
         kubectl apply -f postgresql-configmap.yaml --namespace=$project
-        envsubst '$PROJECT' < postgresql-statefulset.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < postgresql-statefulset.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f postgresql-service.yaml --namespace=$project
         
         while [[ $(kubectl -n ${project} get pods -l app=postgresql-db -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; 
@@ -131,7 +131,7 @@ installPSNC() {
         
         kubectl apply -f influxdb-volume.yaml --namespace=$project
         kubectl apply -f influxdb-secrets.yaml --namespace=$project
-        envsubst '$PROJECT' < influxdb-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < influxdb-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f influxdb-service.yaml --namespace=$project
     fi
 # DEPLOY APIs
@@ -151,7 +151,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/hdr-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < hdr-api-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < hdr-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f hdr-api-service.yaml --namespace=$project
     fi
 
@@ -170,7 +170,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/influx-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < influx-api-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < influx-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f influx-api-service.yaml --namespace=$project
     fi
 
@@ -189,7 +189,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/kpi-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < kpi-api-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < kpi-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f kpi-api-service.yaml --namespace=$project
     fi
 
@@ -208,7 +208,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/ingestion-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < ingestion-api-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < ingestion-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f ingestion-api-service.yaml --namespace=$project
     fi
 
@@ -227,7 +227,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/rules-api:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f rules-api-service.yaml --namespace=$project
     fi
 
@@ -248,7 +248,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/wso:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < wso2-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < wso2-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f wso2-service.yaml --namespace=$project
     fi
 # DEPLOY NEXUS API MANAGER
@@ -290,7 +290,7 @@ installPSNC() {
         # create kubernetes resources
         kubectl apply -f grafana-config.yaml --namespace=$project
         kubectl apply -f grafana-volume.yaml --namespace=$project
-        envsubst '$PROJECT' < grafana-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < grafana-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f grafana-service.yaml --namespace=$project
     fi
 # DEPLOY UI AND KEYCLOAK
@@ -314,7 +314,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/keycloak:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < keycloak-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < keycloak-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f keycloak-service.yaml --namespace=$project
     fi
 
@@ -332,7 +332,7 @@ installPSNC() {
             cd "${current}/docker_config/Others/renergetic-ui"
         fi
         
-        delete kubernetes resources if exists
+        # delete kubernetes resources if exists
         kubectl delete deployments/renergetic-ui --namespace=$project
         kubectl delete services/renergetic-ui-sv --namespace=$project
 
@@ -341,7 +341,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/renergetic-ui:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < ui-deployment.yaml | kubectl apply -f --namespace=$project -
+        envsubst '$PROJECT' < ui-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f ui-service.yaml --namespace=$project
     fi
 }
