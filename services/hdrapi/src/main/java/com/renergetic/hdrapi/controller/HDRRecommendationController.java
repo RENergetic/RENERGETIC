@@ -1,36 +1,25 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.common.dao.HDRRecommendationDAO;
-import com.renergetic.common.dao.MeasurementDAORequest;
 import com.renergetic.common.dao.MeasurementDAOResponse;
-import com.renergetic.common.dao.ResourceDAO;
-import com.renergetic.common.model.Details;
-import com.renergetic.common.model.Measurement;
-import com.renergetic.common.model.MeasurementType;
-import com.renergetic.common.model.details.MeasurementDetails;
-import com.renergetic.common.model.details.MeasurementTags;
-import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
-import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
-import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.hdrapi.dao.temp.HDRRequest;
+import com.renergetic.hdrapi.dao.temp.HDRRecommendationDAO;
 import com.renergetic.hdrapi.dao.temp.HDRRequestDAO;
 import com.renergetic.hdrapi.service.HDRRecommendationService;
-import com.renergetic.hdrapi.service.MeasurementService;
+import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -40,18 +29,24 @@ public class HDRRecommendationController {
 
     @Autowired
     HDRRecommendationService hdrService;
-
+    @Autowired
+    private DummyDataGenerator dummyDataGenerator;
+    @Value("${api.generate.dummy-data}")
+    private Boolean generateDummy;
 //=== GET REQUESTS====================================================================================
 
     @Operation(summary = "list recent recommendations")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/recommendations/recent", produces = "application/json")
+    @GetMapping(path = "/recommendations/current", produces = "application/json")
     public ResponseEntity<List<HDRRecommendationDAO>> getAllRecommendations(
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit) {
 
         List<HDRRecommendationDAO> recommendations;
-        recommendations = hdrService.getRecent().orElse(new ArrayList<>());
+        if (!generateDummy)
+            recommendations = hdrService.getRecent().orElse(new ArrayList<>());
+        else
+            recommendations = dummyDataGenerator.getRecommendations();
 
         return new ResponseEntity<>(recommendations, HttpStatus.OK);
     }
@@ -64,13 +59,18 @@ public class HDRRecommendationController {
             @PathVariable Long id,
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit) {
-        var measurements = hdrService.getMeasurements(id);
+        List<MeasurementDAOResponse> measurements ;
+
+        if (!generateDummy)
+            measurements = hdrService.getMeasurements(id);
+        else
+            measurements = dummyDataGenerator.getMeasurements(id);
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
 
     @Operation(summary = "list requests")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/requests/recent", produces = "application/json")
+    @GetMapping(path = "/requests/current", produces = "application/json")
     public ResponseEntity<List<HDRRequestDAO>> getAllRequests(
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit) {
@@ -100,10 +100,10 @@ public class HDRRecommendationController {
     @PostMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Long> saveRecommendations(@PathVariable(name = "t") Optional<Long> timestamp,
                                                     @RequestBody List<HDRRecommendationDAO> recommendations) {
-        LocalDateTime t;
-        t = timestamp.map(DateConverter::toLocalDateTime).orElseGet(LocalDateTime::now);
+        Long t;
+        t = timestamp.orElse(DateConverter.toEpoch(LocalDateTime.now()));
         hdrService.save(t, recommendations);
-        return new ResponseEntity<>(DateConverter.toEpoch(t), HttpStatus.CREATED);
+        return new ResponseEntity<>(t, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Insert Recommendation")
@@ -114,7 +114,7 @@ public class HDRRecommendationController {
     @PutMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
     public ResponseEntity saveRecommendation(@PathVariable(name = "t", required = true) Long timestamp,
                                              @RequestBody List<HDRRecommendationDAO> recommendations) {
-        hdrService.save(DateConverter.toLocalDateTime(timestamp), recommendations);
+        hdrService.save(timestamp, recommendations);
         return new ResponseEntity(ResponseEntity.noContent(), HttpStatus.CREATED);
     }
 

@@ -10,12 +10,14 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.renergetic.common.dao.MeasurementDAO;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
 import com.renergetic.common.dao.ResourceDAO;
 import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
+import com.renergetic.hdrapi.dao.temp.MeasurementTagsRepositoryTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -47,6 +49,8 @@ public class MeasurementService {
     @Autowired
     MeasurementRepository measurementRepository;
     @Autowired
+    MeasurementTagsRepositoryTemp measurementTagsRepository2;
+    @Autowired
     MeasurementRepositoryTemp measurementRepository2;
 
     @Autowired
@@ -70,7 +74,7 @@ public class MeasurementService {
     }
 
     public MeasurementDAOResponse duplicate(Long id) {
-        var measurementToCopy  = measurementRepository.getById(id);
+        var measurementToCopy = measurementRepository.getById(id);
 //        measurementToCopy.setId(null);
         var dao = MeasurementDAORequest.create(measurementToCopy);
         dao.setId(null);
@@ -125,19 +129,21 @@ public class MeasurementService {
     public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
                                                      String sensorName,
                                                      String assetName, Long typeId, String physicalTypeName,
+                                                     String tagKey,
                                                      Long offset,
                                                      Integer limit) {
-        return measurementRepository2.findMeasurements(
-                        null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
-                        limit)
-                .stream().map((it) ->
-                        {
-//                    var  mt =measurementTypeRepository.findById(it.getTypeId()).orElseThrow();
-//                    return MeasurementDAOImpl.create(it,mt);
-                            return MeasurementDAOImpl.create(it);
-                        }
+        Stream<MeasurementDAO> measurements;
+        if (tagKey == null) {
+            measurements = measurementRepository2.findMeasurements(
+                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
+                    limit).stream();
+        } else {
+            measurements = measurementRepository2.findMeasurements(
+                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,
+                    offset, limit).stream();
+        }
 
-                ).collect(Collectors.toList());
+        return measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
     }
 
     public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {
@@ -338,6 +344,12 @@ public class MeasurementService {
     public List<MeasurementTagsDAO> getMeasurementTags(Long measurementId) {
         List<MeasurementTags> tags = measurementRepository.getTags(measurementId);
         return tags.stream().map(it -> MeasurementTagsDAO.create(it, measurementId)).collect(Collectors.toList());
+
+    }
+
+    public List<String> getTagKeys() {
+        return measurementTagsRepository2.listTagKeys();
+
 
     }
 

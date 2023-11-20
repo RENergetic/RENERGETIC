@@ -21,13 +21,15 @@ public interface MeasurementTagsRepository extends JpaRepository<MeasurementTags
 			"INNER JOIN measurement_tags connection ON connection.tag_id = t.id) " +
 			"WHERE connection.measurement_id = :measurementId", nativeQuery = true)
 	List<MeasurementTags> findByMeasurementId(Long measurementId);
-	
+
 
 
     @Query(value = "SELECT mt.* " +
             " FROM tags mt " +
             " WHERE mt.key=:key and mt.value =:value ", nativeQuery = true)
     List<MeasurementTags> findByKeyAndValue(@Param("key") String key, @Param("value") String value);
+    @Query(value = "SELECT distinct key  from tags;", nativeQuery = true)
+    List<String> listTagKeys( );
 
     @Modifying
     @Transactional

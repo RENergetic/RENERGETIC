@@ -104,6 +104,7 @@ public class MeasurementController {
             @RequestParam(required = false) String direction,
             @RequestParam(required = false, name = "sensor_name") String sensorName,
             @RequestParam(required = false, name = "asset_name") String assetName,
+            @RequestParam(required = false, name = "tag_key") String tagKey,
             @RequestParam(required = false, name = "type_id") Long typeId,
             @RequestParam(required = false, name = "type_physical_name") String physicalTypeName) {
 
@@ -111,7 +112,7 @@ public class MeasurementController {
         List<MeasurementDAOImpl> measurements = new ArrayList<>();
 
         measurements = measurementSv.findMeasurements(name, domain, direction, sensorName,
-                assetName, typeId, physicalTypeName, offset.orElse(0L), limit.orElse(1000));
+                assetName, typeId, physicalTypeName, tagKey, offset.orElse(0L), limit.orElse(1000));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
@@ -155,6 +156,14 @@ public class MeasurementController {
                 daoResponse != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @Operation(summary = "Get All Measurements Tags Keys")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/tags/keys", produces = "application/json")
+    public ResponseEntity<List<String>> getAllMeasurementTagKeys() {
+        List<String> tags = measurementSv.getTagKeys();
+        return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+
     @Operation(summary = "Get All Measurements Types")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/type", produces = "application/json")
@@ -167,6 +176,7 @@ public class MeasurementController {
 
         return new ResponseEntity<>(type, HttpStatus.OK);
     }
+
 
     @Operation(summary = "Get Measurement Type by id")
     @ApiResponses({
