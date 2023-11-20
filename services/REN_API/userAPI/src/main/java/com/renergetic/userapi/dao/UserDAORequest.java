@@ -2,7 +2,7 @@ package com.renergetic.userapi.dao;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.userapi.model.User;
+import com.renergetic.common.model.User;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

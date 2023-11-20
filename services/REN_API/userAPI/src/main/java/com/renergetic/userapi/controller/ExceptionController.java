@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.renergetic.userapi.dao.ErrorMessage;
-import com.renergetic.userapi.exception.HttpRuntimeException;
+import com.renergetic.common.dao.ErrorMessage;
+import com.renergetic.common.exception.HttpRuntimeException;
 
 @RestControllerAdvice
 public class ExceptionController extends ResponseEntityExceptionHandler {

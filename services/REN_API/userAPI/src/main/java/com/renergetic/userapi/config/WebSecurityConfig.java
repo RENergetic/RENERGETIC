@@ -1,7 +1,5 @@
 package com.renergetic.userapi.config;
 
-import com.renergetic.userapi.model.security.KeycloakRole;
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +14,10 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.renergetic.common.config.JwtAuthenticationFilter;
+import com.renergetic.common.config.JwtAuthorizationManager;
+import com.renergetic.common.model.security.KeycloakRole;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,13 +52,14 @@ public class WebSecurityConfig {
         Map<String, KeycloakRole[]> putUrls = new HashMap<>();
         Map<String, KeycloakRole[]> deleteUrls = new HashMap<>();
         
-        getUrls.put("/api/keycloak/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
         
-        postUrls.put("/api/keycloak/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        // getUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
         
-        putUrls.put("/api/keycloak/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        // postUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
         
-        deleteUrls.put("/api/keycloak/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        // putUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        
+        // deleteUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
 
         http.authorizeHttpRequests(registry -> {
 	        

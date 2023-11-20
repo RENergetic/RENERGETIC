@@ -17,8 +17,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.userapi.dao.UserDAORequest;
-import com.renergetic.userapi.model.security.KeycloakRole;
+import com.renergetic.common.dao.UserDAORequest;
+import com.renergetic.common.model.security.KeycloakRole;
 
 @Service
 public class KeycloakService {
@@ -128,7 +128,7 @@ public class KeycloakService {
     }
 
     public List<UserRepresentation> listUsers(String role,int offset,int limit) {
-        return new ArrayList<UserRepresentation>(getRealmApi().roles().get(role).getRoleUserMembers(offset,limit));
+        return new ArrayList<>(getRealmApi().roles().get(role).getRoleUserMembers(offset,limit));
     }
 
     public RoleRepresentation getRole(String role) {

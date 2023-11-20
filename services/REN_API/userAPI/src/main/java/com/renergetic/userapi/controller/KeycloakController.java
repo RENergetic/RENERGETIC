@@ -20,15 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.userapi.dao.UserDAORequest;
-import com.renergetic.userapi.dao.UserDAOResponse;
-import com.renergetic.userapi.model.security.KeycloakRole;
+import com.renergetic.common.dao.UserDAORequest;
+import com.renergetic.common.dao.UserDAOResponse;
+import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.userapi.service.KeycloakService;
 import com.renergetic.userapi.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @CrossOrigin(origins = "*")
@@ -44,7 +43,7 @@ public class KeycloakController {
 	private UserService userSv;
 	
 	@GetMapping("test")
-	public ResponseEntity<?> test() {
+	public ResponseEntity<Void> test() {
 		return ResponseEntity.ok(null);
 	}
 	
@@ -75,11 +74,8 @@ public class KeycloakController {
     }
 
     @Operation(summary = "Create a new user")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "User saved correctly"),
-            @ApiResponse(responseCode = "500", description = "Error saving user")
-    }
-    )
+    @ApiResponse(responseCode = "201", description = "User saved correctly")
+    @ApiResponse(responseCode = "500", description = "Error saving user")
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<UserDAOResponse> createUser(@RequestBody UserDAORequest user) {
         UserRepresentation keycloakUser = keycloakSv.createUser(user);
@@ -89,13 +85,10 @@ public class KeycloakController {
     }
 
     @Operation(summary = "Update a existing User")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "User saved correctly"),
-            @ApiResponse(responseCode = "404", description = "User not exist"),
-            @ApiResponse(responseCode = "422", description = "Type isn's valid"),
-            @ApiResponse(responseCode = "500", description = "Error saving user")
-    }
-    )
+    @ApiResponse(responseCode = "200", description = "User saved correctly")
+    @ApiResponse(responseCode = "404", description = "User not exist")
+    @ApiResponse(responseCode = "422", description = "Type isn's valid")
+    @ApiResponse(responseCode = "500", description = "Error saving user")
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Boolean> updateUser(@PathVariable String userId, @RequestBody UserDAORequest user) {
     	UserRepresentation keycloakUser = keycloakSv.updateUser(user);
@@ -104,13 +97,10 @@ public class KeycloakController {
     }
 
     @Operation(summary = "Add role to the User")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "User saved correctly"),
-            @ApiResponse(responseCode = "404", description = "Role or User to associate not exist"),
-            @ApiResponse(responseCode = "422", description = "Type isn's valid"),
-            @ApiResponse(responseCode = "500", description = "Error saving user")
-    }
-    )
+    @ApiResponse(responseCode = "200", description = "User saved correctly")
+    @ApiResponse(responseCode = "404", description = "Role or User to associate not exist")
+    @ApiResponse(responseCode = "422", description = "Type isn's valid")
+    @ApiResponse(responseCode = "500", description = "Error saving user")
     @PutMapping(path = "/{id}/roles/{roleName}", produces = "application/json")
     public ResponseEntity<List<String>> addRole(@PathVariable String id, @PathVariable String roleName) {
         List<String> roles = keycloakSv.assignRole(id, roleName)
@@ -120,27 +110,26 @@ public class KeycloakController {
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
     @Operation(summary = "Delete a existing User", hidden = false)
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "User deleted correctly"),
-            @ApiResponse(responseCode = "500", description = "Error deleting user")})
+    @ApiResponse(responseCode = "200", description = "User deleted correctly")
+    @ApiResponse(responseCode = "500", description = "Error deleting user")
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable String id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
         UserRepresentation userRepresentation = keycloakSv.getUser(id).toRepresentation();
-        client.deleteUser(userRepresentation.getId());
+        keycloakSv.deleteUser(userRepresentation.getId());
         userSv.delete(userRepresentation);
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        return ResponseEntity.ok(null);
     }
 
 
     @Operation(summary = "Revoke role", hidden = false)
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Role deleted correctly"),
-            @ApiResponse(responseCode = "500", description = "Error deleting user")})
+    @ApiResponse(responseCode = "200", description = "Role deleted correctly")
+    @ApiResponse(responseCode = "500", description = "Error deleting user")
     @DeleteMapping(path = "/{id}/roles/{roleName}")
-    public ResponseEntity<?> deleteRole(@PathVariable String id, @PathVariable String roleName) {
-        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
-        String token = loggedInService.getKeycloakUser().getToken();
-        KeycloakWrapper client = keycloakService.getClient(token, true);
-        List<String> roles = client.revokeRole(id, roleName).stream().map(RoleRepresentation::getName).collect(
-                Collectors.toList());
+    public ResponseEntity<List<String>> deleteRole(@PathVariable String id, @PathVariable String roleName) {
+        List<String> roles = keycloakSv.revokeRole(id, roleName)
+            .stream()
+            .map(RoleRepresentation::getName)
+            .collect(Collectors.toList());
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
 }
