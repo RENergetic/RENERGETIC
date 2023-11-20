@@ -6,6 +6,7 @@ import com.renergetic.common.model.HDRRecommendation;
 import com.renergetic.common.model.Heatmap;
 import com.renergetic.common.model.User;
 import com.renergetic.common.model.details.MeasurementTags;
+import com.renergetic.common.utilities.DateConverter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -27,7 +28,7 @@ public class HDRRecommendationDAO {
     @JsonProperty(required = false)
     private Long id;
     @JsonProperty(required = true)
-    private LocalDateTime timestamp;
+    private Long timestamp;
     @JsonProperty(required = true)
     private MeasurementTagsDAO tag;
 
@@ -40,7 +41,7 @@ public class HDRRecommendationDAO {
 
         if (recommendation != null) {
             dao = new HDRRecommendationDAO();
-            dao.setTimestamp(recommendation.getTimestamp());
+            dao.setTimestamp(DateConverter.toEpoch(recommendation.getTimestamp()));
             dao.setLabel(recommendation.getLabel());
             dao.setTag(MeasurementTagsDAO.create(recommendation.getTag()));
             dao.setId(recommendation.getId());
@@ -54,6 +55,7 @@ public class HDRRecommendationDAO {
         recommendation.setLabel(this.getLabel());
         if (this.id != null)
             recommendation.setId(this.id);
+        recommendation.setTimestamp(DateConverter.toLocalDateTime(this.getTimestamp()));
         return recommendation;
     }
 

@@ -22,10 +22,7 @@ public interface MeasurementTagsRepository extends JpaRepository<MeasurementTags
 			"WHERE connection.measurement_id = :measurementId", nativeQuery = true)
 	List<MeasurementTags> findByMeasurementId(Long measurementId);
 	
-    @Query(value ="SELECT m.* FROM (measurement m " +
-            " inner JOIN measurement_tags mt ON mt.measurement_id = m.id  )" +
-            "  WHERE mt.tag_id = :tagId  LIMIT :limit OFFSET :offset  ", nativeQuery = true)
-    public List<Measurement> getMeasurementByTagId(@Param("tagId") Long tagId, Long offset, Long limit);
+
 
     @Query(value = "SELECT mt.* " +
             " FROM tags mt " +

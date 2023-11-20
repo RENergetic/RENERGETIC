@@ -5,6 +5,7 @@ import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.model.HDRRecommendation;
 import com.renergetic.common.model.HDRRequest;
 import com.renergetic.common.model.MeasurementType;
+import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +28,16 @@ public class HDRRequestDAO {
     @JsonProperty(required = false)
     private Long id;
     @JsonProperty(required = true)
-    private LocalDateTime timestamp;
+    private Long timestamp;
     @JsonProperty(value = "date_from", required = true)
-    private LocalDateTime dateFrom;
+    private Long dateFrom;
     @JsonProperty(value = "date_to", required = true)
-    private LocalDateTime dateTo;
+    private Long dateTo;
     @Column(name = "max_value")
     private Double maxValue;
     @JsonProperty(value = "value_change")
     private Double valueChange;
-    @JsonProperty(required = false)
+    @JsonProperty(value = "value_type",required = false)
     private MeasurementType valueType;
     @JsonProperty(value = "config")
     private Map<String, Object> config;
@@ -49,9 +50,9 @@ public class HDRRequestDAO {
 
         if (request != null) {
             dao = new HDRRequestDAO();
-            dao.setTimestamp(request.getTimestamp());
-            dao.setDateFrom(request.getDateFrom());
-            dao.setDateTo(request.getDateTo());
+            dao.setTimestamp(DateConverter.toEpoch(request.getTimestamp()));
+            dao.setDateFrom(DateConverter.toEpoch(request.getDateFrom()));
+            dao.setDateTo(DateConverter.toEpoch(request.getDateTo()));
             dao.setId(request.getId());
             dao.setMaxValue(request.getMaxValue());
             dao.setValueChange(request.getValueChange());
@@ -71,9 +72,9 @@ public class HDRRequestDAO {
     public HDRRequest mapToEntity() {
         HDRRequest request = new HDRRequest();
         request.setId(this.getId());
-        request.setTimestamp(this.getTimestamp());
-        request.setDateFrom(this.getDateFrom());
-        request.setDateTo(this.getDateTo());
+        request.setTimestamp(DateConverter.toLocalDateTime(this.getTimestamp()));
+        request.setDateFrom(DateConverter.toLocalDateTime(this.getDateFrom()));
+        request.setDateTo(DateConverter.toLocalDateTime(this.getDateTo()));
         request.setId(this.getId());
         request.setMaxValue(this.getMaxValue());
         request.setValueChange(this.getValueChange());
