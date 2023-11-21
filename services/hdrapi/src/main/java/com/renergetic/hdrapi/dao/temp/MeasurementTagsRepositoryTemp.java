@@ -11,9 +11,12 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 public interface MeasurementTagsRepositoryTemp extends JpaRepository<MeasurementTags, Long> {
-	
+
 
     @Query(value = "SELECT distinct key  from tags;", nativeQuery = true)
-    List<String> listTagKeys( );
+    List<String> listTagKeys();
+
+    @Query(value = "SELECT distinct key  from tags WHERE tags.key = :tagKey", nativeQuery = true)
+    List<String> listTagValues(String tagKey);
 
 }

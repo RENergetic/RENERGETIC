@@ -52,15 +52,15 @@ public class MeasurementController {
 
     @Operation(summary = "Get All Measurements having details key and value")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/key/{key}/{value}", produces = "application/json")
-    public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements(
+    @GetMapping(path = "/key/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<List<MeasurementDAOResponse>> getTagMeasurements(
             @PathVariable(name = "key") String key,
             @PathVariable(name = "value") String value,
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit) {
 
         List<MeasurementDAOResponse> measurements =
-                measurementSv.getByProperty(key, value, offset.orElse(0L), limit.orElse(100));
+                measurementSv.getByTag(key, value, offset.orElse(0L), limit.orElse(100));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
@@ -158,10 +158,17 @@ public class MeasurementController {
 
     @Operation(summary = "Get All Measurements Tags Keys")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/tags/keys", produces = "application/json")
+    @GetMapping(path = "/tags/key", produces = "application/json")
     public ResponseEntity<List<String>> getAllMeasurementTagKeys() {
         List<String> tags = measurementSv.getTagKeys();
         return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+    @Operation(summary = "Get All Measurements Tags Keys")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/tags/key/{key}/values", produces = "application/json")
+    public ResponseEntity<List<String>> getAllMeasurementTagKeys(@PathVariable String key) {
+        List<String> tagValues = measurementSv.getTagValues(key);
+        return new ResponseEntity<>(tagValues, HttpStatus.OK);
     }
 
     @Operation(summary = "Get All Measurements Types")

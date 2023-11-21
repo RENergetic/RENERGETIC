@@ -148,17 +148,17 @@ public class DummyDataGenerator {
                 Collectors.toList());
 
         var recommendations = IntStream.range(0, tags.size()).mapToObj((idx) -> {
-            var it = tags.get(idx);
-            var hdr = new HDRRecommendationDAO();
-            hdr.setTimestamp(timestamp);
-            hdr.setTag(MeasurementTagsDAO.create(it));
-            hdr.setId((long) idx);
-            return hdr;
-        }).filter((it) -> random.nextBoolean() || random.nextBoolean()).collect(Collectors.toList());
+                    var it = tags.get(idx);
+                    var hdr = new HDRRecommendationDAO();
+                    hdr.setTimestamp(timestamp);
+                    hdr.setTag(MeasurementTagsDAO.create(it));
+                    hdr.setId((long) idx);
+                    return hdr;
+                }).filter((it) -> !it.getTag().getValue().equals("no_tag"))
+                .filter((it) -> random.nextBoolean() || random.nextBoolean()).collect(Collectors.toList());
         return recommendations;
 
     }
-
 
 
     public List<MeasurementDAOResponse> getMeasurements(Long id) {

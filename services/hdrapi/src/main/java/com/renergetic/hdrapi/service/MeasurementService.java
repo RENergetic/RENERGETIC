@@ -139,6 +139,17 @@ public class MeasurementService {
         return list;
     }
 
+    public List<MeasurementDAOResponse> getByTag(String key, String value, long offset, long limit) {
+        List<Measurement> measurements = measurementRepository2.getMeasurementByTag(key, value, offset, limit);
+        Stream<Measurement> stream = measurements.stream();
+        List<MeasurementDAOResponse> list;
+        list = stream
+                .map(measurement -> MeasurementDAOResponse.create(measurement,
+                        measurementDetailsRepository.findByMeasurementId(measurement.getId()), null))
+                .collect(Collectors.toList());
+        return list;
+    }
+
     public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
                                                      String sensorName,
                                                      String assetName, Long typeId, String physicalTypeName,
@@ -362,8 +373,9 @@ public class MeasurementService {
 
     public List<String> getTagKeys() {
         return measurementTagsRepository2.listTagKeys();
-
-
+    }
+    public List<String> getTagValues(String tagKey) {
+        return measurementTagsRepository2.listTagValues(tagKey);
     }
 
     public MeasurementTags getTagById(Long id) {
