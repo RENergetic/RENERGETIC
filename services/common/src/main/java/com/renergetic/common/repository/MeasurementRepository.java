@@ -210,9 +210,19 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     public List<MeasurementDAO> findMeasurements(Long assetId, String assetName, String measurementName,
                                                  String sensorName, String domain, String direction, Long type,
                                                  String physicalName,String tagKey, long offset, Integer limit);
+
     @Query(value ="SELECT m.* " +
             " FROM (measurement m " +
             " JOIN measurement_tags mt ON mt.measurement_id = m.id  )" +
             " WHERE mt.tag_id = :tagId  LIMIT :limit OFFSET :offset  ", nativeQuery = true)
     public List<Measurement> getMeasurementByTagId(@Param("tagId") Long tagId, Long offset, Long limit);
+    @Query(value ="SELECT m.* " +
+            " FROM (measurement m " +
+            " JOIN measurement_tags mt ON mt.measurement_id = m.id   " +
+            " JOIN tags   ON tags.id = mt.tag_id  )" +
+            " WHERE tags.key =  :tagKey  " +
+            " AND COALESCE(tags.value = CAST(:tagValue AS text)  ,TRUE) " +
+            " LIMIT :limit OFFSET :offset  ", nativeQuery = true)
+    public List<Measurement> getMeasurementByTag(@Param("tagKey") String tagKey, @Param("tagValue") String tagValue,Long offset, Long limit);
+
 }

@@ -31,6 +31,9 @@ public interface MeasurementTagsRepository extends JpaRepository<MeasurementTags
     @Query(value = "SELECT distinct key  from tags;", nativeQuery = true)
     List<String> listTagKeys( );
 
+    @Query(value = "SELECT distinct key  from tags WHERE tags.key = :tagKey", nativeQuery = true)
+    List<String> listTagValues(String tagKey);
+
     @Modifying
     @Transactional
     @Query(value = " INSERT INTO measurement_tags ( tag_id, measurement_id) VALUES " +
