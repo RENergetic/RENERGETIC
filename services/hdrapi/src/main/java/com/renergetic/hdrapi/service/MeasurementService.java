@@ -1,29 +1,26 @@
 package com.renergetic.hdrapi.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
-import com.renergetic.common.dao.MeasurementDAO;
+import com.renergetic.common.dao.*;
+import com.renergetic.common.repository.*;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.common.dao.ResourceDAO;
 import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
 import com.renergetic.hdrapi.dao.temp.MeasurementTagsRepositoryTemp;
+import com.renergetic.hdrapi.dao.temp.MeasurementTypeRepositoryTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.common.dao.MeasurementDAORequest;
-import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.common.exception.InvalidNonExistingIdException;
 import com.renergetic.common.exception.NotFoundException;
@@ -34,10 +31,6 @@ import com.renergetic.common.model.MeasurementType;
 import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.model.details.MeasurementTags;
-import com.renergetic.common.repository.MeasurementRepository;
-import com.renergetic.common.repository.MeasurementTagsRepository;
-import com.renergetic.common.repository.MeasurementTypeRepository;
-import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
@@ -59,6 +52,11 @@ public class MeasurementService {
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;
     @Autowired
+    MeasurementTypeRepositoryTemp measurementTypeRepositoryTemp;
+    @Autowired
+    AssetRepository assetRepository;
+
+    @Autowired
     MeasurementDetailsRepository measurementDetailsRepository;
     @Autowired
     MeasurementTagsRepository measurementTagsRepository;
@@ -70,10 +68,37 @@ public class MeasurementService {
         if (measurement.getId() != null && measurementRepository.existsById(measurement.getId()))
             throw new InvalidCreationIdAlreadyDefinedException(
                     "Already exists a measurement with ID " + measurement.getId());
-
+        var type = measurement.getType();
+        var dbType = measurementTypeRepository.findById(type.getId()).orElse(null);
+        if (dbType == null || !dbType.getName().equals(type.getName())
+                || !dbType.getPhysicalName().equals(type.getPhysicalName())
+                || !dbType.getUnit().equals(type.getUnit())
+        ) {
+            List<MeasurementType> types =
+                    measurementTypeRepositoryTemp.findMeasurementType(type.getName(), type.getUnit(),
+                            type.getPhysicalName());
+            if (types.size() != 1) {
+                throw new InvalidCreationIdAlreadyDefinedException("Measurement type does not exists");
+            }
+            measurement.setType(types.get(0));
+        }
+        var assetDAO = measurement.getAsset();
+        if (assetDAO != null) {
+            var asset = assetRepository.findById(assetDAO.getId()).orElse(null);
+            if (asset == null || !asset.getName().equals(assetDAO.getName())) {
+                measurement.setAsset(SimpleAssetDAO.create(
+                        assetRepository.findByName(assetDAO.getName()).orElseThrow(() ->
+                                new NotFoundException("Asset does not exist " + assetDAO.getName() + " found"))));
+            }
+        }
         Measurement measurementEntity = measurement.mapToEntity();
         measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
         return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null, null);
+    }
+
+    @Transactional
+    public List<MeasurementDAOResponse> save(List<MeasurementDAORequest> measurements) {
+        return measurements.stream().map(this::save).collect(Collectors.toList());
     }
 
     public MeasurementDAOResponse duplicate(Long id) {
@@ -109,7 +134,8 @@ public class MeasurementService {
         details.setMeasurement(new Measurement(measurementId, null, null, null, null, null, null, null));
 
         log.warn(String.format("Saving %s %s", details.getKey(), details.getValue()));
-        MeasurementDetails previousDetails = measurementDetailsRepository.findByKeyAndMeasurementId(details.getKey(), details.getMeasurement().getId()).orElse(null);
+        MeasurementDetails previousDetails = measurementDetailsRepository.findByKeyAndMeasurementId(details.getKey(),
+                details.getMeasurement().getId()).orElse(null);
         if (previousDetails != null) {
             previousDetails.setValue(details.getValue());
             return measurementDetailsRepository.save(previousDetails) != null;
@@ -374,6 +400,7 @@ public class MeasurementService {
     public List<String> getTagKeys() {
         return measurementTagsRepository2.listTagKeys();
     }
+
     public List<String> getTagValues(String tagKey) {
         return measurementTagsRepository2.listTagValues(tagKey);
     }

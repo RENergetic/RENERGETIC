@@ -318,6 +318,18 @@ public class MeasurementController {
         MeasurementDAOResponse _measurement = measurementSv.save(measurement);
         return new ResponseEntity<>(_measurement, HttpStatus.CREATED);
     }
+    @Operation(summary = "Create a new Measurements")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Measurements saved correctly"),
+            @ApiResponse(responseCode = "422", description = "Type isn't valid"),
+            @ApiResponse(responseCode = "500", description = "Error saving measurement")
+    }
+    )
+    @PostMapping(path = "/batch", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<List<MeasurementDAOResponse>> createMeasurements(@RequestBody List<MeasurementDAORequest> measurements) {
+        List<MeasurementDAOResponse> _measurements = measurementSv.save(measurements);
+        return new ResponseEntity<>(_measurements, HttpStatus.CREATED);
+    }
 
     @Operation(summary = "Create a new Measurement Type")
     @ApiResponses({
