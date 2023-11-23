@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.exception.UnauthorizedAccessException;
@@ -11,6 +12,7 @@ import com.renergetic.common.model.User;
 import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import com.renergetic.common.repository.UserRepository;
 
+@Service
 public class LoggedInService {
 	
 	@Autowired
