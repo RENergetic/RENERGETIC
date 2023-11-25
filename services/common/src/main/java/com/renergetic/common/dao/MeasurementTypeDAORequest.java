@@ -13,12 +13,18 @@ public class MeasurementTypeDAORequest {
     //TODO: store symbol ,"ºC",
     @JsonProperty(required = false)
     private Long id;
+    @JsonProperty(required = false, value = "name")
+    private String name;
 
-    @JsonProperty(required = true, value = "physical_name")
+    @JsonProperty(required = false, value = "physical_name")
     private String physicalName;
 
+    @JsonProperty(required = false, value = "unit")
+    private String unit;
+
+
     public static MeasurementTypeDAORequest create(MeasurementType m) {
-        return new MeasurementTypeDAORequest(m.getId(), m.getPhysicalName());
+        return new MeasurementTypeDAORequest(m.getId(),m.getName(), m.getPhysicalName(), m.getUnit());
     }
 
 }
