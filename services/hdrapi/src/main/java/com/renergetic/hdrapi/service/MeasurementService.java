@@ -63,25 +63,70 @@ public class MeasurementService {
     @Autowired
     UuidRepository uuidRepository;
 
+    /**
+     * check if the input measurement type matches database
+     *
+     * @param dao
+     * @return
+     */
+    public MeasurementType verifyMeasurementType(MeasurementType dao) {
+        var dbType = dao.getId()!=null? measurementTypeRepository.findById(dao.getId()).orElse(null):null;
+        //TODO: remove after common library update
+        //hotfix:
+        if(dao.getPhysicalName()==null && dbType!=null){
+            return dbType;
+        }
+        if (dbType == null
+                || (dbType.getName() == null && dao.getName() != null)
+                || !dbType.getName().equals(dao.getName())
+                || (dbType.getPhysicalName() == null && dao.getPhysicalName() != null)
+                || !dbType.getPhysicalName().equals(dao.getPhysicalName())
+                || (dbType.getUnit() == null && dao.getUnit() != null)
+                || !dbType.getUnit().equals(dao.getUnit())
+        ) {
+            List<MeasurementType> types =
+                    measurementTypeRepositoryTemp.findMeasurementType(dao.getName(),
+                            dao.getUnit(), dao.getPhysicalName());
+            if (types.size() != 1) {
+                throw new InvalidCreationIdAlreadyDefinedException("Measurement type does not exists");
+            }
+            return types.get(0);
+        }
+        return dbType;
+    }
+
+    /**
+     * check if the input measurement type matches database
+     *
+     * @param dao
+     * @return
+     */
+    public MeasurementTypeDAORequest verifyMeasurementTypeTemp(MeasurementType dao) {
+        var dbType = dao.getId()!=null? measurementTypeRepository.findById(dao.getId()).orElse(null):null;
+        if (dbType == null
+                || (dbType.getPhysicalName() == null && dao.getPhysicalName() != null)
+                || !dbType.getPhysicalName().equals(dao.getPhysicalName())
+        ) {
+            List<MeasurementType> types =
+                    measurementTypeRepositoryTemp.findMeasurementTypeTemp(null, dao.getPhysicalName());
+            if (types.size() < 1) {
+                throw new InvalidCreationIdAlreadyDefinedException("Measurement type does not exists");
+            }
+            dbType = types.get(0);
+        }
+        var mtDAO = new MeasurementTypeDAORequest();
+        mtDAO.setId(dbType.getId());
+        mtDAO.setPhysicalName(dbType.getPhysicalName());
+        return mtDAO;
+    }
+
+
     // ASSET CRUD OPERATIONS
     public MeasurementDAOResponse save(MeasurementDAORequest measurement) {
         if (measurement.getId() != null && measurementRepository.existsById(measurement.getId()))
             throw new InvalidCreationIdAlreadyDefinedException(
                     "Already exists a measurement with ID " + measurement.getId());
-        var type = measurement.getType();
-        var dbType = measurementTypeRepository.findById(type.getId()).orElse(null);
-        if (dbType == null || !dbType.getName().equals(type.getName())
-                || !dbType.getPhysicalName().equals(type.getPhysicalName())
-                || !dbType.getUnit().equals(type.getUnit())
-        ) {
-            List<MeasurementType> types =
-                    measurementTypeRepositoryTemp.findMeasurementType(type.getName(), type.getUnit(),
-                            type.getPhysicalName());
-            if (types.size() != 1) {
-                throw new InvalidCreationIdAlreadyDefinedException("Measurement type does not exists");
-            }
-            measurement.setType(types.get(0));
-        }
+        measurement.setType(verifyMeasurementType(measurement.getType()));
         var assetDAO = measurement.getAsset();
         if (assetDAO != null) {
             var asset = assetRepository.findById(assetDAO.getId()).orElse(null);
