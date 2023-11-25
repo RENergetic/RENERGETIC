@@ -90,6 +90,9 @@ public class MeasurementTileDAORequest {
                 if (type.getId() != null) {
                     MeasurementType entityType = new MeasurementType();
                     entityType.setId(type.getId());
+                    entityType.setName(type.getName());
+                    entityType.setPhysicalName(type.getPhysicalName());
+                    entityType.setUnit(type.getUnit());
                     entity.setType(entityType);
                 } else {
                     entity.setPhysicalName(type.getPhysicalName());
