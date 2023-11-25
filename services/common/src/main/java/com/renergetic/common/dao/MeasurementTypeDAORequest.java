@@ -24,7 +24,16 @@ public class MeasurementTypeDAORequest {
 
 
     public static MeasurementTypeDAORequest create(MeasurementType m) {
-        return new MeasurementTypeDAORequest(m.getId(),m.getName(), m.getPhysicalName(), m.getUnit());
+        return new MeasurementTypeDAORequest(m.getId(), m.getName(), m.getPhysicalName(), m.getUnit());
+    }
+
+    public MeasurementType mapToEntity() {
+        var mt = new MeasurementType();
+        mt.setPhysicalName(this.getPhysicalName());
+        mt.setId(this.getId());
+        mt.setName(this.getName());
+        mt.setUnit(this.getUnit());
+        return mt;
     }
 
 }
