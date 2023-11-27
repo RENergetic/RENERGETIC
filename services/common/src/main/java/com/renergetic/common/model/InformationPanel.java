@@ -31,7 +31,7 @@ import java.util.List;
 //@ToString // TODO: java.lang.StackOverflowError occurs when wrapper API is called
 public class InformationPanel {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false, unique = true)

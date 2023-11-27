@@ -26,7 +26,7 @@ import lombok.ToString;
 @ToString
 public class NotificationDefinition {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "code", nullable = false, insertable = true, updatable = true, unique = true)

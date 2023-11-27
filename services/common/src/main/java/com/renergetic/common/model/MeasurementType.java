@@ -8,6 +8,8 @@ import lombok.ToString;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -20,6 +22,7 @@ import jakarta.persistence.Table;
 public class MeasurementType {
 	//TODO: store symbol ,"ºC",
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonProperty(required = true)
 	@Column(name = "id", nullable = false, insertable = true, updatable = true, unique = true)
 	private Long id;

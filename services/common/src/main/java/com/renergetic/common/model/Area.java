@@ -27,7 +27,7 @@ import org.hibernate.annotations.NotFoundAction;
 @ToString
 public class Area {	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)

@@ -25,7 +25,7 @@ import jakarta.persistence.Table;
 @ToString
 public class InformationTileLayout {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "layout",columnDefinition="TEXT")

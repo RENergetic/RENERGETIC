@@ -27,7 +27,7 @@ import org.hibernate.annotations.NotFoundAction;
 @ToString
 public class Heatmap {	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "name")

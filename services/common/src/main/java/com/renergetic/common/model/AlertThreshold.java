@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 @ToString
 public class AlertThreshold {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Enumerated(EnumType.STRING)
