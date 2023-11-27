@@ -77,6 +77,13 @@ compileApp() {
         cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
     fi
 
+    if [[ $user = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/userAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/user-api/api.jar"
+    fi
+
     if [[ $ui = 'true' ]]
     then
         cd "${uiPath}/renergetic_ui"
@@ -229,6 +236,25 @@ installPSNC() {
         # create kubernetes resources
         envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f rules-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $user = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/user-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/user-api --namespace=$project
+        kubectl delete services/user-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/user-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/user-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < user-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f user-api-service.yaml --namespace=$project
     fi
 
 # DEPLOY WSO2 API MANAGER
