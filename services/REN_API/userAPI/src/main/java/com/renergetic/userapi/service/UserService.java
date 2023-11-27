@@ -1,25 +1,34 @@
 package com.renergetic.userapi.service;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.renergetic.common.dao.AssetDAOResponse;
+import com.renergetic.common.dao.NotificationScheduleDAO;
 import com.renergetic.common.dao.UserDAOResponse;
 import com.renergetic.common.exception.IdAlreadyDefinedException;
 import com.renergetic.common.exception.IdNoDefinedException;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.Asset;
 import com.renergetic.common.model.AssetType;
+import com.renergetic.common.model.NotificationSchedule;
 import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.User;
 import com.renergetic.common.model.UserSettings;
 import com.renergetic.common.repository.AssetRepository;
 import com.renergetic.common.repository.AssetTypeRepository;
+import com.renergetic.common.repository.MeasurementRepository;
+import com.renergetic.common.repository.NotificationScheduleRepository;
 import com.renergetic.common.repository.UserRepository;
 import com.renergetic.common.repository.UserSettingsRepository;
 import com.renergetic.common.repository.UuidRepository;
+import com.renergetic.common.repository.information.AssetDetailsRepository;
+import com.renergetic.common.utilities.OffSetPaging;
 
 @Service
 public class UserService {
@@ -38,6 +47,15 @@ public class UserService {
 
 	@Autowired
 	AssetRepository assetRepo;
+
+    @Autowired
+    AssetDetailsRepository assetDetailsRepo;
+
+    @Autowired
+    NotificationScheduleRepository notificationRepo;
+
+    @Autowired
+    MeasurementRepository measurementRepo;
 	
 	public UserDAOResponse save(UserRepresentation user) {
 
@@ -164,5 +182,49 @@ public class UserService {
 			save.setSettingsJson(settings);
         }
         return settingsRepo.save(save);
+    }
+
+    public List<NotificationScheduleDAO> getNotifications(String keycloakId, Long offset, Integer limit, Boolean showExpired) {
+        // TODO: filter by user id
+        List<NotificationSchedule> schedules = Boolean.TRUE.equals(showExpired) ?
+            notificationRepo.findAll(new OffSetPaging(offset, limit)).toList()
+            : notificationRepo.findNotExpired(new OffSetPaging(offset, limit));
+        
+        return schedules.stream().map(NotificationScheduleDAO::create).collect(Collectors.toList());
+    }
+    
+    public List<AssetDAOResponse> getAssets(Long id) {
+
+        User user = userRepo.findById(id).orElse(null);
+
+        if(user == null)
+        	throw new NotFoundException("User with id %s found", id);
+
+        List<Asset> userAssets = assetRepo.findByUser(user);
+
+        if (userAssets.isEmpty()) {
+            List<AssetDAOResponse> assets = new LinkedList<>();
+            for (Asset userAsset : userAssets)
+                assets.addAll(userAsset.getConnections().stream()
+                        .map(obj -> {
+                            AssetDAOResponse dao = AssetDAOResponse.create(obj.getConnectedAsset(),
+                                    assetDetailsRepo.findByAssetId(obj.getConnectedAsset().getId()));
+                            dao.setConnectionType(obj.getConnectionType());
+                            return dao;
+                        })
+                        .collect(Collectors.toList()));
+            return assets;
+        } else throw new NotFoundException("User " + id + " hasn't related asset");
+    }
+
+    public List<AssetDAOResponse> getAssetsByCategory(Long id, Long categoryId, long offset, int limit) {
+        List<AssetDAOResponse> list = assetRepo.findByUserIdAndCategoryId(id, categoryId, offset, limit)
+                .stream().map(asset -> AssetDAOResponse.create(asset, assetRepo.findByParentAsset(asset),
+                        measurementRepo.findByAsset(asset)))
+                .collect(Collectors.toList());
+
+        if (list.isEmpty())
+            return list;
+        else throw new NotFoundException("No roles found");
     }
 }

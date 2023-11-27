@@ -1,6 +1,7 @@
 package com.renergetic.userapi.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -10,12 +11,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.renergetic.common.dao.AssetDAOResponse;
+import com.renergetic.common.dao.NotificationScheduleDAO;
 import com.renergetic.common.dao.UserDAORequest;
 import com.renergetic.common.dao.UserDAOResponse;
 import com.renergetic.common.model.security.KeycloakUser;
@@ -74,6 +79,38 @@ public class UserController {
     public ResponseEntity<String> getAllUsersSettings() {
         String userId = loggedInSv.getAuthenticationData().getPrincipal().getId();
         return new ResponseEntity<>(userSv.getSettings(userId).getSettingsJson(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get All Notifications for the user")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/notifications", produces = "application/json")
+    public ResponseEntity<List<NotificationScheduleDAO>> getUserNotifications(
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit,
+            @RequestParam(value = "show_expired", required = false) Optional<Boolean> showExpired) {
+        
+        String userId = loggedInSv.getAuthenticationData().getPrincipal().getId();
+        List<NotificationScheduleDAO> notifications = userSv.getNotifications(userId, offset.orElse(0L), limit.orElse(60), showExpired.orElse(false));
+        return new ResponseEntity<>(notifications, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Assets from User with specific id")
+    @GetMapping(path = "/assets/{id}", produces = "application/json")
+    public ResponseEntity<List<AssetDAOResponse>> getAssets(@PathVariable Long id) {
+        List<AssetDAOResponse> assets = null;
+        assets = userSv.getAssets(id);
+        return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "Get Assets from User with specific id and specific category id")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/assets/{id}/{categoryId}", produces = "application/json")
+    public ResponseEntity<List<AssetDAOResponse>> getAssets(@PathVariable Long id, @PathVariable Long categoryId,
+                                                            @RequestParam(required = false) Optional<Long> offset,
+                                                            @RequestParam(required = false) Optional<Integer> limit) {
+        List<AssetDAOResponse> assets = null;
+        assets = userSv.getAssetsByCategory(id, categoryId, offset.orElse(0L), limit.orElse(20));
+        return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
     
     // POST REQUESTS
