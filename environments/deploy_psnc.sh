@@ -24,6 +24,7 @@ kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 rules=$(grep -ioP "(rules\s*=\s*)\K.+" _installers.properties)
+user=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)

@@ -17,6 +17,7 @@ hdr=$(grep -ioP "(hdr\s*=\s*)\K.+" _installers.properties)
 kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
+user=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -163,6 +164,28 @@ then
         # create kubernetes resources
         kubectl apply -f ingestion-api-deployment.yaml --force=true --namespace=$project
         kubectl apply -f ingestion-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $user = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/userAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/user-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/user-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/user-api --namespace=$project
+        kubectl delete services/user-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=user-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f user-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f user-api-service.yaml --namespace=$project
     fi
 # DEPLOY WSO2 API MANAGER
 
