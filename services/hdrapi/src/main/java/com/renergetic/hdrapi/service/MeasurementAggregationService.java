@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.service;
 
+import com.renergetic.common.dao.OptimizerTypeDAO;
 import com.renergetic.common.dao.aggregation.AggregationConfigurationDAO;
 import com.renergetic.common.dao.aggregation.MeasurementAggregationDAO;
 import com.renergetic.common.dao.aggregation.ParamaterAggregationConfigurationDAO;
@@ -42,7 +43,7 @@ public class MeasurementAggregationService {
     }
 
     @Transactional
-    public void save(Long assetId, AggregationConfigurationDAO aggregationConfigurationDAO) {
+    public AggregationConfigurationDAO save(Long assetId, AggregationConfigurationDAO aggregationConfigurationDAO) {
         Asset asset = assetRepository.findById(assetId).orElseThrow(NotFoundException::new);
 
         setAssetDetail(asset, "optimizer_type", aggregationConfigurationDAO.getMvoComponentType().getType());
@@ -92,6 +93,10 @@ public class MeasurementAggregationService {
         measurementAggregationRepository.deleteAll(measurementAggregationRepository.findByOutputMeasurementsAsset(asset));
         measurementAggregationRepository.saveAll(measurementAggregations);
 
+        return get(assetId);
+
+        //TODO:
+
         /*
             TODO:
             A:
@@ -111,8 +116,8 @@ public class MeasurementAggregationService {
          */
     }
 
-    public List<OptimizerType> getOptimizerTypeList() {
-        return optimizerTypeRepository.findAll();
+    public List<OptimizerTypeDAO> getOptimizerTypeList() {
+        return optimizerTypeRepository.findAll().stream().map(OptimizerTypeDAO::create).collect(Collectors.toList());
     }
 
     public Map<String, ParamaterAggregationConfigurationDAO> getParametersForOptimizerType(Long assetId, String type) {
