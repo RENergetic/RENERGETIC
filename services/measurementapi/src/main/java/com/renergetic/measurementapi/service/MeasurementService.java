@@ -27,6 +27,7 @@ import com.renergetic.measurementapi.exception.InvalidArgumentException;
 import com.renergetic.measurementapi.mapper.MeasurementMapper;
 import com.renergetic.measurementapi.model.InfluxTimeUnit;
 import com.renergetic.measurementapi.service.utils.FieldsFormat;
+import com.renergetic.measurementapi.service.utils.ManageTags;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 public class MeasurementService {
 	@Autowired
     private InfluxDBClient influxDB;
+
+	@Autowired
+	private ManageTags manageTags;
 
 	public void insert(MeasurementDAORequest measurement) {
 		WriteApiBlocking write = influxDB.getWriteApiBlocking();
@@ -118,11 +122,7 @@ public class MeasurementService {
 
 		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
 		if (tags != null && !tags.isEmpty()) {
-			Map<String, List<String>> finalTags = tags;
-			fluxQuery.add( String.format("filter(fn: (r) => %s)",
-					tags.keySet().stream()
-					.map(key -> '(' + finalTags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
-					.collect(Collectors.joining(" and "))) );
+			fluxQuery.add( manageTags.fluxFilter(tags) );
 		}
 		
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
@@ -180,11 +180,7 @@ public class MeasurementService {
 
 		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
 		if (tags != null && !tags.isEmpty()) {
-			Map<String, List<String>> finalTags = tags;
-			fluxQuery.add( String.format("filter(fn: (r) => %s)",
-					tags.keySet().stream()
-					.map(key -> '(' + finalTags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
-					.collect(Collectors.joining(" and "))) );
+			fluxQuery.add( manageTags.fluxFilter(tags) );
 		}
 		fluxQuery.add("filter(fn: (r) => types.isType(v: r._value, type: \"float\") or types.isType(v: r._value, type: \"int\"))");
 
