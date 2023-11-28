@@ -24,7 +24,7 @@ kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 rules=$(grep -ioP "(rules\s*=\s*)\K.+" _installers.properties)
-user=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
+userApi=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -78,7 +78,7 @@ compileApp() {
         cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
     fi
 
-    if [[ $user = 'true' ]]
+    if [[ $userApi = 'true' ]]
     then
         cd "${apisPath}/REN_API/userAPI"
         mvn clean package -Dmaven.test.skip
@@ -239,7 +239,7 @@ installPSNC() {
         kubectl apply -f rules-api-service.yaml --namespace=$project
     fi
 
-    if [[ $user = 'true' ]]
+    if [[ $userApi = 'true' ]]
     then
         cd "${current}/docker_config/APIs/user-api"
         # API INSTALLATION
