@@ -70,6 +70,7 @@ public class MeasurementAggregationService {
         for(MeasurementDetails md : measurement.getDetails()){
             switch(md.getKey()){
                 case "aggregation_ids":
+                    //TODO: Change this to use db table instead
                     mad.setAggregationIds(List.of(gson.fromJson(md.getValue(), Long[].class)));
                     break;
                 case "aggregation_type":
