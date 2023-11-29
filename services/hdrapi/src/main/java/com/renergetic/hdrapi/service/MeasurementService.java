@@ -64,9 +64,9 @@ public class MeasurementService {
         var dbType = dao.getId()!=null? measurementTypeRepository.findById(dao.getId()).orElse(null):null;
         //TODO: remove after common library update
         //hotfix:
-        if(dao.getPhysicalName()==null && dbType!=null){
-            return dbType;
-        }
+//        if(dao.getPhysicalName()==null && dbType!=null){
+//            return dbType;
+//        }
         if (dbType == null
                 || (dbType.getName() == null && dao.getName() != null)
                 || !dbType.getName().equals(dao.getName())
@@ -85,31 +85,33 @@ public class MeasurementService {
         }
         return dbType;
     }
-
-    /**
-     * check if the input measurement type matches database
-     *
-     * @param dao
-     * @return
-     */
-    public MeasurementTypeDAORequest verifyMeasurementTypeTemp(MeasurementType dao) {
+  public MeasurementTypeDAORequest verifyMeasurementType(MeasurementTypeDAORequest dao) {
         var dbType = dao.getId()!=null? measurementTypeRepository.findById(dao.getId()).orElse(null):null;
+        //TODO: remove after common library update
+        //hotfix:
+//        if(dao.getPhysicalName()==null && dbType!=null){
+//            return dbType;
+//        }
         if (dbType == null
+                || (dbType.getName() == null && dao.getName() != null)
+                || !dbType.getName().equals(dao.getName())
                 || (dbType.getPhysicalName() == null && dao.getPhysicalName() != null)
                 || !dbType.getPhysicalName().equals(dao.getPhysicalName())
+                || (dbType.getUnit() == null && dao.getUnit() != null)
+                || !dbType.getUnit().equals(dao.getUnit())
         ) {
             List<MeasurementType> types =
-                    measurementTypeRepository.findMeasurementType(dao.getName(),dao.getUnit(), dao.getPhysicalName());
-            if (types.size() < 1) {
+                    measurementTypeRepository.findMeasurementType(dao.getName(),
+                            dao.getUnit(), dao.getPhysicalName());
+            if (types.size() != 1) {
                 throw new InvalidCreationIdAlreadyDefinedException("Measurement type does not exists");
             }
-            dbType = types.get(0);
+            return  MeasurementTypeDAORequest.create(types.get(0));
         }
-        var mtDAO = new MeasurementTypeDAORequest();
-        mtDAO.setId(dbType.getId());
-        mtDAO.setPhysicalName(dbType.getPhysicalName());
-        return mtDAO;
+        return MeasurementTypeDAORequest.create(dbType);
     }
+
+
 
 
     // ASSET CRUD OPERATIONS

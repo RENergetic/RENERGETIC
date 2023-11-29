@@ -134,9 +134,7 @@ public class InformationPanelService {
                                             && (tileM.getType().getId() != null
                                             || tileM.getType().getPhysicalName() == null)) {
                                         //TODO map to entity tileM.mapToEntity
-                                        var mt = new MeasurementType();
-                                        mt.setPhysicalName(tileM.getType().getPhysicalName());
-                                        tileM.setType(measurementService.verifyMeasurementTypeTemp(mt));
+                                        tileM.setType(measurementService.verifyMeasurementType(tileM.getType()));
                                     }
                                     var l = getInferredMeasurements(tileM);
                                     if (l.isEmpty()) {
