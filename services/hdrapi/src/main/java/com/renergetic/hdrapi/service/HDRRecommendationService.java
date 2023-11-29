@@ -1,5 +1,7 @@
 package com.renergetic.hdrapi.service;
 
+import com.renergetic.common.dao.HDRRecommendationDAO;
+import com.renergetic.common.dao.HDRRequestDAO;
 import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.exception.InvalidArgumentException;
 import com.renergetic.common.exception.NotFoundException;
@@ -8,10 +10,6 @@ import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.hdrapi.dao.temp.HDRRecommendationDAO;
-import com.renergetic.hdrapi.dao.temp.HDRRequest;
-import com.renergetic.hdrapi.dao.temp.HDRRequestDAO;
-import com.renergetic.hdrapi.dao.temp.HDRRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -141,7 +139,7 @@ public class HDRRecommendationService {
         var tagId = r.getTag().getId();
         MeasurementTags tag = measurementTagsRepository.findById(tagId).orElseThrow(
                 () -> new NotFoundException("Tag with id: " + tagId + " not exists"));
-        List<Measurement> measurements = measurementTagsRepository.getMeasurementByTagId(tag.getId(), 0L, 100L);
+        List<Measurement> measurements = measurementRepository.getMeasurementByTagId(tag.getId(), 0L, 100L);
         return measurements.stream().map(it -> MeasurementDAOResponse.create(it, null, null)).collect(
                 Collectors.toList());
 

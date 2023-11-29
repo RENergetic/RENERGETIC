@@ -1,9 +1,9 @@
 package com.renergetic.hdrapi.controller;
 
+import com.renergetic.common.dao.HDRRecommendationDAO;
+import com.renergetic.common.dao.HDRRequestDAO;
 import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.hdrapi.dao.temp.HDRRecommendationDAO;
-import com.renergetic.hdrapi.dao.temp.HDRRequestDAO;
 import com.renergetic.hdrapi.service.HDRRecommendationService;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;

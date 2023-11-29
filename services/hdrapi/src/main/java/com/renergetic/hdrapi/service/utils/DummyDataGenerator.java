@@ -10,8 +10,6 @@ import com.renergetic.common.repository.MeasurementTagsRepository;
 import com.renergetic.common.repository.MeasurementTypeRepository;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
-import com.renergetic.hdrapi.dao.temp.HDRRecommendationDAO;
-import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -30,8 +28,6 @@ public class DummyDataGenerator {
     MeasurementRepository measurementRepository;
     @Autowired
     MeasurementTagsRepository measurementTagsRepository;
-    @Autowired
-    MeasurementRepositoryTemp measurementRepositoryTemp;
     private static final Random random = new Random();
     static final String s =
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce tellus nisl, finibus condimentum " +
@@ -169,7 +165,7 @@ public class DummyDataGenerator {
 //        MeasurementTags tags = measurementTagsRepository.findById(tagId).orElseThrow(
 //                () -> new NotFoundException("Tag with id: " + tagId + " not exists"));
 //        tagId=tags.getId();
-        List<Measurement> measurements = measurementRepositoryTemp.getMeasurementByTagId(tagId, 0L, 100L);
+        List<Measurement> measurements = measurementRepository.getMeasurementByTagId(tagId, 0L, 100L);
         return measurements.stream().map(it -> MeasurementDAOResponse.create(it, null, null)).collect(
                 Collectors.toList());
 

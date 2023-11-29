@@ -14,9 +14,6 @@ import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
-import com.renergetic.hdrapi.dao.temp.MeasurementTagsRepositoryTemp;
-import com.renergetic.hdrapi.dao.temp.MeasurementTypeRepositoryTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -44,15 +41,9 @@ public class MeasurementService {
 
     @Autowired
     MeasurementRepository measurementRepository;
-    @Autowired
-    MeasurementTagsRepositoryTemp measurementTagsRepository2;
-    @Autowired
-    MeasurementRepositoryTemp measurementRepository2;
 
     @Autowired
-    MeasurementTypeRepository measurementTypeRepository;
-    @Autowired
-    MeasurementTypeRepositoryTemp measurementTypeRepositoryTemp;
+    MeasurementTypeRepository measurementTypeRepository; ;
     @Autowired
     AssetRepository assetRepository;
 
@@ -85,7 +76,7 @@ public class MeasurementService {
                 || !dbType.getUnit().equals(dao.getUnit())
         ) {
             List<MeasurementType> types =
-                    measurementTypeRepositoryTemp.findMeasurementType(dao.getName(),
+                    measurementTypeRepository.findMeasurementType(dao.getName(),
                             dao.getUnit(), dao.getPhysicalName());
             if (types.size() != 1) {
                 throw new InvalidCreationIdAlreadyDefinedException("Measurement type does not exists");
@@ -108,7 +99,7 @@ public class MeasurementService {
                 || !dbType.getPhysicalName().equals(dao.getPhysicalName())
         ) {
             List<MeasurementType> types =
-                    measurementTypeRepositoryTemp.findMeasurementTypeTemp(null, dao.getPhysicalName());
+                    measurementTypeRepository.findMeasurementType(dao.getName(),dao.getUnit(), dao.getPhysicalName());
             if (types.size() < 1) {
                 throw new InvalidCreationIdAlreadyDefinedException("Measurement type does not exists");
             }
@@ -211,7 +202,7 @@ public class MeasurementService {
     }
 
     public List<MeasurementDAOResponse> getByTag(String key, String value, long offset, long limit) {
-        List<Measurement> measurements = measurementRepository2.getMeasurementByTag(key, value, offset, limit);
+        List<Measurement> measurements = measurementRepository.getMeasurementByTag(key, value, offset, limit);
         Stream<Measurement> stream = measurements.stream();
         List<MeasurementDAOResponse> list;
         list = stream
@@ -229,11 +220,11 @@ public class MeasurementService {
                                                      Integer limit) {
         Stream<MeasurementDAO> measurements;
         if (tagKey == null) {
-            measurements = measurementRepository2.findMeasurements(
+            measurements = measurementRepository.findMeasurements(
                     null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
                     limit).stream();
         } else {
-            measurements = measurementRepository2.findMeasurements(
+            measurements = measurementRepository.findMeasurements(
                     null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,
                     offset, limit).stream();
         }
@@ -409,7 +400,7 @@ public class MeasurementService {
         }
         MeasurementTags t = l.get(0);
         List<Measurement> m =
-                measurementTagsRepository.getMeasurementByTagId(t.getId(), 0L, 1L);
+                measurementRepository.getMeasurementByTagId(t.getId(), 0L, 1L);
         if (!m.isEmpty())
             throw new InvalidNonExistingIdException("Tag " + key + ":" + value + "  is used ");
 
@@ -443,11 +434,11 @@ public class MeasurementService {
     }
 
     public List<String> getTagKeys() {
-        return measurementTagsRepository2.listTagKeys();
+        return measurementTagsRepository.listTagKeys();
     }
 
     public List<String> getTagValues(String tagKey) {
-        return measurementTagsRepository2.listTagValues(tagKey);
+        return measurementTagsRepository.listTagValues(tagKey);
     }
 
     public MeasurementTags getTagById(Long id) {

@@ -16,8 +16,7 @@ import org.springframework.stereotype.Service;
 import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.common.exception.InvalidNonExistingIdException;
 import com.renergetic.common.exception.NotFoundException;
-import com.renergetic.common.model.InformationTileMeasurement;
-import com.renergetic.common.repository.HeatmapRepository;
+import com.renergetic.common.model.InformationTileMeasurement; 
 import com.renergetic.common.repository.InformationTileMeasurementRepository;
 import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
@@ -29,8 +28,7 @@ public class InformationTileMeasurementService {
 	
 	@Autowired
 	InformationTileMeasurementRepository tileRepository;
-	@Autowired
-	HeatmapRepository heatmapRepository;
+
 	@Autowired
 	UuidRepository uuidRepository;
 

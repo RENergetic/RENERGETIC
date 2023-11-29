@@ -10,8 +10,7 @@ import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
-import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
-import com.renergetic.hdrapi.dao.temp.TempMeasurementTileDAORequest;
+import com.renergetic.common.utilities.Json;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,8 +43,6 @@ public class InformationPanelService {
 
     @Autowired
     private MeasurementRepository measurementRepository;
-    @Autowired
-    private MeasurementRepositoryTemp measurementRepository2;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
         List<InformationPanelDAOResponse> list = informationPanelRepository.findAll(new OffSetPaging(offset, limit))
@@ -161,6 +158,8 @@ public class InformationPanelService {
         });
         return informationPanel;
     }
+
+
 
     private void saveTiles(List<InformationTile> tiles, InformationPanel infoPanelEntity) {
 //        var tiles = infoPanelEntity.getTiles();
@@ -303,7 +302,10 @@ public class InformationPanelService {
         List<InformationPanel> informationPanels = informationPanelRepository.findFeatured(isTemplate, 0, limit);
         List<InformationPanelDAOResponse> list =
                 informationPanels.stream()
-                        .map(panel -> InformationPanelDAOResponse.create(panel, null))
+                        .map(panel -> {
+                            var p =InformationPanelDAOResponse.create(panel, null);
+                            return p;
+                        })
                         .collect(Collectors.toList());
 
 
@@ -379,7 +381,7 @@ public class InformationPanelService {
     }
 
     private List<MeasurementTileDAORequest> getInferredMeasurements(MeasurementTileDAORequest tileM) {
-        List<MeasurementTileDAORequest> list = measurementRepository2
+        List<MeasurementTileDAORequest> list = measurementRepository
                 .inferMeasurement(null,
                         tileM.getName(),
                         tileM.getSensorName(),
@@ -387,7 +389,7 @@ public class InformationPanelService {
                         tileM.getDirection() != null ? tileM.getDirection().name() : null,
                         tileM.getType() != null ? tileM.getType().getId() : null,
                         tileM.getType() != null ? tileM.getType().getPhysicalName() : null)
-                .stream().map((m) -> TempMeasurementTileDAORequest.create(m, tileM.getFunction(), tileM.getProps()))
+                .stream().map((m) -> MeasurementTileDAORequest.create(m, tileM.getFunction(), tileM.getProps()))
                 .collect(Collectors.toList());
         return list;
     }
@@ -396,7 +398,7 @@ public class InformationPanelService {
                                                                  Long assetId, String func) {
 
 
-        List<MeasurementDAOResponse> list = measurementRepository2
+        List<MeasurementDAOResponse> list = measurementRepository
                 .inferMeasurement(assetId,
                         tileM.getMeasurementName(),
                         tileM.getSensorName(),
