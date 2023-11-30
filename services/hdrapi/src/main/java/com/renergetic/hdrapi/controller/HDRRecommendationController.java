@@ -75,9 +75,9 @@ public class HDRRecommendationController {
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit) {
 
-        List<HDRRequestDAO> recommendations;
-        recommendations = hdrService.getRecentRequest().orElse(new ArrayList<>());
-        return new ResponseEntity<>(recommendations, HttpStatus.OK);
+        List<HDRRequestDAO> request;
+        request = hdrService.getRecentRequest().orElse(new ArrayList<>());
+        return new ResponseEntity<>(request, HttpStatus.OK);
     }
 
     @Operation(summary = "Get request by id")
@@ -126,6 +126,9 @@ public class HDRRecommendationController {
     @PostMapping(path = "/requests", produces = "application/json", consumes = "application/json")
     public ResponseEntity<HDRRequestDAO> saveRequest(@RequestBody HDRRequestDAO request) {
 
+        if(request.getTimestamp()==null){
+            request.setTimestamp(DateConverter.toEpoch(LocalDateTime.now()));
+        }
         HDRRequestDAO r = hdrService.save(request);
         return new ResponseEntity<>(r, HttpStatus.CREATED);
     }
