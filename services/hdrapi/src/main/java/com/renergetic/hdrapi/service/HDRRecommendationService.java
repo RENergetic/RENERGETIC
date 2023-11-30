@@ -8,10 +8,7 @@ import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.*;
 import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
-import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.hdrapi.dao.temp.HDRRequestRepositoryTemp;
-import com.renergetic.hdrapi.dao.temp.RecommendationRepositoryTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +21,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class HDRRecommendationService {
-    @PersistenceContext
-    EntityManager entityManager;
-
     @Autowired
     MeasurementRepository measurementRepository;
 
@@ -35,11 +29,7 @@ public class HDRRecommendationService {
     @Autowired
     RecommendationRepository recommendationRepository;
     @Autowired
-    RecommendationRepositoryTemp recommendationRepository2;
-    @Autowired
     HDRRequestRepository hdrRequestRepository;
-    @Autowired
-    HDRRequestRepositoryTemp hdrRequestRepository2;
     @Autowired
     UuidRepository uuidRepository;
 
@@ -62,7 +52,7 @@ public class HDRRecommendationService {
         if (r.isPresent()) {
             throw new InvalidArgumentException("Request exists");
         }
-        var recentRequestTimestamp = hdrRequestRepository2.getRecentRequestTimestamp();
+        var recentRequestTimestamp = hdrRequestRepository.getRecentRequestTimestamp();
         if (recentRequestTimestamp.isPresent() &&
                 DateConverter.toLocalDateTime(requestDAO.getTimestamp())
                         .isBefore(recentRequestTimestamp.get())) {
@@ -100,11 +90,11 @@ public class HDRRecommendationService {
 
 
     public List<LocalDateTime> list(LocalDateTime t) {
-        return recommendationRepository2.listRecentRecommendations(t);
+        return recommendationRepository.listRecentRecommendations(t);
     }
 
     public Optional<List<HDRRecommendationDAO>> getRecent() {
-        var t = recommendationRepository2.getRecentRecommendation();
+        var t = recommendationRepository.getRecentRecommendation();
         List<HDRRecommendationDAO> r = null;
         if (t.isPresent())
             r = this.getRecommendations(t.get());
@@ -112,7 +102,7 @@ public class HDRRecommendationService {
     }
 
     public Optional<List<HDRRequestDAO>> getRecentRequest() {
-        var t = hdrRequestRepository2.getRecentRequestTimestamp();
+        var t = hdrRequestRepository.getRecentRequestTimestamp();
         List<HDRRequestDAO> r = null;
         if (t.isPresent())
             r = this.getRequests(t.get());
