@@ -33,7 +33,7 @@ public class HDRRequestDAO {
     private Long dateFrom;
     @JsonProperty(value = "date_to", required = true)
     private Long dateTo;
-    @Column(name = "max_value")
+    @JsonProperty(value = "max_value")
     private Double maxValue;
     @JsonProperty(value = "value_change")
     private Double valueChange;
