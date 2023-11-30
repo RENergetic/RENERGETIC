@@ -15,7 +15,7 @@ public interface HDRRequestRepository extends JpaRepository<HDRRequest, Long> {
 
     HDRRequest save(HDRRequest request);
 
-    @Query(value = "SELECT max(`timestamp`) as `timestamp` from hdr_request", nativeQuery = true)
+    @Query(value = "SELECT  max(\"timestamp\") as \"timestamp\" from hdr_request", nativeQuery = true)
     Optional<LocalDateTime> getRecentRequestTimestamp();
 
     @Query("SELECT hdrr FROM HDRRequest hdrr WHERE hdrr.timestamp = :timestamp ")
