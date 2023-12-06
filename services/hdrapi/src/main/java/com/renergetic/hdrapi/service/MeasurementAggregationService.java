@@ -7,12 +7,14 @@ import com.renergetic.common.dao.aggregation.ParamaterAggregationConfigurationDA
 import com.renergetic.common.exception.InvalidArgumentException;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.*;
+import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.common.model.details.MeasurementDetails;
-import com.renergetic.common.repository.AssetRepository;
-import com.renergetic.common.repository.MeasurementAggregationRepository;
-import com.renergetic.common.repository.MeasurementRepository;
-import com.renergetic.common.repository.OptimizerTypeRepository;
+import com.renergetic.common.model.details.MeasurementTags;
+import com.renergetic.common.repository.*;
+import com.renergetic.common.repository.information.AssetDetailsRepository;
+import com.renergetic.common.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.dao.MeasurementAggregationMeasurementSelectionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,15 @@ public class MeasurementAggregationService {
     private OptimizerTypeRepository optimizerTypeRepository;
     @Autowired
     private MeasurementRepository measurementRepository;
+    @Autowired
+    private UuidRepository uuidRepository;
+
+    @Autowired
+    private AssetDetailsRepository assetDetailsRepository;
+    @Autowired
+    private MeasurementDetailsRepository measurementDetailsRepository;
+    @Autowired
+    private MeasurementTagsRepository measurementTagsRepository;
 
     public AggregationConfigurationDAO get(Long assetId) {
         Asset asset = assetRepository.findById(assetId).orElseThrow(NotFoundException::new);
@@ -37,7 +48,7 @@ public class MeasurementAggregationService {
         List<MeasurementAggregation> measurementAggregations = measurementAggregationRepository.findByOutputMeasurementsAsset(asset);
 
         OptimizerType optimizerType = optimizerTypeRepository.findByName(asset.getDetails().stream()
-                .filter(x -> x.getKey().equals("optimizer_type")).findFirst().orElse(new AssetDetails()).getValue());
+                .filter(x -> Objects.equals(x.getKey(),"optimizer_type")).findFirst().orElse(new AssetDetails()).getValue());
 
         return AggregationConfigurationDAO.create(asset, measurementAggregations, optimizerType);
     }
@@ -50,15 +61,18 @@ public class MeasurementAggregationService {
         setAssetDetail(asset, "domain_a", aggregationConfigurationDAO.getMvoComponentType().getDomainA());
         setAssetDetail(asset, "domain_b", aggregationConfigurationDAO.getMvoComponentType().getDomainB());
 
+
         List<MeasurementAggregation> measurementAggregations = new ArrayList<>();
+        List<List<MeasurementTags>> measurementTags = new ArrayList<>();
         for(MeasurementAggregationDAO measurementAggregationDAO : aggregationConfigurationDAO.getMeasurementAggregations()){
             //TODO: Check if we need to store the optimizer type and domains in measurement ??
             MeasurementAggregation measurementAggregation = new MeasurementAggregation();
 
             List<Measurement> aggregatedMeasurements = measurementRepository.findByIds(measurementAggregationDAO.getMeasurements());
             checkMeasurementsValidity(aggregatedMeasurements, measurementAggregationDAO.getMeasurements());
-            measurementAggregation.setAggregatedMeasurements(aggregatedMeasurements);
+            measurementAggregation.setAggregatedMeasurements(new HashSet<>(aggregatedMeasurements));
             Measurement ref = aggregatedMeasurements.get(0);
+            measurementTags.add(measurementTagsRepository.findByMeasurementId(ref.getId()));
 
             measurementAggregation.setOutputMeasurements(measurementAggregationDAO.getOutputs().stream().map(x -> {
                 Measurement measurement = new Measurement();
@@ -70,50 +84,65 @@ public class MeasurementAggregationService {
                 measurement.setSensorId(ref.getSensorId());
                 measurement.setIsland(ref.getIsland());
                 measurement.setAsset(asset);
-                measurement.setDetails(ref.getDetails().stream().map(d -> new MeasurementDetails(d.getKey(), d.getValue(), null)).collect(Collectors.toList()));
+                //TODO: This remains in details !!
+                if(measurement.getDetails() == null)
+                    measurement.setDetails(new ArrayList<>());
                 measurement.getDetails().add(new MeasurementDetails("aggregation_type", x.getAggregationType(), null));
                 measurement.getDetails().add(new MeasurementDetails("time_min", x.getTimeMin(), null));
                 measurement.getDetails().add(new MeasurementDetails("time_max", x.getTimeMax(), null));
                 measurement.getDetails().add(new MeasurementDetails("time_range", x.getTimeRange(), null));
+                measurement.setUuid(uuidRepository.saveAndFlush(new UUID()));
                 return measurement;
-            }).collect(Collectors.toList()));
+            }).collect(Collectors.toSet()));
 
-            measurementAggregation.setDomainA(Domain.valueOf(aggregationConfigurationDAO.getMvoComponentType().getDomainA()));
-            measurementAggregation.setDomainB(Domain.valueOf(aggregationConfigurationDAO.getMvoComponentType().getDomainB()));
+            if(aggregationConfigurationDAO.getMvoComponentType().getDomainA() != null)
+                measurementAggregation.setDomainA(Domain.valueOf(aggregationConfigurationDAO.getMvoComponentType().getDomainA()));
+            else
+                measurementAggregation.setDomainA(null);
+
+            if(aggregationConfigurationDAO.getMvoComponentType().getDomainB() != null)
+                measurementAggregation.setDomainB(Domain.valueOf(aggregationConfigurationDAO.getMvoComponentType().getDomainB()));
+            else
+                measurementAggregation.setDomainB(null);
 
             measurementAggregations.add(measurementAggregation);
         }
 
+        assetDetailsRepository.deleteAll(asset.getDetails().stream().filter(x -> x.getKey().contains("_aggregation")).collect(Collectors.toList()));
         asset.getDetails().removeIf(x -> x.getKey().contains("_aggregation"));
         asset.getDetails().addAll(aggregationConfigurationDAO.getParameterAggregationConfigurations().entrySet().stream()
-                .map(e -> new AssetDetails(e.getKey(), e.getValue().getAggregation()+"_aggregation", asset))
+                .map(e -> new AssetDetails(e.getKey()+"_aggregation", e.getValue().getAggregation(), asset))
                 .collect(Collectors.toList()));
 
+        assetDetailsRepository.saveAll(asset.getDetails());
         assetRepository.save(asset);
-        measurementAggregationRepository.deleteAll(measurementAggregationRepository.findByOutputMeasurementsAsset(asset));
+        List<MeasurementAggregation> toDelete = measurementAggregationRepository.findByOutputMeasurementsAsset(asset);
+        toDelete.forEach(x -> x.getOutputMeasurements().forEach(o -> {
+            List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(o.getId());
+            tags.forEach(m -> m.getMeasurements().remove(o));
+            measurementTagsRepository.saveAll(tags);
+            measurementDetailsRepository.deleteAll(o.getDetails());
+        }));
+        measurementAggregationRepository.deleteAll(toDelete);
         measurementAggregationRepository.saveAll(measurementAggregations);
+        for(int i = 0; i < measurementAggregations.size(); i++){
+            Set<Measurement> measurements = measurementAggregations.get(0).getOutputMeasurements();
+            List<MeasurementTags> tags = measurementTags.get(0);
+            tags.forEach(x -> x.getMeasurements().addAll(measurements));
+            measurementTagsRepository.saveAll(tags);
+        }
+
+        //TODO: Check how to overcome this.
+        measurementAggregations.forEach(ma -> {
+            ma.getOutputMeasurements().forEach(om -> {
+                om.getDetails().forEach(d -> {
+                    d.setMeasurement(om);
+                    measurementDetailsRepository.save(d);
+                });
+            });
+        });
 
         return get(assetId);
-
-        //TODO:
-
-        /*
-            TODO:
-            A:
-            1. Fetch all measurements aggregation related to this asset
-            2. For each MeasurementAggregationDAO:
-                - Create a measurement aggregation with specific data
-                    > Validate that measurements are compatible
-                - Create a measurement with specific details
-                    > All details (don't forget the MVO maybe ?)
-            3. In transaction:
-                > Delete all measurements aggregation / measurements related to asset
-                > Save all entities
-
-            B:
-            1. Delete all *_aggregation on the asset
-            2. Save all params as *_aggregation on the asset
-         */
     }
 
     public List<OptimizerTypeDAO> getOptimizerTypeList() {
@@ -127,8 +156,53 @@ public class MeasurementAggregationService {
         return ParamaterAggregationConfigurationDAO.create(asset, optimizerType);
     }
 
+    public List<MeasurementAggregationMeasurementSelectionDAO> getMeasurementsForAssetConnections(Long assetId){
+        //TODO: Optimize this later.
+        List<Long> ids = assetRepository.findById(assetId).orElseThrow(NotFoundException::new).getConnections()
+                .stream().map(x -> x.getConnectedAsset().getId()).collect(Collectors.toList());
+        List<Measurement> measurements = measurementRepository.findAll().stream()
+                .filter(x -> x.getAsset() != null && ids.contains(x.getAsset().getId())).collect(Collectors.toList());
+
+        return measurements.stream().map(MeasurementAggregationMeasurementSelectionDAO::create).collect(Collectors.toList());
+    }
+
+    public List<MeasurementAggregationMeasurementSelectionDAO> getMeasurementsForAssetConnectionsCompatible(Long assetId,
+                                                                                                            Long selectedMeasurementId){
+        Measurement refMeasurement = measurementRepository.findById(selectedMeasurementId).orElseThrow(NotFoundException::new);
+        Map<String, String> tags = new HashMap<>();
+        measurementTagsRepository.findByMeasurementId(refMeasurement.getId()).forEach(x -> tags.put(x.getKey(), x.getValue()));
+        //TODO: Optimize this later.
+        List<Long> ids = assetRepository.findById(assetId).orElseThrow(NotFoundException::new).getConnections()
+                .stream().map(x -> x.getConnectedAsset().getId()).collect(Collectors.toList());
+        List<Measurement> measurements = measurementRepository.findAll().stream()
+                .filter(x -> {
+                                    if(x.getAsset() != null
+                                    && ids.contains(x.getAsset().getId())
+                                    && Objects.equals(x.getDirection(), refMeasurement.getDirection())
+                                    && Objects.equals(x.getDomain(), refMeasurement.getDomain())
+                                    && Objects.equals(x.getName(), refMeasurement.getName())
+                                    && Objects.equals(x.getSensorName(), refMeasurement.getSensorName())
+                                    && Objects.equals(x.getSensorId(), refMeasurement.getSensorId())){
+                                        List<String> remainingKeys = new ArrayList<>(tags.keySet());
+                                        for(Details detail : measurementTagsRepository.findByMeasurementId(x.getId())){
+                                            if((!tags.containsKey(detail.getKey()) || !remainingKeys.remove(detail.getKey()))
+                                                    && Objects.equals(detail.getValue(),  tags.get(detail.getKey()))){
+                                                return false;
+                                            }
+                                        }
+                                        return true;
+                                    }
+                                    return false;
+                        }
+
+                ).collect(Collectors.toList());
+
+        return measurements.stream().map(MeasurementAggregationMeasurementSelectionDAO::create).collect(Collectors.toList());
+    }
+
     private void checkMeasurementsValidity(List<Measurement> measurements, List<Long> ids){
         Measurement ref = null;
+        //TODO: Check for tags instead !!
         Map<String, String> details = new HashMap<>();
         List<String> remainingKeys = new ArrayList<>();
         for(Measurement measurement : measurements){
@@ -163,9 +237,9 @@ public class MeasurementAggregationService {
 
             Measurement finalRef = ref;
             measurement.getDetails().forEach(x -> {
-                if(details.containsKey(x.getKey()) || !remainingKeys.remove(x.getKey())) {
+                if(details.containsKey(x.getKey()) && remainingKeys.remove(x.getKey())) {
                     String value = details.get(x.getKey());
-                    if(!Objects.equals(value, x.getKey()))
+                    if(!Objects.equals(value, x.getValue()))
                         throw new InvalidArgumentException(
                                 String.format("incompatible measurements: measurement detail %s is different between measurements %s ans %s",
                                         x.getKey(), measurement.getId(), finalRef.getId()));

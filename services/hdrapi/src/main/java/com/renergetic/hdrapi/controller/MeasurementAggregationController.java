@@ -5,6 +5,7 @@ import com.renergetic.common.dao.OptimizerTypeDAO;
 import com.renergetic.common.dao.aggregation.AggregationConfigurationDAO;
 import com.renergetic.common.dao.aggregation.ParamaterAggregationConfigurationDAO;
 import com.renergetic.common.model.details.AssetDetails;
+import com.renergetic.hdrapi.dao.MeasurementAggregationMeasurementSelectionDAO;
 import com.renergetic.hdrapi.service.MeasurementAggregationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,5 +59,21 @@ public class MeasurementAggregationController {
     @GetMapping(path = "/optimizerTypes", produces = "application/json")
     public ResponseEntity<List<OptimizerTypeDAO>> getOptimizerTypeList() {
         return new ResponseEntity<>(measurementAggregationService.getOptimizerTypeList(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get All Measurements for given asset aggregator")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/measurements/{assetId}", produces = "application/json")
+    public ResponseEntity<List<MeasurementAggregationMeasurementSelectionDAO>> getOptimizerTypeList
+            (@PathVariable(name = "assetId") Long assetId) {
+        return new ResponseEntity<>(measurementAggregationService.getMeasurementsForAssetConnections(assetId), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get All Measurements compatible for given asset aggregator and selected measurement")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/compatibleMeasurements/{assetId}/{measurementId}", produces = "application/json")
+    public ResponseEntity<List<MeasurementAggregationMeasurementSelectionDAO>> getOptimizerTypeList
+            (@PathVariable(name = "assetId") Long assetId, @PathVariable(name = "measurementId") Long measurementId) {
+        return new ResponseEntity<>(measurementAggregationService.getMeasurementsForAssetConnectionsCompatible(assetId, measurementId), HttpStatus.OK);
     }
 }
