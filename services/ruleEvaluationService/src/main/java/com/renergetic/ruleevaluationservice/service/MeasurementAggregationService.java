@@ -3,8 +3,10 @@ package com.renergetic.ruleevaluationservice.service;
 import com.google.gson.Gson;
 import com.renergetic.common.dao.MeasurementDAO;
 import com.renergetic.common.model.Measurement;
+import com.renergetic.common.model.MeasurementAggregation;
 import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.model.details.MeasurementTags;
+import com.renergetic.common.repository.MeasurementAggregationRepository;
 import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.ruleevaluationservice.dao.MeasurementAggregationDataDAO;
 import com.renergetic.ruleevaluationservice.dao.MeasurementSimplifiedDAO;
@@ -19,10 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.http.HttpResponse;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,6 +32,8 @@ public class MeasurementAggregationService {
     @Autowired
     private MeasurementRepository measurementRepository;
     @Autowired
+    private MeasurementAggregationRepository measurementAggregationRepository;
+    @Autowired
     private DataService dataService;
     @Autowired
     private HttpAPIs httpAPIs;
@@ -40,39 +41,26 @@ public class MeasurementAggregationService {
     private final Gson gson = new Gson();
 
     public void aggregateAll(){
-        List<Measurement> measurements = retrieveMeasurementsToAggregate();
-        for(Measurement measurement : measurements){
-            aggregateOne(measurement);
+        List<MeasurementAggregation> measurementAggregations = measurementAggregationRepository.findAll();
+
+        for(MeasurementAggregation measurementAggregation : measurementAggregations){
+            for(Measurement output : measurementAggregation.getOutputMeasurements())
+                aggregateOne(output, measurementAggregation);
         }
     }
 
-    public void aggregateOne(Measurement measurement){
-        List<MeasurementSimplifiedDAO> aggregated = getAggregatedData(measurement);
+    public void aggregateOne(Measurement measurement, MeasurementAggregation measurementAggregation){
+        List<MeasurementSimplifiedDAO> aggregated = getAggregatedData(measurement, measurementAggregation);
         publishAggregatedData(aggregated);
     }
 
-    public boolean isMeasurementToAggregate(Measurement measurement){
-        return measurement.getDetails().stream()
-                .anyMatch(d -> d.getKey().contains("aggregation_ids"));
-    }
+    private List<MeasurementSimplifiedDAO> getAggregatedData(Measurement measurement, MeasurementAggregation measurementAggregation){
+        //TODO: Retrieve the measurementAggregation here.
+        //TODO: For each output, do all the below.
 
-    private List<Measurement> retrieveMeasurementsToAggregate(){
-        //TODO: Later replace the query to directly fetch the one we want.
-        return measurementRepository.findAll().stream().filter(this::isMeasurementToAggregate).collect(Collectors.toList());
-    }
-
-    private List<Measurement> retrieveChildrenMeasurements(List<Long> ids){
-        return measurementRepository.findByIds(ids);
-    }
-
-    private List<MeasurementSimplifiedDAO> getAggregatedData(Measurement measurement){
         MeasurementAggregationDataDAO mad = new MeasurementAggregationDataDAO();
         for(MeasurementDetails md : measurement.getDetails()){
             switch(md.getKey()){
-                case "aggregation_ids":
-                    //TODO: Change this to use db table instead
-                    mad.setAggregationIds(List.of(gson.fromJson(md.getValue(), Long[].class)));
-                    break;
                 case "aggregation_type":
                     mad.setAggregationType(md.getValue());
                     break;
@@ -88,7 +76,7 @@ public class MeasurementAggregationService {
             }
         }
 
-        List<Measurement> children = retrieveChildrenMeasurements(mad.getAggregationIds());
+        List<Measurement> children = new ArrayList<>(measurementAggregation.getAggregatedMeasurements());
         Long from = null;
         if(mad.getTimeMin().equals("now"))
             from = Instant.now().toEpochMilli();
@@ -129,19 +117,19 @@ public class MeasurementAggregationService {
                 .collect(Collectors.toList());
     }
 
-private void publishAggregatedData(List<MeasurementSimplifiedDAO> aggregated) {
-    // TODO: Send the data to the ingestion api, using the call
-    // The idea is that from time to time, we may have data missing, so we have to check that the
-    // Ingestion API is effectively overwriting existing time point in the timeseries if you add it again,
-    // this way this fixes the problem.
-    Map<String, String> headers = new HashMap<>();
-    headers.put("Content-type", "application/json");
-    HttpResponse<String> response = httpAPIs.sendRequest(ingestionAPI + "/api/ingest", "POST", null, aggregated, headers);
+    private void publishAggregatedData(List<MeasurementSimplifiedDAO> aggregated) {
+        // TODO: Send the data to the ingestion api, using the call
+        // The idea is that from time to time, we may have data missing, so we have to check that the
+        // Ingestion API is effectively overwriting existing time point in the timeseries if you add it again,
+        // this way this fixes the problem.
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-type", "application/json");
+        HttpResponse<String> response = httpAPIs.sendRequest(ingestionAPI + "/api/ingest", "POST", null, aggregated, headers);
 
-    if (response != null && response.statusCode() > 300) {
-        log.error("Failed to insert data to " + ingestionAPI + "/api/ingest. Response: " + response.statusCode() + " " + response.body() + ". Body: " + aggregated);
-    } else if (response == null) {
-        log.error("Failed to insert data to " + ingestionAPI + "/api/ingest. Null response. Body: " + aggregated);
+        if (response != null && response.statusCode() > 300) {
+            log.error("Failed to insert data to " + ingestionAPI + "/api/ingest. Response: " + response.statusCode() + " " + response.body() + ". Body: " + aggregated);
+        } else if (response == null) {
+            log.error("Failed to insert data to " + ingestionAPI + "/api/ingest. Null response. Body: " + aggregated);
+        }
     }
-}
 }
