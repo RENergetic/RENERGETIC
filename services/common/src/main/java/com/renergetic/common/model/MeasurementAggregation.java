@@ -10,6 +10,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "measurement_aggregation")
@@ -24,20 +25,24 @@ public class MeasurementAggregation {
 
 	@OneToMany(cascade = {}, fetch = FetchType.EAGER, orphanRemoval = false)
 	@JoinTable(
-			/*name="measurement_aggr_measurement",
-			joinColumns = @JoinColumn( name="measurement_aggr_id"),
-			inverseJoinColumns = @JoinColumn( name="measurement_id")*/
+			name = "measurement_aggregation_x_measurements_aggregated",
+			joinColumns =
+					{ @JoinColumn(name = "aggregation_id", referencedColumnName = "id") },
+			inverseJoinColumns =
+					{ @JoinColumn(name = "aggregated_id", referencedColumnName = "id") }
 	)
-	private List<Measurement> aggregatedMeasurements;
+	private Set<Measurement> aggregatedMeasurements;
 
 
-	@OneToMany(cascade = {}, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinTable(
-			/*name="measurement_aggr_measurement",
-			joinColumns = @JoinColumn( name="measurement_aggr_id"),
-			inverseJoinColumns = @JoinColumn( name="measurement_id")*/
+			name = "measurement_aggregation_x_measurements_output",
+			joinColumns =
+					{ @JoinColumn(name = "aggregation_id", referencedColumnName = "id") },
+			inverseJoinColumns =
+					{ @JoinColumn(name = "output_id", referencedColumnName = "id") }
 	)
-	private List<Measurement> outputMeasurements;
+	private Set<Measurement> outputMeasurements;
 
 	//TODO: Maybe remain domain_a and domain_b to domain_in and domain_out ?
 	//TODO: Check if domain is needed in the end, as probably inferred from the measurements ?

@@ -21,7 +21,7 @@ public class OptimizerParameter {
     @Column(name = "parameter_name", unique = true, nullable = false)
     private String parameterName;
 
-    @Column(name = "required", unique = true, nullable = false)
+    @Column(name = "required", unique = false, nullable = false)
     private boolean required;
 
     @ManyToOne(optional = false)

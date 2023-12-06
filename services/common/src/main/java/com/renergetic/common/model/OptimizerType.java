@@ -22,7 +22,6 @@ public class OptimizerType {
     @Column(name="name", unique = true, nullable = false)
     private String name;
 
-    @OneToMany(cascade = {}, fetch = FetchType.EAGER, orphanRemoval = false)
-    @JoinColumn(name = "optimizer_parameters_id")
+    @OneToMany(cascade = {}, fetch = FetchType.EAGER, orphanRemoval = false, mappedBy = "optimizerType")
     private List<OptimizerParameter> optimizerParameters;
 }

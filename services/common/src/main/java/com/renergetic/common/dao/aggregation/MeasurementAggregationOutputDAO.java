@@ -22,14 +22,18 @@ public class MeasurementAggregationOutputDAO {
 
     public static MeasurementAggregationOutputDAO create(Measurement measurement){
         MeasurementAggregationOutputDAO measurementAggregationOutputDAO = new MeasurementAggregationOutputDAO();
-        measurementAggregationOutputDAO.setAggregationType(measurement.getDetails().stream()
-                .filter(x -> x.getKey().equals("aggregation_type")).findFirst().orElse(new MeasurementDetails()).getValue());
-        measurementAggregationOutputDAO.setTimeMin(measurement.getDetails().stream()
-                .filter(x -> x.getKey().equals("time_min")).findFirst().orElse(new MeasurementDetails()).getValue());
-        measurementAggregationOutputDAO.setTimeMax(measurement.getDetails().stream()
-                .filter(x -> x.getKey().equals("time_max")).findFirst().orElse(new MeasurementDetails()).getValue());
-        measurementAggregationOutputDAO.setTimeRange(measurement.getDetails().stream()
-                .filter(x -> x.getKey().equals("time_range")).findFirst().orElse(new MeasurementDetails()).getValue());
+
+        if(measurement != null){
+            measurementAggregationOutputDAO.setAggregationType(measurement.getDetails().stream()
+                    .filter(x -> x.getKey().equals("aggregation_type")).findFirst().orElse(new MeasurementDetails()).getValue());
+            measurementAggregationOutputDAO.setTimeMin(measurement.getDetails().stream()
+                    .filter(x -> x.getKey().equals("time_min")).findFirst().orElse(new MeasurementDetails()).getValue());
+            measurementAggregationOutputDAO.setTimeMax(measurement.getDetails().stream()
+                    .filter(x -> x.getKey().equals("time_max")).findFirst().orElse(new MeasurementDetails()).getValue());
+            measurementAggregationOutputDAO.setTimeRange(measurement.getDetails().stream()
+                    .filter(x -> x.getKey().equals("time_range")).findFirst().orElse(new MeasurementDetails()).getValue());
+        }
+
         return measurementAggregationOutputDAO;
     }
 }

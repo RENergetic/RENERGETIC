@@ -21,18 +21,29 @@ public class MeasurementAggregationDAO {
 
     public static List<MeasurementAggregationDAO> create(List<MeasurementAggregation> measurementAggregations){
         List<MeasurementAggregationDAO> measurementAggregationDAOS = new ArrayList<>();
-        for(MeasurementAggregation measurementAggregation : measurementAggregations){
-            measurementAggregationDAOS.add(create(measurementAggregation));
+        if(measurementAggregations != null){
+            for(MeasurementAggregation measurementAggregation : measurementAggregations){
+                measurementAggregationDAOS.add(create(measurementAggregation));
+            }
         }
         return measurementAggregationDAOS;
     }
 
     public static MeasurementAggregationDAO create(MeasurementAggregation measurementAggregation){
         MeasurementAggregationDAO measurementAggregationDAO = new MeasurementAggregationDAO();
-        measurementAggregationDAO.setMeasurements(measurementAggregation.getAggregatedMeasurements()
-                .stream().map(Measurement::getId).collect(Collectors.toList()));
-        measurementAggregationDAO.setOutputs(measurementAggregation.getOutputMeasurements().stream()
-                .map(MeasurementAggregationOutputDAO::create).collect(Collectors.toList()));
+
+        if(measurementAggregation.getAggregatedMeasurements() != null)
+            measurementAggregationDAO.setMeasurements(measurementAggregation.getAggregatedMeasurements()
+                    .stream().map(Measurement::getId).collect(Collectors.toList()));
+        else
+            measurementAggregationDAO.setMeasurements(new ArrayList<>());
+
+        if(measurementAggregation.getOutputMeasurements() != null)
+            measurementAggregationDAO.setOutputs(measurementAggregation.getOutputMeasurements().stream()
+                    .map(MeasurementAggregationOutputDAO::create).collect(Collectors.toList()));
+        else
+            measurementAggregationDAO.setOutputs(new ArrayList<>());
+
         return measurementAggregationDAO;
     }
 }

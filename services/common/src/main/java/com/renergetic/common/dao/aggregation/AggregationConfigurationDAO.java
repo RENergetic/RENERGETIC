@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -25,8 +26,12 @@ public class AggregationConfigurationDAO {
         AggregationConfigurationDAO aggregationConfigurationDAO = new AggregationConfigurationDAO();
         aggregationConfigurationDAO.setMeasurementAggregations(MeasurementAggregationDAO.create(measurementAggregations));
 
-        aggregationConfigurationDAO.setMvoComponentType(MuVeCoTypeDAO
-                .create(measurementAggregations.get(0).getOutputMeasurements().get(0)));
+        if(measurementAggregations != null && !measurementAggregations.isEmpty())
+            aggregationConfigurationDAO.setMvoComponentType(MuVeCoTypeDAO
+                .create(asset));
+        else
+            aggregationConfigurationDAO.setMvoComponentType(MuVeCoTypeDAO
+                    .create(null));
 
         //TODO: in the caller, get the optimizer type based on the one selected and set in MuVeCoTypeDOA.
         aggregationConfigurationDAO.setParameterAggregationConfigurations(

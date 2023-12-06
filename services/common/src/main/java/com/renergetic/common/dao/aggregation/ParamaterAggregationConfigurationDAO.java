@@ -22,32 +22,36 @@ public class ParamaterAggregationConfigurationDAO {
     private Boolean required;
     @JsonProperty(value = "aggregation", required = true)
     private String aggregation;
-    @JsonIgnore
+    @JsonProperty(value = "assetValues", required = false)
     private Map<Long, Double> assetsValues;
 
     public static Map<String, ParamaterAggregationConfigurationDAO> create(Asset asset, OptimizerType optimizerType){
         Map<String, ParamaterAggregationConfigurationDAO> map = new HashMap<>();
-        List<Asset> connectedAssets = asset.getConnections().stream()
-                .map(AssetConnection::getConnectedAsset).collect(Collectors.toList());
 
-        for(OptimizerParameter optimizerParameter : optimizerType.getOptimizerParameters()){
-            ParamaterAggregationConfigurationDAO config = new ParamaterAggregationConfigurationDAO();
-            config.setRequired(optimizerParameter.isRequired());
-            config.setAggregation(asset.getDetails().stream()
-                    .filter(x -> x.getKey().equals(optimizerParameter.getParameterName()+"_aggregation"))
-                    .findFirst().orElse(new AssetDetails()).getValue());
+        if(optimizerType != null){
+            List<Asset> connectedAssets = asset.getConnections().stream()
+                    .map(AssetConnection::getConnectedAsset).collect(Collectors.toList());
 
-            Map<Long, Double> values = new HashMap<>();
-            for(Asset connectedAsset : connectedAssets){
-                AssetDetails assetDetails = connectedAsset.getDetails().stream()
+            for(OptimizerParameter optimizerParameter : optimizerType.getOptimizerParameters()){
+                ParamaterAggregationConfigurationDAO config = new ParamaterAggregationConfigurationDAO();
+                config.setRequired(optimizerParameter.isRequired());
+                config.setAggregation(asset.getDetails().stream()
                         .filter(x -> x.getKey().equals(optimizerParameter.getParameterName()+"_aggregation"))
-                        .findFirst().orElse(null);
-                values.put(connectedAsset.getId(), assetDetails == null ? null : Double.valueOf(assetDetails.getValue()));
-            }
-            config.setAssetsValues(values);
+                        .findFirst().orElse(new AssetDetails()).getValue());
 
-            map.put(optimizerParameter.getParameterName(), config);
+                Map<Long, Double> values = new HashMap<>();
+                for(Asset connectedAsset : connectedAssets){
+                    AssetDetails assetDetails = connectedAsset.getDetails().stream()
+                            .filter(x -> x.getKey().equals(optimizerParameter.getParameterName()))
+                            .findFirst().orElse(null);
+                    values.put(connectedAsset.getId(), assetDetails == null ? null : Double.valueOf(assetDetails.getValue()));
+                }
+                config.setAssetsValues(values);
+
+                map.put(optimizerParameter.getParameterName(), config);
+            }
         }
+
         return map;
     }
 }
