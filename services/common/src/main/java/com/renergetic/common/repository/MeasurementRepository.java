@@ -51,10 +51,10 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
                                                                                                String direction,
                                                                                                Long type);
 
+//            "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
     @Query(value = "SELECT distinct measurement.* " +
             "FROM (measurement " +
-            "INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
-            "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
+            "INNER INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
             "INNER JOIN measurement_type ON measurement_type.id = measurement.measurement_type_id " +
             ")" +
             " WHERE COALESCE(measurement.sensor_name = CAST(:sensorName AS text),TRUE) " +
@@ -139,8 +139,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
 
     @Query(value = "SELECT distinct measurement.* " +
             "FROM (measurement " +
-            "INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
-            "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
+            " LEFT JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
             "INNER JOIN measurement_type ON measurement_type.id = measurement.measurement_type_id " +
             ")" +
             " WHERE COALESCE(measurement.sensor_name = CAST(:sensorName AS text),TRUE) " +
