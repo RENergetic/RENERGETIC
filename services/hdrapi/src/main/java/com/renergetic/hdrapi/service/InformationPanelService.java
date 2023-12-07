@@ -11,6 +11,7 @@ import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.common.utilities.Json;
+import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,8 @@ public class InformationPanelService {
 
     @Autowired
     private MeasurementRepository measurementRepository;
+    @Autowired
+    private MeasurementRepositoryTemp measurementRepository2;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
         List<InformationPanelDAOResponse> list = informationPanelRepository.findAll(new OffSetPaging(offset, limit))
@@ -87,9 +90,14 @@ public class InformationPanelService {
     }
 
     public InformationPanelDAOResponse update(InformationPanelDAO informationPanel) {
-        if (!informationPanelRepository.findByName(informationPanel.getName()).isPresent())
+        if (informationPanel.getId() != null &&
+                !informationPanelRepository.findById(informationPanel.getId()).isPresent())
             throw new InvalidCreationIdAlreadyDefinedException(
-                    "Panel with name does not exists: " + informationPanel.getName());
+                    "Panel with given id does not exists: " + informationPanel.getId());
+        else if (informationPanel.getId() == null
+                && !informationPanelRepository.findByName(informationPanel.getName()).isPresent())
+            throw new InvalidCreationIdAlreadyDefinedException(
+                    "Panel with given name does not exists: " + informationPanel.getName());
         var id = informationPanel.getId();
         var panel = informationPanelRepository.getById(id);
         deleteTiles(panel);
@@ -156,7 +164,6 @@ public class InformationPanelService {
         });
         return informationPanel;
     }
-
 
 
     private void saveTiles(List<InformationTile> tiles, InformationPanel infoPanelEntity) {
@@ -301,7 +308,7 @@ public class InformationPanelService {
         List<InformationPanelDAOResponse> list =
                 informationPanels.stream()
                         .map(panel -> {
-                            var p =InformationPanelDAOResponse.create(panel, null);
+                            var p = InformationPanelDAOResponse.create(panel, null);
                             return p;
                         })
                         .collect(Collectors.toList());
@@ -379,7 +386,7 @@ public class InformationPanelService {
     }
 
     private List<MeasurementTileDAORequest> getInferredMeasurements(MeasurementTileDAORequest tileM) {
-        List<MeasurementTileDAORequest> list = measurementRepository
+        List<MeasurementTileDAORequest> list = measurementRepository2
                 .inferMeasurement(null,
                         tileM.getName(),
                         tileM.getSensorName(),
