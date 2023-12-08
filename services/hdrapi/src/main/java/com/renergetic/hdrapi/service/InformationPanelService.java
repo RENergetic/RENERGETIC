@@ -48,12 +48,11 @@ public class InformationPanelService {
     private MeasurementRepositoryTemp measurementRepository2;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
-        List<InformationPanelDAOResponse> list = informationPanelRepository.findAll(new OffSetPaging(offset, limit))
+      return informationPanelRepository.findAll(new OffSetPaging(offset, limit))
                 .stream().map(x -> informationPanelMapper.toDTO(x)).collect(Collectors.toList());
 
-        if (list != null && list.size() > 0)
-            return list;
-        else throw new NotFoundException("No information panels exists");
+
+
     }
 
     public List<InformationPanelDAOResponse> getAll(Long ownerId) {
