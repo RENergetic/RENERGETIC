@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,7 +36,8 @@ public class HDRRecommendationService {
 
     // ASSET CRUD OPERATIONS
     private HDRRecommendationDAO save(HDRRecommendationDAO recommendationDAO) {
-        var r = recommendationRepository.findByTimestampTag(DateConverter.toLocalDateTime(recommendationDAO.getTimestamp()),
+        var r = recommendationRepository.findByTimestampTag(
+                DateConverter.toLocalDateTime(recommendationDAO.getTimestamp()),
                 recommendationDAO.getTag().getTagId());
         if (r.isPresent()) {
             var recommendation = r.get();
@@ -65,7 +67,7 @@ public class HDRRecommendationService {
     }
 
     public Boolean save(long timestamp, List<HDRRecommendationDAO> recommendations) {
-        var differentTimestamp = recommendations.stream().filter(it -> it.getTimestamp()  != timestamp).findAny();
+        var differentTimestamp = recommendations.stream().filter(it -> it.getTimestamp() != timestamp).findAny();
         if (differentTimestamp.isPresent()) {
             throw new InvalidArgumentException("Recommendation has different timestamp");
         }
@@ -101,12 +103,13 @@ public class HDRRecommendationService {
         return Optional.ofNullable(r);
     }
 
-    public Optional<List<HDRRequestDAO>> getRecentRequest() {
+    public List<HDRRequestDAO> getRecentRequest() {
         var t = hdrRequestRepository.getRecentRequestTimestamp();
-        List<HDRRequestDAO> r = null;
-        if (t.isPresent())
-            r = this.getRequests(t.get());
-        return Optional.ofNullable(r);
+        if (t.isPresent() && (DateConverter.toEpoch(LocalDateTime.now()) < DateConverter.toEpoch(t.get()))) {//TODO: use DateConverter.now()
+            return this.getRequests(t.get());
+
+        }
+        return Collections.emptyList();
     }
 
     public List<HDRRecommendationDAO> getRecommendations(LocalDateTime t) {

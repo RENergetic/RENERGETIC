@@ -76,7 +76,7 @@ public class HDRRecommendationController {
             @RequestParam(required = false) Optional<Integer> limit) {
 
         List<HDRRequestDAO> request;
-        request = hdrService.getRecentRequest().orElse(new ArrayList<>());
+        request = hdrService.getRecentRequest() ;
         return new ResponseEntity<>(request, HttpStatus.OK);
     }
 
