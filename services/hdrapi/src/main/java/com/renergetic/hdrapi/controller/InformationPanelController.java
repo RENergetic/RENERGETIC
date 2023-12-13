@@ -34,7 +34,7 @@ public class InformationPanelController {
 
     @Operation(summary = "Infer a measurements for Information Panel")
     @ApiResponses({
-            @ApiResponse(responseCode = "20o", description = "Panel with filled measurements"),
+            @ApiResponse(responseCode = "200", description = "Panel with filled measurements"),
             @ApiResponse(responseCode = "500", description = "Error getting measurements")
     })
     @PostMapping(path = "/infermeasurements", produces = "application/json", consumes = "application/json")

@@ -16,6 +16,7 @@ import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
@@ -309,6 +310,7 @@ public class MeasurementService {
 
     public MeasurementType updateType(MeasurementType detail, Long id) {
         if (id != null && measurementTypeRepository.existsById(id)) {
+
             detail.setId(id);
             return measurementTypeRepository.save(detail);
         } else throw new InvalidNonExistingIdException("No measurement type with id " + id + "found");
@@ -322,7 +324,8 @@ public class MeasurementService {
     }
 
     public List<MeasurementType> getTypes(Map<String, String> filters, long offset, int limit) {
-        Page<MeasurementType> types = measurementTypeRepository.findAll(new OffSetPaging(offset, limit));
+        Page<MeasurementType> types = measurementTypeRepository.findAll(  new OffSetPaging(offset, limit,
+                Sort.by(Sort.Direction.ASC, "id",  "physicalName")));
         Stream<MeasurementType> stream = types.stream();
 
         if (filters != null)

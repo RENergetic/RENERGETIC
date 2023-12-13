@@ -14,6 +14,7 @@ import com.renergetic.common.utilities.Json;
 import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -48,7 +49,8 @@ public class InformationPanelService {
     private MeasurementRepositoryTemp measurementRepository2;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
-      return informationPanelRepository.findAll(new OffSetPaging(offset, limit))
+      return informationPanelRepository.findAll(new OffSetPaging(offset, limit,
+              Sort.by(Sort.Direction.ASC, "id")))
                 .stream().map(x -> informationPanelMapper.toDTO(x)).collect(Collectors.toList());
 
 
