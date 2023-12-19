@@ -18,7 +18,7 @@ import java.util.List;
 @ToString
 public class InformationTile {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 

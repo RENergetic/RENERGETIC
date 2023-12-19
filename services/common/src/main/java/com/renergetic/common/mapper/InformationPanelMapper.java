@@ -30,7 +30,7 @@ public class InformationPanelMapper implements MapperReponseRequest<InformationP
 //        if(dto.getOwner_id() != null){
 //            User user = new User();
 //            user.setId(dto.getOwner_id());
-//        @GeneratedValue(strategy = GenerationType.AUTO)
+//        @GeneratedValue(strategy = GenerationType.IDENTITY)
         return entity;
     }
     @Override
