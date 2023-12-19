@@ -29,3 +29,7 @@ Files to automatize Gent pilot configuration
 Files to automatize Poznan pilot configuration
 
  - renergetic_wp5.sql ---------- Default configuration for measurements, assets and example tiles
+
+## Script to keep the data integrity and APIs workflow
+
+- resetIds.sql -> You must run it each time that the database has a changes performed without use the APIs
