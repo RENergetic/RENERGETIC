@@ -15,7 +15,7 @@ import javax.persistence.*;
 @ToString
 public class InformationTileMeasurement {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "props", nullable = true, insertable = true, updatable = true)
