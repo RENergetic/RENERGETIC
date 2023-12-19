@@ -30,6 +30,9 @@ import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.common.utilities.OffSetPaging;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class UserService {
 	
@@ -70,9 +73,11 @@ public class UserService {
         entity = userRepo.save(entity);
         settingsRepo.save(new UserSettings(entity, "{}"));
         
-        AssetType type = typeRepo.findByName("user")
-        		.orElse(typeRepo.save(new AssetType("user")));
-
+        AssetType type = typeRepo.findByName("user").orElse(null);
+        if (type == null) {
+            log.warn("Asset type 'user' doesn't exists. It's being created");
+        	type = typeRepo.save(new AssetType("user"));
+        }
 
         Asset asset = new Asset();
         asset.setName(user.getUsername());
@@ -96,9 +101,11 @@ public class UserService {
         if (entity == null)
             throw new IdNoDefinedException("No exists a user with ID %s", user.getId());
         
+        // Create user
         entity = userRepo.save(entity);
+        // Create user settings
         settingsRepo.save(new UserSettings(entity, "{}"));
-        
+        // Create an asset related with the user
         Asset asset = assetRepo.findByUserId(entity.getId());
         asset = asset != null ? asset : new Asset();
 
@@ -126,30 +133,15 @@ public class UserService {
         if (entity == null)
             throw new IdNoDefinedException("No exists a user with ID %s", user.getId());
 
+        // Remove user settings
         settingsRepo.deleteByUserId(entity.getId());
-
+        // Remove asset related with the user
         // TODO: create method at the repository deleteByUserId and replace following code
-        assetRepo.findByUserId(entity.getId());
+        Asset userAsset = assetRepo.findByUserId(entity.getId());
+        if (userAsset != null)
+            assetRepo.delete(userAsset);
+        // Remove user
         userRepo.delete(entity);
-        
-        entity.setKeycloakId(user.getId());
-        entity.setUuid(uuidRepo.saveAndFlush(new UUID()));
-        
-        entity = userRepo.save(entity);
-        settingsRepo.save(new UserSettings(entity, "{}"));
-        
-        AssetType type = typeRepo.findByName("user")
-        		.orElse(typeRepo.save(new AssetType("user")));
-
-
-        Asset asset = new Asset();
-        asset.setName(user.getUsername());
-        asset.setLabel(user.getUsername());
-        asset.setType(type);
-        asset.setUser(entity);
-        asset.setUuid(uuidRepo.saveAndFlush(new UUID()));
-        
-        assetRepo.save(asset);
         
         return UserDAOResponse.create(user, null, null);
 	}
