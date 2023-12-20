@@ -15,7 +15,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.apache.tomcat.util.json.ParseException;
 
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +26,6 @@ import java.util.Map;
 public class DashboardDAO {
     @JsonProperty(required = false )
     private Long id;
-
 
     @JsonProperty(required = false)
     private String name;
@@ -51,6 +50,7 @@ public class DashboardDAO {
     @JsonInclude(value = Include.NON_NULL)
     @JsonProperty(access = Access.READ_ONLY, required = false)
     private Integer status;
+    
     @JsonProperty(value = "measurement_type", required = false)
     private MeasurementType measurementType;
 

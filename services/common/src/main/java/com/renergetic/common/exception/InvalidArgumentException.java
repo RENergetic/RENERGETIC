@@ -1,18 +1,25 @@
 package com.renergetic.common.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class InvalidArgumentException extends RuntimeException{
+public class InvalidArgumentException extends HttpRuntimeException{
 
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = -3547042448040107613L;
+
 	public InvalidArgumentException() {
-		super ();
+		super();
+	}
+
+	public InvalidArgumentException(String formatString, Object... parameters) {
+		super(formatString, parameters);
+	}
+
+	public InvalidArgumentException(String message) {
+		super(message);
 	}
 	
-	public InvalidArgumentException(String message) {
-		super (message);
+	@Override
+	public HttpStatus getHttpStatus() {
+		return HttpStatus.BAD_REQUEST;
 	}
 }
