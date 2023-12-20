@@ -25,7 +25,7 @@ import lombok.ToString;
 @ToString
 public class Request {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@Column(name = "method", nullable = false, insertable = true, updatable = true, unique = false)
