@@ -130,7 +130,7 @@ public class MeasurementController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "No measurements found with this id")
     })
-    @GetMapping(path = "/id/{id}", produces = "application/json")
+    @GetMapping(path = {"{id}", "/id/{id}"}, produces = "application/json")
     public ResponseEntity<MeasurementDAOResponse> getMeasurementsById(@PathVariable Long id) {
         var measurement = measurementSv.getById(id);
         MeasurementDAOResponse daoResponse = null;
@@ -142,12 +142,12 @@ public class MeasurementController {
                 daoResponse != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    @Operation(summary = "Cope measurement")
+    @Operation(summary = "Copy measurement")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "No measurements found with this id")
     })
-    @PostMapping(path = "/id/{id}/copy", produces = "application/json")
+    @PostMapping(path = {"/{id}/copy", "/id/{id}/copy"}, produces = "application/json")
     public ResponseEntity<MeasurementDAOResponse> duplicateMeasurement(@PathVariable Long id) {
         var daoResponse = measurementSv.duplicate(id);
 
