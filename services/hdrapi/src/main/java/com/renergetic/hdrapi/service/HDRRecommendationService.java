@@ -67,7 +67,9 @@ public class HDRRecommendationService {
     }
 
     public Boolean save(long timestamp, List<HDRRecommendationDAO> recommendations) {
-        var differentTimestamp = recommendations.stream().filter(it -> it.getTimestamp() != timestamp).findAny();
+        recommendations.forEach(it -> it.setTimestamp(it.getTimestamp() != null ? it.getTimestamp() : timestamp));
+        var differentTimestamp = recommendations.stream()
+                .filter(it -> it.getTimestamp() != timestamp).findAny();
         if (differentTimestamp.isPresent()) {
             throw new InvalidArgumentException("Recommendation has different timestamp");
         }
@@ -105,7 +107,8 @@ public class HDRRecommendationService {
 
     public List<HDRRequestDAO> getRecentRequest() {
         var t = hdrRequestRepository.getRecentRequestTimestamp();
-        if (t.isPresent() && (DateConverter.toEpoch(LocalDateTime.now()) < DateConverter.toEpoch(t.get()))) {//TODO: use DateConverter.now()
+        if (t.isPresent() && (DateConverter.toEpoch(LocalDateTime.now()) < DateConverter.toEpoch(
+                t.get()))) {//TODO: use DateConverter.now()
             return this.getRequests(t.get());
 
         }

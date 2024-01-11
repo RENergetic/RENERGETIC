@@ -427,7 +427,7 @@ public class MeasurementService {
 
                 return equals;
             });
-        return stream.map(it -> new TagDAO(it.getKey(), it.getValue())).collect(Collectors.toList());
+        return stream.map(it -> new TagDAO(it.getKey(), it.getValue(),it.getId())).collect(Collectors.toList());
 
 
     }

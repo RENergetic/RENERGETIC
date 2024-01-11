@@ -35,13 +35,10 @@ public class HDRRecommendationController {
     private Boolean generateDummy;
 //=== GET REQUESTS====================================================================================
 
-    @Operation(summary = "list recent recommendations")
+    @Operation(summary = "List current valid recommendations")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/recommendations/current", produces = "application/json")
-    public ResponseEntity<List<HDRRecommendationDAO>> getAllRecommendations(
-            @RequestParam(required = false) Optional<Long> offset,
-            @RequestParam(required = false) Optional<Integer> limit) {
-
+    public ResponseEntity<List<HDRRecommendationDAO>> getAllRecommendations() {
         List<HDRRecommendationDAO> recommendations;
         if (!generateDummy)
             recommendations = hdrService.getRecent().orElse(new ArrayList<>());
@@ -52,15 +49,11 @@ public class HDRRecommendationController {
     }
 
 
-    @Operation(summary = "Get All Measurements")
-    @ApiResponse(responseCode = "200", description = "Get measurements related with recommendation by id ")
+    @Operation(summary = "Get recommendation's measurements")
+    @ApiResponse(responseCode = "200", description = "Get all measurements related with the recommendation by id ")
     @GetMapping(path = "/recommendations/id/{id}/measurements", produces = "application/json")
-    public ResponseEntity<List<MeasurementDAOResponse>> listMeasurements(
-            @PathVariable Long id,
-            @RequestParam(required = false) Optional<Long> offset,
-            @RequestParam(required = false) Optional<Integer> limit) {
-        List<MeasurementDAOResponse> measurements ;
-
+    public ResponseEntity<List<MeasurementDAOResponse>> listMeasurements(@PathVariable Long id) {
+        List<MeasurementDAOResponse> measurements;
         if (!generateDummy)
             measurements = hdrService.getMeasurements(id);
         else
@@ -68,15 +61,13 @@ public class HDRRecommendationController {
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
 
-    @Operation(summary = "list requests")
+    @Operation(summary = "List current requests")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/requests/current", produces = "application/json")
-    public ResponseEntity<List<HDRRequestDAO>> getAllRequests(
-            @RequestParam(required = false) Optional<Long> offset,
-            @RequestParam(required = false) Optional<Integer> limit) {
+    public ResponseEntity<List<HDRRequestDAO>> getAllRequests( ) {
 
         List<HDRRequestDAO> request;
-        request = hdrService.getRecentRequest() ;
+        request = hdrService.getRecentRequest();
         return new ResponseEntity<>(request, HttpStatus.OK);
     }
 
@@ -126,7 +117,7 @@ public class HDRRecommendationController {
     @PostMapping(path = "/requests", produces = "application/json", consumes = "application/json")
     public ResponseEntity<HDRRequestDAO> saveRequest(@RequestBody HDRRequestDAO request) {
 
-        if(request.getTimestamp()==null){
+        if (request.getTimestamp() == null) {
             request.setTimestamp(DateConverter.toEpoch(LocalDateTime.now()));
         }
         HDRRequestDAO r = hdrService.save(request);

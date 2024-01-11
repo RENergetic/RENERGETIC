@@ -11,6 +11,7 @@ import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.common.utilities.Json;
+import com.renergetic.hdrapi.dao.temp.InformationPanelMapperTemp;
 import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class InformationPanelService {
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
       return informationPanelRepository.findAll(new OffSetPaging(offset, limit,
               Sort.by(Sort.Direction.ASC, "id")))
-                .stream().map(x -> informationPanelMapper.toDTO(x)).collect(Collectors.toList());
+                .stream().map(x -> InformationPanelMapperTemp.toDTO(x,false)).collect(Collectors.toList());
 
 
 
@@ -59,7 +60,8 @@ public class InformationPanelService {
 
     public List<InformationPanelDAOResponse> getAll(Long ownerId) {
         List<InformationPanelDAOResponse> list = informationPanelRepository.findAllByOwnerId(ownerId).stream()
-                .map(x -> informationPanelMapper.toDTO(x))
+//                .map(x -> informationPanelMapper.toDTO(x))
+                .map(x -> InformationPanelMapperTemp.toDTO(x,false))
                 .collect(Collectors.toList());
 
         if (list != null && list.size() > 0)
@@ -71,12 +73,14 @@ public class InformationPanelService {
 //        return this.getById(id,false)
 //    }
     public InformationPanelDAOResponse getById(Long id, Boolean detailed) {
-        return informationPanelMapper.toDTO(
+//        return informationPanelMapper.toDTO(
+        return InformationPanelMapperTemp.toDTO(
                 informationPanelRepository.findById(id).orElseThrow(NotFoundException::new), detailed);
     }
 
     public InformationPanelDAOResponse getByName(String name) {
-        return informationPanelMapper.toDTO(
+//        return informationPanelMapper.toDTO(
+        return InformationPanelMapperTemp.toDTO(
                 informationPanelRepository.findByName(name).orElseThrow(NotFoundException::new));
     }
 
@@ -87,7 +91,8 @@ public class InformationPanelService {
 
         InformationPanel infoPanelEntity = informationPanelMapper.toEntity(informationPanel);
         infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
+        return InformationPanelMapperTemp.toDTO( informationPanelRepository.save(infoPanelEntity));
+//        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
     }
 
     public InformationPanelDAOResponse update(InformationPanelDAO informationPanel) {
@@ -108,7 +113,8 @@ public class InformationPanelService {
         this.saveTiles(infoPanelEntity.getTiles(), infoPanelEntity);
         infoPanelEntity.setAssets(panel.getAssets());
         infoPanelEntity = informationPanelRepository.save(infoPanelEntity);
-        return informationPanelMapper.toDTO(infoPanelEntity);
+//        return informationPanelMapper.toDTO(infoPanelEntity); //uncomment with new common version
+        return InformationPanelMapperTemp.toDTO(infoPanelEntity,false);
 
 
     }
@@ -127,7 +133,8 @@ public class InformationPanelService {
         infoPanelEntity = informationPanelRepository.save(infoPanelEntity);
         this.saveTiles(tiles, infoPanelEntity);
         informationPanelRepository.flush();
-        return informationPanelMapper.toDTO(infoPanelEntity);
+//        return informationPanelMapper.toDTO(infoPanelEntity);
+       return InformationPanelMapperTemp.toDTO(infoPanelEntity,false);
     }
 
     public InformationPanelDAO inferMeasurements(InformationPanelDAO informationPanel) {
@@ -185,14 +192,14 @@ public class InformationPanelService {
         });
     }
 
-    public InformationPanelDAOResponse update(InformationPanelDAORequest informationPanel) {
-        if (informationPanel.getId() == null || !informationPanelRepository.existsById(informationPanel.getId()))
-            throw new InvalidNonExistingIdException();
-//TODO: validate, check user privileges
-        var panel = informationPanelRepository.getById(informationPanel.getId());
-        return informationPanelMapper.toDTO(
-                informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel, panel)));
-    }
+//    public InformationPanelDAOResponse update(InformationPanelDAORequest informationPanel) {
+//        if (informationPanel.getId() == null || !informationPanelRepository.existsById(informationPanel.getId()))
+//            throw new InvalidNonExistingIdException();
+////TODO: validate, check user privileges
+//        var panel = informationPanelRepository.getById(informationPanel.getId());
+//        return informationPanelMapper.toDTO(
+//                informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel, panel)));
+//    }
 
     public boolean deleteById(Long id) {
         if (id == null || !informationPanelRepository.existsById(id))
