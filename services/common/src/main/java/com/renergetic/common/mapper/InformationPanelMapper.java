@@ -3,10 +3,13 @@ package com.renergetic.common.mapper;
 import com.renergetic.common.dao.InformationPanelDAORequest;
 import com.renergetic.common.dao.InformationPanelDAOResponse;
 import com.renergetic.common.model.InformationPanel;
+import com.renergetic.common.utilities.Json;
+import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +59,13 @@ public class InformationPanelMapper implements MapperReponseRequest<InformationP
                     entity.getTiles().stream().map(x -> informationTileMapper.toDTO(x,detailed)).collect(Collectors.toList()));
         else
             dao.setTiles(new ArrayList<>());
+        if(entity.getProps()!=null &&!entity.getProps().isBlank()){
+            try {
+                dao.setProps(Json.parse(entity.getProps()).toMap() );
+            } catch (ParseException e) {
+                dao.setProps(Collections.emptyMap());
+            }
+        }
         return dao;
     }
 }

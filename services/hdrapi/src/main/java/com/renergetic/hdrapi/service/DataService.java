@@ -89,7 +89,8 @@ public class DataService {
             //TODO: TOMEK/or someone else - check : if asset is null and panel is an template - raise exception  - bad request
             List<InformationTileMeasurement> measurements =
                     informationPanelService.getPanelMeasurements(panelId);
-            List<MeasurementDAOResponse> measurementDAOResponseList = measurements.stream().map(it ->
+            List<MeasurementDAOResponse> measurementDAOResponseList = measurements.stream()
+                    .filter(it->it.getMeasurement()!=null).map(it ->
                     MeasurementDAOResponse.create(it.getMeasurement(), it.getMeasurement().getDetails(),
                             it.getFunction())).collect(Collectors.toList());
             DataDAO res = this.getData(measurementDAOResponseList, from, to);

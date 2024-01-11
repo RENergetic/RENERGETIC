@@ -90,7 +90,7 @@ public class InformationTileDAORequest {
         return dao;
     }
 
-    InformationTile mapToEntity() {
+    public InformationTile mapToEntity() {
         InformationTile tile = new InformationTile();
         tile.setId(id);
         tile.setName(name);
