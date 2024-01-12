@@ -9,6 +9,7 @@ import com.renergetic.common.model.*;
 import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
+import com.renergetic.hdrapi.dao.temp.RecommendationRepositoryTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,13 +31,15 @@ public class HDRRecommendationService {
     @Autowired
     RecommendationRepository recommendationRepository;
     @Autowired
+    RecommendationRepositoryTemp recommendationRepositoryTemp;
+    @Autowired
     HDRRequestRepository hdrRequestRepository;
     @Autowired
     UuidRepository uuidRepository;
 
     // ASSET CRUD OPERATIONS
     private HDRRecommendationDAO save(HDRRecommendationDAO recommendationDAO) {
-        var r = recommendationRepository.findByTimestampTag(
+        var r = recommendationRepositoryTemp.findByTimestampTag(
                 DateConverter.toLocalDateTime(recommendationDAO.getTimestamp()),
                 recommendationDAO.getTag().getTagId());
         if (r.isPresent()) {
@@ -106,12 +109,15 @@ public class HDRRecommendationService {
     }
 
     public List<HDRRequestDAO> getRecentRequest() {
-        var t = hdrRequestRepository.getRecentRequestTimestamp();
-        if (t.isPresent() && (DateConverter.toEpoch(LocalDateTime.now()) < DateConverter.toEpoch(
-                t.get()))) {//TODO: use DateConverter.now()
-            return this.getRequests(t.get());
+        var t = hdrRequestRepository.getRecentRequestTimestamp();//get timestamp of the last request batch
+        if (t.isPresent()) {
+            var now = DateConverter.toEpoch(LocalDateTime.now());
+            //get requests which haven't ended yet
+            return this.getRequests(t.get()).stream().filter(it->it.getDateTo()>now).collect(Collectors.toList());
 
         }
+
+
         return Collections.emptyList();
     }
 

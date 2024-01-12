@@ -89,7 +89,7 @@ public class HDRRecommendationController {
             @ApiResponse(responseCode = "500", description = "Error saving recommendation")
     })
     @PostMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<Long> saveRecommendations(@PathVariable(name = "t") Optional<Long> timestamp,
+    public ResponseEntity<Long> saveRecommendations(@RequestParam(name = "t") Optional<Long> timestamp,
                                                     @RequestBody List<HDRRecommendationDAO> recommendations) {
         Long t;
         t = timestamp.orElse(DateConverter.toEpoch(LocalDateTime.now()));
@@ -103,7 +103,7 @@ public class HDRRecommendationController {
             @ApiResponse(responseCode = "500", description = "Error saving recommendation")
     })
     @PutMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
-    public ResponseEntity saveRecommendation(@PathVariable(name = "t", required = true) Long timestamp,
+    public ResponseEntity saveRecommendation(@RequestParam(name = "t", required = true) Long timestamp,
                                              @RequestBody List<HDRRecommendationDAO> recommendations) {
         hdrService.save(timestamp, recommendations);
         return new ResponseEntity(ResponseEntity.noContent(), HttpStatus.CREATED);
@@ -130,7 +130,7 @@ public class HDRRecommendationController {
             @ApiResponse(responseCode = "500", description = "Error deleting recommendations")
     })
     @DeleteMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<List<HDRRecommendationDAO>> deleteRecommendations(@PathVariable(name = "t") Long timestamp) {
+    public ResponseEntity<List<HDRRecommendationDAO>> deleteRecommendations(@RequestParam(name = "t") Long timestamp) {
         var dt = DateConverter.toLocalDateTime(timestamp);
         var res = hdrService.getRecommendations(dt);
         hdrService.deleteByTimestamp(LocalDateTime.now());
@@ -147,7 +147,7 @@ public class HDRRecommendationController {
             @ApiResponse(responseCode = "500", description = "Error deleting recommendations")
     })
     @DeleteMapping(path = "/requests", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<List<HDRRequestDAO>> deleteRequest(@PathVariable(name = "t") Long timestamp) {
+    public ResponseEntity<List<HDRRequestDAO>> deleteRequest(@RequestParam(name = "t") Long timestamp) {
         var dt = DateConverter.toLocalDateTime(timestamp);
 
         var res = hdrService.getRequests(dt);
