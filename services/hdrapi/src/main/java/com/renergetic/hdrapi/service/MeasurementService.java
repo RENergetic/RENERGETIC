@@ -359,7 +359,8 @@ public class MeasurementService {
     public MeasurementTags saveTag(MeasurementTags tag) {
         if (tag.getId() != null && measurementTagsRepository.existsById(tag.getId()))
             throw new InvalidCreationIdAlreadyDefinedException("Already exists a tag with ID " + tag.getId());
-
+        if(!measurementTagsRepository.findByKeyAndValue(tag.getKey(),tag.getValue()).isEmpty())
+            throw new InvalidCreationIdAlreadyDefinedException("Tag already exists" + tag.getKey()+"="+tag.getValue());
         return measurementTagsRepository.save(tag);
     }
 
