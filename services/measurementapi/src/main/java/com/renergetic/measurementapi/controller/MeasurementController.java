@@ -1,12 +1,9 @@
 package com.renergetic.measurementapi.controller;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import com.renergetic.common.model.InfluxFunction;
 import com.renergetic.measurementapi.service.ConvertService;
@@ -69,6 +66,8 @@ public class MeasurementController {
 			@RequestParam(name = "measurements", required = false) List<String> measurements, 
 			@RequestParam(name = "fields", required = false) List<String> fields, 
 			@RequestParam("bucket") Optional<String> bucket,
+			@RequestParam("from") Optional<String> from,
+			@RequestParam("to") Optional<String> to,
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
 		
@@ -77,11 +76,13 @@ public class MeasurementController {
 		"measurements",
 			"fields",
 			"bucket",
+			"from",
+			"to",
 			"hideNotFound");
 		
 		Map<String, List<String>> parsedTags = manageTags.parse(tags);
 		
-		ret = service.listTags(bucket.orElse("renergetic"), measurements, fields, parsedTags);
+		ret = service.listTags(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(null), to.orElse(null));
 
 		if (ret != null && !ret.isEmpty())
 			return ResponseEntity.ok(ret);
@@ -94,8 +95,10 @@ public class MeasurementController {
 	@GetMapping("/tag/{tag_name}")
 	public ResponseEntity<Map<String, List<String>>> getTagValues(
 			@PathVariable(name = "tag_name") String tagName,
-			@RequestParam(name = "measurements", required = false) List<String> measurements, 
-			@RequestParam(name = "fields", required = false) List<String> fields, 
+			@RequestParam(name = "measurements", required = false) List<String> measurements,
+			@RequestParam("from") Optional<String> from,
+			@RequestParam("to") Optional<String> to,
+			@RequestParam(name = "fields", required = false) List<String> fields,
 			@RequestParam("bucket") Optional<String> bucket,
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
@@ -105,11 +108,13 @@ public class MeasurementController {
 			"measurements",
 			"fields",
 			"bucket",
+			"from",
+			"to",
 			"hideNotFound");
 		
 		Map<String, List<String>> parsedTags = manageTags.parse(tags);
 		
-		ret.put(tagName, service.listTagValues(bucket.orElse("renergetic"), tagName, measurements, fields, parsedTags));
+		ret.put(tagName, service.listTagValues(bucket.orElse("renergetic"), tagName, measurements, fields, parsedTags, from.orElse(null), to.orElse(null)));
 
 		if (!ret.isEmpty())
 			return ResponseEntity.ok(ret);
@@ -122,7 +127,7 @@ public class MeasurementController {
 	@GetMapping("/data")
 	public ResponseEntity<List<MeasurementDAOResponse>> getData(
 			@RequestParam(name = "measurements", required = false) List<String> measurements, 
-			@RequestParam(name = "fields", required = false) List<String> fields, 
+			@RequestParam(name = "fields", required = false) List<String> fields,
 			@RequestParam("from") Optional<String> from,
 			@RequestParam("to") Optional<String> to,
 			@RequestParam("bucket") Optional<String> bucket,
