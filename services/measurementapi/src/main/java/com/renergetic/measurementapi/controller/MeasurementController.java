@@ -1,12 +1,9 @@
 package com.renergetic.measurementapi.controller;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import com.renergetic.common.model.InfluxFunction;
 import com.renergetic.measurementapi.service.ConvertService;
@@ -25,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.renergetic.measurementapi.dao.MeasurementDAORequest;
 import com.renergetic.measurementapi.dao.MeasurementDAOResponse;
 import com.renergetic.measurementapi.service.MeasurementService;
+import com.renergetic.measurementapi.service.utils.ManageTags;
 
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -40,6 +38,9 @@ public class MeasurementController {
 
 	@Autowired
 	ConvertService convertService;
+
+	@Autowired
+	ManageTags manageTags;
 
 // GET REQUESTS
 	
@@ -65,24 +66,23 @@ public class MeasurementController {
 			@RequestParam(name = "measurements", required = false) List<String> measurements, 
 			@RequestParam(name = "fields", required = false) List<String> fields, 
 			@RequestParam("bucket") Optional<String> bucket,
+			@RequestParam("from") Optional<String> from,
+			@RequestParam("to") Optional<String> to,
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
 		
 		Map<String, List<String>> ret;
-		tags.remove("measurements");
-		tags.remove("fields");
-		tags.remove("bucket");
-		tags.remove("hideNotFound");
+		manageTags.remove(tags,
+		"measurements",
+			"fields",
+			"bucket",
+			"from",
+			"to",
+			"hideNotFound");
 		
-		Map<String, List<String>> parsedTags = tags.entrySet().stream()
-				.collect(
-						Collectors.toMap(
-								Entry::getKey, 
-								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
-								)
-						); 
+		Map<String, List<String>> parsedTags = manageTags.parse(tags);
 		
-		ret = service.listTags(bucket.orElse("renergetic"), measurements, fields, parsedTags);
+		ret = service.listTags(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(null), to.orElse(null));
 
 		if (ret != null && !ret.isEmpty())
 			return ResponseEntity.ok(ret);
@@ -95,27 +95,26 @@ public class MeasurementController {
 	@GetMapping("/tag/{tag_name}")
 	public ResponseEntity<Map<String, List<String>>> getTagValues(
 			@PathVariable(name = "tag_name") String tagName,
-			@RequestParam(name = "measurements", required = false) List<String> measurements, 
-			@RequestParam(name = "fields", required = false) List<String> fields, 
+			@RequestParam(name = "measurements", required = false) List<String> measurements,
+			@RequestParam("from") Optional<String> from,
+			@RequestParam("to") Optional<String> to,
+			@RequestParam(name = "fields", required = false) List<String> fields,
 			@RequestParam("bucket") Optional<String> bucket,
 			@RequestParam Map<String, String> tags,
 			@RequestParam(name = "hideNotFound") Optional<Boolean> hideNotFound){
 		
 		Map<String, List<String>> ret = new HashMap<>();
-		tags.remove("measurements");
-		tags.remove("fields");
-		tags.remove("bucket");
-		tags.remove("hideNotFound");
+		manageTags.remove(tags,
+			"measurements",
+			"fields",
+			"bucket",
+			"from",
+			"to",
+			"hideNotFound");
 		
-		Map<String, List<String>> parsedTags = tags.entrySet().stream()
-				.collect(
-						Collectors.toMap(
-								Entry::getKey, 
-								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
-								)
-						); 
+		Map<String, List<String>> parsedTags = manageTags.parse(tags);
 		
-		ret.put(tagName, service.listTagValues(bucket.orElse("renergetic"), tagName, measurements, fields, parsedTags));
+		ret.put(tagName, service.listTagValues(bucket.orElse("renergetic"), tagName, measurements, fields, parsedTags, from.orElse(null), to.orElse(null)));
 
 		if (!ret.isEmpty())
 			return ResponseEntity.ok(ret);
@@ -128,7 +127,7 @@ public class MeasurementController {
 	@GetMapping("/data")
 	public ResponseEntity<List<MeasurementDAOResponse>> getData(
 			@RequestParam(name = "measurements", required = false) List<String> measurements, 
-			@RequestParam(name = "fields", required = false) List<String> fields, 
+			@RequestParam(name = "fields", required = false) List<String> fields,
 			@RequestParam("from") Optional<String> from,
 			@RequestParam("to") Optional<String> to,
 			@RequestParam("bucket") Optional<String> bucket,
@@ -140,24 +139,19 @@ public class MeasurementController {
 			@RequestParam(name = "onlyLastestPrediction") Optional<Boolean> onlyLastestPrediction) {
 		
 		List<MeasurementDAOResponse> ret;
-		tags.remove("measurements");
-		tags.remove("fields");
-		tags.remove("bucket");
-		tags.remove("from");
-		tags.remove("to");
-		tags.remove("hideNotFound");
-		tags.remove("dashboardId");
-		tags.remove("performDecumulation");
-		tags.remove("getTags");
-		tags.remove("onlyLastestPrediction");
+		manageTags.remove(tags,
+			"measurements",
+			"fields",
+			"bucket",
+			"from",
+			"to",
+			"hideNotFound",
+			"dashboardId",
+			"performDecumulation",
+			"getTags",
+			"onlyLastestPrediction");
 		
-		Map<String, List<String>> parsedTags = tags.entrySet().stream()
-				.collect(
-						Collectors.toMap(
-								Entry::getKey, 
-								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
-								)
-						); 
+		Map<String, List<String>> parsedTags = manageTags.parse(tags);
 		
 		ret = service.data(bucket.orElse("renergetic"), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", performDecumulation.orElse(false), getTags.orElse(true), onlyLastestPrediction.orElse(false));
 
@@ -192,27 +186,22 @@ public class MeasurementController {
 			@RequestParam(name = "onlyLastestPrediction") Optional<Boolean> onlyLastestPrediction) {
 
 		List<MeasurementDAOResponse> ret;
-		tags.remove("measurements");
-		tags.remove("fields");
-		tags.remove("bucket");
-		tags.remove("group");
-		tags.remove("by_measurement");
-		tags.remove("to_float");
-		tags.remove("from");
-		tags.remove("to");
-		tags.remove("hideNotFound");
-		tags.remove("dashboardId");
-		tags.remove("performDecumulation");
-		tags.remove("getTags");
-		tags.remove("onlyLastestPrediction");
+		manageTags.remove(tags,
+			"measurements",
+			"fields",
+			"bucket",
+			"group",
+			"by_measurement",
+			"to_float",
+			"from",
+			"to",
+			"hideNotFound",
+			"dashboardId",
+			"performDecumulation",
+			"getTags",
+			"onlyLastestPrediction");
 		
-		Map<String, List<String>> parsedTags = tags.entrySet().stream()
-				.collect(
-						Collectors.toMap(
-								Entry::getKey, 
-								entry -> Arrays.stream(entry.getValue().split(",")).map(String::trim).collect(Collectors.toList())
-								)
-						); 
+		Map<String, List<String>> parsedTags = manageTags.parse(tags);
 
 		ret = service.dataOperation(bucket.orElse("renergetic"), InfluxFunction.obtain(function), measurements, fields, parsedTags, from.orElse(""), to.orElse(""), "time", group.orElse(""), byMeasurement.orElse(false), toFloat.orElse(false), performDecumulation.orElse(false), getTags.orElse(true), onlyLastestPrediction.orElse(false));
 
@@ -274,10 +263,11 @@ public class MeasurementController {
 		measurement.setTags(tags);
 		
 		List<MeasurementDAOResponse> ret;
-		tags.remove("bucket");
-		tags.remove("from");
-		tags.remove("to");
-		tags.remove("hideNotFound");
+		manageTags.remove(tags,
+		"bucket",
+			"from",
+			"to",
+			"hideNotFound");
 		
 		ret = service.select(measurement, from.orElse(""), to.orElse(""), "time");
 
@@ -309,11 +299,12 @@ public class MeasurementController {
 		measurement.setTags(tags);
 		
 		List<MeasurementDAOResponse> ret;
-		tags.remove("from");
-		tags.remove("to");
-		tags.remove("group");
-		tags.remove("field");
-		tags.remove("hideNotFound");
+		manageTags.remove(tags,
+		"from",
+			"to",
+			"group",
+			"field",
+			"hideNotFound");
 		
 		ret = service.operate(measurement, InfluxFunction.obtain(function), field, from.orElse(""), to.orElse(""), group.orElse(""), "time");
 		

@@ -27,6 +27,7 @@ import com.renergetic.measurementapi.exception.InvalidArgumentException;
 import com.renergetic.measurementapi.mapper.MeasurementMapper;
 import com.renergetic.measurementapi.model.InfluxTimeUnit;
 import com.renergetic.measurementapi.service.utils.FieldsFormat;
+import com.renergetic.measurementapi.service.utils.ManageTags;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 public class MeasurementService {
 	@Autowired
     private InfluxDBClient influxDB;
+
+	@Autowired
+	private ManageTags manageTags;
 
 	public void insert(MeasurementDAORequest measurement) {
 		WriteApiBlocking write = influxDB.getWriteApiBlocking();
@@ -103,7 +107,7 @@ public class MeasurementService {
 
 		// IF ONLY FETCHING LATEST PREDICITON GENERATION
 		if (Boolean.TRUE.equals(onlyLatestPrediction)){
-			List<String> predictionValues = listTagValues(bucket, "time_prediction", measurements, fields, tags);
+			List<String> predictionValues = listTagValues(bucket, "time_prediction", measurements, fields, tags, from, to);
 			if(predictionValues != null && !predictionValues.isEmpty()){
 				String latest = null;
 				for(String predTime : predictionValues){
@@ -118,11 +122,7 @@ public class MeasurementService {
 
 		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
 		if (tags != null && !tags.isEmpty()) {
-			Map<String, List<String>> finalTags = tags;
-			fluxQuery.add( String.format("filter(fn: (r) => %s)",
-					tags.keySet().stream()
-					.map(key -> '(' + finalTags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
-					.collect(Collectors.joining(" and "))) );
+			fluxQuery.add( manageTags.fluxFilter(tags) );
 		}
 		
 		// IF DATA IS CUMULATIVE CONVERT TO NON CUMULATIVE DATA
@@ -165,7 +165,7 @@ public class MeasurementService {
 
 		// IF ONLY FETCHING LATEST PREDICITON GENERATION
 		if (Boolean.TRUE.equals(onlyLatestPrediction)){
-			List<String> predictionValues = listTagValues(bucket, "time_prediction", measurements, fields, tags);
+			List<String> predictionValues = listTagValues(bucket, "time_prediction", measurements, fields, tags, from, to);
 			if(predictionValues != null && !predictionValues.isEmpty()){
 				String latest = null;
 				for(String predTime : predictionValues){
@@ -180,11 +180,7 @@ public class MeasurementService {
 
 		// FILTER TAGS AND VALUES RELATED BY THEM, IF A ENTRY HAVEN'T A TAG IS DISCARDED, IF THE LIST IS EMPTY IGNORE THE TAGS
 		if (tags != null && !tags.isEmpty()) {
-			Map<String, List<String>> finalTags = tags;
-			fluxQuery.add( String.format("filter(fn: (r) => %s)",
-					tags.keySet().stream()
-					.map(key -> '(' + finalTags.get(key).stream().map(value -> String.format("r[\"%s\"] == \"%s\"", key, value)).collect(Collectors.joining(" or ")) + ')' )
-					.collect(Collectors.joining(" and "))) );
+			fluxQuery.add( manageTags.fluxFilter(tags) );
 		}
 		fluxQuery.add("filter(fn: (r) => types.isType(v: r._value, type: \"float\") or types.isType(v: r._value, type: \"int\"))");
 
@@ -217,10 +213,13 @@ public class MeasurementService {
      * @param bucket Bucket from search measurement
      * @return A Map with all tags names in Bucket
      */
-    public Map<String, List<String>> listTags(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags) {
+    public Map<String, List<String>> listTags(String bucket, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> filter = new ArrayList<>();
+
+		if (from != null) from = parseTime(from);
+		if (to != null) to = parseTime(to);
 
 		// FILTER USING MEASUREMENTS
 		if (measurements != null && !measurements.isEmpty())
@@ -242,8 +241,13 @@ public class MeasurementService {
 		String filterString = filter.stream().collect(Collectors.joining(" and "));
 		
 		String flux = String.format("import \"influxdata/influxdb/v1\""
-				+ "v1.tagKeys(bucket: \"%s\"%s)",
-				bucket, filterString.isBlank()? "" : ", predicate: (r) => " + filterString);
+				+ "v1.tagKeys(bucket: \"%s\"%s%s%s)",
+				bucket, filterString.isBlank()? "" : ", predicate: (r) => " + filterString,
+				from == null? "" : ", start: " + from,
+				to == null? "": ", stop: " + to);
+
+		String fromVar = from;
+		String toVar = to;
 
 		log.info("Flux query: \n" + flux);
 		FluxTable table = query.query(flux).get(0);
@@ -251,13 +255,16 @@ public class MeasurementService {
 			.stream()
 			.map(row -> row.getValue().toString())
 			.collect(Collectors.toMap(tagKey -> tagKey, 
-					tagKey -> listTagValues(bucket, tagKey, filterString)));
+					tagKey -> listTagValues(bucket, tagKey, filterString, fromVar, toVar)));
     }
 
-    public List<String> listTagValues(String bucket, String tag, List<String> measurements, List<String> fields, Map<String, List<String>> tags) {
+    public List<String> listTagValues(String bucket, String tag, List<String> measurements, List<String> fields, Map<String, List<String>> tags, String from, String to) {
 		QueryApi query = influxDB.getQueryApi();
 
 		List<String> filter = new ArrayList<>();
+
+		if (from != null) from = parseTime(from);
+		if (to != null) to = parseTime(to);
 
 		// FILTER USING MEASUREMENTS
 		if (measurements != null && !measurements.isEmpty())
@@ -279,8 +286,10 @@ public class MeasurementService {
 		String filterString = filter.stream().collect(Collectors.joining(" and "));
 		
 		String flux = String.format("import \"influxdata/influxdb/v1\""
-				+ "v1.tagValues(bucket: \"%s\", tag: \"%s\"%s)",
-				bucket, tag, filterString.isBlank()? "" : ", predicate: (r) => " + filterString);
+				+ "v1.tagValues(bucket: \"%s\", tag: \"%s\"%s%s%s)",
+				bucket, tag, filterString.isBlank()? "" : ", predicate: (r) => " + filterString,
+				from == null? "" : ", start: " + from,
+				to == null? "": ", stop: " + to);
 
 		log.info("Flux query: \n" + flux);
 		FluxTable table = query.query(flux).get(0);
@@ -290,12 +299,14 @@ public class MeasurementService {
 			.collect(Collectors.toList());
     }
 
-    public List<String> listTagValues(String bucket, String tag, String filter) {
+    public List<String> listTagValues(String bucket, String tag, String filter, String from, String to) {
 		QueryApi query = influxDB.getQueryApi();
 		
 		String flux = String.format("import \"influxdata/influxdb/v1\""
-				+ "v1.tagValues(bucket: \"%s\", tag: \"%s\"%s)",
-				bucket, tag, filter.isBlank()? "" : ", predicate: (r) => " + filter);
+				+ "v1.tagValues(bucket: \"%s\", tag: \"%s\"%s%s%s)",
+				bucket, tag, filter.isBlank()? "" : ", predicate: (r) => " + filter,
+				from == null? "" : ", start: " + from,
+				to == null? "": ", stop: " + to);
 
 		log.info("Flux query: \n" + flux);
 		FluxTable table = query.query(flux).get(0);
