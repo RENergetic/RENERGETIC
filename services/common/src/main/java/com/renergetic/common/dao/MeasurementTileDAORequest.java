@@ -19,7 +19,8 @@ import java.util.Map;
 public class MeasurementTileDAORequest {
     @JsonProperty(required = false)
     private Long id;
-
+    @JsonProperty(required = false)
+    private SimpleAssetDAO asset;
     @JsonProperty(required = true)
     private String name;
 
@@ -27,6 +28,7 @@ public class MeasurementTileDAORequest {
     private String sensorName;
 
 
+    //TODO: consider to remove this field
     @JsonProperty(required = false)
     private String icon;
 
@@ -46,27 +48,32 @@ public class MeasurementTileDAORequest {
     @JsonProperty(value = "aggregation_function", required = false)
     private String function;
 
-//	public static MeasurementTileDAORequest create(Measurement measurement) {
-//		MeasurementTileDAORequest dao = null;
-//
-//		if (measurement != null) {
-//			dao = new MeasurementTileDAORequest();
-//
-//			dao.setId(measurement.getId());
-//			dao.setName(measurement.getName());
-//			dao.setSensorName(measurement.getSensorName());
-//			if (measurement.getType() != null)
-//				dao.setType(measurement.getType().getId());
-//			dao.setLabel(measurement.getLabel());
-//			//dao.setDescription(measurement.getDescription());
-//			//dao.setIcon(measurement.getIcon());
-//			dao.setDomain(measurement.getDomain());
-//			dao.setDirection(measurement.getDirection());
-//			if (measurement.getAsset() != null)
-//				dao.setAssetId(measurement.getAsset().getId());
-//		}
-//		return dao;
-//	}
+    public static MeasurementTileDAORequest create(Measurement measurement) {
+        return MeasurementTileDAORequest.create(measurement, null, null);
+    }
+
+    public static MeasurementTileDAORequest create(Measurement measurement, String function, Map<String, ?> props) {
+        MeasurementTileDAORequest dao = null;
+        if (measurement != null) {
+            dao = new MeasurementTileDAORequest();
+
+            dao.setId(measurement.getId());
+            dao.setName(measurement.getName());
+            dao.setSensorName(measurement.getSensorName());
+            if (measurement.getType() != null)
+                dao.setType(MeasurementTypeDAORequest.create(measurement.getType()));
+            if (measurement.getAsset() != null)
+                dao.setAsset(SimpleAssetDAO.create(measurement.getAsset()));
+
+            //dao.setDescription(measurement.getDescription());
+            //dao.setIcon(measurement.getIcon());
+            dao.setDomain(measurement.getDomain());
+            dao.setDirection(measurement.getDirection());
+            dao.setProps(props);
+            dao.setFunction(function);
+        }
+        return dao;
+    }
 
     public InformationTileMeasurement mapToEntity() {
         InformationTileMeasurement entity = new InformationTileMeasurement();
@@ -83,12 +90,16 @@ public class MeasurementTileDAORequest {
                 if (type.getId() != null) {
                     MeasurementType entityType = new MeasurementType();
                     entityType.setId(type.getId());
+                    entityType.setName(type.getName());
+                    entityType.setPhysicalName(type.getPhysicalName());
+                    entityType.setUnit(type.getUnit());
                     entity.setType(entityType);
                 } else {
                     entity.setPhysicalName(type.getPhysicalName());
                 }
-
-
+            }
+            if (asset != null) {
+                entity.setAsset(this.asset.mapToEntity());
             }
             entity.setDirection(direction);
             entity.setDomain(domain);

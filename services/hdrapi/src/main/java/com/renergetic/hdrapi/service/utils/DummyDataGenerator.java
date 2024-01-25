@@ -1,19 +1,24 @@
 package com.renergetic.hdrapi.service.utils;
 
+//import com.renergetic.common.dao.*;
+
 import com.renergetic.common.dao.*;
+import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.model.*;
 import com.renergetic.common.repository.MeasurementRepository;
+import com.renergetic.common.repository.MeasurementTagsRepository;
 import com.renergetic.common.repository.MeasurementTypeRepository;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
-import org.apache.commons.lang3.stream.Streams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class DummyDataGenerator {
@@ -21,6 +26,8 @@ public class DummyDataGenerator {
     MeasurementTypeRepository measurementTypeRepository;
     @Autowired
     MeasurementRepository measurementRepository;
+    @Autowired
+    MeasurementTagsRepository measurementTagsRepository;
     private static final Random random = new Random();
     static final String s =
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce tellus nisl, finibus condimentum " +
@@ -55,9 +62,9 @@ public class DummyDataGenerator {
 
     private static Double getMeasurementValue(MeasurementDAOResponse m, Double previousValue) {
 //TODO: consider measurement type and domains
-        Double max = 300.0 /Math.pow(m.getType().getFactor(),0.6);
+        Double max = 300.0 / Math.pow(m.getType().getFactor(), 0.6);
         if (m.getDomain() == Domain.heat) {
-            max = 5000.0/Math.pow(m.getType().getFactor(),0.6);
+            max = 5000.0 / Math.pow(m.getType().getFactor(), 0.6);
         }
 
         if (Objects.equals(m.getType().getPhysicalName(), "percentage")) {
@@ -129,6 +136,40 @@ public class DummyDataGenerator {
         return data;
     }
 
+    public List<HDRRecommendationDAO> getRecommendations() {
+        var t = DateConverter.toEpoch(LocalDateTime.now()) / 1000L / 60L;
+        final long timestamp = t * 60 * 1000;
+        var tags = measurementTagsRepository.findAll().stream().filter(
+                (it) -> it.getKey().equals("recommendation")).collect(
+                Collectors.toList());
+
+        var recommendations = IntStream.range(0, tags.size()).mapToObj((idx) -> {
+                    var it = tags.get(idx);
+                    var hdr = new HDRRecommendationDAO();
+                    hdr.setTimestamp(timestamp);
+                    hdr.setTag(MeasurementTagsDAO.create(it));
+                    hdr.setId((long) idx);
+                    return hdr;
+                }).filter((it) -> !it.getTag().getValue().equals("no_tag"))
+                .filter((it) -> random.nextBoolean() || random.nextBoolean()).collect(Collectors.toList());
+        return recommendations;
+
+    }
+
+
+    public List<MeasurementDAOResponse> getMeasurements(Long id) {
+        var tag = measurementTagsRepository.findAll().stream().filter(
+                (it) -> it.getKey().equals("recommendation")).collect(
+                Collectors.toList()).get(id.intValue());
+        var tagId = tag.getId();
+//        MeasurementTags tags = measurementTagsRepository.findById(tagId).orElseThrow(
+//                () -> new NotFoundException("Tag with id: " + tagId + " not exists"));
+//        tagId=tags.getId();
+        List<Measurement> measurements = measurementRepository.getMeasurementByTagId(tagId, 0L, 100L);
+        return measurements.stream().map(it -> MeasurementDAOResponse.create(it, null, null)).collect(
+                Collectors.toList());
+
+    }
 
     public static List<DemandScheduleDAO> getDemand(List<DemandScheduleDAO> schedule) {
         long current = (new Date()).getTime();

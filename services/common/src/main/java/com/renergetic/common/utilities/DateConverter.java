@@ -26,6 +26,10 @@ public final class DateConverter {
     public static Long toEpoch(Date date) {
         return date.getTime();
     }
+    public static Long now() {
+        LocalDateTime date = LocalDateTime.now();
+        return toEpoch(date);
+    }
 
     public static Long toEpoch(String date) {
         try {

@@ -1,18 +1,13 @@
 package com.renergetic.hdrapi.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import com.renergetic.common.dao.InformationPanelDAO;
+import com.renergetic.common.dao.*;
+import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.common.dao.MeasurementDAO;
-import com.renergetic.common.dao.ResourceDAO;
 import com.renergetic.common.model.Details;
 import com.renergetic.common.model.details.AssetDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.renergetic.common.dao.MeasurementDAORequest;
-import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.model.Measurement;
 import com.renergetic.common.model.MeasurementType;
 import com.renergetic.common.model.details.MeasurementDetails;
@@ -59,15 +52,15 @@ public class MeasurementController {
 
     @Operation(summary = "Get All Measurements having details key and value")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/key/{key}/{value}", produces = "application/json")
-    public ResponseEntity<List<MeasurementDAOResponse>> getAllMeasurements(
+    @GetMapping(path = "/key/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<List<MeasurementDAOResponse>> getTagMeasurements(
             @PathVariable(name = "key") String key,
             @PathVariable(name = "value") String value,
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit) {
 
         List<MeasurementDAOResponse> measurements =
-                measurementSv.getByProperty(key, value, offset.orElse(0L), limit.orElse(100));
+                measurementSv.getByTag(key, value, offset.orElse(0L), limit.orElse(100));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
@@ -90,10 +83,9 @@ public class MeasurementController {
         if (type.isPresent()) filters.put("type", type.get());
         if (direction.isPresent()) filters.put("direction", direction.get());
         if (domain.isPresent()) filters.put("domain", domain.get());
-        if(filters.size()==1 && filters.containsKey("name")){
-            measurements =  measurementSv.find(filters, offset.orElse(0L), limit.orElse(20));
-        }
-        else{
+        if (filters.size() == 1 && filters.containsKey("name")) {
+            measurements = measurementSv.find(filters, offset.orElse(0L), limit.orElse(20));
+        } else {
             measurements = measurementSv.get(filters, offset.orElse(0L), limit.orElse(20)); //-> old method
 
         }
@@ -106,11 +98,21 @@ public class MeasurementController {
     @GetMapping(path = "/report", produces = "application/json")
     public ResponseEntity<List<MeasurementDAOImpl>> listMeasurements(
             @RequestParam(required = false) Optional<Long> offset,
-            @RequestParam(required = false) Optional<Integer> limit) {
+            @RequestParam(required = false) Optional<Integer> limit,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String domain,
+            @RequestParam(required = false) String direction,
+            @RequestParam(required = false, name = "sensor_name") String sensorName,
+            @RequestParam(required = false, name = "asset_name") String assetName,
+            @RequestParam(required = false, name = "tag_key") String tagKey,
+            @RequestParam(required = false, name = "type_id") Long typeId,
+            @RequestParam(required = false, name = "type_physical_name") String physicalTypeName) {
+
 
         List<MeasurementDAOImpl> measurements = new ArrayList<>();
 
-        measurements = measurementSv.list(offset.orElse(0L), limit.orElse(1000));
+        measurements = measurementSv.findMeasurements(name, domain, direction, sensorName,
+                assetName, typeId, physicalTypeName, tagKey, offset.orElse(0L), limit.orElse(1000));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
@@ -128,7 +130,7 @@ public class MeasurementController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "No measurements found with this id")
     })
-    @GetMapping(path = "{id}", produces = "application/json")
+    @GetMapping(path = {"{id}", "/id/{id}"}, produces = "application/json")
     public ResponseEntity<MeasurementDAOResponse> getMeasurementsById(@PathVariable Long id) {
         var measurement = measurementSv.getById(id);
         MeasurementDAOResponse daoResponse = null;
@@ -138,6 +140,35 @@ public class MeasurementController {
 
         return new ResponseEntity<>(daoResponse,
                 daoResponse != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "Copy measurement")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "404", description = "No measurements found with this id")
+    })
+    @PostMapping(path = {"/{id}/copy", "/id/{id}/copy"}, produces = "application/json")
+    public ResponseEntity<MeasurementDAOResponse> duplicateMeasurement(@PathVariable Long id) {
+        var daoResponse = measurementSv.duplicate(id);
+
+
+        return new ResponseEntity<>(daoResponse,
+                daoResponse != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "Get All Measurements Tags Keys")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/tags/key", produces = "application/json")
+    public ResponseEntity<List<String>> getAllMeasurementTagKeys() {
+        List<String> tags = measurementSv.getTagKeys();
+        return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+    @Operation(summary = "Get All Measurements Tags Keys")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/tags/key/{key}/values", produces = "application/json")
+    public ResponseEntity<List<String>> getAllMeasurementTagKeys(@PathVariable String key) {
+        List<String> tagValues = measurementSv.getTagValues(key);
+        return new ResponseEntity<>(tagValues, HttpStatus.OK);
     }
 
     @Operation(summary = "Get All Measurements Types")
@@ -152,6 +183,7 @@ public class MeasurementController {
 
         return new ResponseEntity<>(type, HttpStatus.OK);
     }
+
 
     @Operation(summary = "Get Measurement Type by id")
     @ApiResponses({
@@ -285,6 +317,18 @@ public class MeasurementController {
     public ResponseEntity<MeasurementDAOResponse> createMeasurement(@RequestBody MeasurementDAORequest measurement) {
         MeasurementDAOResponse _measurement = measurementSv.save(measurement);
         return new ResponseEntity<>(_measurement, HttpStatus.CREATED);
+    }
+    @Operation(summary = "Create a new Measurements")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Measurements saved correctly"),
+            @ApiResponse(responseCode = "422", description = "Type isn't valid"),
+            @ApiResponse(responseCode = "500", description = "Error saving measurement")
+    }
+    )
+    @PostMapping(path = "/batch", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<List<MeasurementDAOResponse>> createMeasurements(@RequestBody List<MeasurementDAORequest> measurements) {
+        List<MeasurementDAOResponse> _measurements = measurementSv.save(measurements);
+        return new ResponseEntity<>(_measurements, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Create a new Measurement Type")

@@ -3,18 +3,29 @@ package com.renergetic.common.dao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.model.HDRRecommendation;
+import com.renergetic.common.model.Heatmap;
+import com.renergetic.common.model.User;
+import com.renergetic.common.model.details.MeasurementTags;
+import com.renergetic.common.utilities.DateConverter;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
-import lombok.Data;
-
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
 public class HDRRecommendationDAO {
 
-    //TODO: unique key: name-asset-sensor-type-direction
-    @JsonProperty(required = true)
-    private LocalDateTime timestamp;
+    //todo: unique key: name-asset-sensor-type-direction
     @JsonProperty(required = false)
+    private Long id;
+    @JsonProperty(required = true)
+    private Long timestamp;
+    @JsonProperty(required = true)
     private MeasurementTagsDAO tag;
     @JsonProperty(required = false)
     private String label;
@@ -25,9 +36,10 @@ public class HDRRecommendationDAO {
 
         if (recommendation != null) {
             dao = new HDRRecommendationDAO();
-            dao.setTimestamp(recommendation.getTimestamp());
+            dao.setTimestamp(DateConverter.toEpoch(recommendation.getTimestamp()));
             dao.setLabel(recommendation.getLabel());
             dao.setTag(MeasurementTagsDAO.create(recommendation.getTag()));
+            dao.setId(recommendation.getId());
         }
         return dao;
     }
@@ -36,6 +48,9 @@ public class HDRRecommendationDAO {
         HDRRecommendation recommendation = new HDRRecommendation();
         recommendation.setTag(this.getTag().mapToEntity());
         recommendation.setLabel(this.getLabel());
+        if (this.id != null)
+            recommendation.setId(this.id);
+        recommendation.setTimestamp(DateConverter.toLocalDateTime(this.getTimestamp()));
         return recommendation;
     }
 
