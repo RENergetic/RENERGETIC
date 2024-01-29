@@ -18,6 +18,8 @@ kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 user=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
+wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
+dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -208,6 +210,28 @@ then
         # create kubernetes resources
         kubectl apply -f wrapper-api-deployment.yaml --force=true --namespace=$project
         kubectl apply -f wrapper-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $dataApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/dataAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/data-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/data-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/data-api --namespace=$project
+        kubectl delete services/data-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=data-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f data-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f data-api-service.yaml --namespace=$project
     fi
 # DEPLOY WSO2 API MANAGER
 

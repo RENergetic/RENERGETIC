@@ -26,6 +26,7 @@ ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 rules=$(grep -ioP "(rules\s*=\s*)\K.+" _installers.properties)
 userApi=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
 wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
+dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -91,6 +92,13 @@ compileApp() {
         cd "${apisPath}/REN_API/wrapperAPI"
         mvn clean package -Dmaven.test.skip
         cp "./target/"*.jar "${current}/docker_config/APIs/wrapper-api/api.jar"
+    fi
+
+    if [[ $dataApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/dataAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/data-api/api.jar"
     fi
 
     if [[ $ui = 'true' ]]
@@ -283,6 +291,25 @@ installPSNC() {
         # create kubernetes resources
         envsubst '$PROJECT' < wrapper-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f wrapper-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $dataApi = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/data-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/data-api --namespace=$project
+        kubectl delete services/data-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/data-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/data-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < data-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f data-api-service.yaml --namespace=$project
     fi
 
 # DEPLOY WSO2 API MANAGER
