@@ -8,6 +8,7 @@ import com.renergetic.common.model.*;
 import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.common.repository.MeasurementTagsRepository;
 import com.renergetic.common.repository.MeasurementTypeRepository;
+import com.renergetic.common.repository.RecommendationRepository;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class DummyDataGenerator {
     MeasurementTypeRepository measurementTypeRepository;
     @Autowired
     MeasurementRepository measurementRepository;
+    @Autowired
+    RecommendationRepository recommendationRepository;
     @Autowired
     MeasurementTagsRepository measurementTagsRepository;
     private static final Random random = new Random();
@@ -158,10 +161,16 @@ public class DummyDataGenerator {
 
 
     public List<MeasurementDAOResponse> getMeasurements(Long id) {
-        var tag = measurementTagsRepository.findAll().stream().filter(
-                (it) -> it.getKey().equals("recommendation")).collect(
-                Collectors.toList()).get(id.intValue());
-        var tagId = tag.getId();
+        var r = recommendationRepository.findById(id);
+        long tagId;
+        if (r.isEmpty()) {
+            var tag = measurementTagsRepository.findAll().stream().filter(
+                    (it) -> it.getKey().equals("recommendation")).collect(
+                    Collectors.toList()).get(id.intValue());
+            tagId = tag.getId();
+        } else {
+            tagId = r.get().getTag().getId();
+        }
 //        MeasurementTags tags = measurementTagsRepository.findById(tagId).orElseThrow(
 //                () -> new NotFoundException("Tag with id: " + tagId + " not exists"));
 //        tagId=tags.getId();
