@@ -18,7 +18,7 @@ import javax.validation.constraints.Pattern;
 @ToString
 public class Dashboard {	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)
