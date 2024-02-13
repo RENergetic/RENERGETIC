@@ -40,10 +40,10 @@ public class HDRRecommendationController {
     @GetMapping(path = "/recommendations/current", produces = "application/json")
     public ResponseEntity<List<HDRRecommendationDAO>> getAllRecommendations() {
         List<HDRRecommendationDAO> recommendations;
-        if (!generateDummy)
+//        if (!generateDummy)
             recommendations = hdrService.getRecent().orElse(new ArrayList<>());
-        else
-            recommendations = dummyDataGenerator.getRecommendations();
+//        else
+//            recommendations = dummyDataGenerator.getRecommendations();
 
         return new ResponseEntity<>(recommendations, HttpStatus.OK);
     }
@@ -64,7 +64,7 @@ public class HDRRecommendationController {
     @Operation(summary = "List current requests")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/requests/current", produces = "application/json")
-    public ResponseEntity<List<HDRRequestDAO>> getAllRequests( ) {
+    public ResponseEntity<List<HDRRequestDAO>> getAllRequests() {
 
         List<HDRRequestDAO> request;
         request = hdrService.getRecentRequest();
@@ -93,8 +93,10 @@ public class HDRRecommendationController {
                                                     @RequestBody List<HDRRecommendationDAO> recommendations) {
         Long t;
         t = timestamp.orElse(DateConverter.toEpoch(LocalDateTime.now()));
-        hdrService.save(t, recommendations);
-        return new ResponseEntity<>(t, HttpStatus.CREATED);
+        if (hdrService.save(t, recommendations))
+            return new ResponseEntity<>(t, HttpStatus.CREATED);
+
+        return new ResponseEntity<>(t, HttpStatus.BAD_REQUEST);
     }
 
     @Operation(summary = "Insert Recommendation")

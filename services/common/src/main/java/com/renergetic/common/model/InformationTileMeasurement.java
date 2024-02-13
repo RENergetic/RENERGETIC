@@ -29,7 +29,7 @@ import java.util.List;
 @Data
 public class InformationTileMeasurement {
     @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "props", nullable = true, insertable = true, updatable = true)

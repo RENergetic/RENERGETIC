@@ -14,6 +14,7 @@ import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
+import com.renergetic.hdrapi.dao.temp.MeasurementDAORequestTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -116,6 +117,31 @@ public class MeasurementService {
 
 
     // ASSET CRUD OPERATIONS
+    public MeasurementDAOResponse save(MeasurementDAORequestTemp measurement) {
+        if (measurement.getId() != null && measurementRepository.existsById(measurement.getId()))
+            throw new InvalidCreationIdAlreadyDefinedException(
+                    "Already exists a measurement with ID " + measurement.getId());
+        measurement.setType(verifyMeasurementType(measurement.getType()));
+        var assetDAO = measurement.getAsset();
+        if (assetDAO != null) {
+            var asset = assetRepository.findById(assetDAO.getId()).orElse(null);
+            if (asset == null || !asset.getName().equals(assetDAO.getName())) {
+                measurement.setAsset(SimpleAssetDAO.create(
+                        assetRepository.findByName(assetDAO.getName()).orElseThrow(() ->
+                                new NotFoundException("Asset does not exist " + assetDAO.getName() + " found"))));
+            }
+        }
+        Measurement measurementEntity = measurement.mapToEntity();
+        measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+        measurementRepository.save(measurementEntity);
+        if(measurementEntity.getDetails()!=null){
+            measurementEntity.getDetails().forEach(
+                    it->this.setProperty(measurementEntity.getId(),it)
+            );
+        }
+        return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null, null);
+    }
+    @Deprecated
     public MeasurementDAOResponse save(MeasurementDAORequest measurement) {
         if (measurement.getId() != null && measurementRepository.existsById(measurement.getId()))
             throw new InvalidCreationIdAlreadyDefinedException(
@@ -136,7 +162,7 @@ public class MeasurementService {
     }
 
     @Transactional
-    public List<MeasurementDAOResponse> save(List<MeasurementDAORequest> measurements) {
+    public List<MeasurementDAOResponse> save(List<MeasurementDAORequestTemp> measurements) {
         return measurements.stream().map(this::save).collect(Collectors.toList());
     }
 

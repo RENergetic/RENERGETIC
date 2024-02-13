@@ -10,6 +10,7 @@ import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
 import com.renergetic.common.model.Details;
 import com.renergetic.common.model.details.AssetDetails;
+import com.renergetic.hdrapi.dao.temp.MeasurementDAORequestTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -326,7 +327,7 @@ public class MeasurementController {
     }
     )
     @PostMapping(path = "/batch", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<List<MeasurementDAOResponse>> createMeasurements(@RequestBody List<MeasurementDAORequest> measurements) {
+    public ResponseEntity<List<MeasurementDAOResponse>> createMeasurements(@RequestBody List<MeasurementDAORequestTemp> measurements) {
         List<MeasurementDAOResponse> _measurements = measurementSv.save(measurements);
         return new ResponseEntity<>(_measurements, HttpStatus.CREATED);
     }

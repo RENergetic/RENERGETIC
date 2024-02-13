@@ -27,7 +27,7 @@ import jakarta.persistence.Table;
 @ToString
 public class DemandDefinition {
     @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "action_type", nullable = false, insertable = true, updatable = true)
