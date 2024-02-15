@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 public class OffSetPaging implements Pageable {
     private final int limit;
     private final long offset;
+    private final Sort sort;
 
     public OffSetPaging(long offset, int limit) {
         if(offset < 0)
@@ -16,6 +17,21 @@ public class OffSetPaging implements Pageable {
             this.limit = limit;
             this.offset = offset;
         }
+        this.sort= Sort.unsorted();
+    }
+
+    public OffSetPaging(long offset, int limit, Sort sort) {
+        if(offset < 0)
+            throw new IllegalArgumentException("Offset must not be less than zero.");
+        if(limit < 0)
+            throw new IllegalArgumentException("Limit must not be less than zero.");
+        else {
+            this.limit = limit;
+            this.offset = offset;
+        }
+        if(sort==null)
+            throw new NullPointerException("null sort argument");
+        this.sort = sort;
     }
 
     @Override
@@ -45,12 +61,12 @@ public class OffSetPaging implements Pageable {
 
     @Override
     public Sort getSort() {
-        return Sort.unsorted();
+        return this.sort;
     }
 
     @Override
     public Pageable next() {
-        return new OffSetPaging(this.offset+this.limit, this.limit);
+        return new OffSetPaging(this.offset + this.limit, this.limit);
     }
 
     @Override
@@ -58,7 +74,7 @@ public class OffSetPaging implements Pageable {
         if(this.offset-this.limit <= 0)
             return new OffSetPaging(0, this.limit);
 
-        return new OffSetPaging(this.offset-this.limit, this.limit);
+        return new OffSetPaging(this.offset - this.limit, this.limit);
     }
 
     @Override
