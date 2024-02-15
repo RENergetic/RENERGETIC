@@ -1,17 +1,13 @@
 package com.renergetic.common.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.common.model.details.MeasurementTags;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity

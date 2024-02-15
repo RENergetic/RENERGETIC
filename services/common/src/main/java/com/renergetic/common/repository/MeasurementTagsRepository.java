@@ -1,6 +1,5 @@
 package com.renergetic.common.repository;
 
-import com.renergetic.common.model.Measurement;
 import com.renergetic.common.model.details.MeasurementTags;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

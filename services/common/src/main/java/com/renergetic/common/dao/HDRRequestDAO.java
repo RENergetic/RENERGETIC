@@ -1,8 +1,6 @@
 package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.common.dao.details.MeasurementTagsDAO;
-import com.renergetic.common.model.HDRRecommendation;
 import com.renergetic.common.model.HDRRequest;
 import com.renergetic.common.model.MeasurementType;
 import com.renergetic.common.utilities.DateConverter;
@@ -12,11 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.tomcat.util.json.ParseException;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
