@@ -1,16 +1,17 @@
 package com.renergetic.common.dao;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.common.model.*;
+import com.renergetic.common.model.Direction;
+import com.renergetic.common.model.Domain;
+import com.renergetic.common.model.Measurement;
+import com.renergetic.common.model.MeasurementType;
 import com.renergetic.common.model.details.MeasurementDetails;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
