@@ -12,7 +12,6 @@ import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.hdrapi.dao.temp.InformationPanelMapperTemp;
-import com.renergetic.hdrapi.dao.temp.MeasurementRepositoryTemp;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -46,8 +45,6 @@ public class InformationPanelService {
 
     @Autowired
     private MeasurementRepository measurementRepository;
-    @Autowired
-    private MeasurementRepositoryTemp measurementRepository2;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
       return informationPanelRepository.findAll(new OffSetPaging(offset, limit,
@@ -394,7 +391,7 @@ public class InformationPanelService {
     }
 
     private List<MeasurementTileDAORequest> getInferredMeasurements(MeasurementTileDAORequest tileM) {
-        List<MeasurementTileDAORequest> list = measurementRepository2
+        List<MeasurementTileDAORequest> list = measurementRepository
                 .inferMeasurement(null,
                         tileM.getName(),
                         tileM.getSensorName(),
