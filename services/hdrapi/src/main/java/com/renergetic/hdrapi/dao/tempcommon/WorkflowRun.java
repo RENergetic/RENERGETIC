@@ -1,4 +1,4 @@
-package com.renergetic.common.model;
+package com.renergetic.hdrapi.dao.tempcommon;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "workflow_run" )
+
 @RequiredArgsConstructor
 @Getter
 @Setter

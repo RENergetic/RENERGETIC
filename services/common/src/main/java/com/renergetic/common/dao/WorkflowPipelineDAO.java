@@ -13,7 +13,6 @@ import java.util.Map;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
 @AllArgsConstructor
 @ToString
 public class WorkflowPipelineDAO {

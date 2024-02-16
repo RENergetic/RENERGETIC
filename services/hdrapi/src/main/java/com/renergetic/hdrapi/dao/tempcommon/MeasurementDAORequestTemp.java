@@ -1,4 +1,4 @@
-package com.renergetic.hdrapi.dao.temp;
+package com.renergetic.hdrapi.dao.tempcommon;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;

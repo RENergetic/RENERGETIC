@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface WorkFlowRepository extends JpaRepository<WorkflowDefinition, Long> {
 
 
-    HDRRequest save(WorkflowDefinition request);
+    WorkflowDefinition save(WorkflowDefinition request);
 
 
 }

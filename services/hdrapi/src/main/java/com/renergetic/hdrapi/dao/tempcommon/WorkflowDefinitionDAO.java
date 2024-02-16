@@ -1,4 +1,4 @@
-package com.renergetic.common.dao;
+package com.renergetic.hdrapi.dao.tempcommon;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

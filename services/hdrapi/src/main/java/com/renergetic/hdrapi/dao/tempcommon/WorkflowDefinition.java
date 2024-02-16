@@ -1,14 +1,18 @@
-package com.renergetic.common.model;
+package com.renergetic.hdrapi.dao.tempcommon;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
-@Table(name = "workflow_definition" ) 
+@Table(name = "workflow_definition" )
+
 @RequiredArgsConstructor
 @Getter
 @Setter

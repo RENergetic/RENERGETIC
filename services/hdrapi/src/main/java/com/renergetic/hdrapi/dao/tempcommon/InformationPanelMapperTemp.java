@@ -1,17 +1,12 @@
-package com.renergetic.hdrapi.dao.temp;
+package com.renergetic.hdrapi.dao.tempcommon;
 
-import com.renergetic.common.dao.InformationPanelDAORequest;
 import com.renergetic.common.dao.InformationPanelDAOResponse;
 import com.renergetic.common.dao.InformationTileDAOResponse;
-import com.renergetic.common.mapper.InformationTileMapper;
-import com.renergetic.common.mapper.MapperReponseRequest;
 import com.renergetic.common.model.InformationPanel;
 import com.renergetic.common.model.InformationTile;
 import com.renergetic.common.model.InformationTileMeasurement;
 import com.renergetic.common.utilities.Json;
 import org.apache.tomcat.util.json.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
