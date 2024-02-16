@@ -21,3 +21,4 @@ services/**/target
 .classpath
 .factorypath
 HELP.md
+services/hdrapi/hs_err_pid10848.log

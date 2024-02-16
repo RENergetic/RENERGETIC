@@ -1,8 +1,6 @@
 package com.renergetic.common.repository;
 
-import com.renergetic.common.model.Asset;
 import com.renergetic.common.model.HDRRecommendation;
-import com.renergetic.common.model.Heatmap;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

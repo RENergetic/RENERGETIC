@@ -1,19 +1,15 @@
 package com.renergetic.common.model;
 
-import lombok.*;
+import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "uuid")
-@Getter
-@Setter
-@AllArgsConstructor
-@RequiredArgsConstructor
-@ToString
+@Data
 public class UUID {
 	@Id
 	private String uuid;
