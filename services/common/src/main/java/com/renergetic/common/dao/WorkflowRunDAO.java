@@ -3,7 +3,7 @@ package com.renergetic.common.dao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import javax.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;

@@ -15,7 +15,6 @@ import org.apache.tomcat.util.json.ParseException;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
