@@ -35,7 +35,7 @@ public class User {
     private Long id;
 
     //TODO: change to nonnullable field
-    @Column(name = "keycloak_id", nullable = false, insertable = true, updatable = true, unique = true)
+    @Column(name = "keycloak_id", nullable = true, insertable = true, updatable = true, unique = true)
     private String keycloakId;
 
 
