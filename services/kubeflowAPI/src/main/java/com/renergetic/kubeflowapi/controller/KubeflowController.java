@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -147,17 +148,44 @@ public class KubeflowController {
     public ResponseEntity<List<WorkflowDefinitionDAO>> listAll(
             @RequestParam(required = false) Optional<Boolean> visible) {
         //TODO: verify admin roles
-        List<WorkflowDefinitionDAO> res =workflowService.getAllAdmin(visible);
+        List<WorkflowDefinitionDAO> res = workflowService.getAllAdmin(visible);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get All workflow")
+    @Operation(summary = "Get experiment run")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/workflow/{experiment_id}/run", produces = "application/json")
     public ResponseEntity<WorkflowRunDAO> getExperimentRun(
-            @PathVariable(name ="experiment_id" ) String experimentId) {
+            @PathVariable(name = "experiment_id") String experimentId) {
+
+        WorkflowRunDAO res = workflowService.getRun(experimentId);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+    @Operation(summary = "Start experiment run")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PostMapping(path = "/workflow/{experiment_id}/run", produces = "application/json")
+    public ResponseEntity<WorkflowRunDAO> startExperimentRun(
+            @PathVariable(name = "experiment_id") String experimentId,@RequestBody Map<String,Object> params) {
+
+        WorkflowRunDAO res = workflowService.startRun(experimentId,params);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Set visibility")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "/workflow/{experiment_id}/visibility", produces = "application/json")
+    public ResponseEntity<Boolean> setVisibility(@PathVariable(name = "experiment_id") String experimentId) {
         //TODO: verify admin roles
-        WorkflowRunDAO res =workflowService.getRun(experimentId);
+        Boolean res = workflowService.setVisibility(experimentId);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Remove visibility")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @DeleteMapping(path = "/workflow/{experiment_id}/visibility", produces = "application/json")
+    public ResponseEntity<Boolean> removeVisibility(@PathVariable(name = "experiment_id") String experimentId) {
+        //TODO: verify admin roles
+        Boolean res = workflowService.removeVisibility(experimentId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 }

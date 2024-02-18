@@ -21,7 +21,7 @@ public class WorkflowRun {
     private String runId;
     @ManyToOne(cascade = CascadeType.REFRESH )
     @JoinColumn(name = "experiment_id" )
-    private WorkflowDefinition experimentId;
+    private WorkflowDefinition workflowDefinition;
     @Column(name = "params",  columnDefinition="TEXT" )
     private String params;
     @Column(nullable = true,name = "start_time" )

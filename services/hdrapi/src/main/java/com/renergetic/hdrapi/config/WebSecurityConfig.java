@@ -4,6 +4,7 @@ import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.hdrapi.service.CustomAccessDeniedHandler;
 
+import javax.servlet.*;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.servlet.*;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,8 +50,8 @@ public class WebSecurityConfig {
     @Value(value = "${keycloak.client-id}")
     private String clientId;
 
-    @Autowired
-    JwtAuthenticationProvider authProvider;
+//    @Autowired
+//    JwtAuthenticationProvider authProvider;
 
     @Bean
     protected JwtAuthenticationProvider authenticationProvider() throws Exception {
@@ -135,22 +136,22 @@ public class WebSecurityConfig {
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>
                 .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
-
-        getUrls.forEach((urlPattern, roles) -> {
-            registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);
-        });
-
-        postUrls.forEach((urlPattern, roles) -> {
-            registry.antMatchers(HttpMethod.POST, urlPattern).hasAnyRole(roles);
-        });
-
-        putUrls.forEach((urlPattern, roles) -> {
-            registry.antMatchers(HttpMethod.PUT, urlPattern).hasAnyRole(roles);
-        });
-
-        deleteUrls.forEach((urlPattern, roles) -> {
-            registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
-        });
+//todo: not supported in spring 3
+//        getUrls.forEach((urlPattern, roles) -> {
+//            registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);
+//        });
+//
+//        postUrls.forEach((urlPattern, roles) -> {
+//            registry.antMatchers(HttpMethod.POST, urlPattern).hasAnyRole(roles);
+//        });
+//
+//        putUrls.forEach((urlPattern, roles) -> {
+//            registry.antMatchers(HttpMethod.PUT, urlPattern).hasAnyRole(roles);
+//        });
+//
+//        deleteUrls.forEach((urlPattern, roles) -> {
+//            registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
+//        });
         //registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         registry.anyRequest().permitAll();
 

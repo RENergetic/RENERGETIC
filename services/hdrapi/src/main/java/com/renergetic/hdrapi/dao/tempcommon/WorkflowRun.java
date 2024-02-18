@@ -1,11 +1,12 @@
 package com.renergetic.hdrapi.dao.tempcommon;
 
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity

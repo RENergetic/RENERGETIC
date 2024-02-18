@@ -66,80 +66,13 @@ public class DummyDataGenerator {
         wr.setStartTime(ts);
         return wr;
     }
+    public static WorkflowRunDAO startKubeflowRun(WorkflowDefinitionDAO wd, Map<String,Object> params){
+        var ts = DateConverter.now();
+        WorkflowRunDAO wr = new WorkflowRunDAO();
+        wr.setParameters(params);
+        wr.setStartTime(ts);
+        wr.setWorkflowDefinition(wd);
+        wr.setStartTime(ts);
+        return wr;
+    }
 }
-
-//    function generatePanelData(informationPanel, predictionWindow) {
-//        let measurements = listMeasurements(informationPanel);
-//
-//        let data = {};
-//        for (let m of Object.keys(measurements)) {
-//            let value = Math.floor(Math.random() * 150);
-//            data[m] = value;
-//        }
-//        if (predictionWindow == null) return { current: { default: data } };
-//        return { prediction: { default: data } };
-//    }
-
-/**
- * {
- * "data": {
- * "current": {
- * "default": {
- * "1": 33
- * },
- * "max": {
- * "1": 33
- * }
- * },
- * "prediction": {
- * "default": {
- * "1": 33
- * },
- * "max": {
- * "1": 33
- * }
- * }
- * }
- *///    public static List<DemandScheduleDAO> getDemand(List<DemandDefinition> demands, List<Asset> assets) {
-//        long current = (new Date()).getTime();
-//
-//        return demands.stream().flatMap(
-//                def -> assets.stream().map(
-//                        asset -> {
-//                            DemandSchedule demandSchedule = new DemandSchedule();
-//                            demandSchedule.setAsset(asset);
-//                            demandSchedule.setDemandDefinition(def);
-//                            demandSchedule.setDemandStart(DateConverter.toLocalDateTime(current - 3600000));
-//                            demandSchedule.setDemandStop(DateConverter.toLocalDateTime(current + 3600000));
-//                            return demandSchedule;
-//                        }
-//                )
-//
-//        ).map(DemandScheduleDAO::create).collect(Collectors.toList());
-//    }
-//    public static DataDAO getDemandData(List<DemandScheduleDAO> demands) {
-//        DataDAO data = new DataDAO();
-//        List<MeasurementDAOResponse> measurementDAOResponseStream = demands.stream().filter(
-//                it -> it.getDemandDefinition().getTile() != null
-//        )
-//                .flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream()).collect(
-//                        Collectors.toList());
-//        Map<String, Double> measurementValues = demands.stream().filter(
-//                it -> it.getDemandDefinition().getTile() != null
-//        )
-//                .flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
-//                .collect(Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue,
-//                        (a1, a2) -> a1));
-//
-//        data.getCurrent().setLast(measurementValues);
-//
-//        return data;
-//    }
-
-//    public static DataDAO getData(List<Measurement> measurements) {
-//        DataDAO data = new DataDAO();
-//        Map<String, Double> measurementValues = measurements.stream().collect(
-//                Collectors.toMap(it -> it.getId().toString(), DummyDataGenerator::getMeasurementValue, (a1, a2) -> a1));
-//        data.getCurrent().setLast(measurementValues);
-//        return data;
-//    }

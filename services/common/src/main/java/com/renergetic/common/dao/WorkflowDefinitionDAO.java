@@ -3,6 +3,7 @@ package com.renergetic.common.dao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class WorkflowDefinitionDAO {
     @JsonProperty(required = false)
     List<WorkflowPipelineDAO> pipelines;
     @JsonProperty(required = false,value = "parameters")
-    Map<String,Object> parameters;
+   Map<String,Object> parameters = Collections.emptyMap();;
     @JsonProperty(required = true,value = "visible")
     boolean visible =false;
     @JsonProperty(required = false,value = "current_run")

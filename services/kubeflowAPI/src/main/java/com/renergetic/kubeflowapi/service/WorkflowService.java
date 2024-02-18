@@ -1,9 +1,8 @@
 package com.renergetic.kubeflowapi.service;
 
-import com.renergetic.kubeflowapi.dao.tempcommon.WorkFlowRepositoryTemp;
-import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowDefinition;
-import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowDefinitionDAO;
-import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowRunDAO;
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.utilities.DateConverter;
+import com.renergetic.kubeflowapi.dao.tempcommon.*;
 import com.renergetic.kubeflowapi.service.utils.DummyDataGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +21,8 @@ public class WorkflowService {
     private Boolean generateDummy;
     @Autowired
     private WorkFlowRepositoryTemp workFlowRepository;
+    @Autowired
+    private WorkFlowRunRepositoryTemp workFlowRunRepository;
 
     public List<WorkflowDefinitionDAO> getAll() {
         Map<String, WorkflowDefinitionDAO> kubeflowMap = getKubeflowMap();
@@ -53,11 +54,91 @@ public class WorkflowService {
     }
 
     public WorkflowRunDAO getRun(String experimentId) {
-        var wd = workFlowRepository.findById(experimentId).orElse(new WorkflowDefinition(experimentId));
+        var wd = workFlowRepository.findById(experimentId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Experiment: " + experimentId + " not available outside kubeflow or not exists"));
         return getKubeflowRun(WorkflowDefinitionDAO.create(wd));
 
     }
 
+    public WorkflowRunDAO startRun(String experimentId, Map<String, Object> params) {
+        var wd = workFlowRepository.findById(experimentId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Experiment: " + experimentId + " not available outside kubeflow or not exists"));
+        if (wd.getWorkflowRun() != null && wd.getWorkflowRun().getStartTime() != null && wd.getWorkflowRun().getEndTime() == null) {
+            //task hasn't finished
+            //TODO: raise exception
+        }
+        WorkflowRunDAO runDAO = startKubeflowRun(wd, params);
+        WorkflowRun currentRun = runDAO.mapToEntity();
+        workFlowRunRepository.save(currentRun);
+        wd.setWorkflowRun(currentRun);
+        workFlowRepository.save(wd);
+        return runDAO;
+    }
+
+    public Boolean stopRun(String experimentId, Map<String, Object> params) {
+        var wd = workFlowRepository.findById(experimentId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Experiment: " + experimentId + " not available outside kubeflow or not exists"));
+        if (wd.getWorkflowRun() != null && wd.getWorkflowRun().getStartTime() != null) {
+            WorkflowRunDAO runDAO = stopKubeflowRun(wd);
+            WorkflowRun currentRun = runDAO.mapToEntity();
+            workFlowRunRepository.save(currentRun);
+            wd.setWorkflowRun(currentRun);
+            workFlowRepository.save(wd);
+        }
+        return true;
+    }
+
+    public boolean setVisibility(String experimentId) {
+        Optional<WorkflowDefinition> byId = workFlowRepository.findById(experimentId);
+        WorkflowDefinition wd;
+        wd = byId.orElseGet(() -> new WorkflowDefinition(experimentId));
+        wd.setVisible(true);
+        wd = workFlowRepository.save(wd);
+        return wd.getVisible();
+    }
+
+    public boolean removeVisibility(String experimentId) {
+        Optional<WorkflowDefinition> byId = workFlowRepository.findById(experimentId);
+        WorkflowDefinition wd;
+        wd = byId.orElseGet(() -> new WorkflowDefinition(experimentId));
+        wd.setVisible(false);
+        wd = workFlowRepository.save(wd);
+        return wd.getVisible();
+    }
+
+    private WorkflowRunDAO startKubeflowRun(WorkflowDefinition wd, Map<String, Object> params) {
+//TODO: check if experiment is already running
+        WorkflowDefinitionDAO definitionDAO = WorkflowDefinitionDAO.create(wd);
+        WorkflowRunDAO runDAO;
+        if (generateDummy) {
+            runDAO = DummyDataGenerator.startKubeflowRun(definitionDAO, params);
+
+        } else {//	 TODO: get kubeflow run
+            runDAO = null;
+        }
+        if (runDAO == null) {
+            runDAO = new WorkflowRunDAO();
+//            todo: log information about failurre start
+        }
+        return runDAO;
+    }
+
+    private WorkflowRunDAO stopKubeflowRun(WorkflowDefinition wd) {
+        WorkflowRun workflowRun = wd.getWorkflowRun();
+        ;
+        if (generateDummy) {
+            workflowRun.setEndTime(DateConverter.toLocalDateTime(DateConverter.now()));
+
+        } else {
+            //	 TODO: stop kubeflow run? currently end time is just set
+            workflowRun.setEndTime(DateConverter.toLocalDateTime(DateConverter.now()));
+        }
+
+        return WorkflowRunDAO.create(workflowRun);
+    }
 
     private WorkflowRunDAO getKubeflowRun(WorkflowDefinitionDAO wd) {
 

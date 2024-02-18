@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface WorkFlowRepositoryTemp extends JpaRepository<WorkflowDefinition, Long> {
 
 
-    WorkflowDefinition save(WorkflowDefinition request);
+    WorkflowDefinition save(WorkflowDefinition workflowDefinition);
 
     @Query(value = "SELECT wd FROM WorkflowDefinition wd WHERE wd.visible = :visible" )
     public List<WorkflowDefinition> findByVisible(boolean visible);

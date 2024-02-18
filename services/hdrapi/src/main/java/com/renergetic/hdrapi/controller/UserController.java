@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.NotAuthorizedException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,7 +81,7 @@ public class UserController {
             List<String> roles = client.getRoles(userId).stream().map(RoleRepresentation::getName).collect(
                     Collectors.toList());
             return new ResponseEntity<>(roles, HttpStatus.OK);
-        } catch (javax.ws.rs.NotAuthorizedException ex) {
+        } catch ( NotAuthorizedException ex) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
     }
@@ -211,7 +212,7 @@ public class UserController {
         //TODO: synchronized section
         try {
             client.updateUser(user);
-        } catch (javax.ws.rs.NotAuthorizedException ex) {
+        } catch ( NotAuthorizedException ex) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
         UserRepresentation ur = client.updateUser(user);
@@ -237,7 +238,7 @@ public class UserController {
         try {
 
             client.updateUser(user);
-        } catch (javax.ws.rs.NotAuthorizedException ex) {
+        } catch ( NotAuthorizedException ex) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
         if (user.getPassword() != null) {

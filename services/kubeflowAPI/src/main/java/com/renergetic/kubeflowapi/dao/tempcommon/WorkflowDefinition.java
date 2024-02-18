@@ -1,9 +1,6 @@
 package com.renergetic.kubeflowapi.dao.tempcommon;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,6 +22,11 @@ public class WorkflowDefinition {
 
     @Column( name = "visible")
     private Boolean visible=false;
+    @OneToOne(cascade = CascadeType.DETACH )
+    @JoinColumn(name = "current_run_id"  )
+    private WorkflowRun workflowRun;
+
+    //TODO: maximum time for the task to finish?
     public  WorkflowDefinition(String experimentId) {
        this.experimentId=experimentId;
     }
