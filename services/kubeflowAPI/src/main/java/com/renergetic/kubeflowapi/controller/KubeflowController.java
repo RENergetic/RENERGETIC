@@ -170,10 +170,19 @@ public class KubeflowController {
         WorkflowRunDAO res = workflowService.startRun(experimentId,params);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+    @Operation(summary = "Stop experiment run")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @DeleteMapping(path = "/workflow/{experiment_id}/run", produces = "application/json")
+    public ResponseEntity<Boolean> startExperimentRun(
+            @PathVariable(name = "experiment_id") String experimentId ) {
+
+        Boolean res = workflowService.stopRun(experimentId);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
 
     @Operation(summary = "Set visibility")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PutMapping(path = "/workflow/{experiment_id}/visibility", produces = "application/json")
+    @PutMapping(path = "/admin/workflow/{experiment_id}/visibility", produces = "application/json")
     public ResponseEntity<Boolean> setVisibility(@PathVariable(name = "experiment_id") String experimentId) {
         //TODO: verify admin roles
         Boolean res = workflowService.setVisibility(experimentId);
@@ -182,7 +191,7 @@ public class KubeflowController {
 
     @Operation(summary = "Remove visibility")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @DeleteMapping(path = "/workflow/{experiment_id}/visibility", produces = "application/json")
+    @DeleteMapping(path = "/admin/workflow/{experiment_id}/visibility", produces = "application/json")
     public ResponseEntity<Boolean> removeVisibility(@PathVariable(name = "experiment_id") String experimentId) {
         //TODO: verify admin roles
         Boolean res = workflowService.removeVisibility(experimentId);

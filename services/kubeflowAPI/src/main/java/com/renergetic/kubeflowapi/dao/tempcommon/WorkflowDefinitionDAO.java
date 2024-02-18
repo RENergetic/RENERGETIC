@@ -37,6 +37,9 @@ public class WorkflowDefinitionDAO {
         WorkflowDefinitionDAO dao = new WorkflowDefinitionDAO();
         dao.visible = wd.getVisible();
         dao.setExperimentId(wd.getExperimentId());
+        if (wd.getWorkflowRun() != null) {
+            dao.setCurrentRun(WorkflowRunDAO.create(wd.getWorkflowRun()));
+        }
         return dao;
     }
 
@@ -44,6 +47,8 @@ public class WorkflowDefinitionDAO {
         WorkflowDefinition wd = new WorkflowDefinition();
         wd.setExperimentId(this.experimentId);
         wd.setVisible(this.visible);
+        if (this.currentRun != null)
+            wd.setWorkflowRun(this.currentRun.mapToEntity());
         return wd;
     }
 }

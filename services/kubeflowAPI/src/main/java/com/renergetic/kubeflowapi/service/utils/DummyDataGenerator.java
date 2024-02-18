@@ -69,6 +69,7 @@ public class DummyDataGenerator {
     public static WorkflowRunDAO startKubeflowRun(WorkflowDefinitionDAO wd, Map<String,Object> params){
         var ts = DateConverter.now();
         WorkflowRunDAO wr = new WorkflowRunDAO();
+        wr.setRunId("run_"+ts);
         wr.setParameters(params);
         wr.setStartTime(ts);
         wr.setWorkflowDefinition(wd);

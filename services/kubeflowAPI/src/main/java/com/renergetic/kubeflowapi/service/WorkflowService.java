@@ -57,7 +57,10 @@ public class WorkflowService {
         var wd = workFlowRepository.findById(experimentId)
                 .orElseThrow(() -> new NotFoundException(
                         "Experiment: " + experimentId + " not available outside kubeflow or not exists"));
-        return getKubeflowRun(WorkflowDefinitionDAO.create(wd));
+        if (wd.getWorkflowRun() != null) {
+            return WorkflowRunDAO.create(wd.getWorkflowRun());
+        }
+        return null;
 
     }
 
@@ -77,16 +80,18 @@ public class WorkflowService {
         return runDAO;
     }
 
-    public Boolean stopRun(String experimentId, Map<String, Object> params) {
+    public Boolean stopRun(String experimentId) {
         var wd = workFlowRepository.findById(experimentId)
                 .orElseThrow(() -> new NotFoundException(
                         "Experiment: " + experimentId + " not available outside kubeflow or not exists"));
-        if (wd.getWorkflowRun() != null && wd.getWorkflowRun().getStartTime() != null) {
+        if (wd.getWorkflowRun() != null && wd.getWorkflowRun().getStartTime() != null && wd.getWorkflowRun().getEndTime() == null) {
             WorkflowRunDAO runDAO = stopKubeflowRun(wd);
             WorkflowRun currentRun = runDAO.mapToEntity();
             workFlowRunRepository.save(currentRun);
             wd.setWorkflowRun(currentRun);
             workFlowRepository.save(wd);
+        } else {
+            throw new NotFoundException(" WorkflowRun for: " + experimentId + " not found , not started or has been already finished");
         }
         return true;
     }
