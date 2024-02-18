@@ -38,7 +38,8 @@ public class WorkflowRunDAO {
         WorkflowRunDAO dao = new WorkflowRunDAO();
         dao.setRunId(wd.getRunId());
         if (wd.getWorkflowDefinition() != null) {
-            WorkflowDefinitionDAO workflowDefinitionDAO = WorkflowDefinitionDAO.create(wd.getWorkflowDefinition());
+            WorkflowDefinitionDAO workflowDefinitionDAO = new WorkflowDefinitionDAO();
+            workflowDefinitionDAO.setExperimentId(wd.getWorkflowDefinition().getExperimentId());
             dao.setWorkflowDefinition(workflowDefinitionDAO);
         }
         if (wd.getParams() != null && !wd.getParams().isEmpty()) {
