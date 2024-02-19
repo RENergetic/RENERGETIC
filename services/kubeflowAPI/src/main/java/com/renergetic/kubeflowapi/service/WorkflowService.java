@@ -91,7 +91,8 @@ public class WorkflowService {
             wd.setWorkflowRun(currentRun);
             workFlowRepository.save(wd);
         } else {
-            throw new NotFoundException(" WorkflowRun for: " + experimentId + " not found , not started or has been already finished");
+            throw new NotFoundException(
+                    " WorkflowRun for: " + experimentId + " not found , not started or has been already finished");
         }
         return true;
     }
@@ -175,7 +176,12 @@ public class WorkflowService {
             item.setName(kb.getName());
             item.setParameters(kb.getParameters());
             item.setPipelines(kb.getPipelines());
-            item.setCurrentRun(kb.getCurrentRun());
+            if (kb.getCurrentRun() == null && item.getCurrentRun() != null) {
+                if (!generateDummy) {
+                    //           TODO:     verify run id in the kubeflow       -> yago
+                }
+            } else
+                item.setCurrentRun(kb.getCurrentRun());
 
         }
         return item;
