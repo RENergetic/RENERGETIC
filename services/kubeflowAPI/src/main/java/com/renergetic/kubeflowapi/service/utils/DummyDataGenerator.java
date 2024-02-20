@@ -39,7 +39,13 @@ public class DummyDataGenerator {
         size = Math.min(10, size);
         return IntStream.range(0, size)
                 .mapToObj(i -> {
-                    WorkflowDefinitionDAO dao = new WorkflowDefinitionDAO("experiment_"+i);
+                    WorkflowDefinitionDAO dao = new WorkflowDefinitionDAO("experiment_" + i);
+                    if (i % 2 == 0) {
+                        HashMap<String, Object> m = new HashMap<>(2);
+                        m.put("param1", "Some parameter decription");
+                        m.put("param2", "parameter 2 decription");
+                        dao.setParameters(m);
+                    }
 
                     return dao;
                 }).collect(Collectors.toList());
@@ -57,19 +63,20 @@ public class DummyDataGenerator {
     public static WorkflowRunDAO getKubeflowRun(WorkflowDefinitionDAO wd) {
         var ts = DateConverter.now();
         WorkflowRunDAO wr = new WorkflowRunDAO();
-        wr.setRunId("run_"+ts);
+        wr.setRunId("run_" + ts);
         wr.setWorkflowDefinition(wd);
-        HashMap<String,Object> m = new HashMap<>(2);
-        m.put("param1",ts+"");
-        m.put("param2",wd.getExperimentId());
+        HashMap<String, Object> m = new HashMap<>(2);
+        m.put("param1", ts + "");
+        m.put("param2", wd.getExperimentId());
         wr.setParameters(m);
         wr.setStartTime(ts);
         return wr;
     }
-    public static WorkflowRunDAO startKubeflowRun(WorkflowDefinitionDAO wd, Map<String,Object> params){
+
+    public static WorkflowRunDAO startKubeflowRun(WorkflowDefinitionDAO wd, Map<String, Object> params) {
         var ts = DateConverter.now();
         WorkflowRunDAO wr = new WorkflowRunDAO();
-        wr.setRunId("run_"+ts);
+        wr.setRunId("run_" + ts);
         wr.setParameters(params);
         wr.setStartTime(ts);
         wr.setWorkflowDefinition(wd);
