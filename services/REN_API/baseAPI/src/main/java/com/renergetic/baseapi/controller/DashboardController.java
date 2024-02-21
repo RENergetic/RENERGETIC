@@ -5,7 +5,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +27,6 @@ import com.renergetic.baseapi.service.DashboardService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @CrossOrigin(origins = "*")
@@ -46,7 +44,7 @@ public class DashboardController {
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
 	public ResponseEntity<List<DashboardDAO>> getAllDashboards (@RequestParam(required = false) Optional<Long> offset, @RequestParam(required = false) Optional<Integer> limit){
-		List<DashboardDAO> dashboards = new ArrayList<>();
+		List<DashboardDAO> dashboards;
 		
 		dashboards = dashboardSv.get(null, offset.orElse(0L), limit.orElse(20));
 		
@@ -54,15 +52,13 @@ public class DashboardController {
 	}
 	
 	@Operation(summary = "Get Dashboards related with a User id")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
-		@ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
-	})
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@ApiResponse(responseCode = "404", description = "No dashboards found related with this user")
 	@GetMapping(path = "user/{user_id}", produces = "application/json")
-	public ResponseEntity<List<DashboardDAO>> getDashboardsByUser (@PathVariable Long user_id){
-		List<DashboardDAO> dashboards = new ArrayList<>();
+	public ResponseEntity<List<DashboardDAO>> getDashboardsByUser (@PathVariable("user_id") Long userId){
+		List<DashboardDAO> dashboards;
 		
-		dashboards = dashboardSv.getByUser(user_id);
+		dashboards = dashboardSv.getByUser(userId);
 		
 		dashboards = dashboards.isEmpty() ? null : dashboards;
 		
@@ -70,11 +66,9 @@ public class DashboardController {
 	}
 	
 	@Operation(summary = "Get Dashboard by id")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
-		@ApiResponse(responseCode = "400", description = "Malformed URL"),
-		@ApiResponse(responseCode = "404", description = "No dashboards found with this id")
-	})
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@ApiResponse(responseCode = "400", description = "Malformed URL")
+	@ApiResponse(responseCode = "404", description = "No dashboards found with this id")
 	@GetMapping(path = "{id}", produces = "application/json")
 	public ResponseEntity<DashboardDAO> getDashboardsById (@PathVariable Long id){
 		DashboardDAO dashboard = dashboardSv.getById(id);
@@ -83,12 +77,10 @@ public class DashboardController {
 	}
 	
 	@Operation(summary = "Get Dashboard by id and test it", description = "Return requested dashboard and add a field (status) with the ping dashboard response")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Request executed correctly"),
-		@ApiResponse(responseCode = "404", description = "No dashboards found with this id"),
-		@ApiResponse(responseCode = "405", description = "Dashboard server doesn't allow GET method"),
-		@ApiResponse(responseCode = "500", description = "Error to try ping dashboard")
-	})
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@ApiResponse(responseCode = "404", description = "No dashboards found with this id")
+	@ApiResponse(responseCode = "405", description = "Dashboard server doesn't allow GET method")
+	@ApiResponse(responseCode = "500", description = "Error to try ping dashboard")
 	@GetMapping(path = "test/{id}", produces = "application/json")
 	public ResponseEntity<DashboardDAO> getTestedDashboardsById (@PathVariable Long id){
 		DashboardDAO dashboard = null;
@@ -110,33 +102,27 @@ public class DashboardController {
 			e.printStackTrace();
 			return ResponseEntity.status(500).build();
 		}
-		return new ResponseEntity<>(dashboard, dashboard != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(dashboard, HttpStatus.OK);
 	}
 
 //=== POST REQUESTS ===================================================================================
 			
 	@Operation(summary = "Create a new Dashboard")
-	@ApiResponses({
-			@ApiResponse(responseCode = "201", description = "Dashboard saved correctly"),
-			@ApiResponse(responseCode = "500", description = "Error saving dashboard")
-		}
-	)
+	@ApiResponse(responseCode = "201", description = "Dashboard saved correctly")
+	@ApiResponse(responseCode = "500", description = "Error saving dashboard")
 	@PostMapping(path = "", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<DashboardDAO> createDashboard(@RequestBody DashboardDAO dashboard) {
-		DashboardDAO _dashboard = dashboardSv.save(dashboard);
+		dashboard = dashboardSv.save(dashboard);
 		
-		return new ResponseEntity<>(_dashboard, HttpStatus.CREATED);
+		return new ResponseEntity<>(dashboard, HttpStatus.CREATED);
 	}
 
 //=== PUT REQUESTS ====================================================================================
 
 	@Operation(summary = "Update a existing Dashboard")
-	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Dashboard saved correctly"),
-			@ApiResponse(responseCode = "404", description = "Dashboard not exist"),
-			@ApiResponse(responseCode = "500", description = "Error saving dashboard")
-		}
-	)
+	@ApiResponse(responseCode = "200", description = "Dashboard saved correctly")
+	@ApiResponse(responseCode = "404", description = "Dashboard not exist")
+	@ApiResponse(responseCode = "500", description = "Error saving dashboard")
 	@PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<DashboardDAO> updateDashboard(@RequestBody DashboardDAO dashboard, @PathVariable Long id) {
 
@@ -146,13 +132,10 @@ public class DashboardController {
 //=== DELETE REQUESTS =================================================================================
 			
 	@Operation(summary = "Delete a existing Dashboard")
-	@ApiResponses({
-			@ApiResponse(responseCode = "204", description = "Dashboard deleted correctly"),
-			@ApiResponse(responseCode = "500", description = "Error saving dashboard")
-		}
-	)
+	@ApiResponse(responseCode = "204", description = "Dashboard deleted correctly")
+	@ApiResponse(responseCode = "500", description = "Error saving dashboard")
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<?> deleteDashboard(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteDashboard(@PathVariable Long id) {
 		dashboardSv.deleteById(id);
 		
 		return ResponseEntity.noContent().build();
