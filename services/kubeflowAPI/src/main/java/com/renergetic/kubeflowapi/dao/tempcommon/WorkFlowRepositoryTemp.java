@@ -13,9 +13,12 @@ public interface WorkFlowRepositoryTemp extends JpaRepository<WorkflowDefinition
 
     WorkflowDefinition save(WorkflowDefinition workflowDefinition);
 
-    @Query(value = "SELECT wd FROM WorkflowDefinition wd WHERE wd.visible = :visible" )
+    @Override
+    @Query(value = "SELECT wd FROM WorkflowDefinition wd order by wd.experiment_id ASC" )
+    public List<WorkflowDefinition> findAll();
+    @Query(value = "SELECT wd FROM WorkflowDefinition wd WHERE wd.visible = :visible order by wd.experiment_id ASC" )
     public List<WorkflowDefinition> findByVisible(boolean visible);
-    @Query(value = "SELECT wd FROM WorkflowDefinition wd WHERE wd.experimentId = :experimentId" )
+    @Query(value = "SELECT wd FROM WorkflowDefinition wd WHERE wd.experimentId = :experimentId order by wd.experiment_id ASC" )
     public Optional<WorkflowDefinition> findById(String experimentId);
 
 
