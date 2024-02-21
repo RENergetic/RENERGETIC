@@ -24,6 +24,7 @@ kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 rules=$(grep -ioP "(rules\s*=\s*)\K.+" _installers.properties)
+baseApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
 userApi=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
 wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
 dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
@@ -45,6 +46,13 @@ resetConnection() {
 }
 
 compileApp() {
+    if [[ $baseApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/baseAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/base-api/api.jar"
+    fi
+
     if [[ $hdr = 'true' ]]
     then
         cd "${apisPath}/hdrAPI"
@@ -158,7 +166,26 @@ installPSNC() {
         envsubst '$PROJECT' < influxdb-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f influxdb-service.yaml --namespace=$project
     fi
-# DEPLOY APIs
+# DEPLOY 
+
+    if [[ $baseApi = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/base-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/base-api --namespace=$project
+        kubectl delete services/base-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/base-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/base-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < base-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f base-api-service.yaml --namespace=$project
+    fi
 
     if [[ $hdr = 'true' ]]
     then
@@ -398,7 +425,6 @@ installPSNC() {
         envsubst '$PROJECT' < keycloak-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f keycloak-service.yaml --namespace=$project
     fi
-
 
     if [[ $ui = 'true' ]]
     then        
