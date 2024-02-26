@@ -6,27 +6,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.renergetic.common.utilities.HttpAPIs;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ExampleUtils {
+public class KubeflowUtils {
 
     // Create here methods with generic funtionalities that can be used in the project
 
