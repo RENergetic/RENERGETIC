@@ -1,10 +1,7 @@
 package com.renergetic.common.dao.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.common.model.Asset;
-import com.renergetic.common.model.Measurement;
-import com.renergetic.common.model.MeasurementAggregation;
-import com.renergetic.common.model.OptimizerType;
+import com.renergetic.common.model.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,20 +19,21 @@ public class AggregationConfigurationDAO {
     @JsonProperty(value = "parametersAggregationConfiguration", required = true)
     private Map<String, ParamaterAggregationConfigurationDAO> parameterAggregationConfigurations;
 
-    public static AggregationConfigurationDAO create(Asset asset, List<MeasurementAggregation> measurementAggregations, OptimizerType optimizerType){
+    public static AggregationConfigurationDAO create(Asset asset, List<MeasurementAggregation> measurementAggregations, OptimizerType optimizerType,
+                                                     List<OptimizerParameter> allParameters){
         AggregationConfigurationDAO aggregationConfigurationDAO = new AggregationConfigurationDAO();
         aggregationConfigurationDAO.setMeasurementAggregations(MeasurementAggregationDAO.create(measurementAggregations));
 
         if(measurementAggregations != null && !measurementAggregations.isEmpty())
             aggregationConfigurationDAO.setMvoComponentType(MuVeCoTypeDAO
-                .create(asset));
+                .create(asset, optimizerType));
         else
             aggregationConfigurationDAO.setMvoComponentType(MuVeCoTypeDAO
-                    .create(null));
+                    .create(null, optimizerType));
 
         //TODO: in the caller, get the optimizer type based on the one selected and set in MuVeCoTypeDOA.
         aggregationConfigurationDAO.setParameterAggregationConfigurations(
-                ParamaterAggregationConfigurationDAO.create(asset, optimizerType));
+                ParamaterAggregationConfigurationDAO.create(asset, optimizerType, allParameters));
 
         return aggregationConfigurationDAO;
     }

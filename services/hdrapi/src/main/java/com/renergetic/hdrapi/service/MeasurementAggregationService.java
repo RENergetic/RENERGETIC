@@ -16,6 +16,7 @@ import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.hdrapi.dao.MeasurementAggregationMeasurementSelectionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -27,9 +28,13 @@ public class MeasurementAggregationService {
     @Autowired
     private AssetRepository assetRepository;
     @Autowired
+    private AssetConnectionRepository assetConnectionRepository;
+    @Autowired
     private MeasurementAggregationRepository measurementAggregationRepository;
     @Autowired
     private OptimizerTypeRepository optimizerTypeRepository;
+    @Autowired
+    private OptimizerParameterRepository optimizerParameterRepository;
     @Autowired
     private MeasurementRepository measurementRepository;
     @Autowired
@@ -50,17 +55,57 @@ public class MeasurementAggregationService {
         OptimizerType optimizerType = optimizerTypeRepository.findByName(asset.getDetails().stream()
                 .filter(x -> Objects.equals(x.getKey(),"optimizer_type")).findFirst().orElse(new AssetDetails()).getValue());
 
-        return AggregationConfigurationDAO.create(asset, measurementAggregations, optimizerType);
+        return AggregationConfigurationDAO.create(asset, measurementAggregations, optimizerType, optimizerParameterRepository.findAll());
     }
 
     @Transactional
     public AggregationConfigurationDAO save(Long assetId, AggregationConfigurationDAO aggregationConfigurationDAO) {
         Asset asset = assetRepository.findById(assetId).orElseThrow(NotFoundException::new);
 
-        setAssetDetail(asset, "optimizer_type", aggregationConfigurationDAO.getMvoComponentType().getType());
-        setAssetDetail(asset, "domain_a", aggregationConfigurationDAO.getMvoComponentType().getDomainA());
-        setAssetDetail(asset, "domain_b", aggregationConfigurationDAO.getMvoComponentType().getDomainB());
+        Long domainA = aggregationConfigurationDAO.getMvoComponentType().getDomainA();
+        Long domainB = aggregationConfigurationDAO.getMvoComponentType().getDomainB();
+        OptimizerType optimizerType = optimizerTypeRepository.findByName(aggregationConfigurationDAO.getMvoComponentType().getType());
+        AssetDetails existingOptimizer = asset.getDetails().stream().filter(x -> x.getKey().equals("optimizer_type")).findFirst().orElse(null);
 
+        if(existingOptimizer != null && existingOptimizer.getValue() != null && !existingOptimizer.getValue().isEmpty()){
+            //TODO: Not working
+            AssetConnection assetConnection = new AssetConnection();
+            assetConnection.setConnectedAsset(asset);
+
+            OptimizerType existingOptimizerType = optimizerTypeRepository.findByName(existingOptimizer.getValue());
+
+            List<AssetConnection> expiredConnections = assetConnectionRepository.findAll(Example.of(assetConnection)).stream().filter(con -> {
+                ConnectionType connectionType = con.getConnectionType();
+                return connectionType != null &&
+                        (connectionType.equals(existingOptimizerType.getConnectionTypeA()) ||
+                                connectionType.equals(existingOptimizerType.getConnectionTypeB()));
+            }).collect(Collectors.toList());
+
+            assetConnectionRepository.deleteAll(expiredConnections);
+        }
+
+        if(optimizerType != null) {
+            if(domainA != null && optimizerType.getConnectionTypeA() != null){
+                Asset assetA = assetRepository.findById(domainA).orElse(null);
+                AssetConnection assetConnection = new AssetConnection();
+                assetConnection.setAsset(assetA);
+                assetConnection.setConnectedAsset(asset);
+                assetConnection.setConnectionType(optimizerType.getConnectionTypeA());
+                assetConnectionRepository.save(assetConnection);
+            }
+            if(domainB != null && optimizerType.getConnectionTypeB() != null){
+                Asset assetB = assetRepository.findById(domainB).orElse(null);
+                AssetConnection assetConnection = new AssetConnection();
+                assetConnection.setAsset(assetB);
+                assetConnection.setConnectedAsset(asset);
+                assetConnection.setConnectionType(optimizerType.getConnectionTypeB());
+                assetConnectionRepository.save(assetConnection);
+            }
+        }
+
+        setAssetDetail(asset, "optimizer_type", aggregationConfigurationDAO.getMvoComponentType().getType());
+        setAssetDetail(asset, "domain_a", domainA == null ? "" : domainA.toString());
+        setAssetDetail(asset, "domain_b", domainB == null ? "" : domainB.toString());
 
         List<MeasurementAggregation> measurementAggregations = new ArrayList<>();
         List<List<MeasurementTags>> measurementTags = new ArrayList<>();
@@ -96,12 +141,12 @@ public class MeasurementAggregationService {
             }).collect(Collectors.toSet()));
 
             if(aggregationConfigurationDAO.getMvoComponentType().getDomainA() != null)
-                measurementAggregation.setDomainA(Domain.valueOf(aggregationConfigurationDAO.getMvoComponentType().getDomainA()));
+                measurementAggregation.setDomainA(aggregationConfigurationDAO.getMvoComponentType().getDomainA());
             else
                 measurementAggregation.setDomainA(null);
 
             if(aggregationConfigurationDAO.getMvoComponentType().getDomainB() != null)
-                measurementAggregation.setDomainB(Domain.valueOf(aggregationConfigurationDAO.getMvoComponentType().getDomainB()));
+                measurementAggregation.setDomainB(aggregationConfigurationDAO.getMvoComponentType().getDomainB());
             else
                 measurementAggregation.setDomainB(null);
 
@@ -153,7 +198,7 @@ public class MeasurementAggregationService {
         Asset asset = assetRepository.findById(assetId).orElseThrow(NotFoundException::new);
         OptimizerType optimizerType = optimizerTypeRepository.findByName(type);
 
-        return ParamaterAggregationConfigurationDAO.create(asset, optimizerType);
+        return ParamaterAggregationConfigurationDAO.create(asset, optimizerType, optimizerParameterRepository.findAll());
     }
 
     public List<MeasurementAggregationMeasurementSelectionDAO> getMeasurementsForAssetConnections(Long assetId){

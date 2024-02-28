@@ -47,12 +47,10 @@ public class MeasurementAggregation {
 	//TODO: Maybe remain domain_a and domain_b to domain_in and domain_out ?
 	//TODO: Check if domain is needed in the end, as probably inferred from the measurements ?
 	@Column(name="domain_a")
-	@Enumerated(EnumType.STRING)
-	private Domain domainA;
+	private Long domainA;
 
 	//TODO: Maybe remain domain_a and domain_b to domain_in and domain_out ?
 	//TODO: Check if domain is needed in the end, as probably inferred from the measurements ?
 	@Column(name="domain_b")
-	@Enumerated(EnumType.STRING)
-	private Domain domainB;
+	private Long domainB;
 }

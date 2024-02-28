@@ -20,11 +20,14 @@ public class OptimizerTypeDAO {
 	@JsonProperty(required = true)
 	private String name;
 
+	@JsonProperty(required = false)
+	private Integer domainsQuantity;
+
 	@JsonProperty(required = true)
 	private List<OptimizerParameterDAO> optimizerParameters;
 	
 	public static OptimizerTypeDAO create(OptimizerType ot) {
-		return new OptimizerTypeDAO(ot.getId(), ot.getName(), ot.getOptimizerParameters()
+		return new OptimizerTypeDAO(ot.getId(), ot.getName(), ot.getDomainsQuantity(), ot.getOptimizerParameters()
 				.stream().map(OptimizerParameterDAO::create).collect(Collectors.toList()));
 	}
 	
@@ -32,6 +35,7 @@ public class OptimizerTypeDAO {
 		OptimizerType ot = new OptimizerType();
 		ot.setId(id);
 		ot.setName(name);
+		ot.setDomainsQuantity(domainsQuantity);
 		ot.setOptimizerParameters(optimizerParameters.stream().map(x -> x.mapToEntity(ot)).collect(Collectors.toList()));
 		return ot;
 	}

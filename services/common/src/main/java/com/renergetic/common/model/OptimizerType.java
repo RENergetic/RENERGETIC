@@ -22,6 +22,17 @@ public class OptimizerType {
     @Column(name="name", unique = true, nullable = false)
     private String name;
 
+    @Column(name="domains_quantity", unique = true, nullable = true)
+    private Integer domainsQuantity;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "connection_type_a", nullable = true, insertable = true, updatable = true)
+    private ConnectionType connectionTypeA;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "connection_type_b", nullable = true, insertable = true, updatable = true)
+    private ConnectionType connectionTypeB;
+
     @OneToMany(cascade = {}, fetch = FetchType.EAGER, orphanRemoval = false, mappedBy = "optimizerType")
     private List<OptimizerParameter> optimizerParameters;
 }
