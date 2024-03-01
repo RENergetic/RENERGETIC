@@ -3,7 +3,6 @@ package com.renergetic.hdrapi.controller;
 import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.dao.OptimizerTypeDAO;
 import com.renergetic.common.dao.aggregation.AggregationConfigurationDAO;
-import com.renergetic.common.dao.aggregation.ParamaterAggregationConfigurationDAO;
 import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.hdrapi.dao.MeasurementAggregationMeasurementSelectionDAO;
 import com.renergetic.hdrapi.service.MeasurementAggregationService;
@@ -47,7 +46,7 @@ public class MeasurementAggregationController {
     @Operation(summary = "Get All optimizer parameters with data for given asset id")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/optimizerParameters/{assetId}/{optimizerType}", produces = "application/json")
-    public ResponseEntity<Map<String, ParamaterAggregationConfigurationDAO>> getOptimizerTypeList(
+    public ResponseEntity<List<Map<String, Object>>> getOptimizerTypeList(
             @PathVariable(name = "assetId") Long assetId,
             @PathVariable(name = "optimizerType") String optimizerType
     ) {

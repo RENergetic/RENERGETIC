@@ -3,7 +3,6 @@ package com.renergetic.hdrapi.service;
 import com.renergetic.common.dao.OptimizerTypeDAO;
 import com.renergetic.common.dao.aggregation.AggregationConfigurationDAO;
 import com.renergetic.common.dao.aggregation.MeasurementAggregationDAO;
-import com.renergetic.common.dao.aggregation.ParamaterAggregationConfigurationDAO;
 import com.renergetic.common.exception.InvalidArgumentException;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.*;
@@ -68,7 +67,6 @@ public class MeasurementAggregationService {
         AssetDetails existingOptimizer = asset.getDetails().stream().filter(x -> x.getKey().equals("optimizer_type")).findFirst().orElse(null);
 
         if(existingOptimizer != null && existingOptimizer.getValue() != null && !existingOptimizer.getValue().isEmpty()){
-            //TODO: Not working
             AssetConnection assetConnection = new AssetConnection();
             assetConnection.setConnectedAsset(asset);
 
@@ -155,9 +153,31 @@ public class MeasurementAggregationService {
 
         assetDetailsRepository.deleteAll(asset.getDetails().stream().filter(x -> x.getKey().contains("_aggregation")).collect(Collectors.toList()));
         asset.getDetails().removeIf(x -> x.getKey().contains("_aggregation"));
-        asset.getDetails().addAll(aggregationConfigurationDAO.getParameterAggregationConfigurations().entrySet().stream()
-                .map(e -> new AssetDetails(e.getKey()+"_aggregation", e.getValue().getAggregation(), asset))
+
+        //TODO: Here process the params aggregation + set the value in the related assets
+        //TODO: Check that the asset id is effectively part of the aggregation group,
+        asset.getDetails().addAll(aggregationConfigurationDAO.getParameterAggregationConfigurations().stream()
+                .filter(e -> e.get("aggregation") != null)
+                .map(e -> new AssetDetails(e.get("parameter").toString()+"_aggregation",
+                        e.get("aggregation").toString(), asset))
                 .collect(Collectors.toList()));
+
+        List<Asset> connectedAssets = asset.getConnections().stream()
+                .map(AssetConnection::getConnectedAsset).collect(Collectors.toList());
+        List<AssetDetails> assetDetailsToSave = new ArrayList<>();
+        for(Map<String, Object> map : aggregationConfigurationDAO.getParameterAggregationConfigurations()){
+            String key = (String) map.getOrDefault("parameter", null);
+            if(key != null){
+                for(Asset lookUpAsset : connectedAssets){
+                    String value = (String) map.getOrDefault(lookUpAsset.getId().toString(), null);
+                    AssetDetails assetDetails = assetDetailsRepository.findByKeyAndAssetId(key, lookUpAsset.getId())
+                            .orElse(new AssetDetails(key, value, lookUpAsset));
+                    assetDetails.setValue(value);
+                    assetDetailsToSave.add(assetDetails);
+                }
+            }
+        }
+        assetDetailsRepository.saveAll(assetDetailsToSave);
 
         assetDetailsRepository.saveAll(asset.getDetails());
         assetRepository.save(asset);
@@ -194,11 +214,11 @@ public class MeasurementAggregationService {
         return optimizerTypeRepository.findAll().stream().map(OptimizerTypeDAO::create).collect(Collectors.toList());
     }
 
-    public Map<String, ParamaterAggregationConfigurationDAO> getParametersForOptimizerType(Long assetId, String type) {
+    public List<Map<String, Object>> getParametersForOptimizerType(Long assetId, String type) {
         Asset asset = assetRepository.findById(assetId).orElseThrow(NotFoundException::new);
         OptimizerType optimizerType = optimizerTypeRepository.findByName(type);
 
-        return ParamaterAggregationConfigurationDAO.create(asset, optimizerType, optimizerParameterRepository.findAll());
+        return AggregationConfigurationDAO.createParameterAggregationConfiguration(asset, optimizerType, optimizerParameterRepository.findAll());
     }
 
     public List<MeasurementAggregationMeasurementSelectionDAO> getMeasurementsForAssetConnections(Long assetId){
