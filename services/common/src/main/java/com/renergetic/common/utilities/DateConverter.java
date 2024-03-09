@@ -45,8 +45,6 @@ public final class DateConverter {
         return new Date(epoch);
     }
 
-
-
     public static String toString(long epoch) {
         return dateFormat.format(new Date(epoch));
     }
