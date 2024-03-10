@@ -45,6 +45,8 @@ public class MeasurementDAOResponse {
     private SimpleAssetDAO asset;
     @JsonProperty(required = false)
     private String category;
+    @JsonProperty(required = false)
+    private String description;
 
     @JsonProperty(value = "measurement_details", required = false)
     private HashMap<String, ?> measurementDetails;
@@ -64,6 +66,7 @@ public class MeasurementDAOResponse {
         if (measurement != null) {
             dao = new MeasurementDAOResponse();
             dao.setId(measurement.getId());
+            dao.setDescription(measurement.getDescription());
             dao.setName(measurement.getName());
             dao.setSensorName(measurement.getSensorName());
             if (measurement.getType() != null)
@@ -102,14 +105,14 @@ public class MeasurementDAOResponse {
         return dao;
     }
 
-    public Measurement mapToEntity(){
+    public Measurement mapToEntity() {
         return this.mapToEntity(new ArrayList<>());
     }
 
 
     public Measurement mapToEntity(List<MeasurementDetails> measurementDetails) {
         Measurement measurement = new Measurement();
-
+        measurement.setDescription(this.description);
         measurement.setId(id);
         measurement.setName(name);
         measurement.setSensorName(sensorName);
