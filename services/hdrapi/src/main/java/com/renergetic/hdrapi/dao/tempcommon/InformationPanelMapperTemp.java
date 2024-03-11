@@ -28,6 +28,7 @@ public class InformationPanelMapperTemp {
                                 .map(InformationTileMeasurement::getMeasurementDAO)
                                 .collect(Collectors.toList()));
             }
+
             dao.setName(entity.getName());
             dao.setLabel(entity.getLabel());
             if (entity.getType() != null)

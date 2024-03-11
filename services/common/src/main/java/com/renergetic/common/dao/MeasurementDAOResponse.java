@@ -83,6 +83,7 @@ public class MeasurementDAOResponse {
                 dao.setAsset(SimpleAssetDAO.create(measurement.getAsset()));
             }
 
+
             if (details != null && !details.isEmpty()) {
                 HashMap<String, String> detailsDao = details.stream().filter(it -> it.getValue() != null)
                         .collect(Collectors.toMap(MeasurementDetails::getKey, MeasurementDetails::getValue,
