@@ -196,7 +196,7 @@ public class MeasurementService {
     }
 
     public boolean setProperty(Long measurementId, MeasurementDetails details) {
-        details.setMeasurement(new Measurement(measurementId, null, null, null, null, null, null, null));
+        details.setMeasurement(new Measurement(measurementId, null, null, null, null, null, null));
 
         log.warn(String.format("Saving %s %s", details.getKey(), details.getValue()));
         MeasurementDetails previousDetails = measurementDetailsRepository.findByKeyAndMeasurementId(details.getKey(),
