@@ -101,7 +101,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     public int setProperty(@Param("measurement_id") Long measurementId,@Param("key")  String key, @Param("value") String value );
 
     @Query(value = "SELECT " +
-            " me.id, me.direction, me.domain, me.label, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
+            " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
             " me.measurement_type_id as typeId," +
             " mt.name as typeName, mt.label as typeLabel,mt.unit, mt.physical_name as physicalName," +
             " me.asset_id as assetId, asset.name as assetName, asset.label as assetLabel," +
@@ -155,7 +155,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             Long assetId, String measurementName, String sensorName, String domain, String direction, Long type,String physicalName);
 
     @Query(value = "SELECT " +
-            " me.id, me.direction, me.domain, me.label, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
+            " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
             " me.measurement_type_id as typeId," +
             " mt.name as typeName, mt.label as typeLabel,mt.unit, mt.physical_name as physicalName," +
             " me.asset_id as assetId, asset.name as assetName, asset.label as assetLabel," +
@@ -182,7 +182,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
                                                  String physicalName, long offset, Integer limit);
 
     @Query(value = "SELECT " +
-            " me.id, me.direction, me.domain, me.label, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
+            " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
             " me.measurement_type_id as typeId," +
             " mt.name as typeName, mt.label as typeLabel,mt.unit, mt.physical_name as physicalName," +
             " me.asset_id as assetId, asset.name as assetName, asset.label as assetLabel," +

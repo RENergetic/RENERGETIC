@@ -1,6 +1,7 @@
 package com.renergetic.common.model;
 
 import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.dao.SimpleAssetDAO;
 import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -83,6 +84,9 @@ public class InformationTileMeasurement {
         }
         var dao = new MeasurementDAOResponse();
         dao.setId(null);
+        if(this.asset!=null){
+            dao.setAsset(SimpleAssetDAO.create(asset));
+        }
         dao.setDirection(direction);
         dao.setDomain(domain);
         dao.setName(measurementName);

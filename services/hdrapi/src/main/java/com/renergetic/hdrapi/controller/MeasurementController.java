@@ -4,13 +4,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.renergetic.common.dao.*;
-import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.common.model.Details;
-import com.renergetic.common.model.details.AssetDetails;
-import com.renergetic.hdrapi.dao.temp.MeasurementDAORequestTemp;
+import com.renergetic.hdrapi.dao.tempcommon.MeasurementDAORequestTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
