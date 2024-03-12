@@ -3,15 +3,11 @@ package com.renergetic.common.mapper;
 import com.renergetic.common.dao.InformationPanelDAORequest;
 import com.renergetic.common.dao.InformationPanelDAOResponse;
 import com.renergetic.common.dao.InformationTileDAOResponse;
-import com.renergetic.common.mapper.InformationTileMapper;
-import com.renergetic.common.mapper.MapperReponseRequest;
 import com.renergetic.common.model.InformationPanel;
 import com.renergetic.common.model.InformationTile;
 import com.renergetic.common.model.InformationTileMeasurement;
 import com.renergetic.common.utilities.Json;
 import org.apache.tomcat.util.json.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +15,19 @@ import java.util.stream.Collectors;
 
 
 public class InformationPanelMapper {
+    public InformationPanel toEntity(InformationPanelDAORequest dto) {
+        if (dto == null)
+            return null;
+        
+        InformationPanel entity =  new InformationPanel();
+        entity.setId(dto.getId());
+
+        entity.setLabel(dto.getLabel());
+        entity.setName(dto.getName());
+
+        return entity;
+    }
+
     private static InformationTileDAOResponse tileToDTO(InformationTile entity, Boolean includeMeasurements) {
         try {
             if (entity == null)
