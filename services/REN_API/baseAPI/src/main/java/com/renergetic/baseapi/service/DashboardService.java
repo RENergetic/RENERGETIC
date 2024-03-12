@@ -83,14 +83,14 @@ public class DashboardService {
 					equals = String.valueOf(dashboard.getUser().getId()).equals(filters.get("user"));
 				
 				return equals;
-			}).map(dashboard -> DashboardDAO.create(dashboard))
+			}).map(DashboardDAO::create)
 					.collect(Collectors.toList());
 		else
 			dashboards = stream
-				.map(dashboard -> DashboardDAO.create(dashboard))
+				.map(DashboardDAO::create)
 				.collect(Collectors.toList());
 		
-		if (dashboards.size() > 0)
+		if (!dashboards.isEmpty())
 			return dashboards;
 		else throw new NotFoundException("No dashboards are found");
 	}
@@ -111,7 +111,7 @@ public class DashboardService {
 			
 			if (dashboards != null) 
 				return dashboards.stream()
-						.map((dashboard) -> DashboardDAO.create(dashboard))
+						.map(DashboardDAO::create)
 						.collect(Collectors.toList());
 			else throw new NotFoundException("No dashboards found related with given user id " + id);
 		} else throw new NotFoundException("No users found related with id " + id);

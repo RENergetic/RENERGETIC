@@ -10,12 +10,14 @@ import com.renergetic.common.utilities.Json;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.tomcat.util.json.ParseException;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Service
 public class InformationTilePanelMapper {
     private InformationTileDAOResponse tileToDTO(InformationTile entity, Boolean includeMeasurements) {
         try {
