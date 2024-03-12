@@ -70,7 +70,8 @@ public class Measurement {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
 	private UUID uuid;
-
+	@Column(name = "description",  columnDefinition="TEXT")
+	private String description;
 	@OneToMany(cascade = CascadeType.REFRESH, mappedBy = "measurement")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private List<MeasurementDetails> details;
@@ -78,14 +79,14 @@ public class Measurement {
 	@Transient
 	String function;
 	
-	public Measurement(Long id, String uuid, String name, String label,Asset asset, String description, String icon, Direction direction) {
+	public Measurement(Long id, String uuid, String name, String label,Asset asset, String description,   Direction direction ) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.label = label;
 		this.asset = asset;
-		//this.description = description;
-		//this.icon = icon;
+		this.description = description;
+
 		this.direction = direction;
 		this.type = new MeasurementType();
 	}

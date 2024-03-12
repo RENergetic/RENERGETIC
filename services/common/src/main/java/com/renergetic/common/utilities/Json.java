@@ -41,12 +41,13 @@ public class Json {
         return parse(json).toMap();
     }
 
-    //    public static String toJson(JSONObject json) {
+//    public static String toJson(JSONObject json) {
 //        if (json != null) {
 //            return json.toString();
 //        }
 //        return "{}";
 //    }
+
     public static String toJson(Object obj) {
 
         if (obj != null)

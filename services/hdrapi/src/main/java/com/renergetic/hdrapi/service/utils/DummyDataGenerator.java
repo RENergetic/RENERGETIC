@@ -151,6 +151,13 @@ public class DummyDataGenerator {
                     var hdr = new HDRRecommendationDAO();
                     hdr.setTimestamp(timestamp);
                     hdr.setTag(MeasurementTagsDAO.create(it));
+                    if(random.nextBoolean()){
+                        hdr.setLabel("Decrease temperature by " + random.nextInt());
+                    }
+                    else{
+                        hdr.setLabel("Increase temperature by " + random.nextInt());
+                    }
+
                     hdr.setId((long) idx);
                     return hdr;
                 }).filter((it) -> !it.getTag().getValue().equals("no_tag"))

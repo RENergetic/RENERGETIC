@@ -9,7 +9,6 @@ import com.renergetic.common.model.*;
 import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.hdrapi.dao.temp.RecommendationRepositoryTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,15 +30,13 @@ public class HDRRecommendationService {
     @Autowired
     RecommendationRepository recommendationRepository;
     @Autowired
-    RecommendationRepositoryTemp recommendationRepositoryTemp;
-    @Autowired
     HDRRequestRepository hdrRequestRepository;
     @Autowired
     UuidRepository uuidRepository;
 
     // ASSET CRUD OPERATIONS
     private HDRRecommendationDAO save(HDRRecommendationDAO recommendationDAO) {
-        var r = recommendationRepositoryTemp.findByTimestampTag(
+        var r = recommendationRepository.findByTimestampTag(
                 DateConverter.toLocalDateTime(recommendationDAO.getTimestamp()),
                 recommendationDAO.getTag().getTagId());
         if (r.isPresent()) {
