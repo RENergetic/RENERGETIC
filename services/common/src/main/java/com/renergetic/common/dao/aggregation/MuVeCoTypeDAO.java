@@ -20,6 +20,10 @@ public class MuVeCoTypeDAO {
     private Long domainB;
     @JsonProperty(required = false)
     private Integer domainsQuantity;
+    @JsonProperty(value = "domainAReadableConnection", required = true)
+    private String domainAReadableConnection;
+    @JsonProperty(value = "domainBReadableConnection", required = true)
+    private String domainBReadableConnection;
 
     public static MuVeCoTypeDAO create(Asset asset, OptimizerType optimizerType){
         MuVeCoTypeDAO muVeCoTypeDAO = new MuVeCoTypeDAO();
@@ -47,6 +51,8 @@ public class MuVeCoTypeDAO {
 
         if(optimizerType != null){
             muVeCoTypeDAO.domainsQuantity = optimizerType.getDomainsQuantity();
+            muVeCoTypeDAO.domainAReadableConnection = optimizerType.getConnectionTypeAReadable();
+            muVeCoTypeDAO.domainBReadableConnection = optimizerType.getConnectionTypeBReadable();
         }
 
         return muVeCoTypeDAO;

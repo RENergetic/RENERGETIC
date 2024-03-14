@@ -1,5 +1,7 @@
 package com.renergetic.common.model;
 
+import com.renergetic.common.model.listeners.AssetConnectionListener;
+import com.renergetic.common.model.listeners.AssetDetailsListener;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -10,6 +12,7 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.*;
 
 @Entity
+@EntityListeners(AssetConnectionListener.class)
 @Table(name = "asset_connection")
 @RequiredArgsConstructor
 @Getter

@@ -33,6 +33,12 @@ public class OptimizerType {
     @Column(name = "connection_type_b", nullable = true, insertable = true, updatable = true)
     private ConnectionType connectionTypeB;
 
+    @Column(name = "connection_type_a_readable", nullable = true, insertable = true, updatable = true)
+    private String connectionTypeAReadable;
+
+    @Column(name = "connection_type_b_readable", nullable = true, insertable = true, updatable = true)
+    private String connectionTypeBReadable;
+
     @OneToMany(cascade = {}, fetch = FetchType.EAGER, orphanRemoval = false, mappedBy = "optimizerType")
     private List<OptimizerParameter> optimizerParameters;
 }

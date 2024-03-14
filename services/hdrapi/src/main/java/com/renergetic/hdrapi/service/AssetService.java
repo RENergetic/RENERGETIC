@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -94,10 +95,22 @@ public class AssetService {
         if (connection.getType() == ConnectionType.owner && !isUser(asset)) {
             throw new InvalidArgumentException("Non user assets cannot be owners");
         }
+
+        if(assetConnectionRepository.existsByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
+                connection.getAssetConnectedId(), connection.getType()))
+            throw new InvalidArgumentException("connection already existing for that type between those assets");
+
         requireAsset(connection.getAssetConnectedId());
         assetConnectionRepository.save(connection.mapToEntity());
         return AssetDAOResponse.create(assetRepository.findById(connection.getAssetId()).orElse(null), null, null);
 //       throw new InvalidNonExistingIdException("The assets to connect don't exists");
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public boolean disconnect(AssetConnectionDAORequest connection){
+        assetConnectionRepository.deleteByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
+                connection.getAssetConnectedId(), connection.getType());
+        return true;
     }
 
     public MeasurementDAOResponse assignMeasurement(Long assetId, Long measurementId) {
@@ -389,6 +402,7 @@ public class AssetService {
                 "No asset detail with id " + id + " related with " + assetId + " found");
     }
 
+    @Transactional
     public boolean deleteDetailByKey(String key, Long assetId) {
         if (key != null && assetDetailsRepository.existsByKeyAndAssetId(key, assetId)) {
             assetDetailsRepository.deleteByKeyAndAssetId(key, assetId);

@@ -16,6 +16,7 @@ import com.renergetic.common.repository.information.MeasurementDetailsRepository
 import com.renergetic.hdrapi.dao.MeasurementAggregationMeasurementSelectionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -45,6 +46,115 @@ public class MeasurementAggregationService {
     private MeasurementDetailsRepository measurementDetailsRepository;
     @Autowired
     private MeasurementTagsRepository measurementTagsRepository;
+
+    public boolean isUpdatingAssetNeedsAggregationUpdate(Asset asset) {
+        //TODO: Check if either a virtual asset or part of a virtual asset.
+        //TODO: Call this before any change to the asset and after too.
+        return asset.getType().getName().equals("pv_virtual_asset_group") || asset.getConnections().stream()
+                .anyMatch(x -> x.getConnectionType().equals(ConnectionType.va_grouping) &&
+                x.getAsset().getType().getName().equals("pv_virtual_asset_group"));
+    }
+
+    public void updateAfterAssetChange(@Nullable Long assetId, @Nullable Asset previousAsset){
+        Asset asset = assetId == null ? null : assetRepository.findById(assetId).orElse(null);
+        if(asset != null && asset.getType().getName().equals("pv_virtual_asset_group")) {
+            updateAggregatedParameterForVirtualAsset(asset,
+                    previousAsset != null && previousAsset.getId().equals(assetId) ? previousAsset.getDetails() : null);
+        } else {
+            List<Asset> aggrs = asset == null ? new ArrayList<>() : asset.getConnections().stream()
+                    .filter(x -> x.getConnectionType().equals(ConnectionType.va_grouping) &&
+                            x.getAsset().getType().getName().equals("pv_virtual_asset_group"))
+                    .map(AssetConnection::getAsset).collect(Collectors.toList());
+            List<Long> existingIds = aggrs.stream().map(Asset::getId).collect(Collectors.toList());
+            if(previousAsset != null)
+                aggrs.addAll(previousAsset.getConnections().stream()
+                        .filter(x -> x.getConnectionType().equals(ConnectionType.va_grouping) &&
+                                x.getAsset().getType().getName().equals("pv_virtual_asset_group") &&
+                                !existingIds.contains(x.getId()))
+                        .map(AssetConnection::getAsset).collect(Collectors.toList()));
+            if(!aggrs.isEmpty()){
+                aggrs.forEach(x -> updateAggregatedParameterForVirtualAsset(x, null));
+            }
+        }
+    }
+
+    @Transactional
+    public void updateAggregationForEditedAsset(Asset priorToChange, Asset posteriorToChange) {
+        if(posteriorToChange.getType().getName().equals("pv_virtual_asset_group")){
+            updateAggregatedParameterForVirtualAsset(posteriorToChange, priorToChange == null ? null : priorToChange.getDetails());
+        } else {
+            //TODO: For now, only limiting to max one level of aggregation.
+            List<Asset> assetsToUpdate = posteriorToChange.getConnections().stream()
+                    .filter(x -> x.getConnectionType().equals(ConnectionType.va_grouping) &&
+                            x.getAsset().getType().getName().equals("pv_virtual_asset_group"))
+                    .map(AssetConnection::getAsset).collect(Collectors.toList());
+
+            List<Long> oldIds = priorToChange.getConnections().stream()
+                    .filter(x -> x.getConnectionType().equals(ConnectionType.va_grouping))
+                    .map(AssetConnection::getId).collect(Collectors.toList());
+
+            assetsToUpdate.forEach(x -> {
+                updateAggregatedParameterForVirtualAsset(x,
+                        priorToChange.getConnections().stream().filter(c -> c.getAsset().getId().equals(x.getId()))
+                                .map(c -> c.getAsset().getDetails()).findFirst().orElse(null));
+                oldIds.remove(x.getId());
+            });
+
+            if(!oldIds.isEmpty()){
+                List<Asset> oldAssets = assetRepository.findAllById(oldIds);
+                oldAssets.forEach(o -> updateAggregatedParameterForVirtualAsset(o,
+                        priorToChange.getConnections().stream().filter(c -> c.getAsset().getId().equals(o.getId()))
+                        .map(c -> c.getAsset().getDetails()).findFirst().orElse(null)));
+            }
+        }
+    }
+
+    @Transactional
+    public void updateAggregatedParameterForVirtualAsset(Asset va, List<AssetDetails> previousDetails) {
+        List<AssetDetails> existingDef = va.getDetails().stream()
+                .filter(x -> x.getKey().endsWith("_aggregation")).collect(Collectors.toList());
+
+        if(previousDetails != null && !previousDetails.isEmpty()){
+            //Cleaning up previously defined aggregation.
+            List<AssetDetails> previousDef = previousDetails.stream()
+                    .filter(x -> x.getKey().endsWith("_aggregation")).collect(Collectors.toList());
+
+            List<String> existingKeys = existingDef.stream().map(Details::getKey).collect(Collectors.toList());
+
+            List<AssetDetails> deletedDef = previousDef.stream()
+                    .filter(x -> !existingKeys.contains(x.getKey())).collect(Collectors.toList());
+
+            assetDetailsRepository.deleteAll(deletedDef);
+        }
+
+        List<AssetDetails> connectedDetails = va.getConnections().stream().map(ac -> ac.getConnectedAsset().getDetails())
+                .flatMap(List::stream).collect(Collectors.toList());
+
+        existingDef.forEach(def -> {
+            String argument = def.getKey().split("_aggregation")[0];
+            AssetDetails assetDetails = va.getDetails().stream().filter(x -> x.getKey().equals(argument)).findFirst().orElse(new AssetDetails());
+            if(assetDetails.getKey() == null) {
+                assetDetails.setKey(argument);
+                assetDetails.setAsset(va);
+                va.getDetails().add(assetDetails);
+            }
+            switch (def.getValue().toLowerCase()) {
+                case "sum":
+                    assetDetails.setValue(connectedDetails.stream().filter(x -> x.getKey().equals(argument))
+                            .map(x -> Double.parseDouble(x.getValue())).reduce(0.0, Double::sum).toString());
+                case "min":
+                    assetDetails.setValue(connectedDetails.stream().filter(x -> x.getKey().equals(argument))
+                            .map(x -> Double.parseDouble(x.getValue())).reduce(0.0, Double::min).toString());
+                case "max":
+                    assetDetails.setValue(connectedDetails.stream().filter(x -> x.getKey().equals(argument))
+                            .map(x -> Double.parseDouble(x.getValue())).reduce(0.0, Double::max).toString());
+                case "mean":
+                    assetDetails.setValue(String.valueOf(connectedDetails.stream().filter(x -> x.getKey().equals(argument))
+                            .map(x -> Double.parseDouble(x.getValue())).mapToDouble(Double::doubleValue).average().orElse(0.0)));
+            }
+        });
+        assetDetailsRepository.saveAll(va.getDetails());
+    }
 
     public AggregationConfigurationDAO get(Long assetId) {
         Asset asset = assetRepository.findById(assetId).orElseThrow(NotFoundException::new);
@@ -159,12 +269,13 @@ public class MeasurementAggregationService {
         asset.getDetails().addAll(aggregationConfigurationDAO.getParameterAggregationConfigurations().stream()
                 .filter(e -> e.get("aggregation") != null)
                 .map(e -> new AssetDetails(e.get("parameter").toString()+"_aggregation",
-                        e.get("aggregation").toString(), asset))
+                                e.get("aggregation").toString(), asset))
                 .collect(Collectors.toList()));
 
         List<Asset> connectedAssets = asset.getConnections().stream()
                 .map(AssetConnection::getConnectedAsset).collect(Collectors.toList());
         List<AssetDetails> assetDetailsToSave = new ArrayList<>();
+        List<AssetDetails> assetDetailsToDelete = new ArrayList<>();
         for(Map<String, Object> map : aggregationConfigurationDAO.getParameterAggregationConfigurations()){
             String key = (String) map.getOrDefault("parameter", null);
             if(key != null){
@@ -173,11 +284,16 @@ public class MeasurementAggregationService {
                     AssetDetails assetDetails = assetDetailsRepository.findByKeyAndAssetId(key, lookUpAsset.getId())
                             .orElse(new AssetDetails(key, value, lookUpAsset));
                     assetDetails.setValue(value);
-                    assetDetailsToSave.add(assetDetails);
+
+                    if(assetDetails.getId() != null && assetDetails.getValue() == null)
+                        assetDetailsToDelete.add(assetDetails);
+                    else if (assetDetails.getValue() != null)
+                        assetDetailsToSave.add(assetDetails);
                 }
             }
         }
         assetDetailsRepository.saveAll(assetDetailsToSave);
+        assetDetailsRepository.deleteAll(assetDetailsToDelete);
 
         assetDetailsRepository.saveAll(asset.getDetails());
         assetRepository.save(asset);
@@ -206,6 +322,8 @@ public class MeasurementAggregationService {
                 });
             });
         });
+
+        //updateAggregatedParameterForVirtualAsset(asset, initialDetails);
 
         return get(assetId);
     }

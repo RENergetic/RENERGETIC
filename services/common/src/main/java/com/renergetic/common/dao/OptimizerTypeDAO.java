@@ -23,11 +23,18 @@ public class OptimizerTypeDAO {
 	@JsonProperty(required = false)
 	private Integer domainsQuantity;
 
+	@JsonProperty(value = "domainAReadableConnection", required = true)
+	private String domainAReadableConnection;
+
+	@JsonProperty(value = "domainBReadableConnection", required = true)
+	private String domainBReadableConnection;
+
 	@JsonProperty(required = true)
 	private List<OptimizerParameterDAO> optimizerParameters;
 	
 	public static OptimizerTypeDAO create(OptimizerType ot) {
-		return new OptimizerTypeDAO(ot.getId(), ot.getName(), ot.getDomainsQuantity(), ot.getOptimizerParameters()
+		return new OptimizerTypeDAO(ot.getId(), ot.getName(), ot.getDomainsQuantity(),
+				ot.getConnectionTypeAReadable(), ot.getConnectionTypeBReadable(), ot.getOptimizerParameters()
 				.stream().map(OptimizerParameterDAO::create).collect(Collectors.toList()));
 	}
 	
@@ -36,6 +43,8 @@ public class OptimizerTypeDAO {
 		ot.setId(id);
 		ot.setName(name);
 		ot.setDomainsQuantity(domainsQuantity);
+		ot.setConnectionTypeAReadable(domainAReadableConnection);
+		ot.setConnectionTypeBReadable(domainBReadableConnection);
 		ot.setOptimizerParameters(optimizerParameters.stream().map(x -> x.mapToEntity(ot)).collect(Collectors.toList()));
 		return ot;
 	}
