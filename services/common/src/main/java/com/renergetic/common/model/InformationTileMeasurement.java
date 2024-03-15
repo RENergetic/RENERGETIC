@@ -96,6 +96,9 @@ public class InformationTileMeasurement {
         }
         var dao = new MeasurementDAOResponse();
         dao.setId(null);
+        if(this.asset!=null){
+            dao.setAsset(SimpleAssetDAO.create(asset));
+        }
         dao.setDirection(direction);
         dao.setDomain(domain);
         dao.setName(measurementName);

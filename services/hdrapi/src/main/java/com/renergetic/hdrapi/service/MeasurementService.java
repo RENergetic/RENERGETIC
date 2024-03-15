@@ -14,7 +14,7 @@ import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.hdrapi.dao.temp.MeasurementDAORequestTemp;
+import com.renergetic.hdrapi.dao.tempcommon.MeasurementDAORequestTemp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -196,7 +196,7 @@ public class MeasurementService {
     }
 
     public boolean setProperty(Long measurementId, MeasurementDetails details) {
-        details.setMeasurement(new Measurement(measurementId, null, null, null, null, null, null, null));
+        details.setMeasurement(new Measurement(measurementId, null, null, null, null, null, null));
 
         log.warn(String.format("Saving %s %s", details.getKey(), details.getValue()));
         MeasurementDetails previousDetails = measurementDetailsRepository.findByKeyAndMeasurementId(details.getKey(),

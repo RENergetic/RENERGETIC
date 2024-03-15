@@ -1,16 +1,18 @@
-package com.renergetic.common.dao;
+package com.renergetic.hdrapi.dao.tempcommon;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.renergetic.common.model.*;
+import com.renergetic.common.dao.SimpleAssetDAO;
+import com.renergetic.common.model.Direction;
+import com.renergetic.common.model.Domain;
+import com.renergetic.common.model.Measurement;
+import com.renergetic.common.model.MeasurementType;
 import com.renergetic.common.model.details.MeasurementDetails;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,10 +21,9 @@ import java.util.stream.Collectors;
 @Setter
 @RequiredArgsConstructor
 @ToString
-public class MeasurementDAORequest {
+public class MeasurementDAORequestTemp {
     @JsonProperty(required = false, access = Access.READ_ONLY)
     private Long id;
-
     @JsonProperty(required = true)
     private String name;
 
@@ -52,11 +53,11 @@ public class MeasurementDAORequest {
     @JsonProperty(value = "measurement_details", required = false)
     private HashMap<String, ?> measurementDetails;
 
-    public static MeasurementDAORequest create(Measurement measurement) {
-        MeasurementDAORequest dao = null;
+    public static MeasurementDAORequestTemp create(Measurement measurement) {
+        MeasurementDAORequestTemp dao = null;
 
         if (measurement != null) {
-            dao = new MeasurementDAORequest();
+            dao = new MeasurementDAORequestTemp();
 
             dao.setId(measurement.getId());
             dao.setName(measurement.getName());
@@ -64,7 +65,7 @@ public class MeasurementDAORequest {
             if (measurement.getType() != null)
                 dao.setType(measurement.getType());
             dao.setLabel(measurement.getLabel());
-            dao.setDescription(measurement.getDescription());
+            //dao.setDescription(measurement.getDescription());
             //dao.setIcon(measurement.getIcon());
             dao.setDomain(measurement.getDomain());
             dao.setDirection(measurement.getDirection());
@@ -89,7 +90,7 @@ public class MeasurementDAORequest {
             measurement.setType(type);
         }
         measurement.setLabel(label);
-        measurement.setDescription(description);
+        //measurement.setDescription(description);
         //measurement.setIcon(icon);
         measurement.setDomain(domain);
         measurement.setDirection(direction);

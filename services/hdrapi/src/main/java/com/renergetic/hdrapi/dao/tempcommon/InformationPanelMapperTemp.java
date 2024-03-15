@@ -1,6 +1,5 @@
-package com.renergetic.common.mapper;
+package com.renergetic.hdrapi.dao.tempcommon;
 
-import com.renergetic.common.dao.InformationPanelDAORequest;
 import com.renergetic.common.dao.InformationPanelDAOResponse;
 import com.renergetic.common.dao.InformationTileDAOResponse;
 import com.renergetic.common.model.InformationPanel;
@@ -14,20 +13,7 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 
-public class InformationPanelMapper {
-    public InformationPanel toEntity(InformationPanelDAORequest dto) {
-        if (dto == null)
-            return null;
-        
-        InformationPanel entity =  new InformationPanel();
-        entity.setId(dto.getId());
-
-        entity.setLabel(dto.getLabel());
-        entity.setName(dto.getName());
-
-        return entity;
-    }
-
+public class InformationPanelMapperTemp {
     private static InformationTileDAOResponse tileToDTO(InformationTile entity, Boolean includeMeasurements) {
         try {
             if (entity == null)
@@ -42,6 +28,7 @@ public class InformationPanelMapper {
                                 .map(InformationTileMeasurement::getMeasurementDAO)
                                 .collect(Collectors.toList()));
             }
+
             dao.setName(entity.getName());
             dao.setLabel(entity.getLabel());
             if (entity.getType() != null)
