@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.NotAuthorizedException;
+
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "User Controller", description = "Allows add and see Users")
@@ -80,7 +82,7 @@ public class UserController {
             List<String> roles = client.getRoles(userId).stream().map(RoleRepresentation::getName).collect(
                     Collectors.toList());
             return new ResponseEntity<>(roles, HttpStatus.OK);
-        } catch (javax.ws.rs.NotAuthorizedException ex) {
+        } catch (NotAuthorizedException ex) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
     }
@@ -211,7 +213,7 @@ public class UserController {
         //TODO: synchronized section
         try {
             client.updateUser(user);
-        } catch (javax.ws.rs.NotAuthorizedException ex) {
+        } catch (NotAuthorizedException ex) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
         UserRepresentation ur = client.updateUser(user);
@@ -237,7 +239,7 @@ public class UserController {
         try {
 
             client.updateUser(user);
-        } catch (javax.ws.rs.NotAuthorizedException ex) {
+        } catch (NotAuthorizedException ex) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
         if (user.getPassword() != null) {
