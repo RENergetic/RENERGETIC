@@ -1,13 +1,11 @@
 package com.renergetic.common.repository;
 
-import com.renergetic.common.model.Measurement;
 import com.renergetic.common.model.details.MeasurementTags;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 import jakarta.transaction.Transactional;
