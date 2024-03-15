@@ -18,6 +18,7 @@ kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 user=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
+baseApi=$(grep -ioP "(base\s*=\s*)\K.+" _installers.properties)
 wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
 dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
 # Others
@@ -79,6 +80,28 @@ then
         kubectl apply -f influxdb-service.yaml --namespace=$project
     fi
 # DEPLOY APIs
+
+    if [[ $baseApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/baseApi"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/base-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/base-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/base-api --namespace=$project
+        kubectl delete services/base-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=base-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f base-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f base-api-service.yaml --namespace=$project
+    fi
 
     if [[ $hdr = 'true' ]]
     then

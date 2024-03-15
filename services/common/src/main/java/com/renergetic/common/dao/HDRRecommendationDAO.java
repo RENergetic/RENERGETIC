@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class HDRRecommendationDAO {
 
-    //todo: unique key: name-asset-sensor-type-direction
+    // TODO: unique key: name-asset-sensor-type-direction
     @JsonProperty(required = false)
     private Long id;
     @JsonProperty(required = true)

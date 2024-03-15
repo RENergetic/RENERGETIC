@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface MeasurementDetailsRepository extends JpaRepository<MeasurementDetails, Long> {
 	MeasurementDetails save(MeasurementDetails information);
 
-	List<MeasurementDetails> findByMeasurementId(long resource_id);
+	List<MeasurementDetails> findByMeasurementId(long resourceId);
 
     boolean existsByKeyAndMeasurementId(String key, Long id);
 
