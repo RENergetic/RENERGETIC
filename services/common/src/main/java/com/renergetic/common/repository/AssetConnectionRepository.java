@@ -9,6 +9,7 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public interface AssetConnectionRepository extends JpaRepository<AssetConnection, Long> {
 	AssetConnection save(AssetConnection dashboard);
+	List<AssetConnection> findByAssetId(Long assetId);
 	List<AssetConnection> findByConnectedAssetIdAndConnectionType(Long connectedAssetId, ConnectionType connectionType);
 	void deleteByAssetIdAndConnectedAssetIdAndConnectionType(Long assetId, Long connectedAssetId, ConnectionType connectionType);
 

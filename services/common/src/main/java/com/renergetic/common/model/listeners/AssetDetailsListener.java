@@ -39,15 +39,23 @@ public class AssetDetailsListener {
     @PostRemove
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateAggregatedParamsAfterDelete(AssetDetails assetDetails) {
-        assetDetails.setValue(null);
-        updateAggregatedParams(assetDetails, true);
+        try {
+            assetDetails.setValue(null);
+            updateAggregatedParams(assetDetails, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @PostPersist
     @PostUpdate
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateAggregatedParamsAfterUpdate(AssetDetails assetDetails){
-        updateAggregatedParams(assetDetails, false);
+        try {
+            updateAggregatedParams(assetDetails, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateAggregatedParams(AssetDetails assetDetails, boolean deleting){

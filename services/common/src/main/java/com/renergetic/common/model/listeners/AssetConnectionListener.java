@@ -37,13 +37,21 @@ public class AssetConnectionListener {
     @PostRemove
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateAggregatedParamsAfterDelete(AssetConnection assetConnection) {
-        updateAggregatedParams(assetConnection, true);
+        try {
+            updateAggregatedParams(assetConnection, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @PostPersist
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateAggregatedParamsAfterUpdate(AssetConnection assetConnection){
-        updateAggregatedParams(assetConnection, false);
+        try {
+            updateAggregatedParams(assetConnection, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateAggregatedParams(AssetConnection assetConnection, boolean deleting){

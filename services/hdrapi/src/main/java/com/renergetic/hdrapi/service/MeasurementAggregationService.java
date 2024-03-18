@@ -157,8 +157,11 @@ public class MeasurementAggregationService {
     }
 
     public AggregationConfigurationDAO get(Long assetId) {
-        Asset asset = assetRepository.findById(assetId).orElseThrow(NotFoundException::new);
+        return get(assetRepository.findById(assetId).orElseThrow(NotFoundException::new));
+    }
 
+    @org.springframework.transaction.annotation.Transactional
+    public AggregationConfigurationDAO get(Asset asset) {
         List<MeasurementAggregation> measurementAggregations = measurementAggregationRepository.findByOutputMeasurementsAsset(asset);
 
         OptimizerType optimizerType = optimizerTypeRepository.findByName(asset.getDetails().stream()
@@ -167,7 +170,7 @@ public class MeasurementAggregationService {
         return AggregationConfigurationDAO.create(asset, measurementAggregations, optimizerType, optimizerParameterRepository.findAll());
     }
 
-    @Transactional
+    @org.springframework.transaction.annotation.Transactional
     public AggregationConfigurationDAO save(Long assetId, AggregationConfigurationDAO aggregationConfigurationDAO) {
         Asset asset = assetRepository.findById(assetId).orElseThrow(NotFoundException::new);
 
@@ -189,7 +192,7 @@ public class MeasurementAggregationService {
                                 connectionType.equals(existingOptimizerType.getConnectionTypeB()));
             }).collect(Collectors.toList());
 
-            assetConnectionRepository.deleteAll(expiredConnections);
+            assetConnectionRepository.deleteAllInBatch(expiredConnections);
         }
 
         if(optimizerType != null) {
@@ -261,7 +264,7 @@ public class MeasurementAggregationService {
             measurementAggregations.add(measurementAggregation);
         }
 
-        assetDetailsRepository.deleteAll(asset.getDetails().stream().filter(x -> x.getKey().contains("_aggregation")).collect(Collectors.toList()));
+        assetDetailsRepository.deleteAllInBatch(asset.getDetails().stream().filter(x -> x.getKey().contains("_aggregation")).collect(Collectors.toList()));
         asset.getDetails().removeIf(x -> x.getKey().contains("_aggregation"));
 
         //TODO: Here process the params aggregation + set the value in the related assets
@@ -274,7 +277,11 @@ public class MeasurementAggregationService {
 
         List<Asset> connectedAssets = asset.getConnections().stream()
                 .map(AssetConnection::getConnectedAsset).collect(Collectors.toList());
-        List<AssetDetails> assetDetailsToSave = new ArrayList<>();
+        List<AssetDetails> assetDetailsToSave = asset.getDetails().stream().filter(x ->
+                x.getKey().endsWith("_aggregation") ||
+                        x.getKey().equals("optimizer_type") ||
+                        x.getKey().equals("domain_a") ||
+                        x.getKey().equals("domain_b")).collect(Collectors.toList());
         List<AssetDetails> assetDetailsToDelete = new ArrayList<>();
         for(Map<String, Object> map : aggregationConfigurationDAO.getParameterAggregationConfigurations()){
             String key = (String) map.getOrDefault("parameter", null);
@@ -293,7 +300,7 @@ public class MeasurementAggregationService {
             }
         }
         assetDetailsRepository.saveAll(assetDetailsToSave);
-        assetDetailsRepository.deleteAll(assetDetailsToDelete);
+        assetDetailsRepository.deleteAllInBatch(assetDetailsToDelete);
 
         assetDetailsRepository.saveAll(asset.getDetails());
         assetRepository.save(asset);
@@ -302,9 +309,9 @@ public class MeasurementAggregationService {
             List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(o.getId());
             tags.forEach(m -> m.getMeasurements().remove(o));
             measurementTagsRepository.saveAll(tags);
-            measurementDetailsRepository.deleteAll(o.getDetails());
+            measurementDetailsRepository.deleteAllInBatch(o.getDetails());
         }));
-        measurementAggregationRepository.deleteAll(toDelete);
+        measurementAggregationRepository.deleteAllInBatch(toDelete);
         measurementAggregationRepository.saveAll(measurementAggregations);
         for(int i = 0; i < measurementAggregations.size(); i++){
             Set<Measurement> measurements = measurementAggregations.get(0).getOutputMeasurements();
@@ -325,7 +332,7 @@ public class MeasurementAggregationService {
 
         //updateAggregatedParameterForVirtualAsset(asset, initialDetails);
 
-        return get(assetId);
+        return get(asset);
     }
 
     public List<OptimizerTypeDAO> getOptimizerTypeList() {
