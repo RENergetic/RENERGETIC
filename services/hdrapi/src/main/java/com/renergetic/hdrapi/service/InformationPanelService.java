@@ -10,15 +10,22 @@ import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.dao.tempcommon.InformationPanelMapperTemp;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class InformationPanelService {
+    @Autowired
+    private MeasurementService measurementService;
+    @Autowired
+    private AssetService assetService;
     @Autowired
     private InformationPanelRepository informationPanelRepository;
     @Autowired
@@ -41,17 +48,17 @@ public class InformationPanelService {
     private MeasurementRepository measurementRepository;
 
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
-        List<InformationPanelDAOResponse> list = informationPanelRepository.findAll(new OffSetPaging(offset, limit))
-                .stream().map(x -> informationPanelMapper.toDTO(x)).collect(Collectors.toList());
+        return informationPanelRepository.findAll(new OffSetPaging(offset, limit,
+                        Sort.by(Sort.Direction.ASC, "id")))
+                .stream().map(x -> InformationPanelMapperTemp.toDTO(x, false)).collect(Collectors.toList());
 
-        if (list != null && list.size() > 0)
-            return list;
-        else throw new NotFoundException("No information panels exists");
+
     }
 
     public List<InformationPanelDAOResponse> getAll(Long ownerId) {
         List<InformationPanelDAOResponse> list = informationPanelRepository.findAllByOwnerId(ownerId).stream()
-                .map(x -> informationPanelMapper.toDTO(x))
+//                .map(x -> informationPanelMapper.toDTO(x))
+                .map(x -> InformationPanelMapperTemp.toDTO(x, false))
                 .collect(Collectors.toList());
 
         if (list != null && list.size() > 0)
@@ -63,12 +70,14 @@ public class InformationPanelService {
 //        return this.getById(id,false)
 //    }
     public InformationPanelDAOResponse getById(Long id, Boolean detailed) {
-        return informationPanelMapper.toDTO(
+//        return informationPanelMapper.toDTO(
+        return InformationPanelMapperTemp.toDTO(
                 informationPanelRepository.findById(id).orElseThrow(NotFoundException::new), detailed);
     }
 
     public InformationPanelDAOResponse getByName(String name) {
-        return informationPanelMapper.toDTO(
+//        return informationPanelMapper.toDTO(
+        return InformationPanelMapperTemp.toDTO(
                 informationPanelRepository.findByName(name).orElseThrow(NotFoundException::new));
     }
 
@@ -79,41 +88,99 @@ public class InformationPanelService {
 
         InformationPanel infoPanelEntity = informationPanelMapper.toEntity(informationPanel);
         infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
+        return InformationPanelMapperTemp.toDTO(informationPanelRepository.save(infoPanelEntity));
+//        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
     }
 
     public InformationPanelDAOResponse update(InformationPanelDAO informationPanel) {
-        if (!informationPanelRepository.findByName(informationPanel.getName()).isPresent())
+        if (informationPanel.getId() != null &&
+                !informationPanelRepository.findById(informationPanel.getId()).isPresent())
             throw new InvalidCreationIdAlreadyDefinedException(
-                    "Panel with name does not exists: " + informationPanel.getName());
+                    "Panel with given id does not exists: " + informationPanel.getId());
+        else if (informationPanel.getId() == null
+                && !informationPanelRepository.findByName(informationPanel.getName()).isPresent())
+            throw new InvalidCreationIdAlreadyDefinedException(
+                    "Panel with given name does not exists: " + informationPanel.getName());
         var id = informationPanel.getId();
         var panel = informationPanelRepository.getById(id);
         deleteTiles(panel);
         informationPanelRepository.flush();
         InformationPanel infoPanelEntity = informationPanel.mapToEntity();
         infoPanelEntity.setId(id);
-        this.saveTiles(infoPanelEntity);
+        this.saveTiles(infoPanelEntity.getTiles(), infoPanelEntity);
         infoPanelEntity.setAssets(panel.getAssets());
         infoPanelEntity = informationPanelRepository.save(infoPanelEntity);
-        return informationPanelMapper.toDTO(infoPanelEntity);
+//        return informationPanelMapper.toDTO(infoPanelEntity); //uncomment with new common version
+        return InformationPanelMapperTemp.toDTO(infoPanelEntity, false);
 
 
     }
 
+    @Transactional
     public InformationPanelDAOResponse save(InformationPanelDAO informationPanel) {
         if (informationPanelRepository.findByName(informationPanel.getName()).isPresent())
             throw new InvalidCreationIdAlreadyDefinedException(
                     "Already exists a information panel with name " + informationPanel.getName());
 
         InformationPanel infoPanelEntity = informationPanel.mapToEntity();
-        infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        informationPanelRepository.save(infoPanelEntity);
-        this.saveTiles(infoPanelEntity);
-        return informationPanelMapper.toDTO(infoPanelEntity);
+        var tiles = infoPanelEntity.getTiles();
+        var uuid = uuidRepository.save(new UUID());
+        infoPanelEntity.setUuid(uuid);
+        infoPanelEntity.setTiles(null);
+        infoPanelEntity = informationPanelRepository.save(infoPanelEntity);
+        this.saveTiles(tiles, infoPanelEntity);
+        informationPanelRepository.flush();
+//        return informationPanelMapper.toDTO(infoPanelEntity);
+        return InformationPanelMapperTemp.toDTO(infoPanelEntity, false);
     }
 
-    private void saveTiles(InformationPanel infoPanelEntity) {
-        var tiles = infoPanelEntity.getTiles();
+    public InformationPanelDAO inferMeasurements(InformationPanelDAO informationPanel) {
+        var tiles = informationPanel.getTiles();
+
+        tiles.forEach(tile -> {
+            List<MeasurementTileDAORequest> collect = tile.getMeasurements()
+                    .stream().map(
+                            tileM -> {
+                                if (tileM.getId() == null) {
+                                    //infer type
+                                    if (tileM.getType() != null
+                                            && (tileM.getType().getId() != null
+                                            || tileM.getType().getPhysicalName() == null)) {
+                                        //TODO map to entity tileM.mapToEntity
+                                        tileM.setType(measurementService.verifyMeasurementType(tileM.getType()));
+                                    }
+                                    if (tileM.getAsset() != null && tileM.getAsset().getId() != null) {
+                                        Optional<Asset> byId = assetRepository.findById(tileM.getId());
+                                        if (byId.isPresent()) {
+                                            tileM.setAsset(SimpleAssetDAO.create(byId.get()));
+                                        } else {
+                                            tileM.getAsset().setId(null);
+                                        }
+                                    }
+                                    var l = getInferredMeasurements(tileM);
+                                    if (l.isEmpty()) {
+                                        //return non inferred measurements so the client can see what's missing
+                                        return List.of(tileM);
+                                    }
+                                    return l;
+                                } else {
+                                    measurementRepository.findById(tileM.getId()).orElseThrow(
+                                            () -> new NotFoundException("Measurement not found " + tileM.getId()));
+                                    return List.of(tileM);
+                                }
+
+                            }
+                    )
+                    .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList());
+            if (!collect.isEmpty())
+                tile.setMeasurements(collect);
+        });
+        return informationPanel;
+    }
+
+
+    private void saveTiles(List<InformationTile> tiles, InformationPanel infoPanelEntity) {
+//        var tiles = infoPanelEntity.getTiles();
         infoPanelEntity.setTiles(null);
         tiles.stream().forEach(it -> {
             it.setId(null);
@@ -121,21 +188,46 @@ public class InformationPanelService {
             informationTileRepository.save(it);
             it.getInformationTileMeasurements().stream().forEach(tm ->
             {
-                tm.setId(null);
-                tm.setInformationTile(it);
-                informationTileMeasurementRepository.save(tm);
+                if (tm.getMeasurement() != null) {
+                    var m = new InformationTileMeasurement();
+                    tm.setId(null);
+                    m.setInformationTile(it);
+                    m.setFunction(tm.getFunction());
+                    m.setMeasurement(tm.getMeasurement());
+                    m.setProps(tm.getProps());
+                    informationTileMeasurementRepository.save(m);
+                } else {
+                    if (tm.getType() != null)
+                        tm.setType(measurementService.verifyMeasurementType(tm.getType()));
+                    if (tm.getAsset() != null) {
+                        Asset mAsset = null;
+                        if (tm.getAsset().getId() != null) {
+                            mAsset = assetRepository.findById(tm.getAsset().getId()).orElse(null);
+                        }
+                        if (mAsset == null && tm.getAsset().getName() != null) {
+                            mAsset = assetRepository.findByName(tm.getAsset().getName()).orElse(null);
+                        }
+                        tm.setAsset(mAsset);
+
+                    }
+                    tm.setId(null);
+                    tm.setInformationTile(it);
+                    informationTileMeasurementRepository.save(tm);
+                }
+
+
             });
         });
     }
 
-    public InformationPanelDAOResponse update(InformationPanelDAORequest informationPanel) {
-        if (informationPanel.getId() == null || !informationPanelRepository.existsById(informationPanel.getId()))
-            throw new InvalidNonExistingIdException();
-//TODO: validate, check user privileges
-        var panel = informationPanelRepository.getById(informationPanel.getId());
-        return informationPanelMapper.toDTO(
-                informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel, panel)));
-    }
+//    public InformationPanelDAOResponse update(InformationPanelDAORequest informationPanel) {
+//        if (informationPanel.getId() == null || !informationPanelRepository.existsById(informationPanel.getId()))
+//            throw new InvalidNonExistingIdException();
+////TODO: validate, check user privileges
+//        var panel = informationPanelRepository.getById(informationPanel.getId());
+//        return informationPanelMapper.toDTO(
+//                informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel, panel)));
+//    }
 
     public boolean deleteById(Long id) {
         if (id == null || !informationPanelRepository.existsById(id))
@@ -251,7 +343,10 @@ public class InformationPanelService {
         List<InformationPanel> informationPanels = informationPanelRepository.findFeatured(isTemplate, 0, limit);
         List<InformationPanelDAOResponse> list =
                 informationPanels.stream()
-                        .map(panel -> InformationPanelDAOResponse.create(panel, null))
+                        .map(panel -> {
+                            var p = InformationPanelDAOResponse.create(panel, null);
+                            return p;
+                        })
                         .collect(Collectors.toList());
 
 
@@ -279,7 +374,7 @@ public class InformationPanelService {
                                             tileM -> tileM.getMeasurement() == null
                                                     && panel.get().getIsTemplate() && assetId != null
                                                     && tileM.getAssetCategory() == null ?
-                                                    getInferredMeasurements(tileM, assetId,  tileM.getFunction())
+                                                    getInferredMeasurements(tileM, assetId, tileM.getFunction())
                                                     : Collections.singletonList(getMeasurementFromTileMeasurement(tileM)))
                                     .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList())
                     )).collect(Collectors.toList())
@@ -326,23 +421,38 @@ public class InformationPanelService {
         throw new NotFoundException("No tile found related with tile id: " + tileId);
     }
 
+    private List<MeasurementTileDAORequest> getInferredMeasurements(MeasurementTileDAORequest tileM) {
+        List<MeasurementTileDAORequest> list = measurementRepository
+                .inferMeasurement(null,
+                        tileM.getName(),
+                        tileM.getSensorName(),
+                        tileM.getDomain() != null ? tileM.getDomain().name() : null,
+                        tileM.getDirection() != null ? tileM.getDirection().name() : null,
+                        tileM.getType() != null ? tileM.getType().getId() : null,
+                        tileM.getType() != null ? tileM.getType().getPhysicalName() : null)
+                .stream().map((m) -> MeasurementTileDAORequest.create(m, tileM.getFunction(), tileM.getProps()))
+                .collect(Collectors.toList());
+        return list;
+    }
+
     private List<MeasurementDAOResponse> getInferredMeasurements(InformationTileMeasurement tileM,
                                                                  Long assetId, String func) {
 
+
         List<MeasurementDAOResponse> list = measurementRepository
-                .findByAssetIdAndBySensorNameAndDomainAndDirectionAndType(assetId,
+                .inferMeasurement(assetId,
                         tileM.getMeasurementName(),
                         tileM.getSensorName(),
                         tileM.getDomain() != null ? tileM.getDomain().name() : null,
                         tileM.getDirection() != null ? tileM.getDirection().name() : null,
-                        tileM.getType()!=null?tileM.getType().getId():null,
+                        tileM.getType() != null ? tileM.getType().getId() : null,
                         tileM.getPhysicalName())
                 .stream().map(x -> MeasurementDAOResponse.create(x,
-                        measurementDetailsRepository.findByMeasurementId(x.getId()),func))
+                        measurementDetailsRepository.findByMeasurementId(x.getId()), func))
                 .collect(Collectors.toList());
 //TODO: throw some exception code to the UI - so the users know that not all measurements are not available for this asset
 //        if (list.size() > 0)
-            return list;
+        return list;
 //        else throw new NotFoundException(
 //                "No measurements related with the user:" + (userId != null ? userId.toString() : " N/A ") + " and  asset " + assetId + "with the tile data found");
     }
@@ -352,7 +462,8 @@ public class InformationPanelService {
         if (tileM.getMeasurement() == null) {
             return null;
         }
-        List<MeasurementDetails>  details = measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId());
+        List<MeasurementDetails> details =
+                measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId());
         return MeasurementDAOResponse.create(tileM.getMeasurement(), details, tileM.getFunction());
     }
 

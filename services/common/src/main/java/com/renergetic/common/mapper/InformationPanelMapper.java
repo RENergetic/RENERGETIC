@@ -2,47 +2,65 @@ package com.renergetic.common.mapper;
 
 import com.renergetic.common.dao.InformationPanelDAORequest;
 import com.renergetic.common.dao.InformationPanelDAOResponse;
+import com.renergetic.common.dao.InformationTileDAOResponse;
 import com.renergetic.common.model.InformationPanel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.renergetic.common.model.InformationTile;
+import com.renergetic.common.model.InformationTileMeasurement;
+import com.renergetic.common.utilities.Json;
+import org.apache.tomcat.util.json.ParseException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
-@Service
-public class InformationPanelMapper implements MapperReponseRequest<InformationPanel, InformationPanelDAOResponse, InformationPanelDAORequest> {
-    @Autowired
-    private InformationTileMapper informationTileMapper;
 
-    public InformationPanel toEntity(InformationPanelDAORequest dto, InformationPanel entity) {
+public class InformationPanelMapper {
+    public InformationPanel toEntity(InformationPanelDAORequest dto) {
         if (dto == null)
             return null;
-        if(entity==null){
-            entity =  new InformationPanel();
-            entity.setId(dto.getId());
-
-        }
+        
+        InformationPanel entity =  new InformationPanel();
+        entity.setId(dto.getId());
 
         entity.setLabel(dto.getLabel());
         entity.setName(dto.getName());
 
-        // entity.setUuid(new UUID(dto.getUuid()));
-//        if(dto.getOwner_id() != null){
-//            User user = new User();
-//            user.setId(dto.getOwner_id());
-//        @GeneratedValue(strategy = GenerationType.AUTO)
         return entity;
     }
-    @Override
-    public InformationPanel toEntity(InformationPanelDAORequest dto ) {
-   return this.toEntity(dto,null);
-    }
-    @Override
-    public InformationPanelDAOResponse toDTO(InformationPanel entity) {
-        return this.toDTO(entity,false);
+
+    private static InformationTileDAOResponse tileToDTO(InformationTile entity, Boolean includeMeasurements) {
+        try {
+            if (entity == null)
+                return null;
+            InformationTileDAOResponse dao = new InformationTileDAOResponse();
+            dao.setId(entity.getId());
+//            if (entity.getInformationPanel() != null)
+//            dao.setPanel(InformationPanelDAOResponse.create(entity.getInformationPanel()));
+            if (includeMeasurements) {
+                dao.setMeasurements(
+                        entity.getInformationTileMeasurements().stream()
+                                .map(InformationTileMeasurement::getMeasurementDAO)
+                                .collect(Collectors.toList()));
+            }
+            dao.setName(entity.getName());
+            dao.setLabel(entity.getLabel());
+            if (entity.getType() != null)
+                dao.setType(entity.getType());
+            dao.setLayout(Json.parse(entity.getLayout()).toMap());
+            dao.setProps(Json.parse(entity.getProps()).toMap());
+            return dao;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            //todo: handle error
+            return null;
+        }
     }
 
-    public InformationPanelDAOResponse toDTO(InformationPanel entity, Boolean detailed) {
+    public static InformationPanelDAOResponse toDTO(InformationPanel entity) {
+        return toDTO(entity, false);
+    }
+
+    public static InformationPanelDAOResponse toDTO(InformationPanel entity, Boolean detailed) {
         if (entity == null)
             return null;
         InformationPanelDAOResponse dao = new InformationPanelDAOResponse();
@@ -53,9 +71,16 @@ public class InformationPanelMapper implements MapperReponseRequest<InformationP
         dao.setIsTemplate(entity.getIsTemplate());
         if (entity.getTiles() != null)
             dao.setTiles(
-                    entity.getTiles().stream().map(x -> informationTileMapper.toDTO(x,detailed)).collect(Collectors.toList()));
+                    entity.getTiles().stream().map(x -> tileToDTO(x, detailed)).collect(Collectors.toList()));
         else
             dao.setTiles(new ArrayList<>());
+        if (entity.getProps() != null && !entity.getProps().isBlank()) {
+            try {
+                dao.setProps(Json.parse(entity.getProps()).toMap());
+            } catch (ParseException e) {
+                dao.setProps(Collections.emptyMap());
+            }
+        }
         return dao;
     }
 }

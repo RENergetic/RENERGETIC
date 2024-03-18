@@ -48,24 +48,24 @@ public class WebSecurityConfig {
 
     @Value(value = "${keycloak.client-id}")
     private String clientId;
-    
+
     @Autowired
     JwtAuthenticationProvider authProvider;
-    
+
     @Bean
     protected JwtAuthenticationProvider authenticationProvider() throws Exception {
-    	JwtAuthenticationProvider provider = new JwtAuthenticationProvider();
-    	return provider;
+        JwtAuthenticationProvider provider = new JwtAuthenticationProvider();
+        return provider;
     }
-    
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-      return authConfig.getAuthenticationManager();
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    	JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
         filter.setClientId(clientId);
 
         http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -84,40 +84,76 @@ public class WebSecurityConfig {
         Map<String, String[]> postUrls = new HashMap<>();
         Map<String, String[]> putUrls = new HashMap<>();
         Map<String, String[]> deleteUrls = new HashMap<>();
-        
-        getUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name});
-        getUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
-        
-        postUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name});
-        postUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
-        
-        putUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name});
-        putUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
-        
-        deleteUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name});
-        deleteUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
-        
+//        #TODO
+//    ### GET METHODS ###
+        getUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name});
+        getUrls.put("/api/users/**",
+                new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                        KeycloakRole.REN_VISITOR.name, KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                        KeycloakRole.REN_TECHNICAL_MANAGER.name});
+        getUrls.put("/api/users/profile",new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+        getUrls.put("/api/users/profile/settings",new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+        getUrls.put("/api/users/notifications",
+                new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name});
+        getUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+        getUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+//    ### POST METHODS ###
+        postUrls.put("/api/users/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+        postUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+        postUrls.put("/api/users/profile/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+//    ### PUT METHODS ###
+        putUrls.put("/api/users/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+        putUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+        putUrls.put("/api/users/profile/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+//    ### DELETE METHODS ###
+        deleteUrls.put("/api/users/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+        deleteUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
+                KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>
-        	.ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
-        
+                .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
+
         getUrls.forEach((urlPattern, roles) -> {
-        	registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);
+            registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);
         });
-        
+
         postUrls.forEach((urlPattern, roles) -> {
-        	registry.antMatchers(HttpMethod.POST, urlPattern).hasAnyRole(roles);
+            registry.antMatchers(HttpMethod.POST, urlPattern).hasAnyRole(roles);
         });
-        
+
         putUrls.forEach((urlPattern, roles) -> {
-        	registry.antMatchers(HttpMethod.PUT, urlPattern).hasAnyRole(roles);
+            registry.antMatchers(HttpMethod.PUT, urlPattern).hasAnyRole(roles);
         });
-        
+
         deleteUrls.forEach((urlPattern, roles) -> {
-        	registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
+            registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
         });
         //registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         registry.anyRequest().permitAll();
-        
+
         return http.build();
     }
 
@@ -129,7 +165,7 @@ public class WebSecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-    	
+
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(methods);
@@ -179,8 +215,6 @@ public class WebSecurityConfig {
 //    public AuthenticationManager authenticationManagerBean() throws Exception {
 //        return super.authenticationManagerBean();
 //    }
-
-
 
 
 }

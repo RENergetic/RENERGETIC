@@ -3,6 +3,7 @@ package com.renergetic.common.model;
 public enum ConnectionType {
 	owner,
 	resident,
+	manager,
 	visitor,
 	energy_connection,
 	fixed_generation_in,

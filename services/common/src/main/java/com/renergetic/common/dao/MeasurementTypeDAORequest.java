@@ -1,21 +1,39 @@
 package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.renergetic.common.model.MeasurementType;
+import lombok.*;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
 @ToString
 public class MeasurementTypeDAORequest {
-	//TODO: store symbol ,"ºC",
-	@JsonProperty(required = false)
-	private Long id;
+    //TODO: store symbol ,"ºC",
+    @JsonProperty(required = false)
+    private Long id;
+    @JsonProperty(required = false, value = "name")
+    private String name;
 
-	@JsonProperty(required = true,value = "physical_name")
-	private String physicalName;
+    @JsonProperty(required = false, value = "physical_name")
+    private String physicalName;
+
+    @JsonProperty(required = false, value = "unit")
+    private String unit;
+
+
+    public static MeasurementTypeDAORequest create(MeasurementType m) {
+        return new MeasurementTypeDAORequest(m.getId(), m.getName(), m.getPhysicalName(), m.getUnit());
+    }
+
+    public MeasurementType mapToEntity() {
+        var mt = new MeasurementType();
+        mt.setPhysicalName(this.getPhysicalName());
+        mt.setId(this.getId());
+        mt.setName(this.getName());
+        mt.setUnit(this.getUnit());
+        return mt;
+    }
 
 }

@@ -90,7 +90,7 @@ public class AssetService {
         return false;
     }
 
-    public AssetDAOResponse connect(AssetConnectionDAORequest connection) {
+    public AssetDAOResponse connect(AssetConnectionDAORequest connection, boolean biDirection) {
         Asset asset = assetRepository.getById(connection.getAssetId());
         if (connection.getType() == ConnectionType.owner && !isUser(asset)) {
             throw new InvalidArgumentException("Non user assets cannot be owners");
@@ -102,6 +102,13 @@ public class AssetService {
 
         requireAsset(connection.getAssetConnectedId());
         assetConnectionRepository.save(connection.mapToEntity());
+        if(biDirection){
+            AssetConnectionDAORequest reversed = new AssetConnectionDAORequest();
+            reversed.setAssetId(connection.getAssetConnectedId());
+            reversed.setAssetConnectedId(connection.getAssetId());
+            reversed.setType(connection.getType());
+            assetConnectionRepository.save(reversed.mapToEntity());
+        }
         return AssetDAOResponse.create(assetRepository.findById(connection.getAssetId()).orElse(null), null, null);
 //       throw new InvalidNonExistingIdException("The assets to connect don't exists");
     }

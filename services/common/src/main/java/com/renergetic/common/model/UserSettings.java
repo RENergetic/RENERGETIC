@@ -18,7 +18,7 @@ import javax.persistence.*;
 @ToString
 public class UserSettings {	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "settings_json", nullable = false, insertable = true, updatable = true, unique = false,columnDefinition="TEXT")
