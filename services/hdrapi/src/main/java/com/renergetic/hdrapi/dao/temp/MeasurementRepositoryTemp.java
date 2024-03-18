@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-@SuppressWarnings("unchecked")
 public interface MeasurementRepositoryTemp extends JpaRepository<Measurement, Long> {
 
 //TODO: remove after common update

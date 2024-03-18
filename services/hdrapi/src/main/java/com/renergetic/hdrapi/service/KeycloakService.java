@@ -34,9 +34,6 @@ public class KeycloakService {
     @Value(value = "${keycloak.admin.client-id}")
     private String adminClient;
 
-    @Autowired
-    private LoggedInService loggedInService;
-
 
 //    public Keycloak getInstance(String token) {
 //        return KeycloakBuilder.builder()
@@ -75,11 +72,6 @@ public class KeycloakService {
 //            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance(authToken));
         }
         return new KeycloakWrapper(this.realm, clientId, this.getInstance(authToken));
-    }
-
-    public KeycloakWrapper getClient(boolean admin) {
-        String token = loggedInService.getKeycloakUser().getToken();
-        return this.getClient(token, admin);
     }
 
 

@@ -97,7 +97,7 @@ public class UserController {
     public ResponseEntity<UserDAOResponse> getProfile() {
         KeycloakUser user = loggedInService.getKeycloakUser();
 
-        KeycloakWrapper client = keycloakService.getClient(true);
+        KeycloakWrapper client = keycloakService.getClient(user.getToken(), true);
         UserRepresentation keycloakProfile = client.getUser(user.getId()).toRepresentation();
         List<String> roles = client.getRoles(keycloakProfile.getId()).stream().map(RoleRepresentation::getName).collect(
                 Collectors.toList());
@@ -164,7 +164,7 @@ public class UserController {
     public ResponseEntity<UserDAOResponse> createUser(@RequestBody UserDAORequest user) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        KeycloakWrapper client = keycloakService.getClient(true);
+        KeycloakWrapper client = keycloakService.getClient(loggedInService.getKeycloakUser().getToken(), true);
         UserRepresentation ur = client.createUser(user);
         user.setId(ur.getId());
         UserDAOResponse save = userSv.save(ur, user);
@@ -209,7 +209,7 @@ public class UserController {
     public ResponseEntity<Boolean> updateUser(@RequestBody UserDAORequest user, @PathVariable String id) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        KeycloakWrapper client = keycloakService.getClient(true);
+        KeycloakWrapper client = keycloakService.getClient(loggedInService.getKeycloakUser().getToken(), true);
         //TODO: synchronized section
         try {
             client.updateUser(user);
@@ -232,7 +232,7 @@ public class UserController {
     )
     @PutMapping(path = "/profile", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Boolean> updateProfile(@RequestBody UserDAORequest user) {
-        KeycloakWrapper client = keycloakService.getClient(true);
+        KeycloakWrapper client = keycloakService.getClient(loggedInService.getKeycloakUser().getToken(), true);
         KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
         user.setId(keycloakUser.getId());
         //TODO: synchronized section
