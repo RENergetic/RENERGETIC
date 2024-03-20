@@ -115,14 +115,14 @@ public class WorkflowService {
         return wd.getVisible();
     }
 
-    public boolean setParameters(String experimentId, Map<String, String> parameters) {
+    public boolean setKubeFlowParameters(String experimentId, Map<String, String> kubeFlowParameters) {
         Optional<WorkflowDefinition> byId = workFlowRepository.findById(experimentId);
         WorkflowDefinition wd;
         if (byId.isPresent()) {
             wd = byId.get();
             Map<String, WorkflowParameter> wpMap =
                     wd.getParameters().stream().collect(Collectors.toMap(WorkflowParameter::getKey, o -> o));
-            List<WorkflowParameter> wpList = parameters.entrySet().stream().map(entry ->
+            List<WorkflowParameter> wpList = kubeFlowParameters.entrySet().stream().map(entry ->
             {
                 if (wpMap.containsKey(entry.getKey())) {
                     return wpMap.get(entry.getKey());
@@ -135,7 +135,7 @@ public class WorkflowService {
             }).collect(Collectors.toList());
             wd.setParameters(wpList);
         } else {
-            wd = initWorkFlowDefinition(experimentId, parameters);
+            wd = initWorkFlowDefinition(experimentId, kubeFlowParameters);
 
         }
         wd = workFlowRepository.save(wd);
