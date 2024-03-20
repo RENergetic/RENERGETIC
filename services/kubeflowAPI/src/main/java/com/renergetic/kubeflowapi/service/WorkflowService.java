@@ -135,9 +135,35 @@ public class WorkflowService {
             }).collect(Collectors.toList());
             wd.setParameters(wpList);
         } else {
-            wd =  initWorkFlowDefinition(experimentId, parameters);
+            wd = initWorkFlowDefinition(experimentId, parameters);
 
         }
+        wd = workFlowRepository.save(wd);
+        return wd.getVisible();
+    }
+
+    public boolean setParameters(String experimentId, Map<String, WorkflowParameterDAO> parameters) {
+        //TODO: yago -> download parameters from the kubeflow API
+        Optional<WorkflowDefinition> byId = workFlowRepository.findById(experimentId);
+        Map<String, String> kubeFlowParameters = parameters.values().stream()
+                .collect(Collectors.toMap(WorkflowParameterDAO::getKey, WorkflowParameterDAO::getKey));
+        WorkflowDefinition wd;
+        wd = byId.orElseGet(() -> initWorkFlowDefinition(experimentId, kubeFlowParameters));
+
+//        Map<String, WorkflowParameter> wpMap =
+//                wd.getParameters().stream().collect(Collectors.toMap(WorkflowParameter::getKey, o -> o));
+        List<WorkflowParameter> wpList = parameters.entrySet().stream().map(entry ->
+        {
+            if (kubeFlowParameters.containsKey(entry.getKey())) {
+                return entry.getValue().mapToEntity();
+            }
+            WorkflowParameter wp = new WorkflowParameter();
+            wp.setType("string");
+            wp.setDefaultValue(wp.getDefaultValue());
+            wp.setKey(wp.getKey());
+            return wp;
+        }).collect(Collectors.toList());
+        wd.setParameters(wpList);
         wd = workFlowRepository.save(wd);
         return wd.getVisible();
     }

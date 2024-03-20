@@ -5,6 +5,7 @@ import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.dao.ExampleRequest;
 import com.renergetic.kubeflowapi.dao.ExampleResponse;
 import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowDefinitionDAO;
+import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowParameterDAO;
 import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowRunDAO;
 import com.renergetic.kubeflowapi.model.*;
 import com.renergetic.kubeflowapi.service.ExampleService;
@@ -365,6 +366,17 @@ public class KubeflowController {
         Boolean res = workflowService.removeVisibility(experimentId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
+
+	@Operation(summary = "Set parameters")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@PutMapping(path = "/admin/workflow/{experiment_id}/parameters", produces = "application/json")
+	public ResponseEntity<Boolean> setParameters(@PathVariable(name = "experiment_id") String experimentId,
+												 Map<String, WorkflowParameterDAO> parameters  ) {
+		//TODO: verify admin roles
+		Boolean res = workflowService.setParameters(experimentId,parameters);
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
 }
 
 //TODO: INSERT AUTOMATIC HEADERS
