@@ -35,6 +35,6 @@ public class PipelineSpec {
 
     @OneToMany()
     @JoinColumn(name = "parameter", nullable = false, updatable = true)
-    private List<KeyValue> parameters; //TODO: did
+    private List<KeyValue> parameters; 
 
 }

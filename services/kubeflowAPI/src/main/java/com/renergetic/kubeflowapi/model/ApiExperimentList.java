@@ -1,4 +1,4 @@
-package com.renergetic.kubeflowapi.model;
+/*package com.renergetic.kubeflowapi.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,3 +18,4 @@ public class ApiExperimentList {
     @Column(nullable = true, name = "next_page_token")
     String next_page_token;
 }
+*/

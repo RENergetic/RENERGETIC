@@ -93,9 +93,9 @@ public class KubeflowController {
 		PipelineSpec pipeSpec = new PipelineSpec(null, null,null, null, parameters);
 		List<ApiResourceReference> resourceReference = new ArrayList<>();
 		ApiResourceKey key = new ApiResourceKey("a8069584-de7f-4a31-9c1d-6d4a04ce66a8", "EXPERIMENT");
-		resourceReference.add(new ApiResourceReference(key, "", "OWNER"));
+		resourceReference.add(new ApiResourceReference(null, key, "", "OWNER"));
 		key = new ApiResourceKey("cd6edfd0-ed26-4c15-bb18-bdba5d5c99aa", "PIPELINE_VERSION");
-		resourceReference.add(new ApiResourceReference(key, "", "CREATOR"));
+		resourceReference.add(new ApiResourceReference(null, key, "", "CREATOR"));
 		ApiRunPostDAO body = new ApiRunPostDAO("DummyTest4Description", "DummyTest4Name", pipeSpec, resourceReference, ""); //TODO: RESOURCE_REFERENCES
 		headers.put("Accept", "*/*");
 		headers.put("Accept-Encoding", "gzip, deflat, br");
@@ -188,6 +188,36 @@ public class KubeflowController {
 		headers.put("Cookie", cookie);
 		headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
 		headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
+
+		return new ResponseEntity<>(utils.sendRequest(urlString, httpsMethod, params, body, headers), HttpStatus.OK);
+	}
+
+	@Operation(summary = "Login")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping("/pipelines/login/{cookie}")
+	public ResponseEntity<?> getAllPipelinesWithLogin(@PathVariable String cookie) {
+
+		String urlString = "https://kubeflow.apps.dcw1-test.paas.psnc.pl";
+		String httpsMethod = "GET";
+		Object body = null;
+		HashMap params = new HashMap<>();
+		HashMap headers = new HashMap<>();
+		KubeflowUtils utils = new KubeflowUtils();
+		this.cookie = cookie;
+
+		params.put("page_size", "10");
+		params.put("resource_reference_key.type", "NAMESPACE");
+		params.put("resource_reference_key.id", "kubeflow-renergetic");
+		params.put("filter","{\"predicates\":[{\"key\":\"storage_state\",\"op\":\"NOT_EQUALS\",\"string_value\":\"STORAGESTATE_ARCHIVED\"}]}");
+
+		headers.put("Accept", "*/*");
+		headers.put("Accept-Encoding", "gzip, deflat, br");
+		headers.put("Accept-Language", "en-US,en;q=0.9");
+		headers.put("Connection", "keep-alive");
+		headers.put("Cookie", cookie);
+		headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
+		headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
+
 		return new ResponseEntity<>(utils.sendRequest(urlString, httpsMethod, params, body, headers), HttpStatus.OK);
 	}
 	
