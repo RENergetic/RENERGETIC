@@ -3,6 +3,12 @@ package com.renergetic.kubeflowapi.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,14 +16,25 @@ import lombok.Data;
 @AllArgsConstructor
 public class PipelineSpec {
 
-    private String pipeline_id;
+    @Id
+    @Column(name = "pipeline_id")
+    @JsonProperty(required = true, value = "pipeline_id")
+    private String pipelineId;
 
-    private String pipeline_name;
+    @Column(nullable = true, name = "pipeline_name")
+    @JsonProperty(required = true, value = "pipeline_name")
+    private String pipelineName;
 
-    private String workflow_manifest;
+    @Column(nullable = true, name = "workflow_manifest")
+    @JsonProperty(required = true, value = "workflow_manifest")
+    private String workflowManifest;
 
-    private String pipeline_manifest;
+    @Column(nullable = true, name = "pipeline_manifest")
+    @JsonProperty(required = true, value = "pipeline_manifest")
+    private String pipelineManifest;
 
-    private List<KeyValueParam> parameters; //  name: String; value: String;
+    @OneToMany()
+    @JoinColumn(name = "parameter", nullable = false, updatable = true)
+    private List<KeyValue> parameters; //TODO: did
 
 }

@@ -2,6 +2,7 @@ package com.renergetic.kubeflowapi.controller;
 
 import com.renergetic.common.utilities.HttpAPIs;
 import com.renergetic.common.utilities.Json;
+import com.renergetic.kubeflowapi.dao.ApiRunPostDAO;
 import com.renergetic.kubeflowapi.dao.ExampleRequest;
 import com.renergetic.kubeflowapi.dao.ExampleResponse;
 import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowDefinitionDAO;
@@ -48,11 +49,15 @@ public class KubeflowController {
 
 	private String cookie; //= "authservice_session=MTcwODYwNDAzOXxOd3dBTkRVelRVSllWVlJVUTFwR1ZWUk1Wa3RSTmxCUFFrMVNWVXd5V2taUVEwMDFUak5JUzBSRVQwdFVORmRJTjBsSE5WVkhXVUU9fDi91bsE7zDKYFLkmh6D2uH6Coo6WpI_K9526oVRu9TN";
 
-	/**
-	 * Returns the data from the list of pipelines in the Kubeflow API
-	 *
-	 * @return   The response entity with a null value.
-	 */
+
+	// ********************************************************************************
+	// ********************************************************************************
+	// ********************************************************************************
+	// KUBEFLOW INTEGRATION
+	// ********************************************************************************
+	// ********************************************************************************
+	// ********************************************************************************
+
 	@Operation(summary = "Get all pipelines from kubeflow")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping("/pipelines/{cookie}")
@@ -79,14 +84,10 @@ public class KubeflowController {
 		HashMap headers = new HashMap<>();
 		Json jsonUtil;
 		this.cookie = cookie;
-		// String cookie =
-		// "authservice_session=MTcwNzEzODcwMXxOd3dBTkVVeU5sTkVTRlZXVjB0RVNsbFRWMDlWTjBGSlJrNDJOVE0xUTBZMU5GVkVVVWRRU0U1RU5rdEpOVFZNUlRWTFFVb3lUVkU9fM3w1NRjgY4XWImclLUj224bdgiA63MFavHwt2e1C61c";
-		//
-		//Constructing the request
-		List<KeyValueParam> parameters = new ArrayList<>();
-		parameters.add(new KeyValueParam("value_1","1"));
-		parameters.add(new KeyValueParam("value_2","b"));
-		parameters.add(new KeyValueParam("value_3", "8"));
+		List<KeyValue> parameters = new ArrayList<>();
+		parameters.add(new KeyValue("value_1", "1"));
+		parameters.add(new KeyValue("value_2","b"));
+		parameters.add(new KeyValue("value_3", "8"));
 		//PipelineSpec pipeSpec = new PipelineSpec("5cda125a-2973-467b-b58b-b1c1cab712e6", "DETAULT NAME","WORLKFLOW MANIFEST", "PIPELINE MANIFEST", parameters);
 		PipelineSpec pipeSpec = new PipelineSpec(null, null,null, null, parameters);
 		List<ApiResourceReference> resourceReference = new ArrayList<>();
@@ -94,7 +95,7 @@ public class KubeflowController {
 		resourceReference.add(new ApiResourceReference(key, "", "OWNER"));
 		key = new ApiResourceKey("cd6edfd0-ed26-4c15-bb18-bdba5d5c99aa", "PIPELINE_VERSION");
 		resourceReference.add(new ApiResourceReference(key, "", "CREATOR"));
-		ApiRunPost body = new ApiRunPost("DummyTest4Description", "DummyTest4Name", pipeSpec, resourceReference, ""); //TODO: RESOURCE_REFERENCES
+		ApiRunPostDAO body = new ApiRunPostDAO("DummyTest4Description", "DummyTest4Name", pipeSpec, resourceReference, ""); //TODO: RESOURCE_REFERENCES
 		headers.put("Accept", "*/*");
 		headers.put("Accept-Encoding", "gzip, deflat, br");
 		headers.put("Accept-Language", "en-US,en;q=0.9");
@@ -119,23 +120,6 @@ public class KubeflowController {
 		System.out.println("+++++++++++++++++++++++++++++++++++++");
 		System.out.println("++++++++++++++++++  RESPONSE  ++++++++++++++++++");
 		System.out.println("+++++++++++++++++++++++++++++++++++++");
-		/*String response = utils.sendRequest(urlString, httpsMethod, params, body, headers);
-		JSONObject jsonObject = null;
-		try {
-			jsonObject = Json.parse(response);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("JSON: ");
-		System.out.println(jsonObject);
-		System.out.println("*********************************** ");
-		System.out.println(jsonObject.getString("name"));
-		System.out.println("*********************************** ");
-		// System.out.println("Experiment ID: " + experiment);
-		System.out.println("Response: ");
-		System.out.println(response);
-		*/
 		return new ResponseEntity<>(Json.toJson(body), HttpStatus.OK);
 	}
 
@@ -205,69 +189,14 @@ public class KubeflowController {
 		headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
 		return new ResponseEntity<>(utils.sendRequest(urlString, httpsMethod, params, body, headers), HttpStatus.OK);
 	}
-
-
-
-    /**
-     * Returns the data from the list of pipelines in the Kubeflow API
-     *
-     * @return The response entity with a null value.
-     */
-    @GetMapping("/pipelines")
-    public ResponseEntity<?> test() {
-        //Initial data
-        String urlString = "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/apis/v1beta1/pipelines";
-        String httpsMethod = "";
-        HashMap params = new HashMap<>();
-        Object body = null;
-        HashMap headers = new HashMap<>();
-        String cookie =
-                "authservice_session=MTcwNTA1Njc2OHxOd3dBTkU1U1MwOVdXVk5IUWxkRVZVTkhUMWhXTjBWVlIwRTNVMUExVURSRk1qWkVNbHBZVmxCRE5UTllXVkUxVUVkR1RrNVFSVkU9fH6RL1nwdX7jfD98Q3WqaQwlZ4sJx-xZmSA-50-K5ioH";
-        //
-        StringBuilder response = new StringBuilder();
-        String jsonResponse = "";
-        try {
-            // Specify the URL you want to connect to
-            URL url = new URL(urlString);
-
-            // Open a connection to the URL
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            // Set the request method (GET, POST, etc.)
-            connection.setRequestMethod("GET");
-
-            // Set request headers (if needed)
-            connection.setRequestProperty("Accept", "*/*");
-            connection.setRequestProperty("Accept-Encoding", "gzip, deflat, br");
-            connection.setRequestProperty("Accept-Language", "en-US,en;q=0.9");
-            connection.setRequestProperty("Connection", "keep-alive");
-            connection.setRequestProperty("Cookie", cookie);
-            connection.setRequestProperty("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
-            connection.setRequestProperty("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
-
-            // Enable input/output streams for reading/writing data
-            connection.setDoOutput(true);
-
-            // Get the response code
-            int responseCode = connection.getResponseCode();
-
-            // Read the response from the server
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                System.out.println("Response Code: " + responseCode);
-                System.out.println("Response Body: " + response.toString());
-            }
-
-            System.out.println(Json.toJson(response.toString()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //return new ResponseEntity<>(response.toString(), HttpStatus.OK);
-        return new ResponseEntity<>(response.toString(), HttpStatus.OK);
-
-    }
+	
+	// ********************************************************************************
+	// ********************************************************************************
+	// ********************************************************************************
+	// EXAMPLE TESTS
+	// ********************************************************************************
+	// ********************************************************************************
+	// ********************************************************************************
 
     @Operation(summary = "Get all examples saved on the repository")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -297,12 +226,20 @@ public class KubeflowController {
     @Operation(summary = "Delete an example")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @DeleteMapping(path = "", produces = "application/json")
-    public ResponseEntity<Void> deleteExample(@RequestParam Long id) {
-        exampleService.delete(id);
-        return ResponseEntity.ok().build();
-    }
+	public ResponseEntity<Void> deleteExample(@RequestParam Long id) {
+		exampleService.delete(id);
+		return ResponseEntity.ok().build();
+	}
+	
+	// ********************************************************************************
+	// ********************************************************************************
+	// ********************************************************************************
+	// TOMEK'S TESTS
+	// ********************************************************************************
+	// ********************************************************************************
+	// ********************************************************************************
 
-    @Operation(summary = "Get All workflow for non-admin users")
+    @Operation(summary = "Get All workflow for non-admin users") // GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR NON ADMINS)
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/workflow", produces = "application/json")
     public ResponseEntity<List<WorkflowDefinitionDAO>> listAll() {
@@ -310,7 +247,7 @@ public class KubeflowController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get All workflow")
+    @Operation(summary = "Get All workflow") //GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR ADMINS)
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/admin/workflow", produces = "application/json")
     public ResponseEntity<List<WorkflowDefinitionDAO>> listAll(
@@ -320,7 +257,7 @@ public class KubeflowController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get experiment run")
+    @Operation(summary = "Get experiment run") //GET RUN
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/workflow/{experiment_id}/run", produces = "application/json")
     public ResponseEntity<WorkflowRunDAO> getExperimentRun(
@@ -329,7 +266,7 @@ public class KubeflowController {
         WorkflowRunDAO res = workflowService.getRun(experimentId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
-    @Operation(summary = "Start experiment run")
+    @Operation(summary = "Start experiment run") //RUN PIPELINE
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = "/workflow/{experiment_id}/run", produces = "application/json")
     public ResponseEntity<WorkflowRunDAO> startExperimentRun(
@@ -338,7 +275,7 @@ public class KubeflowController {
         WorkflowRunDAO res = workflowService.startRun(experimentId,params);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
-    @Operation(summary = "Stop experiment run")
+    @Operation(summary = "Stop experiment run") //STOP PIPELINE
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @DeleteMapping(path = "/workflow/{experiment_id}/run", produces = "application/json")
     public ResponseEntity<Boolean> startExperimentRun(
@@ -370,3 +307,56 @@ public class KubeflowController {
 //TODO: INSERT AUTOMATIC HEADERS
 //TODO: INSERT AUTOMATIC PARAMS
 //TODO: IMPORT MOST OF THE FUCTIONS TO A SERVICE CLASS
+
+/*
+@Operation(summary = "Login")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping("/pipelines/login/{cookie}")
+	public ResponseEntity<?> getAllPipelinesWithLogin(@PathVariable String cookie) {
+
+		String stateValue = "STATE_VALUE"; // You need to generate a unique state value
+		String step0Url = String.format("http://%s:%s", SERVICE, PORT);
+		String step0Response = restTemplate.getForObject(step0Url, String.class);
+		HttpServletRequest request;
+		HttpServletResponse response;
+		// Extract the URL from the response and fetch the state value
+
+		// Step 1
+		String step1Url = String.format(
+				"http://%s:%s/dex/auth?client_id=kubeflow-oidc-authservice&redirect_uri=%2Flogin%2Foidc&response_type=code&scope=profile+email+groups+openid&state=%s",
+				SERVICE, PORT, stateValue);
+		String step1Response = restTemplate.getForObject(step1Url, String.class);
+		// Extract the URL from the response and fetch the REQ value
+		System.out.println(step1Response);
+		
+		// Step 2
+		String reqValue = "REQ_VALUE"; // You need to get this from step 1 response
+		String step2Url = String.format("http://%s:%s/dex/auth/local?req=%s", SERVICE, PORT, reqValue);
+		String step2Response = restTemplate.postForObject(step2Url, null, String.class);
+
+		// Step 3
+		String step3Url = String.format("http://%s:%s/dex/approval?req=%s", SERVICE, PORT, reqValue);
+		String step3Response = restTemplate.getForObject(step3Url, String.class);
+		// Extract the URL from the response and fetch the CODE value
+
+		// Step 4
+		String codeValue = "CODE_VALUE"; // You need to get this from step 3 response
+		String step4Url = String.format("http://%s:%s/login/oidc?code=%s&state=%s", SERVICE, PORT, codeValue,
+				stateValue);
+		String step4Response = restTemplate.getForObject(step4Url, String.class);
+		// Extract the SESSION cookie from the response and set it in the
+		// HttpServletResponse object
+
+		// Step 5
+		String pipelineUrl = String.format("http://%s:%s/pipeline/apis/v1beta1/pipelines", SERVICE, PORT);
+		String sessionCookie = request.getHeader("Cookie");
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Cookie", sessionCookie);
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		ResponseEntity<String> pipelineResponse = restTemplate.exchange(pipelineUrl, HttpMethod.GET, entity,
+				String.class);
+		this.cookie = cookie;
+		
+		return new ResponseEntity<>(kubeflowService.getListPipelines(cookie), HttpStatus.OK);
+	}
+	*/
