@@ -14,7 +14,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "workflow_definition" )
-
 @RequiredArgsConstructor
 @Getter
 @Setter
@@ -29,7 +28,7 @@ public class WorkflowDefinition {
     @OneToOne(cascade = CascadeType.DETACH )
     @JoinColumn(name = "current_run_id"  )
     private WorkflowRun workflowRun;
-    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "workflow_definition")
+    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "workflowDefinition")
     @NotFound(action = NotFoundAction.IGNORE)
     private List<WorkflowParameter> parameters;
 
