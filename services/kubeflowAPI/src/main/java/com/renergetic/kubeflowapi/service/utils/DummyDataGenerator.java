@@ -13,6 +13,8 @@ import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.controller.KubeflowController;
 import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowDefinitionDAO;
+import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowParameter;
+import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowParameterDAO;
 import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowRunDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,9 +43,10 @@ public class DummyDataGenerator {
                 .mapToObj(i -> {
                     WorkflowDefinitionDAO dao = new WorkflowDefinitionDAO("experiment_" + i);
                     if (i % 2 == 0) {
-                        HashMap<String, Object> m = new HashMap<>(2);
-                        m.put("param1", "Some parameter decription");
-                        m.put("param2", "parameter 2 decription");
+                        HashMap<String, WorkflowParameterDAO> m = new HashMap<>(2);
+                        m.put("param1",
+                                new WorkflowParameterDAO("param1", "default", "string", "Some parameter decription"));
+                        m.put("param2", new WorkflowParameterDAO("param2", null, "string", "parameter 2 decription"));
                         dao.setParameters(m);
                     }
 
