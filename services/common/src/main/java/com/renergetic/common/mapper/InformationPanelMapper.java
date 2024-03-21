@@ -8,12 +8,13 @@ import com.renergetic.common.model.InformationTile;
 import com.renergetic.common.model.InformationTileMeasurement;
 import com.renergetic.common.utilities.Json;
 import org.apache.tomcat.util.json.ParseException;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-
+@Service
 public class InformationPanelMapper {
     public InformationPanel toEntity(InformationPanelDAORequest dto) {
         if (dto == null)
@@ -28,7 +29,7 @@ public class InformationPanelMapper {
         return entity;
     }
 
-    private static InformationTileDAOResponse tileToDTO(InformationTile entity, Boolean includeMeasurements) {
+    private InformationTileDAOResponse tileToDTO(InformationTile entity, Boolean includeMeasurements) {
         try {
             if (entity == null)
                 return null;
@@ -56,11 +57,11 @@ public class InformationPanelMapper {
         }
     }
 
-    public static InformationPanelDAOResponse toDTO(InformationPanel entity) {
+    public InformationPanelDAOResponse toDTO(InformationPanel entity) {
         return toDTO(entity, false);
     }
 
-    public static InformationPanelDAOResponse toDTO(InformationPanel entity, Boolean detailed) {
+    public InformationPanelDAOResponse toDTO(InformationPanel entity, Boolean detailed) {
         if (entity == null)
             return null;
         InformationPanelDAOResponse dao = new InformationPanelDAOResponse();
