@@ -11,6 +11,8 @@ import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.dao.tempcommon.TempAssetRepository;
+import com.renergetic.hdrapi.dao.tempcommon.TempMeasurementRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class AssetService {
 
     @Autowired
     AssetRepository assetRepository;
+
+    @Autowired
+    TempAssetRepository tempAssetRepository;
     @Autowired
     MeasurementRepository measurementRepository;
     @Autowired
@@ -356,18 +361,40 @@ public class AssetService {
         } else throw new InvalidNonExistingIdException("No asset with id " + assetId + " found");
     }
 
-    public AssetDetails updateDetail(AssetDetails detail, Long id, Long assetId) {
-        if (id != null && assetDetailsRepository.existsByIdAndAssetId(id, assetId)) {
-            if (assetDetailsRepository.existsByKeyAndAssetId(detail.getKey(), assetId))
-                throw new InvalidCreationIdAlreadyDefinedException(
-                        "There are details with the same key and asset id");
-            detail.setId(id);
+    public AssetDetails setDetail(AssetDetails detail,  Long assetId) {
+        AssetDetails assetDetails;
+        if(detail.getId()!=null&&assetDetailsRepository.existsById(detail.getId()))
+        {
+            assetDetails = assetDetailsRepository.findById(detail.getId()).get();
+
+        } else  {
+            assetDetails=assetDetailsRepository.findByKeyAndAssetId(detail.getKey(),assetId).orElse(null);
+        }
+        if(assetDetails!=null){
+            assetDetails.setValue(assetDetails.getValue());
+        }
+        else{
             Asset asset = new Asset();
             asset.setId(assetId);
             detail.setAsset(asset);
-            return assetDetailsRepository.save(detail);
-        } else throw new InvalidNonExistingIdException(
-                "No asset detail with id " + id + " related with " + assetId + " found");
+            assetDetails =detail;
+        }
+        return assetDetailsRepository.save(assetDetails);
+//        if (id != null && assetDetailsRepository.existsByIdAndAssetId(detail.getId(), assetId)) {
+//            if (assetDetailsRepository.existsByKeyAndAssetId(detail.getKey(), assetId))
+//                throw new InvalidCreationIdAlreadyDefinedException(
+//                        "There are details with the same key and asset id");
+//            detail.setId(id);
+//
+//            return assetDetailsRepository.save(detail);
+//        } else{
+//            Asset asset = new Asset();
+//            asset.setId(assetId);
+//            detail.setAsset(asset);
+//            return assetDetailsRepository.save(detail);
+////            throw new InvalidNonExistingIdException(
+////                    "No asset detail with id " + id + " related with " + assetId + " found");
+//        }
     }
 
     public AssetDetails updateDetailByKey(AssetDetails detail, Long assetId) {

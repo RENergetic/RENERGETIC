@@ -179,10 +179,24 @@ public class AssetController {
                                                           @PathVariable("asset_id") Long assetId,
                                                           @PathVariable("info_id") Long infoId) {
         detail.setId(infoId);
-        AssetDetails _detail = assetSv.updateDetail(detail, infoId, assetId);
+        AssetDetails _detail = assetSv.setDetail(detail,  assetId);
         return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @Operation(summary = "Update Information from its id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Details saved correctly"),
+            @ApiResponse(responseCode = "400", description = "Path isn't valid"),
+            @ApiResponse(responseCode = "404", description = "Detail not exist"),
+            @ApiResponse(responseCode = "500", description = "Error saving information")
+    })
+    @PutMapping(path = "{asset_id}/info", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<AssetDetails> updateInformation(@RequestBody AssetDetails detail,
+                                                          @PathVariable("asset_id") Long assetId ) {
+
+        AssetDetails _detail = assetSv.setDetail(detail,  assetId);
+        return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
     @Operation(summary = "Update Information from its key")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Details saved correctly"),

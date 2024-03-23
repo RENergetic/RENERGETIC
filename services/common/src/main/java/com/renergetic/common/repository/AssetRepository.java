@@ -78,6 +78,17 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
                                     @Param("categoryName") String categoryName, @Param("typeName") String typeName,
                                     @Param("offset") long offset, @Param("limit") int limit);
 
+    @Query(value = "SELECT m_asset.* " +
+            "FROM  asset m_asset " +
+            "LEFT JOIN asset_type ON asset_type.id = m_asset.asset_type_id " +
+            "LEFT JOIN asset_details ON asset_details.asset_id = m_asset.id " +
+            " WHERE COALESCE(m_asset.name ilike CONCAT('%', :name, '%'),:name is null ) " +
+            " AND COALESCE(asset_type.name ilike CONCAT('%', :typeName, '%'),:typeName is null) " +
+            " AND  asset_details.key =:mKey AND asset_details.value =:mValue  " +
+            " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
+    public List<Asset> filterByDetail(@Param("mKey") String key, @Param("mValue") String value,
+                                      @Param("name") String name, @Param("typeName") String typeName,
+                                      @Param("offset") long offset, @Param("limit") int limit);
 //    @Modifying
 //    @Query(value = "DELETE FROM asset " +
 //            " WHERE asset.user_id = :userId and asset.asset_type_id = :userTypeId",nativeQuery = true)
@@ -93,7 +104,8 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 
     List<Asset> findByAssetCategoryId(Long categoryId);
 
-    List<Asset> findByConnectionsConnectionTypeAndConnectionsConnectedAssetTypeName(ConnectionType connectionType, String assetTypeName);
+    List<Asset> findByConnectionsConnectionTypeAndConnectionsConnectedAssetTypeName(ConnectionType connectionType,
+                                                                                    String assetTypeName);
 
     List<Asset> findDistinctByConnectionsConnectionTypeAndTypeName(ConnectionType connectionType, String assetTypeName);
 }
