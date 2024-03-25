@@ -24,6 +24,7 @@ kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 rules=$(grep -ioP "(rules\s*=\s*)\K.+" _installers.properties)
+kubeflow=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -75,6 +76,13 @@ compileApp() {
         cd "${apisPath}/ruleEvaluationService"
         mvn clean package -Dmaven.test.skip
         cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
+    fi
+
+    if [[ $kubeflow = 'true' ]]
+    then
+        cd "${apisPath}/kubeflowAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/kubeflow-api/api.jar"
     fi
 
     if [[ $ui = 'true' ]]
@@ -229,6 +237,25 @@ installPSNC() {
         # create kubernetes resources
         envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f rules-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $kubeflow = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/kubeflow-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/kubeflow-api --namespace=$project
+        kubectl delete services/kubeflow-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/kubeflow-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/kubeflow-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < kubeflow-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f kubeflow-api-service.yaml --namespace=$project
     fi
 
 # DEPLOY WSO2 API MANAGER
