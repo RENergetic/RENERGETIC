@@ -38,7 +38,7 @@ public class LogDAO {
         LogDAO logDAO = new LogDAO();
         logDAO.setId(log.getId());
         logDAO.setDescription(log.getDescription());
-        logDAO.setTitle(logDAO.getTitle());
+        logDAO.setTitle(log.getTitle());
         logDAO.setService(log.getService());
         logDAO.setTimestamp(log.getTimestamp());
         logDAO.setSeverity(log.getSeverity());
