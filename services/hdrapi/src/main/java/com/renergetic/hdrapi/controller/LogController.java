@@ -1,6 +1,7 @@
 package com.renergetic.hdrapi.controller;
 
 import com.renergetic.common.dao.LogDAO;
+import com.renergetic.common.dao.wrapper.PagedDAO;
 import com.renergetic.common.model.LogService;
 import com.renergetic.common.model.LogSeverity;
 import com.renergetic.hdrapi.service.LoggingService;
@@ -27,21 +28,22 @@ public class LogController {
     @Operation(summary = "Get All logs entries with or without filters")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/list", produces = "application/json")
-    public ResponseEntity<List<LogDAO>> listLogs(@RequestParam(name = "offset", required = false) Optional<Long> offset,
-                                                 @RequestParam(name = "limit", required = false) Optional<Integer> limit,
-                                                 @RequestParam(name = "orderBy", required = false) Optional<String> orderBy,
-                                                 @RequestParam(name = "severity", required = false) Optional<LogSeverity> severity,
-                                                 @RequestParam(name = "service", required = false) Optional<LogService> service,
-                                                 @RequestParam(name = "from", required = false) Optional<String> from,
-                                                 @RequestParam(name = "to", required = false) Optional<String> to){
+    public ResponseEntity<PagedDAO<LogDAO>> listLogs(@RequestParam(name = "offset", required = false) Optional<Long> offset,
+                                                     @RequestParam(name = "limit", required = false) Optional<Integer> limit,
+                                                     @RequestParam(name = "orderBy", required = false) Optional<String> orderBy,
+                                                     @RequestParam(name = "severity", required = false) Optional<List<LogSeverity>> severity,
+                                                     @RequestParam(name = "service", required = false) Optional<List<LogService>> service,
+                                                     @RequestParam(name = "from", required = false) Optional<String> from,
+                                                     @RequestParam(name = "to", required = false) Optional<String> to){
         return new ResponseEntity<>(loggingService.list(offset, limit, orderBy, severity, service, from, to), HttpStatus.OK);
     }
 
     @Operation(summary = "Create a new log entry")
     @ApiResponse(responseCode = "201", description = "Request executed correctly")
     @PostMapping(path = "/create", produces = "application/json")
-    public ResponseEntity<LogDAO> createLog(@RequestBody LogDAO logDAO){
-        return new ResponseEntity<>(loggingService.create(logDAO), HttpStatus.CREATED);
+    public ResponseEntity<LogDAO> createLog(@RequestBody LogDAO logDAO,
+                                            @RequestParam(name = "notification", required = false) Optional<Boolean> notification){
+        return new ResponseEntity<>(loggingService.create(logDAO, notification), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Delete a log entry by id")
