@@ -331,7 +331,7 @@ public class UserController {
     //#endregion
 
     //#region Admin DELETE REQUESTS
-    @Operation(summary = "Delete a existing User", hidden = false)
+    @Operation(summary = "Delete an existing User", hidden = false)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "User deleted correctly"),
             @ApiResponse(responseCode = "500", description = "Error deleting user")})
     @DeleteMapping(path = "/{id}")
@@ -360,6 +360,9 @@ public class UserController {
     @DeleteMapping(path = "/{id}/roles/{roleName}")
     public ResponseEntity<?> deleteRole(@PathVariable String id, @PathVariable String roleName) {
         loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
+        if (Objects.equals(loggedInService.getKeycloakUser().getId(), id) && roleName.equals(KeycloakRole.REN_ADMIN.name)) {
+            throw new RuntimeException("Cannot self remove admin role");
+        }
         String token = loggedInService.getKeycloakUser().getToken();
         KeycloakWrapper client = keycloakService.getClient(token, true);
         List<String> roles = client.revokeRole(id, roleName).stream().map(RoleRepresentation::getName).collect(
