@@ -114,6 +114,19 @@ public class MeasurementController {
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get All Measurements")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/report/asset/{id}", produces = "application/json")
+    public ResponseEntity<List<MeasurementDAOImpl>> listAssetDetailedMeasurements(
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit,
+            @PathVariable(required = true, name = "id") Long assetId) {
+        List<MeasurementDAOImpl> measurements =
+                measurementSv.findAssetMeasurements(assetId, offset.orElse(0L), limit.orElse(500));
+
+        return new ResponseEntity<>(measurements, HttpStatus.OK);
+    }
+
     @Operation(summary = "Get linked panels for given measurement")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/{id}/panels", produces = "application/json")
@@ -160,6 +173,7 @@ public class MeasurementController {
         List<String> tags = measurementSv.getTagKeys();
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
+
     @Operation(summary = "Get All Measurements Tags Keys")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/tags/key/{key}/values", produces = "application/json")
@@ -315,6 +329,7 @@ public class MeasurementController {
         MeasurementDAOResponse _measurement = measurementSv.save(measurement);
         return new ResponseEntity<>(_measurement, HttpStatus.CREATED);
     }
+
     @Operation(summary = "Create a new Measurements")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Measurements saved correctly"),
@@ -323,7 +338,8 @@ public class MeasurementController {
     }
     )
     @PostMapping(path = "/batch", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<List<MeasurementDAOResponse>> createMeasurements(@RequestBody List<MeasurementDAORequest> measurements) {
+    public ResponseEntity<List<MeasurementDAOResponse>> createMeasurements(
+            @RequestBody List<MeasurementDAORequest> measurements) {
         List<MeasurementDAOResponse> _measurements = measurementSv.save(measurements);
         return new ResponseEntity<>(_measurements, HttpStatus.CREATED);
     }

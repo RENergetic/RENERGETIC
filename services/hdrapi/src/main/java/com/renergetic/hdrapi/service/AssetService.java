@@ -101,13 +101,13 @@ public class AssetService {
             throw new InvalidArgumentException("Non user assets cannot be owners");
         }
 
-        if(assetConnectionRepository.existsByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
+        if (assetConnectionRepository.existsByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
                 connection.getAssetConnectedId(), connection.getType()))
             throw new InvalidArgumentException("connection already existing for that type between those assets");
 
         requireAsset(connection.getAssetConnectedId());
         assetConnectionRepository.save(connection.mapToEntity());
-        if(biDirection){
+        if (biDirection) {
             AssetConnectionDAORequest reversed = new AssetConnectionDAORequest();
             reversed.setAssetId(connection.getAssetConnectedId());
             reversed.setAssetConnectedId(connection.getAssetId());
@@ -119,7 +119,7 @@ public class AssetService {
     }
 
     @org.springframework.transaction.annotation.Transactional
-    public boolean disconnect(AssetConnectionDAORequest connection){
+    public boolean disconnect(AssetConnectionDAORequest connection) {
         assetConnectionRepository.deleteByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
                 connection.getAssetConnectedId(), connection.getType());
         return true;
@@ -165,6 +165,17 @@ public class AssetService {
         assets = stream.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
                         measurementRepository.findByAsset(asset)))
                 .collect(Collectors.toList());
+        return assets;
+    }
+
+    public List<AssetDAOResponse> getByDetail(String key, String value, long offset, int limit) {
+
+        Stream<Asset> stream = tempAssetRepository.filterByDetail(key, value, null, null, offset, limit).stream();
+        List<AssetDAOResponse> assets;
+        assets = stream.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
+                        measurementRepository.findByAsset(asset)))
+                .collect(Collectors.toList());
+//        tempAssetRepository.filterByDetail(key, value, null, null, offset, limit)
         return assets;
     }
 
@@ -361,23 +372,21 @@ public class AssetService {
         } else throw new InvalidNonExistingIdException("No asset with id " + assetId + " found");
     }
 
-    public AssetDetails setDetail(AssetDetails detail,  Long assetId) {
+    public AssetDetails setDetail(AssetDetails detail, Long assetId) {
         AssetDetails assetDetails;
-        if(detail.getId()!=null&&assetDetailsRepository.existsById(detail.getId()))
-        {
+        if (detail.getId() != null && assetDetailsRepository.existsById(detail.getId())) {
             assetDetails = assetDetailsRepository.findById(detail.getId()).get();
 
-        } else  {
-            assetDetails=assetDetailsRepository.findByKeyAndAssetId(detail.getKey(),assetId).orElse(null);
+        } else {
+            assetDetails = assetDetailsRepository.findByKeyAndAssetId(detail.getKey(), assetId).orElse(null);
         }
-        if(assetDetails!=null){
+        if (assetDetails != null) {
             assetDetails.setValue(assetDetails.getValue());
-        }
-        else{
+        } else {
             Asset asset = new Asset();
             asset.setId(assetId);
             detail.setAsset(asset);
-            assetDetails =detail;
+            assetDetails = detail;
         }
         return assetDetailsRepository.save(assetDetails);
 //        if (id != null && assetDetailsRepository.existsByIdAndAssetId(detail.getId(), assetId)) {

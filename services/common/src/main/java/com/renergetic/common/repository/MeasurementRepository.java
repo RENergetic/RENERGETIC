@@ -116,7 +116,8 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
                            @Param("value") String value);
 
     @Query(value = "SELECT " +
-            " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
+            " me.id, me.direction, me.domain, me.label,me.description," +
+            " me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
             " me.measurement_type_id as typeId," +
             " mt.name as typeName, mt.label as typeLabel,mt.unit, mt.physical_name as physicalName," +
             " me.asset_id as assetId, asset.name as assetName, asset.label as assetLabel," +

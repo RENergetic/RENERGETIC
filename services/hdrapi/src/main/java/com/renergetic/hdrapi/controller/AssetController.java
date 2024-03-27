@@ -69,6 +69,22 @@ public class AssetController {
 
         return new ResponseEntity<>(assets, HttpStatus.OK);
     }
+    @Operation(summary = "list by details")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "key/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<List<AssetDAOResponse>> getAllAssets(@PathVariable String key,@PathVariable String value,
+                                                               @RequestParam(required = false) Optional<Long> offset,
+                                                               @RequestParam(required = false) Optional<Integer> limit ) {
+        List<AssetDAOResponse> assets = new ArrayList<AssetDAOResponse>();
+
+        try {
+            assets = assetSv.getByDetail(key,value, offset.orElse(0L), limit.orElse(50));
+        } catch (NotFoundException ex) {
+            assets = Collections.emptyList();
+        }
+
+        return new ResponseEntity<>(assets, HttpStatus.OK);
+    }
 
     @Operation(summary = "Get Asset by id")
     @ApiResponses({
@@ -183,20 +199,7 @@ public class AssetController {
         return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    @Operation(summary = "Update Information from its id")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Details saved correctly"),
-            @ApiResponse(responseCode = "400", description = "Path isn't valid"),
-            @ApiResponse(responseCode = "404", description = "Detail not exist"),
-            @ApiResponse(responseCode = "500", description = "Error saving information")
-    })
-    @PutMapping(path = "{asset_id}/info", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<AssetDetails> updateInformation(@RequestBody AssetDetails detail,
-                                                          @PathVariable("asset_id") Long assetId ) {
 
-        AssetDetails _detail = assetSv.setDetail(detail,  assetId);
-        return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-    }
     @Operation(summary = "Update Information from its key")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Details saved correctly"),
@@ -207,9 +210,11 @@ public class AssetController {
     @PutMapping(path = "{asset_id}/info", produces = "application/json", consumes = "application/json")
     public ResponseEntity<AssetDetails> updateInformationByKey(@RequestBody AssetDetails detail,
                                                                @PathVariable("asset_id") Long assetId) {
-        AssetDetails _detail = assetSv.updateDetailByKey(detail, assetId);
+        AssetDetails _detail = assetSv.setDetail(detail, assetId);
         return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
+
+
 
     @Operation(summary = "Delete Information from its id")
     @ApiResponses({

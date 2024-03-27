@@ -3,6 +3,7 @@ package com.renergetic.common.dao;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.model.*;
 import com.renergetic.common.model.details.MeasurementDetails;
 import lombok.Getter;
@@ -50,6 +51,8 @@ public class MeasurementDAOResponse {
 
     @JsonProperty(value = "measurement_details", required = false)
     private HashMap<String, ?> measurementDetails;
+    @JsonProperty(value = "tags", required = false)
+    private List<MeasurementTagsDAO> tags;
 
     @JsonInclude(Include.NON_EMPTY)
     @JsonProperty(value = "aggregation_function", required = false)
