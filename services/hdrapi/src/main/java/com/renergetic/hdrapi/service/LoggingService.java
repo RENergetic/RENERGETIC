@@ -67,16 +67,20 @@ public class LoggingService {
     public LogDAO create(LogDAO logDAO, Optional<Boolean> createNotification){
         Log log = logRepository.save(logDAO.mapToEntity());
         if(createNotification.orElse(true) && log.getSeverity().equals(LogSeverity.error)){
-            NotificationDefinition nd = new NotificationDefinition();
-            nd.setCode("LOG_ERROR");
-            nd.setMessage(logDAO.getTitle());
-            nd.setType(NotificationType.error);
-            notificationDefinitionRepository.save(nd);
+            NotificationDefinition ndef = notificationDefinitionRepository.findByCode("LOG_ERROR").orElseGet(() -> {
+                NotificationDefinition nd = new NotificationDefinition();
+                nd.setCode("LOG_ERROR");
+                nd.setMessage("A new error has been logged.");
+                nd.setType(NotificationType.error);
+                return notificationDefinitionRepository.save(nd);
+            });
+
 
             NotificationSchedule ns = new NotificationSchedule();
             ns.setDateFrom(LocalDateTime.now());
             ns.setDateTo(LocalDateTime.now().plusMinutes(15));
             ns.setNotificationTimestamp(logDAO.getTimestamp().toLocalDateTime());
+            ns.setDefinition(ndef);
             notificationScheduleRepository.save(ns);
         }
         return LogDAO.create(log);
