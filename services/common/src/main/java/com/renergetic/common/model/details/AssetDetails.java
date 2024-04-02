@@ -3,6 +3,7 @@ package com.renergetic.common.model.details;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.renergetic.common.model.Asset;
 import com.renergetic.common.model.Details;
+import com.renergetic.common.model.listeners.AssetDetailsListener;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.*;
 
 @Entity
+@EntityListeners(AssetDetailsListener.class)
 @Table(name = "asset_details")
 @RequiredArgsConstructor
 @Getter

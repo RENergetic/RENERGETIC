@@ -1,6 +1,6 @@
 package com.renergetic.common.model;
 
-import javax.persistence.*;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -8,6 +8,7 @@ import lombok.ToString;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import javax.persistence.*;
 import java.util.List;
 
 

@@ -1,6 +1,7 @@
 package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.common.model.WorkflowRun;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
 import lombok.Getter;

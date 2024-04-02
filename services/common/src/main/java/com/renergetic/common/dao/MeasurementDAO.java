@@ -8,6 +8,8 @@ public interface MeasurementDAO {
 
     String getName();
 
+    String getDescription();
+
     String getLabel();
 
     Direction getDirection();

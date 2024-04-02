@@ -1,6 +1,8 @@
 package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.common.model.WorkflowDefinition;
+import com.renergetic.common.model.WorkflowParameter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

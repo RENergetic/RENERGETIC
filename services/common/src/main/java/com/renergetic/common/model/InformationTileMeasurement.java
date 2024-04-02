@@ -1,11 +1,13 @@
 package com.renergetic.common.model;
 
 import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.dao.SimpleAssetDAO;
 import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "information_tile_measurement")
@@ -15,7 +17,7 @@ import javax.persistence.*;
 @ToString
 public class InformationTileMeasurement {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "props", nullable = true, insertable = true, updatable = true)
@@ -57,7 +59,10 @@ public class InformationTileMeasurement {
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "measurement_id", nullable = true, insertable = true, updatable = true)
     private Measurement measurement;
-
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "asset_id")
+    private Asset asset;
 
     @ManyToOne(optional = false, cascade = CascadeType.REFRESH)
     @NotFound(action = NotFoundAction.IGNORE)
@@ -75,10 +80,13 @@ public class InformationTileMeasurement {
     public MeasurementDAOResponse getMeasurementDAO() {
         if (measurement != null) {
             measurement.setFunction(function);
-            return MeasurementDAOResponse.create(measurement, measurement.getDetails(),function);
+            return MeasurementDAOResponse.create(measurement, measurement.getDetails(), function);
         }
         var dao = new MeasurementDAOResponse();
         dao.setId(null);
+        if(this.asset!=null){
+            dao.setAsset(SimpleAssetDAO.create(asset));
+        }
         dao.setDirection(direction);
         dao.setDomain(domain);
         dao.setName(measurementName);

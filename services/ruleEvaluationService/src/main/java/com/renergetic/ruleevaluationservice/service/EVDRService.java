@@ -44,11 +44,12 @@ public class EVDRService {
 
     @Autowired
     private RuleEvaluationService ruleEvaluationService;
+    @Autowired
+    private MeasurementAggregationRepository measurementAggregationRepository;
 
     private final Gson gson = new Gson();
 
     public void evaluateEVDR() throws ConfigurationError {
-
         //TODO: Replace this call later by the new asset type for VA GROUPING asset.
         List<Asset> assets = assetRepository.findDistinctByConnectionsConnectionTypeAndTypeName(ConnectionType.va_grouping, "pv_virtual_asset_group");
 
@@ -58,6 +59,8 @@ public class EVDRService {
         LocalDateTime nextExecution = cronTrigger.next(currentTime);
 
         for(Asset assetPVGroup : assets){
+            if(!assetPVGroup.getDetails().stream().anyMatch(d -> d.getKey().equals("ev-dr-threshold")))
+                continue;
             try{
 
                 /*
@@ -66,32 +69,15 @@ public class EVDRService {
                     Later, should define a way to uniquely retrieve the aggregation for the EV-DR
                  */
                 // Looking for a measurement that contains all pvIds in details.
-                List<Measurement> measurements = measurementRepository.findByAsset(assetPVGroup);
-                Optional<Measurement> measurement = Optional.empty();
-                if(measurements.size() == 1)
-                    measurement = Optional.of(measurements.get(0));
-                /*for(Measurement ms : measurements){
-                    if(ms.getDetails()
-                            .stream().anyMatch(x -> {
-                                boolean a = x.getKey().equals("aggregation_ids");
-                                String value = x.getValue();
-                                List<Long> test = Stream.of(gson.fromJson(x.getValue(), Long[].class)).sorted()
-                                        .collect(Collectors.toList());
-                                boolean b = Stream.of(gson.fromJson(x.getValue(), Long[].class)).sorted()
-                                        .collect(Collectors.toList()).equals(pvIds);
-                                    return a && b;
-                            })){
-                        measurement = Optional.of(ms);
-                        break;
-                    }
-                }*/
-                if(measurement.isEmpty())
+                List<MeasurementAggregation> ma = measurementAggregationRepository.findByOutputMeasurementsAsset(assetPVGroup);
+
+                if(ma.isEmpty() || ma.get(0).getOutputMeasurements().isEmpty())
                     return;
 
-                Measurement finalMeasurement = measurement.get();
+                Measurement finalMeasurement = ma.get(0).getOutputMeasurements().stream().findFirst().get();
 
                 //TODO: Evaluate the aggregation first. Take decision here on timing to run it in the scheduler.
-                measurementAggregationService.aggregateOne(finalMeasurement);
+                measurementAggregationService.aggregateOne(finalMeasurement, ma.get(0));
                 ruleEvaluationService.retrieveAndExecuteAllRulesForAssetId(assetPVGroup.getId());
 
                 List<NotificationSchedule> ns = notificationScheduleRepository.findByAssetId(assetPVGroup.getId());

@@ -15,6 +15,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -94,7 +95,9 @@ public class AssetDAOResponse {
 			if(asset.getAssetCategory() != null)
 				dao.setAsset_category(AssetCategoryDAO.create(asset.getAssetCategory()));
 			if(asset.getDetails() != null)
-				dao.setDetails(asset.getDetails().stream().collect(Collectors.toMap(AssetDetails::getKey, AssetDetails::getValue)));
+				dao.setDetails(asset.getDetails().stream().collect(
+						HashMap::new, (m, p) -> m.put(p.getKey(),p.getValue()), Map::putAll));
+						//Collectors.toMap(AssetDetails::getKey, AssetDetails::getValue)));
 		}
 		return dao;
 	}

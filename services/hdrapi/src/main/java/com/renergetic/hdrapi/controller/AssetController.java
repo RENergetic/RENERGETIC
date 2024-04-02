@@ -215,7 +215,7 @@ public class AssetController {
             @ApiResponse(responseCode = "204", description = "Information delete"),
             @ApiResponse(responseCode = "500", description = "Error deleting information")
     })
-    @DeleteMapping(path = "{asset_id}/info/{key}")
+    @DeleteMapping(path = "{asset_id}/info/key/{key}")
     public ResponseEntity<AssetDetails> deleteInformationByKey(@PathVariable("asset_id") Long assetId,
                                                                @PathVariable("key") String key) {
         assetSv.deleteDetailByKey(key, assetId);
@@ -276,11 +276,12 @@ public class AssetController {
             @ApiResponse(responseCode = "500", description = "Error assigning parent")
     }
     )
-    @PutMapping(path = "/{id}/parent/{parentId}" )
-    public ResponseEntity  assignParent(@PathVariable Long id, @PathVariable Long parentId) {
+    @PutMapping(path = "/{id}/parent/{parentId}")
+    public ResponseEntity assignParent(@PathVariable Long id, @PathVariable Long parentId) {
         assetSv.assignParent(id, parentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
     @Operation(summary = "Delete parent from  an existing Asset")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Asset saved correctly"),
@@ -289,7 +290,7 @@ public class AssetController {
             @ApiResponse(responseCode = "500", description = "Error revoking parent")
     }
     )
-    @DeleteMapping(path = "/{id}/parent" )
+    @DeleteMapping(path = "/{id}/parent")
     public ResponseEntity revokeParent(@PathVariable Long id) {
         assetSv.revokeParent(id);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -305,12 +306,13 @@ public class AssetController {
     @PutMapping(path = "/connect/{id}", produces = "application/json")
     public ResponseEntity<AssetDAOResponse> connectAssets(@PathVariable Long id,
                                                           @RequestParam("connect_to") Long connectId,
+                                                          @RequestParam("bi_directional") Optional<Boolean> biDirectional,
                                                           @RequestParam(value = "type", required = false) Optional<ConnectionType> type) {
         AssetConnectionDAORequest connection = new AssetConnectionDAORequest();
         connection.setAssetId(id);
         connection.setAssetConnectedId(connectId);
         connection.setType(type.orElse(null));
-        AssetDAOResponse _asset = assetSv.connect(connection);
+        AssetDAOResponse _asset = assetSv.connect(connection, biDirectional.orElse(false));
         return new ResponseEntity<>(_asset, _asset != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
@@ -387,10 +389,14 @@ public class AssetController {
 
     //=== DELETE REQUESTS ================================================================================
     @DeleteMapping(path = "/connect/{id}", produces = "application/json")
-    public ResponseEntity<?> connectAssets(@PathVariable Long id, @RequestParam("connected_asset_id") Long connectId) {
+    public ResponseEntity<?> connectAssets(@PathVariable Long id, @RequestParam("connected_asset_id") Long connectId,
+                                           @RequestParam("type") ConnectionType connectionType) {
         AssetConnectionDAORequest connection = new AssetConnectionDAORequest();
-        throw new NotImplementedException("TODO:");
-//        return ResponseEntity.noContent().build();
+        connection.setAssetConnectedId(connectId);
+        connection.setAssetId(id);
+        connection.setType(connectionType);
+        assetService.disconnect(connection);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Delete a existing Asset", hidden = false)

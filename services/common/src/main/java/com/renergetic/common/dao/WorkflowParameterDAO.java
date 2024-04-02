@@ -1,7 +1,8 @@
 package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
+
+import com.renergetic.common.model.WorkflowParameter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

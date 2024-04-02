@@ -19,7 +19,6 @@ import com.renergetic.common.model.Area;
 import com.renergetic.common.model.Heatmap;
 import com.renergetic.common.model.UUID;
 import com.renergetic.common.repository.AreaRepository;
-import com.renergetic.common.repository.HeatmapRepository;
 import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
@@ -30,8 +29,6 @@ public class AreaService {
 	
 	@Autowired
 	AreaRepository areaRepository;
-	@Autowired
-	HeatmapRepository heatmapRepository;
 	@Autowired
 	UuidRepository uuidRepository;
 
@@ -96,15 +93,15 @@ public class AreaService {
 		else throw new NotFoundException("No area found related with id " + id);
 	}
 
-	public List<AreaDAO> getByHeatmap(Long id) {
-		Heatmap heatmap = heatmapRepository.findById(id).orElse(null);
-		List<AreaDAO> areas = null;
-		if (heatmap != null) {
-			areas = Stream.concat(areaRepository.findByParent(heatmap).stream(), areaRepository.findByChild(heatmap).stream())
-					.map(area -> AreaDAO.create(area)).collect(Collectors.toList());
-		}		
-		if (areas != null)
-			return areas;
-		else throw new NotFoundException("No areas found related with id " + id);
-	}
+//	public List<AreaDAO> getByHeatmap(Long id) {
+//		Heatmap heatmap = heatmapRepository.findById(id).orElse(null);
+//		List<AreaDAO> areas = null;
+//		if (heatmap != null) {
+//			areas = Stream.concat(areaRepository.findByParent(heatmap).stream(), areaRepository.findByChild(heatmap).stream())
+//					.map(area -> AreaDAO.create(area)).collect(Collectors.toList());
+//		}
+//		if (areas != null)
+//			return areas;
+//		else throw new NotFoundException("No areas found related with id " + id);
+//	}
 }
