@@ -21,6 +21,7 @@ user=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
 baseApi=$(grep -ioP "(base\s*=\s*)\K.+" _installers.properties)
 wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
 dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
+kubeflowApi=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -255,6 +256,28 @@ then
         # create kubernetes resources
         kubectl apply -f data-api-deployment.yaml --force=true --namespace=$project
         kubectl apply -f data-api-service.yaml --namespace=$project
+    fi
+    
+    if [[ $kubeflowApi = 'true' ]]
+    then
+        cd "${apisPath}/kubeflowAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/kubeflow-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/kubeflow-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/kubeflow-api --namespace=$project
+        kubectl delete services/kubeflow-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=kubeflow-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f kubeflow-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f kubeflow-api-service.yaml --namespace=$project
     fi
 # DEPLOY WSO2 API MANAGER
 
