@@ -2,7 +2,7 @@ package com.renergetic.kubeflowapi.model;
 
 import lombok.Data;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Entity
 @Data

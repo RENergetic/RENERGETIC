@@ -1,6 +1,5 @@
 package com.renergetic.kubeflowapi.dao;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

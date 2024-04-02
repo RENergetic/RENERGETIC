@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.5</version> <!-- lookup parent from repository -->
+		<version>2.7.2</version> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.renergetic.kubeflowapi</groupId>
 	<artifactId>kubeflowAPI</artifactId>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.renergetic</groupId>
             <artifactId>common</artifactId>
-            <version>[2.0.0,3.0.0)</version>
+            <version>1.1.26</version>
         </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -96,14 +96,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 import org.apache.tomcat.util.json.ParseException;
 import org.hibernate.annotations.NotFound;

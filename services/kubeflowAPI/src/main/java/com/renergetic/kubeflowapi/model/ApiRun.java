@@ -2,11 +2,13 @@ package com.renergetic.kubeflowapi.model;
 
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -29,9 +31,11 @@ public class ApiRun {
     @Column(nullable = true, name = "description")
     private String description;
 
+    @OneToOne()
     @JoinColumn(name = "asset_type_id", nullable = false, insertable = true, updatable = true) //TODO
     private PipelineSpec pipeline_spec;
 
+    @OneToMany()
     @JoinColumn(name = "asset_type_id", nullable = false, insertable = true, updatable = true) //TODO
     private List<ApiResourceReference> resource_references;
 

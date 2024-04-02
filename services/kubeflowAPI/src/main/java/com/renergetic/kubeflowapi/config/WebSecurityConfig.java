@@ -1,28 +1,38 @@
 package com.renergetic.kubeflowapi.config;
 
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
+import com.renergetic.common.model.security.KeycloakRole;
+import com.renergetic.kubeflowapi.service.CustomAccessDeniedHandler;
+
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.renergetic.common.config.JwtAuthenticationFilter;
-import com.renergetic.common.config.JwtAuthorizationManager;
-import com.renergetic.common.model.security.KeycloakRole;
-
+import javax.servlet.*;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+//import static pl.psnc.vtl.portal.model.users.SecurityGroup.SUPER_ADMIN;
 
 @Configuration
 @EnableWebSecurity
@@ -38,6 +48,20 @@ public class WebSecurityConfig {
 
     @Value(value = "${keycloak.client-id}")
     private String clientId;
+    
+    @Autowired
+    JwtAuthenticationProvider authProvider;
+    
+    @Bean
+    protected JwtAuthenticationProvider authenticationProvider() throws Exception {
+    	JwtAuthenticationProvider provider = new JwtAuthenticationProvider();
+    	return provider;
+    }
+    
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+      return authConfig.getAuthenticationManager();
+    }
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -45,45 +69,64 @@ public class WebSecurityConfig {
         filter.setClientId(clientId);
 
         http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(filter, AuthorizationFilter.class);
+        http.addFilterBefore(filter, FilterSecurityInterceptor.class);
+        //for some reason it doesnt work
+//        http.csrf().disable().authorizeRequests().antMatchers("/api/users")
+//                .hasAnyRole(KeycloakRole.REN_ADMIN.getAuthority(),
+//                        KeycloakRole.REN_TECHNICAL_MANAGER.getAuthority())
+//                .and().exceptionHandling().accessDeniedHandler(
+//                accessDeniedHandler()
+//        );
+//        http.csrf().disable().antMatcher("/api/users").addFilterAfter(
+//                new RoleFilter(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask),
+//                JwtAuthenticationFilter.class);
+        Map<String, String[]> getUrls = new HashMap<>();
+        Map<String, String[]> postUrls = new HashMap<>();
+        Map<String, String[]> putUrls = new HashMap<>();
+        Map<String, String[]> deleteUrls = new HashMap<>();
+       
+        /*
+        getUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name});
+        getUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
         
-        Map<String, KeycloakRole[]> getUrls = new HashMap<>();
-        Map<String, KeycloakRole[]> postUrls = new HashMap<>();
-        Map<String, KeycloakRole[]> putUrls = new HashMap<>();
-        Map<String, KeycloakRole[]> deleteUrls = new HashMap<>();
+        postUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name});
+        postUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
         
+        putUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name});
+        putUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
         
-        // getUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        deleteUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name});
+        deleteUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name, KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
+        */
         
-        // postUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>
+        	.ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
         
-        // putUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // deleteUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-
-        http.authorizeHttpRequests(registry -> {
-	        
-	        getUrls.forEach((urlPattern, roles) -> {
-	        	registry.requestMatchers(HttpMethod.GET, urlPattern).access(new JwtAuthorizationManager(roles));
-	        });
-	        
-	        postUrls.forEach((urlPattern, roles) -> {
-	        	registry.requestMatchers(HttpMethod.POST, urlPattern).access(new JwtAuthorizationManager(roles));
-	        });
-	        
-	        putUrls.forEach((urlPattern, roles) -> {
-	        	registry.requestMatchers(HttpMethod.PUT, urlPattern).access(new JwtAuthorizationManager(roles));
-	        });
-	        
-	        deleteUrls.forEach((urlPattern, roles) -> {
-	        	registry.requestMatchers(HttpMethod.DELETE, urlPattern).access(new JwtAuthorizationManager(roles));
-	        });
-	        
-	    //     registry.anyRequest().access(new JwtAuthorizationManager()); // Access to authenticated users 
-                registry.anyRequest().permitAll(); // Access to all users
+        getUrls.forEach((urlPattern, roles) -> {
+        	registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);
         });
         
+        postUrls.forEach((urlPattern, roles) -> {
+        	registry.antMatchers(HttpMethod.POST, urlPattern).hasAnyRole(roles);
+        });
+        
+        putUrls.forEach((urlPattern, roles) -> {
+        	registry.antMatchers(HttpMethod.PUT, urlPattern).hasAnyRole(roles);
+        });
+        
+        deleteUrls.forEach((urlPattern, roles) -> {
+        	registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
+        });
+        //registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        registry.anyRequest().permitAll();
+        
         return http.build();
+    }
+
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
     }
 
     @Bean
@@ -103,5 +146,43 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+    public class RoleFilter implements Filter {
+        private final int expectedMask;
+
+        public RoleFilter(int expectedMask) {
+            this.expectedMask = expectedMask;
+        }
+
+        @Override
+        public void destroy() {
+        }
+
+        @Override
+        public void doFilter(ServletRequest req, ServletResponse res,
+                             FilterChain chain) throws IOException, ServletException {
+
+
+            KeycloakAuthenticationToken authentication =
+                    (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            if (authentication.hasRole(expectedMask)) {
+                chain.doFilter(req, res);
+            } else {
+                System.err.println("TODO:");
+                //TODO:
+            }
+
+        }
+
+    }
+//
+//    @Bean(BeanIds.AUTHENTICATION_MANAGER)
+//    @Override
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
+
+
+
 
 }

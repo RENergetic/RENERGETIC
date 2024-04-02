@@ -2,7 +2,7 @@ package com.renergetic.kubeflowapi.dao.tempcommon;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.renergetic.common.model.Measurement;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
