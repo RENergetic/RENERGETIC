@@ -16,10 +16,10 @@ import com.renergetic.kpiapi.model.security.KeycloakRole;
 import com.renergetic.kpiapi.model.security.KeycloakUser;
 import com.renergetic.kpiapi.service.utils.Json;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;

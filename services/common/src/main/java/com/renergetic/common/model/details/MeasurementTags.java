@@ -6,12 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.renergetic.common.model.Details;
 import com.renergetic.common.model.Measurement;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.JoinColumn;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.JoinColumn;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

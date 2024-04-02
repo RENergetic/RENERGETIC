@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import jakarta.persistence.Transient;
+import javax.persistence.Transient;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;

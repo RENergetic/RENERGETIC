@@ -2,7 +2,7 @@ package com.renergetic.common.repository;
 
 import com.renergetic.common.model.UserSettings;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

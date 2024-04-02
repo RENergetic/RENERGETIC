@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 
 @SuppressWarnings("unchecked")
 public interface MeasurementTagsRepository extends JpaRepository<MeasurementTags, Long> {

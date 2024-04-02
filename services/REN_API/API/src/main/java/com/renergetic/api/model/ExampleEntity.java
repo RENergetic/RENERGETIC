@@ -2,7 +2,7 @@ package com.renergetic.api.model;
 
 import lombok.Data;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Entity
 @Data

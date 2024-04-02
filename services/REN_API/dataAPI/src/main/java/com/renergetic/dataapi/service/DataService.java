@@ -43,8 +43,8 @@ import com.renergetic.common.utilities.HttpAPIs;
 import com.renergetic.dataapi.service.utils.Basic;
 import com.renergetic.dataapi.service.utils.DummyDataGenerator;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 
 

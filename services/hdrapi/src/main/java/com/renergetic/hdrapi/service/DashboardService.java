@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 
 import com.renergetic.common.model.MeasurementType;
 import com.renergetic.common.repository.MeasurementTypeRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

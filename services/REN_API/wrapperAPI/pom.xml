@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.5</version> <!-- lookup parent from repository -->
+		<version>2.7.18</version> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.renergetic.wrapperapi</groupId>
 	<artifactId>wrapperAPI</artifactId>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.renergetic</groupId>
             <artifactId>common</artifactId>
-            <version>[2.0.0,3.0.0)</version>
+            <version>1.2.0</version>
         </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -42,13 +42,13 @@
 		</dependency>
 	    <dependency>
 	       <groupId>org.springdoc</groupId>
-	       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-	       <version>2.1.0</version>
+	       <artifactId>springdoc-openapi-ui</artifactId>
+	       <version>1.6.4</version>
 	    </dependency>
 		<dependency>
 		    <groupId>org.springdoc</groupId>
-		    <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-		    <version>2.1.0</version>
+		    <artifactId>springdoc-openapi-data-rest</artifactId>
+		    <version>1.6.4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -96,14 +96,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
