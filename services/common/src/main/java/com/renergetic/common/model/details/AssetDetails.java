@@ -18,7 +18,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@EntityListeners(AssetDetailsListener.class)
 @Table(name = "asset_details")
 @RequiredArgsConstructor
 @Getter

@@ -22,7 +22,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@EntityListeners(AssetConnectionListener.class)
 @Table(name = "asset_connection")
 @RequiredArgsConstructor
 @Getter
