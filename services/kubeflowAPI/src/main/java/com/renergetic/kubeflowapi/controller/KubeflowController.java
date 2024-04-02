@@ -1,6 +1,5 @@
 package com.renergetic.kubeflowapi.controller;
 
-import com.renergetic.common.utilities.HttpAPIs;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.dao.ApiRunPostDAO;
 import com.renergetic.kubeflowapi.dao.ExampleRequest;
@@ -8,7 +7,6 @@ import com.renergetic.kubeflowapi.dao.ExampleResponse;
 import com.renergetic.kubeflowapi.model.*;
 import com.renergetic.kubeflowapi.service.ExampleService;
 import com.renergetic.kubeflowapi.service.KubeflowService;
-import com.renergetic.kubeflowapi.service.WorkflowService;
 import com.renergetic.kubeflowapi.service.utils.KubeflowUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,28 +20,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @Tag(name = "Kubeflow Controller", description = "Manage the connection to Kubeflow API")
 @RequestMapping("/api/kubeflow")
 public class KubeflowController {
     @Value("${api.generate.dummy-data}")
-    private Boolean generateDummy;
+	private Boolean generateDummy;
+	
+	@Value("${kubeflow.user.name}")
+	private String kubeflowUsername;
+
+	@Value("${kubeflow.user.password}")
+	private String kubeflowPassword;	
 
 	@Autowired
 	private ExampleService exampleService;
 	@Autowired
-	private HttpAPIs apis;
-	@Autowired
 	private KubeflowService kubeflowService;
-    @Autowired
-    private WorkflowService workflowService;
+    //@Autowired
+    //private WorkflowService workflowService;
 
 	private String cookie; //= "authservice_session=MTcxMTM2ODUxOHxOd3dBTkZKT05VMU5XRVpVVjA5TVFWZFBVMUJNVDFGTVVrcE1TMWRDTWtOWVVVa3lVRlZGUmxKTlJrOUhUVEpRVWtsWFZraEZTa0U9fP6c_WZhE0UgbxeoNjBjExcwvdA8rm_Cm7uJc4VrheSg";
 
@@ -62,6 +62,8 @@ public class KubeflowController {
 		this.cookie = cookie;
 		return new ResponseEntity<>(kubeflowService.getListPipelines(cookie), HttpStatus.OK);
 	}
+
+	
 
 	@Operation(summary = "Get all runs from kubeflow")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -222,7 +224,7 @@ public class KubeflowController {
 
 	@Operation(summary = "Get all examples saved on the repository")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
-	@GetMapping(path = "", produces = "application/json")
+	@GetMapping(path = "/kubeflow/login", produces = "application/json")
 	public ResponseEntity<?> logUser() {
 
 		String urlString = "https://kubeflow.apps.dcw1-test.paas.psnc.pl";
@@ -241,7 +243,7 @@ public class KubeflowController {
 
 		String response = utils.sendRequest(urlString, httpsMethod, params, body, headers);
 		String[] lines = response.split("\n");
-		String stateValue="";
+		String stateValue = "";
 		for (String line : lines) {
 			if (line.contains("action=\"/dex/auth/local/login?back=&amp;state=")) {
 				int startIndex = line.indexOf("state=") + "state=".length();
@@ -253,6 +255,13 @@ public class KubeflowController {
 		}
 
 		return new ResponseEntity<>(stateValue, HttpStatus.OK);
+	}
+	
+	@Operation(summary = "Get all examples saved on the repository")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "/example/user", produces = "application/json")
+	public ResponseEntity<?> getMethodName() {
+		return new ResponseEntity<>(String.format("%s: %s", kubeflowUsername, kubeflowPassword), HttpStatus.OK);
 	}
 
 	// ********************************************************************************
