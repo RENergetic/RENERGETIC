@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.5.0</version>
+		<version>2.7.18</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.renergetic</groupId>
@@ -14,7 +14,7 @@
 	<name>backdb</name>
 	<description>Project to access the relational database</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.renergetic</groupId>
 			<artifactId>common</artifactId>
-			<version>1.1.21</version>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.keycloak</groupId>
@@ -70,7 +70,6 @@
 		    <artifactId>springdoc-openapi-data-rest</artifactId>
 		    <version>1.6.4</version>
 		</dependency>
-
 		<dependency>
 		    <groupId>mysql</groupId>
 		    <artifactId>mysql-connector-java</artifactId>

@@ -50,7 +50,7 @@ public class InformationPanelService {
     public List<InformationPanelDAOResponse> getAll(long offset, int limit) {
         return informationPanelRepository.findAll(new OffSetPaging(offset, limit,
                         Sort.by(Sort.Direction.ASC, "id")))
-                .stream().map(x -> InformationPanelMapperTemp.toDTO(x, false)).collect(Collectors.toList());
+                .stream().map(x -> informationPanelMapper.toDTO(x, false)).collect(Collectors.toList());
 
 
     }
@@ -58,7 +58,7 @@ public class InformationPanelService {
     public List<InformationPanelDAOResponse> getAll(Long ownerId) {
         List<InformationPanelDAOResponse> list = informationPanelRepository.findAllByOwnerId(ownerId).stream()
 //                .map(x -> informationPanelMapper.toDTO(x))
-                .map(x -> InformationPanelMapperTemp.toDTO(x, false))
+                .map(x -> informationPanelMapper.toDTO(x, false))
                 .collect(Collectors.toList());
 
         if (list != null && list.size() > 0)
@@ -71,13 +71,13 @@ public class InformationPanelService {
 //    }
     public InformationPanelDAOResponse getById(Long id, Boolean detailed) {
 //        return informationPanelMapper.toDTO(
-        return InformationPanelMapperTemp.toDTO(
+        return informationPanelMapper.toDTO(
                 informationPanelRepository.findById(id).orElseThrow(NotFoundException::new), detailed);
     }
 
     public InformationPanelDAOResponse getByName(String name) {
 //        return informationPanelMapper.toDTO(
-        return InformationPanelMapperTemp.toDTO(
+        return informationPanelMapper.toDTO(
                 informationPanelRepository.findByName(name).orElseThrow(NotFoundException::new));
     }
 
@@ -88,7 +88,7 @@ public class InformationPanelService {
 
         InformationPanel infoPanelEntity = informationPanelMapper.toEntity(informationPanel);
         infoPanelEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        return InformationPanelMapperTemp.toDTO(informationPanelRepository.save(infoPanelEntity));
+        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
 //        return informationPanelMapper.toDTO(informationPanelRepository.save(infoPanelEntity));
     }
 
@@ -111,7 +111,7 @@ public class InformationPanelService {
         infoPanelEntity.setAssets(panel.getAssets());
         infoPanelEntity = informationPanelRepository.save(infoPanelEntity);
 //        return informationPanelMapper.toDTO(infoPanelEntity); //uncomment with new common version
-        return InformationPanelMapperTemp.toDTO(infoPanelEntity, false);
+        return informationPanelMapper.toDTO(infoPanelEntity, false);
 
 
     }
@@ -131,7 +131,7 @@ public class InformationPanelService {
         this.saveTiles(tiles, infoPanelEntity);
         informationPanelRepository.flush();
 //        return informationPanelMapper.toDTO(infoPanelEntity);
-        return InformationPanelMapperTemp.toDTO(infoPanelEntity, false);
+        return informationPanelMapper.toDTO(infoPanelEntity, false);
     }
 
     public InformationPanelDAO inferMeasurements(InformationPanelDAO informationPanel) {

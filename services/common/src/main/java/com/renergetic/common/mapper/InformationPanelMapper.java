@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-
 @Service
 public class InformationPanelMapper {
     public InformationPanel toEntity(InformationPanelDAORequest dto) {
