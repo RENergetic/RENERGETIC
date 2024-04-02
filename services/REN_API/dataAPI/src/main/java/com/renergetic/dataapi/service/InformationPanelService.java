@@ -147,7 +147,7 @@ public class InformationPanelService {
 
         //TODO: validate, check user privileges
         return informationPanelMapper.toDTO(
-                informationPanelRepository.save(informationPanelMapper.toEntity(informationPanel, panel)));
+                informationPanelRepository.save(panel));
     }
 
     public boolean deleteById(Long id) {

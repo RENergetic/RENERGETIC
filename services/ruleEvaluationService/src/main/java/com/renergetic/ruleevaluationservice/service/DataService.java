@@ -8,7 +8,7 @@ import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.AssetRepository;
 import com.renergetic.common.repository.MeasurementTagsRepository;
 import com.renergetic.ruleevaluationservice.dao.MeasurementSimplifiedDAO;
-import com.renergetic.ruleevaluationservice.service.utils.HttpAPIs;
+import com.renergetic.common.utilities.HttpAPIs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
