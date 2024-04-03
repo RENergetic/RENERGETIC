@@ -10,7 +10,7 @@ import com.renergetic.common.repository.MeasurementAggregationRepository;
 import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.ruleevaluationservice.dao.MeasurementAggregationDataDAO;
 import com.renergetic.ruleevaluationservice.dao.MeasurementSimplifiedDAO;
-import com.renergetic.ruleevaluationservice.service.utils.HttpAPIs;
+import com.renergetic.common.utilities.HttpAPIs;
 import com.renergetic.ruleevaluationservice.utils.TimeUtils;
 
 import lombok.extern.slf4j.Slf4j;

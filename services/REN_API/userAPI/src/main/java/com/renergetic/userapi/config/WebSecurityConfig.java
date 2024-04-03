@@ -1,24 +1,32 @@
 package com.renergetic.userapi.config;
 
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
+import com.renergetic.common.model.security.KeycloakRole;
+import com.renergetic.common.config.CustomAccessDeniedHandler;
+
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.renergetic.common.config.JwtAuthenticationFilter;
-import com.renergetic.common.config.JwtAuthorizationManager;
-import com.renergetic.common.model.security.KeycloakRole;
-
+import javax.servlet.*;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,19 +48,29 @@ public class WebSecurityConfig {
     private String clientId;
 
     @Bean
+    protected JwtAuthenticationProvider authenticationProvider() throws Exception {
+        JwtAuthenticationProvider provider = new JwtAuthenticationProvider();
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+
+    @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    	JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
         filter.setClientId(clientId);
 
         http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(filter, AuthorizationFilter.class);
+        http.addFilterBefore(filter, FilterSecurityInterceptor.class);
         
-        Map<String, KeycloakRole[]> getUrls = new HashMap<>();
-        Map<String, KeycloakRole[]> postUrls = new HashMap<>();
-        Map<String, KeycloakRole[]> putUrls = new HashMap<>();
-        Map<String, KeycloakRole[]> deleteUrls = new HashMap<>();
-        
-        
+        Map<String, String[]> getUrls = new HashMap<>();
+        Map<String, String[]> postUrls = new HashMap<>();
+        Map<String, String[]> putUrls = new HashMap<>();
+        Map<String, String[]> deleteUrls = new HashMap<>();
+
         // getUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
         
         // postUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
@@ -61,34 +79,39 @@ public class WebSecurityConfig {
         
         // deleteUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
 
-        http.authorizeHttpRequests(registry -> {
-	        
-	        getUrls.forEach((urlPattern, roles) -> {
-	        	registry.requestMatchers(HttpMethod.GET, urlPattern).access(new JwtAuthorizationManager(roles));
-	        });
-	        
-	        postUrls.forEach((urlPattern, roles) -> {
-	        	registry.requestMatchers(HttpMethod.POST, urlPattern).access(new JwtAuthorizationManager(roles));
-	        });
-	        
-	        putUrls.forEach((urlPattern, roles) -> {
-	        	registry.requestMatchers(HttpMethod.PUT, urlPattern).access(new JwtAuthorizationManager(roles));
-	        });
-	        
-	        deleteUrls.forEach((urlPattern, roles) -> {
-	        	registry.requestMatchers(HttpMethod.DELETE, urlPattern).access(new JwtAuthorizationManager(roles));
-	        });
-	        
-	        registry.anyRequest().access(new JwtAuthorizationManager()); // Access to authenticated users 
-	        //registry.anyRequest().permitAll(); // Access to all users
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>
+                .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
+
+        getUrls.forEach((urlPattern, roles) -> {
+            registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);
         });
-        
+
+        postUrls.forEach((urlPattern, roles) -> {
+            registry.antMatchers(HttpMethod.POST, urlPattern).hasAnyRole(roles);
+        });
+
+        putUrls.forEach((urlPattern, roles) -> {
+            registry.antMatchers(HttpMethod.PUT, urlPattern).hasAnyRole(roles);
+        });
+
+        deleteUrls.forEach((urlPattern, roles) -> {
+            registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
+        });
+        //registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        registry.anyRequest().permitAll();
+
         return http.build();
+    }
+
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-    	
+
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(methods);
@@ -104,4 +127,31 @@ public class WebSecurityConfig {
         return source;
     }
 
+    public class RoleFilter implements Filter {
+        private final int expectedMask;
+
+        public RoleFilter(int expectedMask) {
+            this.expectedMask = expectedMask;
+        }
+
+        @Override
+        public void destroy() {
+        }
+
+        @Override
+        public void doFilter(ServletRequest req, ServletResponse res,
+                             FilterChain chain) throws IOException, ServletException {
+
+
+            KeycloakAuthenticationToken authentication =
+                    (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            if (authentication.hasRole(expectedMask)) {
+                chain.doFilter(req, res);
+            } else {
+                //TODO:
+            }
+
+        }
+
+    }
 }

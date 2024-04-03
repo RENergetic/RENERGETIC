@@ -1,17 +1,14 @@
-package com.renergetic.common.config;
+package com.renergetic.hdrapi.config;
 
-import com.renergetic.common.exception.UnauthorizedAccessException;
 import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.common.model.security.KeycloakUser;
 import com.renergetic.common.utilities.Json;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -72,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var userId = keycloakJSON.get("sub").toString();
             var client = keycloakJSON.get("azp").toString();
             if (!client.equals(clientId)) {
-                throw new UnauthorizedAccessException("Invalid client" + clientId);
+                throw new Exception("Invalid client" + clientId);
             }
             var username = keycloakJSON.get("preferred_username").toString();
             var roles = keycloakJSON.getJSONObject("resource_access").getJSONObject(client).getJSONArray("roles");

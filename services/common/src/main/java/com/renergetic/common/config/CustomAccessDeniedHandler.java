@@ -1,4 +1,4 @@
-package com.renergetic.hdrapi.service;
+package com.renergetic.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;

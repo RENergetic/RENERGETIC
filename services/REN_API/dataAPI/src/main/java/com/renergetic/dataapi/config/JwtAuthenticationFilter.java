@@ -1,9 +1,9 @@
-package com.renergetic.kpiapi.config;
+package com.renergetic.dataapi.config;
 
-import com.renergetic.kpiapi.model.security.KeycloakAuthenticationToken;
-import com.renergetic.kpiapi.model.security.KeycloakRole;
-import com.renergetic.kpiapi.model.security.KeycloakUser;
-import com.renergetic.kpiapi.service.utils.Json;
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
+import com.renergetic.common.model.security.KeycloakRole;
+import com.renergetic.common.model.security.KeycloakUser;
+import com.renergetic.common.utilities.Json;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
