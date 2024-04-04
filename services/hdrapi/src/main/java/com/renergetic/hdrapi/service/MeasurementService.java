@@ -15,6 +15,7 @@ import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
 import com.renergetic.hdrapi.dao.tempcommon.TempMeasurementRepository;
+import com.renergetic.hdrapi.dao.tempcommon.TempMeasurementTagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -56,6 +57,8 @@ public class MeasurementService {
     MeasurementDetailsRepository measurementDetailsRepository;
     @Autowired
     MeasurementTagsRepository measurementTagsRepository;
+    @Autowired
+    TempMeasurementTagsRepository tempMeasurementTagsRepository;
     @Autowired
     UuidRepository uuidRepository;
 
@@ -246,7 +249,7 @@ public class MeasurementService {
     public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
                                                      String sensorName,
                                                      String assetName, Long typeId, String physicalTypeName,
-                                                     String tagKey,
+                                                     String tagKey,String tagValue,
                                                      Long offset,
                                                      Integer limit) {
         Stream<MeasurementDAO> measurements;
@@ -255,16 +258,24 @@ public class MeasurementService {
                     null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
                     limit).stream();
         } else {
-            measurements = measurementRepository.findMeasurements(
-                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,
+            measurements = tempMeasurementRepository.findMeasurementsByTag(
+                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,tagValue,
                     offset, limit).stream();
         }
 
         return measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
     }
 
+    public MeasurementDAOImpl findMeasurement(Long id) {
+        MeasurementDAO measurement = tempMeasurementRepository.findMeasurement(id)
+                .orElseThrow(() -> new NotFoundException("Measurement not found"));
+
+        return MeasurementDAOImpl.create(measurement);
+    }
+
     /**
      * get detailed list of measurements related with the asset
+     *
      * @param assetId
      * @param offset
      * @param limit
@@ -276,7 +287,7 @@ public class MeasurementService {
             Integer limit) {
         Stream<MeasurementDAO> measurements;
 
-        measurements = measurementRepository.findMeasurements(
+        measurements = tempMeasurementRepository.findMeasurements(
                 assetId, null, null, null, null, null, null, null, offset,
                 limit).stream();
         List<MeasurementDAOImpl> collect = measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
@@ -421,6 +432,13 @@ public class MeasurementService {
         return measurementTagsRepository.save(tag);
     }
 
+    public MeasurementTags updateTag(MeasurementTags tag, Long id) {
+        if (id != null && measurementTagsRepository.existsById(id)) {
+            tag.setId(id);
+            return measurementTagsRepository.save(tag);
+        } else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
+    }
+
     public boolean setTags(Long measurementId, Map<String, String> tags) {
         Measurement m = this.getById(measurementId);//check is exists
         List<MeasurementTags> tagList = tags.entrySet().stream().map(it -> {
@@ -441,12 +459,21 @@ public class MeasurementService {
         return true;
     }
 
+    public boolean setTag(Long measurementId, String key, String value) {
+        this.deleteMeasurementTag(measurementId,key);
+        Measurement m = this.getById(measurementId);//check is exists
+        var l = measurementTagsRepository.findByKeyAndValue(key, value);
+        if (l.size() == 0) {//  should be    if (l.size() != 1) {
+            throw new InvalidNonExistingIdException(
+                    "No tag with key " + key + " and value: " + value);
+        }
+        var tag = l.get(0);
+        measurementTagsRepository.setTag(tag.getId(), measurementId);//fails on duplicate
+        return true;
+    }
 
-    public MeasurementTags updateTag(MeasurementTags tag, Long id) {
-        if (id != null && measurementTagsRepository.existsById(id)) {
-            tag.setId(id);
-            return measurementTagsRepository.save(tag);
-        } else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
+    public boolean deleteMeasurementTag(Long measurementId, String tagKey) {
+        return tempMeasurementTagsRepository.clearTag(measurementId, tagKey) == 1;
     }
 
     public boolean deleteTagById(Long id) {

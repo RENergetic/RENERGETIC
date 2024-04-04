@@ -39,12 +39,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Measurement Controller", description = "Allows add and see Measurements")
 @RequestMapping("/api/measurements")
 public class MeasurementController {
-
+    //#region fields
     @Autowired
     MeasurementService measurementSv;
     @Autowired
     MeasurementDetailsRepository informationRepository;
+//#endregion
 
+//    #region get requests
+
+
+// endregion
 //=== GET REQUESTS====================================================================================
 
     @Operation(summary = "Get All Measurements having details key and value")
@@ -102,6 +107,7 @@ public class MeasurementController {
             @RequestParam(required = false, name = "sensor_name") String sensorName,
             @RequestParam(required = false, name = "asset_name") String assetName,
             @RequestParam(required = false, name = "tag_key") String tagKey,
+            @RequestParam(required = false, name = "tag_value") String tagValue,
             @RequestParam(required = false, name = "type_id") Long typeId,
             @RequestParam(required = false, name = "type_physical_name") String physicalTypeName) {
 
@@ -109,7 +115,7 @@ public class MeasurementController {
         List<MeasurementDAOImpl> measurements = new ArrayList<>();
 
         measurements = measurementSv.findMeasurements(name, domain, direction, sensorName,
-                assetName, typeId, physicalTypeName, tagKey, offset.orElse(0L), limit.orElse(1000));
+                assetName, typeId, physicalTypeName, tagKey,tagValue, offset.orElse(0L), limit.orElse(1000));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
@@ -140,6 +146,18 @@ public class MeasurementController {
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
             @ApiResponse(responseCode = "404", description = "No measurements found with this id")
     })
+    @GetMapping(path = {"/id/{id}/report"}, produces = "application/json")
+    public ResponseEntity<MeasurementDAOImpl> getDetailedMeasurement(@PathVariable Long id) {
+        var m =measurementSv.findMeasurement(id);
+        m.setTags(measurementSv.getMeasurementTags(id));
+        return new ResponseEntity<>(m, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Measurement by id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
+            @ApiResponse(responseCode = "404", description = "No measurements found with this id")
+    })
     @GetMapping(path = {"{id}", "/id/{id}"}, produces = "application/json")
     public ResponseEntity<MeasurementDAOResponse> getMeasurementsById(@PathVariable Long id) {
         var measurement = measurementSv.getById(id);
@@ -160,8 +178,6 @@ public class MeasurementController {
     @PostMapping(path = {"/{id}/copy", "/id/{id}/copy"}, produces = "application/json")
     public ResponseEntity<MeasurementDAOResponse> duplicateMeasurement(@PathVariable Long id) {
         var daoResponse = measurementSv.duplicate(id);
-
-
         return new ResponseEntity<>(daoResponse,
                 daoResponse != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
@@ -445,7 +461,7 @@ public class MeasurementController {
 
     @Operation(summary = "Get measurement tags")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "{id}/tags", produces = "application/json")
+    @GetMapping(path = {"{id}/tags", "/id/{id}/tags"}, produces = "application/json")
     public ResponseEntity<List<MeasurementTagsDAO>> getAllTags(@PathVariable Long id) {
         List<MeasurementTagsDAO> tags = new ArrayList<>();
 
@@ -500,6 +516,27 @@ public class MeasurementController {
         boolean res = measurementSv.setTags(measurementId, tags);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Insert Tags for Measurement")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "id/{id}/tags/key/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<Boolean> setMeasurementTag(
+            @PathVariable(name = "id") Long measurementId, @PathVariable String key, @PathVariable String value) {
+//TODO check privileges
+        boolean res = measurementSv.setTag(measurementId, key, value);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Delete measurement tag")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tag deleted"),
+            @ApiResponse(responseCode = "500", description = "Error deleting tag")
+    })
+    @DeleteMapping(path = "id/{id}/tags/key/{key}")
+    public ResponseEntity<Boolean> deleteMeasurementTag(@PathVariable Long id, @PathVariable String key) {
+        measurementSv.deleteMeasurementTag(id, key);
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
     @Operation(summary = "Delete tag")

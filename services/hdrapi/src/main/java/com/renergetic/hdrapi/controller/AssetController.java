@@ -1,10 +1,6 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.common.dao.AssetCategoryDAO;
-import com.renergetic.common.dao.AssetConnectionDAORequest;
-import com.renergetic.common.dao.AssetDAORequest;
-import com.renergetic.common.dao.AssetDAOResponse;
-import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.dao.*;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.AssetType;
 import com.renergetic.common.model.ConnectionType;
@@ -72,18 +68,16 @@ public class AssetController {
     @Operation(summary = "list by details")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "key/{key}/value/{value}", produces = "application/json")
-    public ResponseEntity<List<AssetDAOResponse>> getAllAssets(@PathVariable String key,@PathVariable String value,
-                                                               @RequestParam(required = false) Optional<Long> offset,
-                                                               @RequestParam(required = false) Optional<Integer> limit ) {
-        List<AssetDAOResponse> assets = new ArrayList<AssetDAOResponse>();
-
+    public ResponseEntity<List<SimpleAssetDAO>> getAllAssets(@PathVariable String key, @PathVariable String value,
+                                                             @RequestParam(required = false) Optional<Long> offset,
+                                                             @RequestParam(required = false) Optional<Integer> limit ) {
         try {
-            assets = assetSv.getByDetail(key,value, offset.orElse(0L), limit.orElse(50));
+            List<SimpleAssetDAO> assets  = assetSv.getByDetail(key,value, offset.orElse(0L), limit.orElse(50));
+            return new ResponseEntity<>(assets, HttpStatus.OK);
         } catch (NotFoundException ex) {
-            assets = Collections.emptyList();
+            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(assets, HttpStatus.OK);
     }
 
     @Operation(summary = "Get Asset by id")

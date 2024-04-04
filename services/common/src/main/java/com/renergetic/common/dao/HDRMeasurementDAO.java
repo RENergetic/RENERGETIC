@@ -1,8 +1,7 @@
 package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.common.dao.details.MeasurementTagsDAO;
-import com.renergetic.common.model.HDRRecommendation;
+import com.renergetic.common.model.HDRMeasurement;
 import com.renergetic.common.utilities.DateConverter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,31 +22,28 @@ public class HDRMeasurementDAO {
     @JsonProperty(required = true)
     private MeasurementDAOResponse measurement;
 
-    @JsonProperty(required = false)
-    private String label;
 
-    public static HDRMeasurementDAO create(HDRRecommendation recommendation) {
+    public static HDRMeasurementDAO create(HDRMeasurement mHDRMeasurement) {
 
         HDRMeasurementDAO dao = null;
 
-        if (recommendation != null) {
+        if (mHDRMeasurement != null) {
             dao = new HDRMeasurementDAO();
-            dao.setTimestamp(DateConverter.toEpoch(recommendation.getTimestamp()));
-            dao.setLabel(recommendation.getLabel());
-            dao.set(MeasurementDAOResponse.create());
-            dao.setId(recommendation.getId());
+            dao.setTimestamp(DateConverter.toEpoch(mHDRMeasurement.getTimestamp()));
+
+            dao.setMeasurement(MeasurementDAOResponse.create(mHDRMeasurement.getMeasurement(), null, null));
+            dao.setId(mHDRMeasurement.getId());
         }
         return dao;
     }
 
-    public HDRRecommendation mapToEntity() {
-        HDRRecommendation recommendation = new HDRRecommendation();
-        recommendation.setTag(this.getTag().mapToEntity());
-        recommendation.setLabel(this.getLabel());
+    public HDRMeasurement mapToEntity() {
+        HDRMeasurement mHDRMeasurement = new HDRMeasurement();
         if (this.id != null)
-            recommendation.setId(this.id);
-        recommendation.setTimestamp(DateConverter.toLocalDateTime(this.getTimestamp()));
-        return recommendation;
+            mHDRMeasurement.setId(this.id);
+        mHDRMeasurement.setTimestamp(DateConverter.toLocalDateTime(this.getTimestamp()));
+        mHDRMeasurement.setMeasurement(this.measurement.mapToEntity());
+        return mHDRMeasurement;
     }
 
 }

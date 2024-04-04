@@ -89,6 +89,8 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     public List<Asset> filterByDetail(@Param("mKey") String key, @Param("mValue") String value,
                                       @Param("name") String name, @Param("typeName") String typeName,
                                       @Param("offset") long offset, @Param("limit") int limit);
+
+
 //    @Modifying
 //    @Query(value = "DELETE FROM asset " +
 //            " WHERE asset.user_id = :userId and asset.asset_type_id = :userTypeId",nativeQuery = true)
@@ -108,4 +110,5 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
                                                                                     String assetTypeName);
 
     List<Asset> findDistinctByConnectionsConnectionTypeAndTypeName(ConnectionType connectionType, String assetTypeName);
+
 }

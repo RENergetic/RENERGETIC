@@ -168,13 +168,13 @@ public class AssetService {
         return assets;
     }
 
-    public List<AssetDAOResponse> getByDetail(String key, String value, long offset, int limit) {
+    public List<SimpleAssetDAO> getByDetail(String key, String value, long offset, int limit) {
 
         Stream<Asset> stream = tempAssetRepository.filterByDetail(key, value, null, null, offset, limit).stream();
-        List<AssetDAOResponse> assets;
-        assets = stream.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
-                        measurementRepository.findByAsset(asset)))
-                .collect(Collectors.toList());
+        List<SimpleAssetDAO> assets;
+//        assets = stream.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
+//                        measurementRepository.findByAsset(asset))).collect(Collectors.toList());
+        assets = stream.map(asset -> SimpleAssetDAO.create(asset)).collect(Collectors.toList());
 //        tempAssetRepository.filterByDetail(key, value, null, null, offset, limit)
         return assets;
     }

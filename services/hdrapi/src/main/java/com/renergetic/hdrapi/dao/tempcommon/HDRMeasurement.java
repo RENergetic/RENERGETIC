@@ -12,7 +12,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "hdr_recommendation", uniqueConstraints =
+@Table(name = "hdr_measurement", uniqueConstraints =
 @UniqueConstraint(columnNames = {"timestamp", "measurement_id"}))
 
 @RequiredArgsConstructor
