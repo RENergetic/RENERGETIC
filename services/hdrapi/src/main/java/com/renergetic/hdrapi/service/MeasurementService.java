@@ -247,7 +247,7 @@ public class MeasurementService {
     }
 
     public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
-                                                     String sensorName,
+                                                     String sensorName,Long assetId,
                                                      String assetName, Long typeId, String physicalTypeName,
                                                      String tagKey,String tagValue,
                                                      Long offset,
@@ -255,11 +255,11 @@ public class MeasurementService {
         Stream<MeasurementDAO> measurements;
         if (tagKey == null) {
             measurements = measurementRepository.findMeasurements(
-                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
                     limit).stream();
         } else {
             measurements = tempMeasurementRepository.findMeasurementsByTag(
-                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,tagValue,
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,tagValue,
                     offset, limit).stream();
         }
 
@@ -287,8 +287,8 @@ public class MeasurementService {
             Integer limit) {
         Stream<MeasurementDAO> measurements;
 
-        measurements = tempMeasurementRepository.findMeasurements(
-                assetId, null, null, null, null, null, null, null, offset,
+        measurements = tempMeasurementRepository.findMeasurementsByTag(
+                assetId, null, null, null, null, null, null, null,null,null, offset,
                 limit).stream();
         List<MeasurementDAOImpl> collect = measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
         collect.forEach(it ->
