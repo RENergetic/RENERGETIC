@@ -11,6 +11,7 @@ import com.renergetic.common.repository.MeasurementTypeRepository;
 import com.renergetic.common.repository.RecommendationRepository;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
+import com.renergetic.hdrapi.dao.tempcommon.TempAssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,8 @@ import java.util.stream.IntStream;
 public class DummyDataGenerator {
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;
+    @Autowired
+    TempAssetRepository assetRepository;
     @Autowired
     MeasurementRepository measurementRepository;
     @Autowired
@@ -58,6 +61,7 @@ public class DummyDataGenerator {
             return previousValue + (random.nextInt((max.intValue() / 3) * 100)) / 100.0 - max * 0.1;
         }
     }
+
 
     private static Double getMeasurementValue(MeasurementDAOResponse m) {
         return getMeasurementValue(m, null);

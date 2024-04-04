@@ -11,6 +11,8 @@ import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
+import com.renergetic.hdrapi.dao.tempcommon.TempAssetRepository;
+import com.renergetic.hdrapi.dao.tempcommon.TempMeasurementRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class AssetService {
 
     @Autowired
     AssetRepository assetRepository;
+
+    @Autowired
+    TempAssetRepository tempAssetRepository;
     @Autowired
     MeasurementRepository measurementRepository;
     @Autowired
@@ -96,13 +101,13 @@ public class AssetService {
             throw new InvalidArgumentException("Non user assets cannot be owners");
         }
 
-        if(assetConnectionRepository.existsByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
+        if (assetConnectionRepository.existsByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
                 connection.getAssetConnectedId(), connection.getType()))
             throw new InvalidArgumentException("connection already existing for that type between those assets");
 
         requireAsset(connection.getAssetConnectedId());
         assetConnectionRepository.save(connection.mapToEntity());
-        if(biDirection){
+        if (biDirection) {
             AssetConnectionDAORequest reversed = new AssetConnectionDAORequest();
             reversed.setAssetId(connection.getAssetConnectedId());
             reversed.setAssetConnectedId(connection.getAssetId());
@@ -114,7 +119,7 @@ public class AssetService {
     }
 
     @org.springframework.transaction.annotation.Transactional
-    public boolean disconnect(AssetConnectionDAORequest connection){
+    public boolean disconnect(AssetConnectionDAORequest connection) {
         assetConnectionRepository.deleteByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
                 connection.getAssetConnectedId(), connection.getType());
         return true;
@@ -160,6 +165,17 @@ public class AssetService {
         assets = stream.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
                         measurementRepository.findByAsset(asset)))
                 .collect(Collectors.toList());
+        return assets;
+    }
+
+    public List<SimpleAssetDAO> getByDetail(String key, String value, long offset, int limit) {
+
+        Stream<Asset> stream = tempAssetRepository.filterByDetail(key, value, null, null, offset, limit).stream();
+        List<SimpleAssetDAO> assets;
+//        assets = stream.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
+//                        measurementRepository.findByAsset(asset))).collect(Collectors.toList());
+        assets = stream.map(asset -> SimpleAssetDAO.create(asset)).collect(Collectors.toList());
+//        tempAssetRepository.filterByDetail(key, value, null, null, offset, limit)
         return assets;
     }
 
@@ -356,18 +372,38 @@ public class AssetService {
         } else throw new InvalidNonExistingIdException("No asset with id " + assetId + " found");
     }
 
-    public AssetDetails updateDetail(AssetDetails detail, Long id, Long assetId) {
-        if (id != null && assetDetailsRepository.existsByIdAndAssetId(id, assetId)) {
-            if (assetDetailsRepository.existsByKeyAndAssetId(detail.getKey(), assetId))
-                throw new InvalidCreationIdAlreadyDefinedException(
-                        "There are details with the same key and asset id");
-            detail.setId(id);
+    public AssetDetails setDetail(AssetDetails detail, Long assetId) {
+        AssetDetails assetDetails;
+        if (detail.getId() != null && assetDetailsRepository.existsById(detail.getId())) {
+            assetDetails = assetDetailsRepository.findById(detail.getId()).get();
+
+        } else {
+            assetDetails = assetDetailsRepository.findByKeyAndAssetId(detail.getKey(), assetId).orElse(null);
+        }
+        if (assetDetails != null) {
+            assetDetails.setValue(assetDetails.getValue());
+        } else {
             Asset asset = new Asset();
             asset.setId(assetId);
             detail.setAsset(asset);
-            return assetDetailsRepository.save(detail);
-        } else throw new InvalidNonExistingIdException(
-                "No asset detail with id " + id + " related with " + assetId + " found");
+            assetDetails = detail;
+        }
+        return assetDetailsRepository.save(assetDetails);
+//        if (id != null && assetDetailsRepository.existsByIdAndAssetId(detail.getId(), assetId)) {
+//            if (assetDetailsRepository.existsByKeyAndAssetId(detail.getKey(), assetId))
+//                throw new InvalidCreationIdAlreadyDefinedException(
+//                        "There are details with the same key and asset id");
+//            detail.setId(id);
+//
+//            return assetDetailsRepository.save(detail);
+//        } else{
+//            Asset asset = new Asset();
+//            asset.setId(assetId);
+//            detail.setAsset(asset);
+//            return assetDetailsRepository.save(detail);
+////            throw new InvalidNonExistingIdException(
+////                    "No asset detail with id " + id + " related with " + assetId + " found");
+//        }
     }
 
     public AssetDetails updateDetailByKey(AssetDetails detail, Long assetId) {
