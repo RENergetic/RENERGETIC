@@ -1,0 +1,12 @@
+# Backdb Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubeflow-api-sv
+spec:
+  selector:
+    app: kubeflow-api
+  type: NodePort
+  ports:
+    - port: 8082
+      targetPort: 8082
