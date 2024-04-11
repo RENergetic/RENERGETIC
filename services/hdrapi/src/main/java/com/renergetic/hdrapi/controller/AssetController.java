@@ -1,10 +1,6 @@
 package com.renergetic.hdrapi.controller;
 
-import com.renergetic.common.dao.AssetCategoryDAO;
-import com.renergetic.common.dao.AssetConnectionDAORequest;
-import com.renergetic.common.dao.AssetDAORequest;
-import com.renergetic.common.dao.AssetDAOResponse;
-import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.dao.*;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.AssetType;
 import com.renergetic.common.model.ConnectionType;
@@ -68,6 +64,20 @@ public class AssetController {
 
 
         return new ResponseEntity<>(assets, HttpStatus.OK);
+    }
+    @Operation(summary = "list by details")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "key/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<List<SimpleAssetDAO>> getAllAssets(@PathVariable String key, @PathVariable String value,
+                                                             @RequestParam(required = false) Optional<Long> offset,
+                                                             @RequestParam(required = false) Optional<Integer> limit ) {
+        try {
+            List<SimpleAssetDAO> assets  = assetSv.getByDetail(key,value, offset.orElse(0L), limit.orElse(50));
+            return new ResponseEntity<>(assets, HttpStatus.OK);
+        } catch (NotFoundException ex) {
+            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+        }
+
     }
 
     @Operation(summary = "Get Asset by id")
@@ -179,9 +189,10 @@ public class AssetController {
                                                           @PathVariable("asset_id") Long assetId,
                                                           @PathVariable("info_id") Long infoId) {
         detail.setId(infoId);
-        AssetDetails _detail = assetSv.updateDetail(detail, infoId, assetId);
+        AssetDetails _detail = assetSv.setDetail(detail,  assetId);
         return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
+
 
     @Operation(summary = "Update Information from its key")
     @ApiResponses({
@@ -193,9 +204,11 @@ public class AssetController {
     @PutMapping(path = "{asset_id}/info", produces = "application/json", consumes = "application/json")
     public ResponseEntity<AssetDetails> updateInformationByKey(@RequestBody AssetDetails detail,
                                                                @PathVariable("asset_id") Long assetId) {
-        AssetDetails _detail = assetSv.updateDetailByKey(detail, assetId);
+        AssetDetails _detail = assetSv.setDetail(detail, assetId);
         return new ResponseEntity<>(_detail, _detail != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
+
+
 
     @Operation(summary = "Delete Information from its id")
     @ApiResponses({

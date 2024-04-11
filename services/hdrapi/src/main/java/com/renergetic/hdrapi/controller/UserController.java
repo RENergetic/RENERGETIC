@@ -10,6 +10,7 @@ import com.renergetic.hdrapi.service.NotificationService;
 import com.renergetic.hdrapi.service.UserService;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,11 +18,13 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,48 +47,7 @@ public class UserController {
     @Autowired
     KeycloakService keycloakService;
 
-//=== GET REQUESTS====================================================================================
-
-
-    @Operation(summary = "Get All Users")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "", produces = "application/json")
-    public ResponseEntity<List<UserRepresentation>> getAllUsers(@RequestParam(required = false) Optional<String> role,
-                                                                @RequestParam(required = false) Optional<Integer> offset,
-                                                                @RequestParam(required = false) Optional<Integer> limit) {
-        loggedInService.hasRole(
-                KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        String token = loggedInService.getKeycloakUser().getToken();
-        List<UserRepresentation> users;
-        KeycloakWrapper client = keycloakService.getClient(token, true);
-        int mOffset = offset.orElse(0);
-        int mLimit = limit.orElse(50);
-        if (role.isPresent() && KeycloakRole.roleByName(role.get()) != null) {
-            users = client.listUsers(KeycloakRole.roleByName(role.get()).name, mOffset, mLimit);
-        } else {
-            users = client.listUsers(  mOffset, mLimit);
-        }
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Get user roles")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/{userId}/roles", produces = "application/json")
-    public ResponseEntity<List<String>> getRoles(@PathVariable String userId) {
-        loggedInService.hasRole(
-                KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        String token = loggedInService.getKeycloakUser().getToken();
-        KeycloakWrapper client = keycloakService.getClient(token, true);
-        try {
-            List<String> roles = client.getRoles(userId).stream().map(RoleRepresentation::getName).collect(
-                    Collectors.toList());
-            return new ResponseEntity<>(roles, HttpStatus.OK);
-        } catch (javax.ws.rs.NotAuthorizedException ex) {
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-
+    //#region PROFILE REQUESTS
     @Operation(summary = "Get current user profile")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Request executed correctly"),
@@ -106,7 +68,124 @@ public class UserController {
     }
 
 
-    @Operation(summary = "Get All Notifications for the user")
+    @Operation(summary = "Get notifications for the current user")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/profile/notifications", produces = "application/json")
+    public ResponseEntity<List<NotificationScheduleDAO>> getProfileNotifications(
+            @RequestParam(value = "show_expired", required = false) Optional<Boolean> showExpired) {
+        List<NotificationScheduleDAO> notifications;
+        //TODO: filter by user id
+        if (generateDummy) {
+            notifications = dummyDataGenerator.getNotifications();
+        } else {
+            notifications = notificationSv.get(0L, 100, showExpired.orElse(false));
+        }
+        return new ResponseEntity<>(notifications, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Current user Settings")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/profile/settings", produces = "application/json")
+    public ResponseEntity<String> getAllUsersSettings() {
+        Long userId = loggedInService.getLoggedInUser().getId();
+        return new ResponseEntity<>(userSv.getSettings(userId), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Set current user's settings")
+    @ApiResponses({@ApiResponse(responseCode = "201", description = "Setting saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving role")})
+    @PostMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
+    @PutMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<String> saveUserSetting(@RequestBody String settings) {
+        Long userId = loggedInService.getLoggedInUser().getId();
+        settings = userSv.saveSettings(userId, settings);
+        return new ResponseEntity<>(settings, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Update current User")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User saved correctly"),
+            @ApiResponse(responseCode = "404", description = "User not exist"),
+            @ApiResponse(responseCode = "422", description = "Type isn's valid"),
+            @ApiResponse(responseCode = "500", description = "Error saving user")
+    }
+    )
+    @PutMapping(path = "/profile", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<Boolean> updateProfile(@RequestBody UserDAORequest user) {
+        KeycloakWrapper client = keycloakService.getClient(true);
+        KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
+        user.setId(keycloakUser.getId());
+        //TODO: synchronized section
+        try {
+            client.updateUser(user);
+        } catch (javax.ws.rs.NotAuthorizedException ex) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        if (user.getPassword() != null) {
+            client.updatePassword(keycloakUser.getId(), user.getPassword());
+        }
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Delete current user", hidden = false)
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "User deleted correctly"),
+            @ApiResponse(responseCode = "500", description = "Error deleting user")})
+    @DeleteMapping(path = "/profile")
+    public ResponseEntity<?> deleteCurrentUser() {
+        KeycloakWrapper client = keycloakService.getClient(true);
+        KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
+        UserRepresentation userRepresentation = client.deleteUser(keycloakUser.getId());
+
+        userSv.delete(userRepresentation);
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+    //#endregion
+
+    //#region Admin GET REQUESTS
+
+
+    @Operation(summary = "Get All Users")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "", produces = "application/json")
+    public ResponseEntity<List<UserRepresentation>> getAllUsers
+            (@Parameter(description = "Filter by role name") @RequestParam(required = false) Optional<String> role,
+             @RequestParam(required = false) Optional<Integer> offset,
+             @RequestParam(required = false) Optional<Integer> limit) {
+        loggedInService.hasRole(
+                KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
+        String token = loggedInService.getKeycloakUser().getToken();
+        List<UserRepresentation> users;
+        KeycloakWrapper client = keycloakService.getClient(token, true);
+        int mOffset = offset.orElse(0);
+        int mLimit = limit.orElse(50);
+        if (role.isPresent() && KeycloakRole.roleByName(role.get()) != null) {
+            users = client.listUsers(KeycloakRole.roleByName(role.get()).name, mOffset, mLimit);
+        } else {
+            users = client.listUsers(mOffset, mLimit);
+        }
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get any user's roles")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/{userId}/roles", produces = "application/json")
+    public ResponseEntity<List<String>> getRoles(@PathVariable String userId) {
+        loggedInService.hasRole(
+                KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
+        String token = loggedInService.getKeycloakUser().getToken();
+        KeycloakWrapper client = keycloakService.getClient(token, true);
+        try {
+            List<String> roles = client.getRoles(userId).stream().map(RoleRepresentation::getName).collect(
+                    Collectors.toList());
+            return new ResponseEntity<>(roles, HttpStatus.OK);
+        } catch (javax.ws.rs.NotAuthorizedException ex) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+
+    //    TODO: to remove in the future releases
+    @Operation(summary = "Get notifications for the current user")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/notifications", produces = "application/json")
     public ResponseEntity<List<NotificationScheduleDAO>> getUserNotifications(
@@ -123,11 +202,11 @@ public class UserController {
         return new ResponseEntity<>(notifications, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get Assets from User with specific id")
-    @GetMapping(path = "/assets/{id}", produces = "application/json")
-    public ResponseEntity<List<AssetDAOResponse>> getAssets(@PathVariable Long id) {
+    @Operation(summary = "List all linked assets to the user")
+    @GetMapping(path = "/assets/{userId}", produces = "application/json")
+    public ResponseEntity<List<AssetDAOResponse>> getAssets(@PathVariable Long userId) {
         List<AssetDAOResponse> assets = null;
-        assets = userSv.getAssets(id);
+        assets = userSv.getAssets(userId);
         return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
@@ -142,15 +221,10 @@ public class UserController {
         return new ResponseEntity<>(assets, assets != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    @Operation(summary = "Get User Settings")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/profile/settings", produces = "application/json")
-    public ResponseEntity<String> getAllUsersSettings() {
-        Long userId = loggedInService.getLoggedInUser().getId();
-        return new ResponseEntity<>(userSv.getSettings(userId), HttpStatus.OK);
-    }
 
-//=== POST REQUESTS ===================================================================================
+    //#endregion
+
+    //#region Admin POST/PUT REQUESTS
 
     @Operation(summary = "Create a new User")
     @ApiResponses({
@@ -159,41 +233,23 @@ public class UserController {
     }
     )
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<UserDAOResponse> createUser(@RequestBody UserDAORequest user) {
+    public ResponseEntity<UserRepresentation> createUser(@RequestBody UserDAORequest userRequest) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        KeycloakWrapper client = keycloakService.getClient(true);
-        UserRepresentation ur = client.createUser(user);
-        user.setId(ur.getId());
-        UserDAOResponse save = userSv.save(ur, user);
-        return new ResponseEntity<>(save, HttpStatus.CREATED);
+        KeycloakWrapper kClient = keycloakService.getClient(true);
+        UserRepresentation kUser = userSv.create(kClient, userRequest);
+        return new ResponseEntity<>(kUser, HttpStatus.CREATED);
     }
 
-
-    @Operation(summary = "Create a new User Setting associated to a User")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Setting saved correctly"),
-            @ApiResponse(responseCode = "404", description = "User to assign role not found"),
-            @ApiResponse(responseCode = "500", description = "Error saving role")
-    }
-    )
-    @PostMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
-    @PutMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<String> saveUserSetting(@RequestBody String settings) {
-//        Long userId = 2l;
-        Long userId = loggedInService.getLoggedInUser().getId();
-        settings = userSv.saveSettings(userId, settings);
-
-        return new ResponseEntity<>(settings, HttpStatus.OK);
-    }
-
+    @Operation(summary = "Modify user's settings")
     @PostMapping(path = "/settings/user", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<UserSettingsDAO> createUserSetting(@RequestBody UserSettingsDAO role) {
-        UserSettingsDAO _role = userSv.saveSetting(role);
-        return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
-    }
+    public ResponseEntity<UserSettingsDAO> createUserSetting(@RequestBody UserSettingsDAO UserDAORequest) {
+        loggedInService.hasRole(
+                KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
 
-//=== PUT REQUESTS====================================================================================
+        UserSettingsDAO _settings = userSv.saveSetting(UserDAORequest);
+        return new ResponseEntity<>(_settings, _settings != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
+    }
 
     @Operation(summary = "Update a existing User")
     @ApiResponses({
@@ -218,32 +274,6 @@ public class UserController {
         userSv.update(user, ur);//TODO: return respoonse of the user ?
         return new ResponseEntity<>(true, HttpStatus.OK);
 //        return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);//todo trow not found
-    }
-
-    @Operation(summary = "Update current User")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "User saved correctly"),
-            @ApiResponse(responseCode = "404", description = "User not exist"),
-            @ApiResponse(responseCode = "422", description = "Type isn's valid"),
-            @ApiResponse(responseCode = "500", description = "Error saving user")
-    }
-    )
-    @PutMapping(path = "/profile", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<Boolean> updateProfile(@RequestBody UserDAORequest user) {
-        KeycloakWrapper client = keycloakService.getClient(true);
-        KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
-        user.setId(keycloakUser.getId());
-        //TODO: synchronized section
-        try {
-
-            client.updateUser(user);
-        } catch (javax.ws.rs.NotAuthorizedException ex) {
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        }
-        if (user.getPassword() != null) {
-            client.updatePassword(keycloakUser.getId(), user.getPassword());
-        }
-        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
 
@@ -280,6 +310,7 @@ public class UserController {
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
 
+    //TODO: is it used anywhere ?
     @Operation(summary = "Update a existing User Setting")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User saved correctly"),
@@ -291,20 +322,31 @@ public class UserController {
     @PutMapping(path = "/settings/{id}", produces = "application/json", consumes = "application/json")
     public ResponseEntity<UserSettingsDAO> updateUserSettings(@RequestBody UserSettingsDAO setting,
                                                               @PathVariable Long id) {
+        loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
         setting.setId(id);//todo
         UserSettingsDAO _setting = userSv.updateSettings(setting, id);
         return new ResponseEntity<>(_setting, _setting != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    //=== DELETE REQUESTS ================================================================================
-    @Operation(summary = "Delete a existing User", hidden = false)
+    //#endregion
+
+    //#region Admin DELETE REQUESTS
+    @Operation(summary = "Delete an existing User", hidden = false)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "User deleted correctly"),
             @ApiResponse(responseCode = "500", description = "Error deleting user")})
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
         loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
+        if (Objects.equals(loggedInService.getKeycloakUser().getId(), id)) {
+            throw new RuntimeException("Cannot self delete user");
+        }
         String token = loggedInService.getKeycloakUser().getToken();
         KeycloakWrapper client = keycloakService.getClient(token, true);
+        boolean isAdmin = client.getRoles(id).stream().filter(
+                it -> it.getName().equals(KeycloakRole.REN_ADMIN.name)).findAny().isEmpty();
+        if (isAdmin) {
+            throw new RuntimeException("Cannot delete admin");
+        }
         UserRepresentation userRepresentation = client.getUser(id).toRepresentation();
         client.deleteUser(userRepresentation.getId());
         userSv.delete(userRepresentation);
@@ -318,95 +360,15 @@ public class UserController {
     @DeleteMapping(path = "/{id}/roles/{roleName}")
     public ResponseEntity<?> deleteRole(@PathVariable String id, @PathVariable String roleName) {
         loggedInService.hasRole(KeycloakRole.REN_ADMIN.mask);//TODO: WebSecurityConfig
+        if (Objects.equals(loggedInService.getKeycloakUser().getId(), id) && roleName.equals(KeycloakRole.REN_ADMIN.name)) {
+            throw new RuntimeException("Cannot self remove admin role");
+        }
         String token = loggedInService.getKeycloakUser().getToken();
         KeycloakWrapper client = keycloakService.getClient(token, true);
         List<String> roles = client.revokeRole(id, roleName).stream().map(RoleRepresentation::getName).collect(
                 Collectors.toList());
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
-
+    //#endregion
 
 }
-
-//    @Operation(summary = "Delete a existing User Role", hidden = false)
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "204", description = "User Role deleted correctly"),
-//            @ApiResponse(responseCode = "500", description = "Error deleting user role")
-//    }
-//    )
-//    @DeleteMapping(path = "/roles/{id}")
-//    public ResponseEntity<?> deleteUserRole(@PathVariable Long id) {
-//        userSv.deleteRoleById(id);
-//
-//        return ResponseEntity.noContent().build();
-//    }
-//    @Operation(summary = "Delete a existing User Setting", hidden = false)
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "204", description = "User Setting deleted correctly"),
-//            @ApiResponse(responseCode = "500", description = "Error deleting user setting")
-//    }
-//    )
-//    @DeleteMapping(path = "/settings/{id}")
-//    public ResponseEntity<?> deleteUserSetting(@PathVariable Long id) {
-//        userSv.deleteSettingById(id);
-//
-//        return ResponseEntity.noContent().build();
-//    }
-//    @Operation(summary = "Get All Users Settings")
-//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-//    @GetMapping(path = "/settings", produces = "application/json")
-//    public ResponseEntity<List<UserSettingsDAO>> getAllUsersSettings(
-//            @RequestParam(required = false) Optional<Long> offset,
-//            @RequestParam(required = false) Optional<Integer> limit) {
-//        List<UserSettingsDAO> settings = new ArrayList<>();
-//
-//        settings = userSv.getSettings(null, offset.orElse(0L), limit.orElse(20));
-//
-//        return new ResponseEntity<>(settings, HttpStatus.OK);
-//    }
-//    @Operation(summary = "Get All Users")
-//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-//    @GetMapping(path = "", produces = "application/json")
-//    public ResponseEntity<List<UserDAOResponse>> getAllUsers(@RequestParam(required = false) Optional<Long> offset,
-//                                                             @RequestParam(required = false) Optional<Integer> limit) {
-//        List<UserDAOResponse> users = new ArrayList<UserDAOResponse>();
-//
-//        users = userSv.get(null, offset.orElse(0L), limit.orElse(20));
-//
-//        return new ResponseEntity<>(users, HttpStatus.OK);
-//    }//    @Operation(summary = "Get User by id")
-////    @ApiResponses({
-////            @ApiResponse(responseCode = "200", description = "Request executed correctly"),
-////            @ApiResponse(responseCode = "404", description = "No users found with this id")
-////    })
-////    @GetMapping(path = "id/{id}", produces = "application/json")
-////    public ResponseEntity<UserDAOResponse> getUsersById(@PathVariable Long id) {
-////        UserDAOResponse user = null;
-////
-////        user = userSv.getById(id);
-////
-////        return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-////    }//
-////    @Operation(summary = "Get All Users Roles")
-////    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-////    @GetMapping(path = "/roles", produces = "application/json")
-////    public ResponseEntity<List<UserRolesDAO>> getAllUsersRoles(@RequestParam(required = false) Optional<Long> offset,
-////                                                               @RequestParam(required = false) Optional<Integer> limit) {
-////        List<UserRolesDAO> roles = new ArrayList<>();
-////
-////        roles = userSv.getRoles(null, offset.orElse(0L), limit.orElse(20));
-////
-////        return new ResponseEntity<>(roles, HttpStatus.OK);
-////    }
-//    @Operation(summary = "Create a new User Role associated to a User")
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "201", description = "Role saved correctly"),
-//            @ApiResponse(responseCode = "404", description = "User to assign role not found"),
-//            @ApiResponse(responseCode = "500", description = "Error saving role")
-//    }
-//    )
-//    @PostMapping(path = "/roles", produces = "application/json", consumes = "application/json")
-//    public ResponseEntity<UserRolesDAO> createUserRole(@RequestBody UserRolesDAO role) {
-//        UserRolesDAO _role = userSv.saveRole(role);
-//        return new ResponseEntity<>(_role, _role != null ? HttpStatus.CREATED : HttpStatus.NOT_FOUND);
-//    }

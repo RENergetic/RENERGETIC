@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.service;
 
+import com.renergetic.common.dao.ErrorMessage;
 import com.renergetic.common.dao.AssetDAOResponse;
 import com.renergetic.common.dao.UserDAORequest;
 import com.renergetic.common.dao.UserDAOResponse;
@@ -11,8 +12,10 @@ import com.renergetic.common.model.*;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@Slf4j
 public class UserService {
     @PersistenceContext
     EntityManager entityManager;
@@ -46,29 +50,78 @@ public class UserService {
     @Autowired
     AssetTypeRepository assetTypeRepository;
 
+    @Autowired
+    KeycloakService keycloakService;
+
     // USER CRUD OPERATIONS
+//    @Transactional
+//    public UserDAOResponse save(UserRepresentation keycloakUser, UserDAORequest user) {
+//        KeycloakWrapper client = keycloakService.getClient(true);
+//        if (client.userExists(user.getUsername()) || userSv.) {
+//            throw new DuplicateKeyException("User exists: " + user.getUsername());
+//        }
+//        UserRepresentation ur = client.createUser(user);
+//        user.setId(ur.getId());
+//        if (user.getId() != null && userRepository.findByKeycloakId(user.getId()) != null)
+//            throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
+//
+//        User userEntity = user.mapToEntity();
+//        userEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+//        userEntity = userRepository.save(userEntity);
+//        userSettingsRepository.save(new UserSettings(userEntity, "{}"));
+//        Optional<AssetType> type = assetTypeRepository.findByName("user");
+//        AssetType assetType;
+//        if (type.isEmpty()) {
+//            assetType = new AssetType("user");
+//            assetTypeRepository.save(assetType);
+//        } else {
+//            assetType = type.get();
+//        }
+//        Asset asset = Asset.initUserAsset(user.getUsername(), userEntity, assetType, null);
+//        asset.setUuid(uuidRepository.saveAndFlush(new UUID()));
+//        assetRepository.save(asset);
+//        return UserDAOResponse.create(keycloakUser, null, null);
+//    }
+
     @Transactional
-    public UserDAOResponse save(UserRepresentation keycloakUser,UserDAORequest user) {
-
-        if (user.getId() != null && userRepository.findByKeycloakId(user.getId()) != null)
-            throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
-
-        User userEntity = user.mapToEntity();
-        userEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        userEntity = userRepository.save(userEntity);
-        userSettingsRepository.save(new UserSettings(userEntity, "{}"));
-        Optional<AssetType> type = assetTypeRepository.findByName("user");
-        AssetType assetType;
-        if (type.isEmpty()) {
-            assetType = new AssetType("user");
-            assetTypeRepository.save(assetType);
+    public UserRepresentation create(KeycloakWrapper client, UserDAORequest request) {
+        UserRepresentation kUser;
+        if (client.userExists(request.getUsername())) {
+            //TODO:
+//            throw new DuplicateKeyException("User exists: "+ user.getUsername());
+            kUser = client.getUserByUsername(request.getUsername());
         } else {
-            assetType = type.get();
+            kUser = client.createUser(request);
         }
-        Asset asset = Asset.initUserAsset(user.getUsername(), userEntity, assetType, null);
-        asset.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        assetRepository.save(asset);
-        return UserDAOResponse.create(keycloakUser, null, null);
+        if (kUser.getId() == null && userRepository.findByKeycloakId(kUser.getId()) == null) {
+            throw new InvalidNonExistingIdException(
+                    "User not created, check Keycloak state (" + request.getUsername() + ")");
+        }
+        try {
+            User userEntity = request.mapToEntity();
+            userEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+            userEntity.setKeycloakId(kUser.getId());
+            userEntity = userRepository.save(userEntity);
+            userSettingsRepository.save(new UserSettings(userEntity, "{}"));
+            Optional<AssetType> type = assetTypeRepository.findByName("user");
+            AssetType assetType;
+            if (type.isEmpty()) {
+                assetType = new AssetType("user");
+                assetTypeRepository.save(assetType);
+            } else {
+                assetType = type.get();
+            }
+            Asset asset = Asset.initUserAsset(request.getUsername(), userEntity, assetType, null);
+            asset.setUuid(uuidRepository.saveAndFlush(new UUID()));
+            assetRepository.save(asset);
+        } catch (Exception ex) {
+//            ex.printStackTrace();
+            log.error(ex.getMessage());
+            client.deleteUser(kUser.getId());
+            throw new RuntimeException("User not created");
+        }
+        return kUser;
+//        return UserDAOResponse.create(keycloakUser, null, null);
     }
 
     @Transactional
@@ -81,8 +134,8 @@ public class UserService {
                     "Not exists a user with ID " + keycloakUser.getId() + ":" + keycloakUser.getUsername());
 //        var uuid = entityUser.getUuid();
         userSettingsRepository.deleteByUserId(entityUser.getId());
-        var userTypeId= assetTypeRepository.findByName("user").get().getId();
-        assetRepository.clearUserId(entityUser.getId(),userTypeId);
+        var userTypeId = assetTypeRepository.findByName("user").get().getId();
+        assetRepository.clearUserId(entityUser.getId(), userTypeId);
         var asset = assetRepository.findByUserId(entityUser.getId());
         assetRepository.deleteById(asset.getId());
         uuidRepository.delete(asset.getUuid());
@@ -218,12 +271,12 @@ public class UserService {
 //                userSettingsRepository.findByUserId(user.getId()));
 //    }
 
-    public List<AssetDAOResponse> getAssets(Long id) {
+    public List<AssetDAOResponse> getAssets(Long userId) {
 
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("No user with id " + id + " found"));
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException("No user with id " + userId + " found"));
         if (user == null) {
-            throw new InvalidNonExistingIdException("No user realated with id" + id);
+            throw new InvalidNonExistingIdException("No user realated with id" + userId);
         } else {
             List<Asset> userAssets = assetRepository.findByUser(user);
             List<AssetDAOResponse> assets = new ArrayList<>();
@@ -240,7 +293,7 @@ public class UserService {
                             })
                             .collect(Collectors.toList()));
                 return assets;
-            } else throw new NotFoundException("User " + id + " hasn't related asset");
+            } else throw new NotFoundException("User " + userId + " hasn't related asset");
         }
     }
 

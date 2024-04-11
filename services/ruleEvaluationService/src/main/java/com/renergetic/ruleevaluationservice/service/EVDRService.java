@@ -59,7 +59,7 @@ public class EVDRService {
         LocalDateTime nextExecution = cronTrigger.next(currentTime);
 
         for(Asset assetPVGroup : assets){
-            if(!assetPVGroup.getDetails().stream().anyMatch(d -> d.getKey().equals("ev-dr-threshold")))
+            if(!assetPVGroup.getDetails().stream().anyMatch(d -> d.getKey().equals("ev-dr-asset-recommendation")))
                 continue;
             try{
 
