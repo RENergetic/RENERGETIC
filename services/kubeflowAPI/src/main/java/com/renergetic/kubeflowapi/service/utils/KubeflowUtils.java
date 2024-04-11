@@ -8,8 +8,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import com.renergetic.kubeflowapi.model.HttpsResponseInfo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,13 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 public class KubeflowUtils {
 
     // Create here methods with generic funtionalities that can be used in the project
-
-    public String sendRequest(String urlString, String httpMethod, Map<String, String> params, Object body,
+    
+    public HttpsResponseInfo sendRequest(String urlString, String httpMethod, Map<String, String> params, Object body,
             Map<String, String> headers) {
 
-        StringBuilder response = new StringBuilder();
+        String response = new String();
         String jsonResponse = "";
         String paramsString = "";
+        HttpURLConnection connection;
         URL url;
         try {
             System.out.println("SEND REQUEST *******************************************");
@@ -33,7 +39,9 @@ public class KubeflowUtils {
             parseParams = parseParams.isBlank() ? parseParams : '?' + parseParams;
             url = new URL(urlString + parseParams);
 
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setInstanceFollowRedirects(true);
+            HttpURLConnection.setFollowRedirects(true); /////// TODO: REVISAR QUE ES NECESARIO DE AQUÍ
             connection.setRequestMethod(httpMethod);
 
             if (headers != null) {
@@ -52,22 +60,13 @@ public class KubeflowUtils {
                 }
             }
 
-            int responseCode = connection.getResponseCode();
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                System.out.println("Response Code: " + responseCode);
-                System.out.println("Response Body: " + response.toString());
-            }
-
-            System.out.println(response.toString());
+            HttpsResponseInfo info = new HttpsResponseInfo(connection.getResponseCode(), getBody(connection), connection.getHeaderFields());
+            
+            return info;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return response.toString();
+        return null;
     }
     
     static public String mapParams(Map<String, String> params) {
@@ -89,5 +88,22 @@ public class KubeflowUtils {
         return resultString.length() > 0
                 ? resultString.substring(0, resultString.length() - 1)
                 : resultString;
+    }
+
+    public String getBody(HttpURLConnection connection) {
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            System.out.println("");
+            System.out.println("Response Body: " + response.toString());
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return response.toString();
     }
 }

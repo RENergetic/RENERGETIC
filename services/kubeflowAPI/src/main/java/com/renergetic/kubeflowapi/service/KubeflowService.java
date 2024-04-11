@@ -9,8 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.service.utils.KubeflowUtils;
+import com.renergetic.common.utilities.Json;
 
 @Service
 public class KubeflowService {
@@ -32,7 +32,7 @@ public class KubeflowService {
         headers.put("Cookie", cookie);
         headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
         headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
-        return utils.sendRequest(urlString, httpsMethod, params, body, headers);
+        return utils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
     }
 
     public String getListRuns(String cookie) {
@@ -60,7 +60,7 @@ public class KubeflowService {
         headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
         headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
 
-        return utils.sendRequest(urlString, httpsMethod, params, body, headers);
+        return utils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
     }
     
     public String getRunsFromPipeline(String cookie) {
