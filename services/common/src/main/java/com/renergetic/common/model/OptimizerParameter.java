@@ -15,7 +15,7 @@ import javax.persistence.*;
 @ToString
 public class OptimizerParameter {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "parameter_name", unique = true, nullable = false)

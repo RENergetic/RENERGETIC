@@ -20,7 +20,7 @@ import java.util.Set;
 @ToString
 public class MeasurementAggregation {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@OneToMany(cascade = {}, fetch = FetchType.EAGER, orphanRemoval = false)

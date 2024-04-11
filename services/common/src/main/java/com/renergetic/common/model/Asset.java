@@ -24,7 +24,7 @@ public class Asset {
     public static Map<String, AssetTypeCategory> ALLOWED_TYPES;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)
