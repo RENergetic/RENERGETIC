@@ -1,5 +1,6 @@
 package com.renergetic.kubeflowapi.controller;
 
+import com.renergetic.common.dao.WorkflowDefinitionDAO;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.dao.ApiRunPostDAO;
 import com.renergetic.kubeflowapi.dao.ExampleRequest;
@@ -42,8 +43,8 @@ public class KubeflowController {
 	private ExampleService exampleService;
 	@Autowired
 	private KubeflowService kubeflowService;
-    //@Autowired
-    //private WorkflowService workflowService;
+    @Autowired
+    private WorkflowService workflowService;
 
 	private String cookie; //= "authservice_session=MTcxMTM2ODUxOHxOd3dBTkZKT05VMU5XRVpVVjA5TVFWZFBVMUJNVDFGTVVrcE1TMWRDTWtOWVVVa3lVRlZGUmxKTlJrOUhUVEpRVWtsWFZraEZTa0U9fP6c_WZhE0UgbxeoNjBjExcwvdA8rm_Cm7uJc4VrheSg";
 
@@ -314,7 +315,7 @@ public class KubeflowController {
 	// ********************************************************************************
 
 
-	/*
+
 	@Operation(summary = "Get All workflow for non-admin users") // GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR NON ADMINS)
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "/workflow", produces = "application/json")
@@ -389,7 +390,7 @@ public class KubeflowController {
 		Boolean res = workflowService.setParameters(experimentId, parameters);
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
-	*/
+
 
 }
 
