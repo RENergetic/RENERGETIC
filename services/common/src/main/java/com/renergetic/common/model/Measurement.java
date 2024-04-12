@@ -21,7 +21,7 @@ public class Measurement {
 
 	//todo: unique key: name-asset-sensor-type-direction
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@Column(name = "name", nullable = false, insertable = true, updatable = true)

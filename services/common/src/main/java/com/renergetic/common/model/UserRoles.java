@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @ToString
 public class UserRoles {	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@Column(name = "uuid", nullable = true, insertable = true, updatable = true, unique = true)

@@ -18,7 +18,7 @@ import javax.persistence.*;
 @ToString
 public class Area {	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)
