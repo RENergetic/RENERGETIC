@@ -1,4 +1,4 @@
 [submodule "front"]
 	path = front
-	url = https://atlassian.gfi.es/bitbucket/scm/renergetic/rener_front.git
+	url = https://github.com/RENergetic/RENER_FRONT.git
 	branch = develop
