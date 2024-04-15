@@ -1,6 +1,5 @@
 package com.renergetic.kubeflowapi.service.utils;
-/*
-//import com.renergetic.common.dao.*;
+
 
 import com.renergetic.common.dao.*;
 import com.renergetic.common.dao.details.MeasurementTagsDAO;
@@ -12,10 +11,10 @@ import com.renergetic.common.repository.RecommendationRepository;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.controller.KubeflowController;
-import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowDefinitionDAO;
-import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowParameter;
-import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowParameterDAO;
-import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowRunDAO;
+//import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowDefinitionDAO;
+//import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowParameter;
+//import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowParameterDAO;
+//import com.renergetic.kubeflowapi.dao.tempcommon.WorkflowRunDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -37,21 +36,47 @@ public class DummyDataGenerator {
         return getAllKubeflowWorkflows(15);
     }
 
+    private static List<WorkflowParameter> mapKubeflowParameters(Map<String, String> parameters) {
+        List<WorkflowParameter> params = parameters.entrySet().stream().map((entry) -> {
+            WorkflowParameter wp = new WorkflowParameter();
+            wp.setType("string");
+//            wp.setDefaultValue(wp.getDefaultValue());
+            wp.setKey(entry.getKey());
+            if (entry.getValue() != null)
+                wp.setDefaultValue(entry.getValue());
+            return wp;
+        }).collect(Collectors.toList());
+        return params;
+    }
+
     public static List<WorkflowDefinitionDAO> getAllKubeflowWorkflows(int size) {
         size = Math.min(10, size);
         return IntStream.range(0, size)
                 .mapToObj(i -> {
                     WorkflowDefinitionDAO dao = new WorkflowDefinitionDAO("experiment_" + i);
-                    if (i % 2 == 0) {
-                        HashMap<String, WorkflowParameterDAO> m = new HashMap<>(2);
-                        m.put("param1",
-                                new WorkflowParameterDAO("param1", "default", "string", "Some parameter decription"));
-                        m.put("param2", new WorkflowParameterDAO("param2", null, "string", "parameter 2 decription"));
-                        dao.setParameters(m);
-                    }
+                    dao.setParameters(mapKubeflowParameters(getParameters(dao.getExperimentId())).stream().collect(
+                            Collectors.toMap(WorkflowParameter::getKey, WorkflowParameterDAO::create)));
+//                    if (i % 2 == 0) {
+//                        HashMap<String, WorkflowParameterDAO> m = new HashMap<>(2);
+//                        m.put("param1",
+//                                new WorkflowParameterDAO("param1", "default", "string", "Some parameter decription"));
+//                        m.put("param2", new WorkflowParameterDAO("param2", null, "string", "parameter 2 decription"));
+//                        dao.setParameters(m);
+//                    }
 
                     return dao;
                 }).collect(Collectors.toList());
+    }
+
+    public static HashMap<String, String> getParameters(String experimentId) {
+        String[] s = experimentId.split("_");
+        HashMap<String, String> params = new HashMap<>();
+        if (s.length == 2 && Integer.parseInt(s[1]) % 2 == 0) {
+            params.put("param1", "default");
+            params.put("param2", null);
+        }
+        return params;
+
     }
 
     public static Map<String, WorkflowDefinitionDAO> getAllKubeflowWorkflowsMap() {
@@ -87,4 +112,3 @@ public class DummyDataGenerator {
         return wr;
     }
 }
-*/

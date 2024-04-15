@@ -106,6 +106,7 @@ public class MeasurementController {
             @RequestParam(required = false) String direction,
             @RequestParam(required = false, name = "sensor_name") String sensorName,
             @RequestParam(required = false, name = "asset_name") String assetName,
+            @RequestParam(required = false, name = "asset_id") Long assetId,
             @RequestParam(required = false, name = "tag_key") String tagKey,
             @RequestParam(required = false, name = "tag_value") String tagValue,
             @RequestParam(required = false, name = "type_id") Long typeId,
@@ -114,7 +115,7 @@ public class MeasurementController {
 
         List<MeasurementDAOImpl> measurements = new ArrayList<>();
 
-        measurements = measurementSv.findMeasurements(name, domain, direction, sensorName,
+        measurements = measurementSv.findMeasurements(name, domain, direction, sensorName,assetId,
                 assetName, typeId, physicalTypeName, tagKey,tagValue, offset.orElse(0L), limit.orElse(1000));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
