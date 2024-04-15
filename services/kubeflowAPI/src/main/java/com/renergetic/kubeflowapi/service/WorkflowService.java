@@ -3,6 +3,7 @@ package com.renergetic.kubeflowapi.service;
 import com.renergetic.common.dao.WorkflowPipelineDAO;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.utilities.DateConverter;
+import com.renergetic.kubeflowapi.repository.WorkFlowParameterRepository;
 import com.renergetic.kubeflowapi.service.utils.DummyDataGenerator;
 import com.renergetic.common.model.WorkflowDefinition;
 import com.renergetic.common.model.WorkflowParameter;
@@ -27,6 +28,8 @@ public class WorkflowService {
     private Boolean generateDummy;
     @Autowired
     private WorkFlowRepository workFlowRepository;
+    @Autowired
+    private WorkFlowParameterRepository workFlowParameterRepository;
     @Autowired
     private WorkFlowRunRepository workFlowRunRepository;
 
@@ -133,13 +136,16 @@ public class WorkflowService {
         //take exististing parameters only if exists in the kubeflow, otherwise init paremeter object
         List<WorkflowParameter> wpList = kubeFlowParameters.entrySet().stream().map(entry ->
         {
+            //key exist in the kubeflow - keep current definition
             if (wpMap.containsKey(entry.getKey())) {
                 return wpMap.get(entry.getKey());
             }
             WorkflowParameter wp = new WorkflowParameter();
+            wp.setWorkflowDefinition(wd);
             wp.setType("string");
-            wp.setDefaultValue(wp.getDefaultValue());
-            wp.setKey(wp.getKey());
+            if (entry.getValue().getDefaultValue() != null)
+                wp.setDefaultValue(entry.getValue().getDefaultValue());
+            wp.setKey(entry.getKey());
             return wp;
         }).collect(Collectors.toList());
 //            wd.setParameters(wpList);
@@ -260,15 +266,22 @@ public class WorkflowService {
         if (kubeflowMap.containsKey(item.getExperimentId())) {
             var kb = kubeflowMap.get(item.getExperimentId());
 
-            item.setParameters(this.mergeParameters(item, kb.getParameters()));
+
             if (kb.getCurrentRun() == null && item.getWorkflowRun() != null) {
                 if (!generateDummy) {
                     //           TODO:     verify run id in the kubeflow       -> yago
                 }
             } else
                 item.setWorkflowRun(kb.getCurrentRun().mapToEntity());
-            if (update)
+            if (update) {
+                item.getParameters().forEach(it -> workFlowParameterRepository.delete(it));
+
+                item.setParameters(this.mergeParameters(item, kb.getParameters()));
+                item.getParameters().forEach(it -> workFlowParameterRepository.save(it));
                 workFlowRepository.save(item);
+            } else {
+                item.setParameters(this.mergeParameters(item, kb.getParameters()));
+            }
             dao = WorkflowDefinitionDAO.create(item);
             dao.setName(kb.getName());
             dao.setPipelines(kb.getPipelines());

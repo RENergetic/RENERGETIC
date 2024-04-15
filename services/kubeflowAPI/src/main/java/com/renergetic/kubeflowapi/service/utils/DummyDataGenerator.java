@@ -41,7 +41,9 @@ public class DummyDataGenerator {
             WorkflowParameter wp = new WorkflowParameter();
             wp.setType("string");
 //            wp.setDefaultValue(wp.getDefaultValue());
-            wp.setKey(wp.getKey());
+            wp.setKey(entry.getKey());
+            if (entry.getValue() != null)
+                wp.setDefaultValue(entry.getValue());
             return wp;
         }).collect(Collectors.toList());
         return params;
