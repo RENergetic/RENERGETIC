@@ -21,8 +21,15 @@ public class AssetRuleDAO {
     private String manualThreshold;
     private String comparator;
     private boolean active;
+    private boolean sendDemandTrue;
+    private Long demandAssetTrue;
+    private DemandDefinitionDAO demandDefinitionTrue;
+    private boolean sendDemandFalse;
+    private Long demandAssetFalse;
+    private DemandDefinitionDAO demandDefinitionFalse;
 
-    public AssetRule mapToEntity(Asset asset, Measurement measurement1, Measurement measurement2){
+    public AssetRule mapToEntity(Asset asset, Measurement measurement1, Measurement measurement2,
+                                 Asset demandAssetTrue, Asset demandAssetfalse){
         AssetRule assetRule = new AssetRule();
         assetRule.setId(getId());
         assetRule.setAsset(asset);
@@ -36,6 +43,13 @@ public class AssetRuleDAO {
         assetRule.setManualThreshold(getManualThreshold());
         assetRule.setComparator(getComparator());
         assetRule.setActive(isActive());
+
+        assetRule.setSendDemandTrue(isSendDemandTrue());
+        assetRule.setDemandAssetTrue(demandAssetTrue);
+        assetRule.setDemandDefinitionTrue(demandDefinitionTrue != null ? demandDefinitionTrue.mapToEntity() : null);
+        assetRule.setSendDemandFalse(isSendDemandFalse());
+        assetRule.setDemandAssetFalse(demandAssetfalse);
+        assetRule.setDemandDefinitionFalse(demandDefinitionFalse != null ? demandDefinitionFalse.mapToEntity() : null);
         return assetRule;
     }
 
@@ -53,6 +67,17 @@ public class AssetRuleDAO {
         dao.setManualThreshold(assetRule.getManualThreshold());
         dao.setComparator(assetRule.getComparator());
         dao.setActive(assetRule.isActive());
+
+        dao.setSendDemandTrue(assetRule.getSendDemandTrue());
+        dao.setDemandAssetTrue(assetRule.getDemandAssetTrue() != null ?
+                assetRule.getDemandAssetTrue().getId() : null);
+        dao.setDemandDefinitionTrue(assetRule.getDemandDefinitionTrue() != null ?
+                DemandDefinitionDAO.create(assetRule.getDemandDefinitionTrue()) : null);
+        dao.setSendDemandFalse(assetRule.getSendDemandFalse());
+        dao.setDemandAssetFalse(assetRule.getDemandAssetFalse() != null ?
+                assetRule.getDemandAssetFalse().getId() : null);
+        dao.setDemandDefinitionFalse(assetRule.getDemandDefinitionFalse() != null ?
+                DemandDefinitionDAO.create(assetRule.getDemandDefinitionFalse()) : null);
         return dao;
     }
 }

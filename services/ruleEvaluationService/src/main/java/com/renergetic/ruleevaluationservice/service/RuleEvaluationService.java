@@ -1,13 +1,12 @@
 package com.renergetic.ruleevaluationservice.service;
 
+import com.renergetic.common.exception.InvalidNonExistingIdException;
 import com.renergetic.common.model.*;
-import com.renergetic.common.repository.NotificationDefinitionRepository;
-import com.renergetic.common.repository.NotificationScheduleRepository;
+import com.renergetic.common.repository.*;
 import com.renergetic.ruleevaluationservice.dao.DataResponse;
 import com.renergetic.ruleevaluationservice.dao.EvaluationResult;
 import com.renergetic.ruleevaluationservice.dao.MeasurementSimplifiedDAO;
 import com.renergetic.ruleevaluationservice.exception.RuleEvaluationException;
-import com.renergetic.common.repository.AssetRuleRepository;
 import com.renergetic.ruleevaluationservice.utils.AssetRuleUtils;
 import com.renergetic.ruleevaluationservice.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +35,12 @@ public class RuleEvaluationService {
     private NotificationScheduleRepository notificationScheduleRepository;
 
     @Autowired
+    private DemandDefinitionRepository demandDefinitionRepository;
+
+    @Autowired
+    private DemandScheduleRepository demandScheduleRepository;
+
+    @Autowired
     DataService dataService;
 
     public List<EvaluationResult> retrieveAndExecuteAllRules(){
@@ -53,7 +58,14 @@ public class RuleEvaluationService {
         Set<Thread> threads = new HashSet<>();
         for(AssetRule assetRule : assetRules){
             Thread thread = new Thread(() -> {
-                evaluationResults.add(executeRule(assetRule));
+                try {
+                    evaluationResults.add(executeRule(assetRule));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    EvaluationResult evaluationResult = new EvaluationResult();
+                    evaluationResult.setErrorMessage(e.getMessage());
+                    evaluationResults.add(evaluationResult);
+                }
             });
             thread.start();
             threads.add(thread);
@@ -94,6 +106,9 @@ public class RuleEvaluationService {
             evaluationResult.setErrorMessage("evaluation failed.");
         }
 
+        CronExpression cronTrigger = CronExpression.parse(executionCRON);
+        LocalDateTime nextExecution = cronTrigger.next(currentTime);
+
         if(evaluationResult.getExecutionResult() != null && evaluationResult.getExecutionResult().equals("true")){
             Optional<NotificationDefinition> ndo = notificationDefinitionRepository.findByCode(evaluationResult.getExecutedReadableString());
             NotificationDefinition nd;
@@ -107,9 +122,6 @@ public class RuleEvaluationService {
             nd.setType(evaluationResult.getErrorMessage() == null ? NotificationType.anomaly : NotificationType.error);
             notificationDefinitionRepository.save(nd);
 
-            CronExpression cronTrigger = CronExpression.parse(executionCRON);
-            LocalDateTime nextExecution = cronTrigger.next(currentTime);
-
             NotificationSchedule notificationSchedule = new NotificationSchedule();
             notificationSchedule.setAsset(assetRule.getAsset());
             notificationSchedule.setDateFrom(currentTime);
@@ -119,6 +131,28 @@ public class RuleEvaluationService {
             notificationSchedule.setNotificationTimestamp(LocalDateTime.now());
             notificationSchedule = notificationScheduleRepository.save(notificationSchedule);
             evaluationResult.setNotificationSchedule(notificationSchedule);
+
+            if(assetRule.getSendDemandTrue() && assetRule.getDemandAssetTrue() != null && assetRule.getDemandDefinitionTrue() != null){
+                DemandSchedule demandSchedule = new DemandSchedule();
+                demandSchedule.setAsset(assetRule.getDemandAssetTrue());
+                demandSchedule.setDemandDefinition(assetRule.getDemandDefinitionTrue());
+                demandSchedule.setDemandStart(currentTime);
+                demandSchedule.setDemandStop(nextExecution);
+                demandSchedule.setUpdate(currentTime);
+
+                demandScheduleRepository.save(demandSchedule);
+            }
+        } else if (evaluationResult.getExecutionResult() != null && evaluationResult.getExecutionResult().equals("false")) {
+            if(assetRule.getSendDemandFalse() && assetRule.getDemandAssetFalse() != null && assetRule.getDemandDefinitionFalse() != null){
+                DemandSchedule demandSchedule = new DemandSchedule();
+                demandSchedule.setAsset(assetRule.getDemandAssetFalse());
+                demandSchedule.setDemandDefinition(assetRule.getDemandDefinitionFalse());
+                demandSchedule.setDemandStart(currentTime);
+                demandSchedule.setDemandStop(nextExecution);
+                demandSchedule.setUpdate(currentTime);
+
+                demandScheduleRepository.save(demandSchedule);
+            }
         }
 
         return evaluationResult;

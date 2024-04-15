@@ -22,7 +22,7 @@ public class EVDRExecutionScheduler {
     @Scheduled(cron = "${ev-dr.executionCRON}")
     @Transactional(propagation= Propagation.REQUIRED)
     public void executeRules() throws ConfigurationError {
-        evdrService.evaluateEVDR();
+        //evdrService.evaluateEVDR();
     }
 
 }

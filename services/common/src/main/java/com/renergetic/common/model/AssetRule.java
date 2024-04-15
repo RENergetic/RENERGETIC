@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class AssetRule {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(optional = false)
@@ -52,4 +52,26 @@ public class AssetRule {
 
     @Column(name = "active", nullable = false)
     private boolean active;
+
+    @Column(name = "demand_on_true", nullable = false, columnDefinition = "boolean default false")
+    private Boolean sendDemandTrue;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "demand_on_true_asset_id", nullable = true, insertable = true, updatable = true)
+    private Asset demandAssetTrue;
+
+    @ManyToOne(optional = true, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
+    @JoinColumn(name = "demand_on_true_definition_id", nullable = true, insertable = true, updatable = true)
+    private DemandDefinition demandDefinitionTrue;
+
+    @Column(name = "demand_on_false", nullable = false, columnDefinition = "boolean default false")
+    private Boolean sendDemandFalse;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "demand_on_false_asset_id", nullable = true, insertable = true, updatable = true)
+    private Asset demandAssetFalse;
+
+    @ManyToOne(optional = true, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
+    @JoinColumn(name = "demand_on_false_definition_id", nullable = true, insertable = true, updatable = true)
+    private DemandDefinition demandDefinitionFalse;
 }

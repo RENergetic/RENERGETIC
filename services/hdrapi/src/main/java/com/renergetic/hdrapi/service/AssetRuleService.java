@@ -89,13 +89,19 @@ public class AssetRuleService {
         Asset asset = null;
         Measurement measurement1 = null;
         Measurement measurement2 = null;
+        Asset demandAssetTrue = null;
+        Asset demandAssetFalse = null;
         if(assetRuleDAO.getAssetId() != null)
             asset = assetRepository.findById(assetRuleDAO.getAssetId()).orElseThrow(() -> new NotFoundException("Asset id not found."));
         if(assetRuleDAO.getMeasurement1Id() != null)
             measurement1 = measurementRepository.findById(assetRuleDAO.getMeasurement1Id()).orElseThrow(() -> new NotFoundException("Measurement1 id not found."));
         if(assetRuleDAO.getMeasurement2Id() != null)
             measurement2 = measurementRepository.findById(assetRuleDAO.getMeasurement2Id()).orElseThrow(() -> new NotFoundException("Measurement2 id not found."));
-        AssetRule assetRule = assetRuleDAO.mapToEntity(asset, measurement1, measurement2);
+        if(assetRuleDAO.getDemandAssetTrue() != null)
+            demandAssetTrue = assetRepository.findById(assetRuleDAO.getDemandAssetTrue()).orElseThrow(() -> new NotFoundException("Asset demand true id not found."));
+        if(assetRuleDAO.getDemandAssetFalse() != null)
+            demandAssetFalse = assetRepository.findById(assetRuleDAO.getDemandAssetFalse()).orElseThrow(() -> new NotFoundException("Asset demand false id not found."));
+        AssetRule assetRule = assetRuleDAO.mapToEntity(asset, measurement1, measurement2, demandAssetTrue, demandAssetFalse);
         assetRuleValidator.validate(assetRule);
         return assetRule;
     }

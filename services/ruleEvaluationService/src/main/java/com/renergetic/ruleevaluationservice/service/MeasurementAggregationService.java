@@ -50,8 +50,12 @@ public class MeasurementAggregationService {
     }
 
     public void aggregateOne(Measurement measurement, MeasurementAggregation measurementAggregation){
-        List<MeasurementSimplifiedDAO> aggregated = getAggregatedData(measurement, measurementAggregation);
-        publishAggregatedData(aggregated);
+        try {
+            List<MeasurementSimplifiedDAO> aggregated = getAggregatedData(measurement, measurementAggregation);
+            publishAggregatedData(aggregated);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private List<MeasurementSimplifiedDAO> getAggregatedData(Measurement measurement, MeasurementAggregation measurementAggregation){
