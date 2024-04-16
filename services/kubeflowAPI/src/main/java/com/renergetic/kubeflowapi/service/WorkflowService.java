@@ -1,6 +1,5 @@
 package com.renergetic.kubeflowapi.service;
 
-import com.renergetic.common.dao.WorkflowPipelineDAO;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.kubeflowapi.repository.WorkFlowParameterRepository;
@@ -158,27 +157,32 @@ public class WorkflowService {
 //        return wd;
     }
 
-    public void setParameters(String experimentId, Map<String, WorkflowParameterDAO> parameters) {
-        List<WorkflowParameter> kfParameters;
+    public Map<String, WorkflowParameterDAO> setParameters(String experimentId,
+                                                           Map<String, WorkflowParameterDAO> parameters) {
+        Map<String, String> kfParameters;
         if (generateDummy) {
-            kfParameters = mapKubeflowParameters(DummyDataGenerator.getParameters(experimentId));
+            kfParameters = DummyDataGenerator.getParameters(experimentId);
         } else {
-            kfParameters = Collections.emptyList();
-//	 //TODO: yago -> download parameters from the kubeflow API
+            kfParameters = Collections.emptyMap();//TODO: yago -> download parameters from the kubeflow API
         }
-
+        Map<String, WorkflowParameterDAO> kubeflowParameters = mapKubeflowParameters(kfParameters);
+        List<WorkflowParameter> userParams =
+                parameters.values().stream().map(WorkflowParameterDAO::mapToEntity).collect(Collectors.toList());
         Optional<WorkflowDefinition> byId = workFlowRepository.findById(experimentId);
         WorkflowDefinition wd;
         if (byId.isEmpty()) {
-            wd = initWorkFlowDefinition(experimentId, kfParameters);
+            wd = initWorkFlowDefinition(experimentId, userParams);
         } else {
             wd = byId.get();
-            Map<String, WorkflowParameterDAO> collect = kfParameters.stream().collect(
-                    Collectors.toMap(WorkflowParameter::getKey, WorkflowParameterDAO::create));
-            List<WorkflowParameter> workflowParameters = this.mergeParameters(wd, collect);
-            wd.setParameters(workflowParameters);
+            wd.setParameters(userParams);
         }
-        workFlowRepository.save(wd);
+        List<WorkflowParameter> workflowParameters = this.mergeParameters(wd, kubeflowParameters);
+        WorkflowDefinition savedWD = workFlowRepository.save(wd);
+        workflowParameters.forEach(it -> it.setWorkflowDefinition(savedWD));
+        return workflowParameters.stream().map(it -> workFlowParameterRepository.save(it))
+                .map(WorkflowParameterDAO::create)
+                .collect(Collectors.toMap(WorkflowParameterDAO::getKey, Function.identity()));
+
 
     }
 
@@ -186,14 +190,14 @@ public class WorkflowService {
         return this.initWorkFlowDefinition(experimentId, null);
     }
 
-    private List<WorkflowParameter> mapKubeflowParameters(Map<String, String> parameters) {
-        List<WorkflowParameter> params = parameters.entrySet().stream().map((entry) -> {
-            WorkflowParameter wp = new WorkflowParameter();
+    private Map<String, WorkflowParameterDAO> mapKubeflowParameters(Map<String, String> parameters) {
+        Map<String, WorkflowParameterDAO> params = parameters.entrySet().stream().map((entry) -> {
+            WorkflowParameterDAO wp = new WorkflowParameterDAO();
             wp.setType("string");
             wp.setDefaultValue(wp.getDefaultValue());
             wp.setKey(wp.getKey());
             return wp;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toMap(WorkflowParameterDAO::getKey, Function.identity()));
         return params;
     }
 
@@ -239,7 +243,6 @@ public class WorkflowService {
     }
 
     private WorkflowRunDAO getKubeflowRun(WorkflowDefinitionDAO wd) {
-
         if (generateDummy) {
             return DummyDataGenerator.getKubeflowRun(wd);
         } else {//	 TODO: get kubeflow run
@@ -258,7 +261,12 @@ public class WorkflowService {
         return kubeflowMap;
     }
 
-
+    /**
+     * @param kubeflowMap kubeflow experiments definitions with input parameters
+     * @param item
+     * @param update
+     * @return
+     */
     private WorkflowDefinitionDAO enrichDAO(Map<String, WorkflowDefinitionDAO> kubeflowMap,
                                             WorkflowDefinition item, Boolean update) {
         WorkflowDefinitionDAO dao = WorkflowDefinitionDAO.create(item);
@@ -269,22 +277,20 @@ public class WorkflowService {
                 if (!generateDummy) {
                     //           TODO:     verify run id in the kubeflow       -> yago
                 }
-            } else if(kb.getCurrentRun()!=null) {
+            } else if (kb.getCurrentRun() != null) {
                 item.setWorkflowRun(kb.getCurrentRun().mapToEntity());
             }
-            if (update) {
-                item.getParameters().forEach(it -> workFlowParameterRepository.delete(it));
-                item.setParameters(this.mergeParameters(item, kb.getParameters()));
-                item.getParameters().forEach(it -> workFlowParameterRepository.save(it));
-                workFlowRepository.save(item);
-            } else {
-                item.setParameters(this.mergeParameters(item, kb.getParameters()));
-            }
+//            if (update) {
+//                item.getParameters().forEach(it -> workFlowParameterRepository.delete(it));
+//                item.setParameters(this.mergeParameters(item, kb.getParameters()));
+//                item.getParameters().forEach(it -> workFlowParameterRepository.save(it));
+//                workFlowRepository.save(item);
+//            } else {
+            item.setParameters(this.mergeParameters(item, kb.getParameters()));
+//            }
             dao = WorkflowDefinitionDAO.create(item);
             dao.setName(kb.getName());
             dao.setPipelines(kb.getPipelines());
-
-
         }
         return dao;
     }
