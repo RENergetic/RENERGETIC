@@ -52,7 +52,7 @@ public class KubeflowController {
     private WorkflowService workflowService;
 
     private String cookie;
-            //= "authservice_session=MTcxMTM2ODUxOHxOd3dBTkZKT05VMU5XRVpVVjA5TVFWZFBVMUJNVDFGTVVrcE1TMWRDTWtOWVVVa3lVRlZGUmxKTlJrOUhUVEpRVWtsWFZraEZTa0U9fP6c_WZhE0UgbxeoNjBjExcwvdA8rm_Cm7uJc4VrheSg";
+    //= "authservice_session=MTcxMTM2ODUxOHxOd3dBTkZKT05VMU5XRVpVVjA5TVFWZFBVMUJNVDFGTVVrcE1TMWRDTWtOWVVVa3lVRlZGUmxKTlJrOUhUVEpRVWtsWFZraEZTa0U9fP6c_WZhE0UgbxeoNjBjExcwvdA8rm_Cm7uJc4VrheSg";
 
     // ********************************************************************************
     // ********************************************************************************
@@ -441,11 +441,13 @@ public class KubeflowController {
     @Operation(summary = "Set parameters")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PutMapping(path = "/admin/workflow/{experiment_id}/parameters", produces = "application/json")
-    public ResponseEntity setParameters(@PathVariable(name = "experiment_id") String experimentId,
-                                          Map<String, WorkflowParameterDAO> parameters) {
+    public ResponseEntity<Map<String, WorkflowParameterDAO>> setParameters(
+            @PathVariable(name = "experiment_id") String experimentId,
+            Map<String, WorkflowParameterDAO> parameters) {
         //TODO: verify admin roles
-        workflowService.setParameters(experimentId, parameters);
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        Map<String, WorkflowParameterDAO> params =
+                workflowService.setParameters(experimentId, parameters);
+        return new ResponseEntity<>(params, HttpStatus.OK);
     }
 
 
