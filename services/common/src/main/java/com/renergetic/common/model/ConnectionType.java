@@ -15,7 +15,8 @@ public enum ConnectionType {
 	va_grouping,
 	inter_connector_to,
 	inter_connector_from,
-	time_shiftable_load_in
+	time_shiftable_load_in,
+	flexible_load_in
 
 
 }
