@@ -8,7 +8,7 @@ import lombok.ToString;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "optimizer_parameter")
+@Table(name = "optimizer_parameter", uniqueConstraints = { @UniqueConstraint(columnNames = { "parameter_name", "optimizer_type_id" }) })
 @RequiredArgsConstructor
 @Getter
 @Setter
@@ -18,7 +18,7 @@ public class OptimizerParameter {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "parameter_name", unique = true, nullable = false)
+    @Column(name = "parameter_name", unique = false, nullable = false)
     private String parameterName;
 
     @Column(name = "required", unique = false, nullable = false)

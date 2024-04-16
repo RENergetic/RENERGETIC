@@ -22,7 +22,7 @@ public class OptimizerType {
     @Column(name="name", unique = true, nullable = false)
     private String name;
 
-    @Column(name="domains_quantity", unique = true, nullable = true)
+    @Column(name="domains_quantity", unique = false, nullable = true)
     private Integer domainsQuantity;
 
     @Enumerated(EnumType.STRING)
