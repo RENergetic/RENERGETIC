@@ -157,7 +157,8 @@ public class WorkflowService {
 //        return wd;
     }
 
-    public Map<String, WorkflowParameterDAO> setParameters(String experimentId, Map<String, WorkflowParameterDAO> parameters) {
+    public Map<String, WorkflowParameterDAO> setParameters(String experimentId,
+                                                           Map<String, WorkflowParameterDAO> parameters) {
         Map<String, String> kfParameters;
         if (generateDummy) {
             kfParameters = DummyDataGenerator.getParameters(experimentId);
@@ -178,7 +179,7 @@ public class WorkflowService {
         List<WorkflowParameter> workflowParameters = this.mergeParameters(wd, kubeflowParameters);
         WorkflowDefinition savedWD = workFlowRepository.save(wd);
         workflowParameters.forEach(it -> it.setWorkflowDefinition(savedWD));
-       return workflowParameters.stream().map(it -> workFlowParameterRepository.save(it))
+        return workflowParameters.stream().map(it -> workFlowParameterRepository.save(it))
                 .map(WorkflowParameterDAO::create)
                 .collect(Collectors.toMap(WorkflowParameterDAO::getKey, Function.identity()));
 
@@ -276,8 +277,9 @@ public class WorkflowService {
                 if (!generateDummy) {
                     //           TODO:     verify run id in the kubeflow       -> yago
                 }
-            } else
+            } else if (kb.getCurrentRun() != null) {
                 item.setWorkflowRun(kb.getCurrentRun().mapToEntity());
+            }
 //            if (update) {
 //                item.getParameters().forEach(it -> workFlowParameterRepository.delete(it));
 //                item.setParameters(this.mergeParameters(item, kb.getParameters()));
