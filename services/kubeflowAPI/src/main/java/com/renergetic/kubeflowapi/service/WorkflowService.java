@@ -265,17 +265,15 @@ public class WorkflowService {
         ;
         if (kubeflowMap.containsKey(item.getExperimentId())) {
             var kb = kubeflowMap.get(item.getExperimentId());
-
-
             if (kb.getCurrentRun() == null && item.getWorkflowRun() != null) {
                 if (!generateDummy) {
                     //           TODO:     verify run id in the kubeflow       -> yago
                 }
-            } else
+            } else if(kb.getCurrentRun()!=null) {
                 item.setWorkflowRun(kb.getCurrentRun().mapToEntity());
+            }
             if (update) {
                 item.getParameters().forEach(it -> workFlowParameterRepository.delete(it));
-
                 item.setParameters(this.mergeParameters(item, kb.getParameters()));
                 item.getParameters().forEach(it -> workFlowParameterRepository.save(it));
                 workFlowRepository.save(item);
