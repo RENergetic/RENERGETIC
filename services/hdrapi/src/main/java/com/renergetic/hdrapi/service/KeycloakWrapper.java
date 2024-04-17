@@ -63,6 +63,19 @@ public class KeycloakWrapper {
         return getRealmApi().users().get(id);
     }
 
+    public Boolean userExists(String username) {
+
+        return !getRealmApi().users().searchByUsername(username, true).isEmpty();
+    }
+
+    public UserRepresentation getUserByUsername(String username) {
+
+        List<UserRepresentation> users = getRealmApi().users().searchByUsername(username, true);
+        if (users.size() == 0) throw new IllegalArgumentException("Keycloak user: " + username + " does not exists: ");
+        if (users.size() > 1) throw new IllegalArgumentException("There is more then one Keycloak user: " + username);
+        return users.get(0);
+    }
+
     public UserRepresentation updateUser(UserDAORequest user) {
         UserResource userResource = getRealmApi().users().get(user.getId());
         UserRepresentation current = userResource.toRepresentation();
@@ -103,25 +116,26 @@ public class KeycloakWrapper {
 
         return userRepresentation;
     }
-    public void updatePassword(String userId,String password){
 
-            CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
-            credentialRepresentation.setTemporary(false);
-            credentialRepresentation.setType("password");
-            credentialRepresentation.setValue(password);
-            getRealmApi().users().get(userId).resetPassword(credentialRepresentation);
+    public void updatePassword(String userId, String password) {
+
+        CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+        credentialRepresentation.setTemporary(false);
+        credentialRepresentation.setType("password");
+        credentialRepresentation.setValue(password);
+        getRealmApi().users().get(userId).resetPassword(credentialRepresentation);
 
     }
 
-    public List<UserRepresentation> listUsers(int offset,int limit) {
-        return getRealmApi().users().list(  offset,  limit);
+    public List<UserRepresentation> listUsers(int offset, int limit) {
+        return getRealmApi().users().list(offset, limit);
         //TODO: make every user with guest role
 //        return new ArrayList<>(this.getRealmApi().clients().get(this.getClient_Id()).roles().get(
 //                KeycloakRole.REN_GUEST.name).getRoleUserMembers());
     }
 
-    public List<UserRepresentation> listUsers(String role,int offset,int limit) {
-        return new ArrayList<UserRepresentation>(getRealmApi().roles().get(role).getRoleUserMembers(offset,limit));
+    public List<UserRepresentation> listUsers(String role, int offset, int limit) {
+        return new ArrayList<UserRepresentation>(getRealmApi().roles().get(role).getRoleUserMembers(offset, limit));
     }
 
     public RoleRepresentation getRole(String role) {

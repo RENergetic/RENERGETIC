@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("unchecked")
-public interface WorkFlowRepository extends JpaRepository<WorkflowDefinition, Long> {
+public interface WorkFlowRepository extends JpaRepository<WorkflowDefinition, String> {
     WorkflowDefinition save(WorkflowDefinition workflowDefinition);
 
     @Override

@@ -3,20 +3,11 @@ package com.renergetic.common.dao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.model.HDRRecommendation;
-import com.renergetic.common.model.Heatmap;
-import com.renergetic.common.model.User;
-import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.utilities.DateConverter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter

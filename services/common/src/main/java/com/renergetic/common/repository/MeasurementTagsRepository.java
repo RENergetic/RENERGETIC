@@ -44,5 +44,10 @@ public interface MeasurementTagsRepository extends JpaRepository<MeasurementTags
     @Transactional
     @Query(value = " DELETE from measurement_tags WHERE measurement_id = :measurement_id ", nativeQuery = true)
     public int clearTags(@Param("measurement_id") Long measurementId);
-
+    @Modifying
+    @Transactional
+    @Query(value = " DELETE   from measurement_tags using tags " +
+            " WHERE tags.id = measurement_tags.tag_id  and" +
+            " measurement_id =  :measurement_id and tags.key = :tagKey  ", nativeQuery = true)
+    public int clearTag(@Param("measurement_id") Long measurementId, @Param("tagKey") String tagKey);
 }

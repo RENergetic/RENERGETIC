@@ -29,4 +29,5 @@ INSERT INTO measurement_type ( id, name, physical_name, label, base_unit, unit, 
 	 ( 28, 'moisture', 'moisture', 'Moisture [cb]', 'cb', 'cb', 1, '#4CAF50'),
 	 ( 29, 'value', 'value', 'Value', 'any', 'any', 1, '#4CAF50'),
      ( 30, 'power_gj/h', 'power', 'Power [GJ/h]', 'W', 'GJ/h', 277777.777778, '#4CAF50'),
-     ( 31, 'speed_kmperh', 'speed', 'Speed [km/h]', 'm/s', 'km/h', 3.6, '#4CAF50');
+     ( 31, 'speed_kmperh', 'speed', 'Speed [km/h]', 'm/s', 'km/h', 3.6, '#4CAF50'),
+     ( 32, 'flow_lpermin', 'flow', 'Flow [l/min]', 'm3/h', 'l/min', 0.06, '#4CAF50');
