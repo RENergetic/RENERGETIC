@@ -12,7 +12,11 @@ public enum ConnectionType {
 	heat_pump_to,
 	flexible_generation_in,
 	storage_in,
-	va_grouping
+	va_grouping,
+	inter_connector_to,
+	inter_connector_from,
+	time_shiftable_load_in,
+	flexible_load_in
 
 
 }
