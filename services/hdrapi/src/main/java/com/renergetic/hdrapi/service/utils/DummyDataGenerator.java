@@ -8,7 +8,7 @@ import com.renergetic.common.model.*;
 import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.common.repository.MeasurementTagsRepository;
 import com.renergetic.common.repository.MeasurementTypeRepository;
-import com.renergetic.common.repository.RecommendationRepository;
+import com.renergetic.common.repository.HDRRecommendationRepository;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.hdrapi.dao.tempcommon.TempAssetRepository;
@@ -31,7 +31,7 @@ public class DummyDataGenerator {
     @Autowired
     MeasurementRepository measurementRepository;
     @Autowired
-    RecommendationRepository recommendationRepository;
+    HDRRecommendationRepository recommendationRepository;
     @Autowired
     MeasurementTagsRepository measurementTagsRepository;
     private static final Random random = new Random();
