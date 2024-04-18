@@ -11,6 +11,8 @@ spec:
   minReadySeconds: 5
   template:
     metadata:
+      annotations:
+        backup.velero.io/backup-volumes: influx2-disk
       labels:
         app: influx-db
     spec:
