@@ -464,7 +464,7 @@ public class MeasurementController {
     @Operation(summary = "Get All Tags")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "tags/key/{key}", produces = "application/json")
-    public ResponseEntity<List<TagDAO>> getAllTagsByKey(@PathParam ("key") String key,@RequestParam(required = false) Optional<Long> offset,
+    public ResponseEntity<List<TagDAO>> getAllTagsByKey(@PathVariable ("key") String key,@RequestParam(required = false) Optional<Long> offset,
                                                    @RequestParam(required = false) Optional<Integer> limit) {
         List<TagDAO> tags = new ArrayList<>();
         tags = measurementSv.getTags(key,  offset.orElse(0L), limit.orElse(500));

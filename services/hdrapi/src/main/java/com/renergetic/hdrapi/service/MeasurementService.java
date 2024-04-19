@@ -247,19 +247,21 @@ public class MeasurementService {
     }
 
     public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
-                                                     String sensorName,Long assetId,
+                                                     String sensorName, Long assetId,
                                                      String assetName, Long typeId, String physicalTypeName,
-                                                     String tagKey,String tagValue,
+                                                     String tagKey, String tagValue,
                                                      Long offset,
                                                      Integer limit) {
         Stream<MeasurementDAO> measurements;
         if (tagKey == null) {
             measurements = measurementRepository.findMeasurements(
-                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName,
+                    offset,
                     limit).stream();
         } else {
-            measurements = tempMeasurementRepository.findMeasurementsByTag(
-                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,tagValue,
+            measurements = measurementRepository.findMeasurementsByTag(
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName,
+                    tagKey, tagValue,
                     offset, limit).stream();
         }
 
@@ -267,7 +269,7 @@ public class MeasurementService {
     }
 
     public MeasurementDAOImpl findMeasurement(Long id) {
-        MeasurementDAO measurement = tempMeasurementRepository.findMeasurement(id)
+        MeasurementDAO measurement = measurementRepository.findMeasurement(id)
                 .orElseThrow(() -> new NotFoundException("Measurement not found"));
 
         return MeasurementDAOImpl.create(measurement);
@@ -287,9 +289,8 @@ public class MeasurementService {
             Integer limit) {
         Stream<MeasurementDAO> measurements;
 
-        measurements = tempMeasurementRepository.findMeasurementsByTag(
-                assetId, null, null, null, null, null, null, null,null,null, offset,
-                limit).stream();
+        measurements = measurementRepository.findMeasurements(
+                assetId, null, null, null, null, null, null, null, offset,limit).stream();
         List<MeasurementDAOImpl> collect = measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
         collect.forEach(it ->
         {
@@ -460,7 +461,7 @@ public class MeasurementService {
     }
 
     public boolean setTag(Long measurementId, String key, String value) {
-        this.deleteMeasurementTag(measurementId,key);
+        this.deleteMeasurementTag(measurementId, key);
         Measurement m = this.getById(measurementId);//check is exists
         var l = measurementTagsRepository.findByKeyAndValue(key, value);
         if (l.size() == 0) {//  should be    if (l.size() != 1) {
@@ -473,7 +474,7 @@ public class MeasurementService {
     }
 
     public boolean deleteMeasurementTag(Long measurementId, String tagKey) {
-        return tempMeasurementTagsRepository.clearTag(measurementId, tagKey) == 1;
+        return measurementTagsRepository.clearTag(measurementId, tagKey) == 1;
     }
 
     public boolean deleteTagById(Long id) {
@@ -500,8 +501,12 @@ public class MeasurementService {
     }
 
     public List<TagDAO> getTags(String key, long offset, int limit) {
-        Page<MeasurementTags> tags = measurementTagsRepository.findAll(new OffSetPaging(offset, limit));
-        Stream<MeasurementTags> stream = tags.stream();
+
+        Stream<MeasurementTags> stream;
+        Page<MeasurementTags> tags;
+        if (key == null) stream = measurementTagsRepository.findAll(new OffSetPaging(offset, limit)).stream();
+        else stream = tempMeasurementTagsRepository.findByKey(key).stream();
+
 
 //        if (filters != null)
 //            stream = stream.filter(Detail -> {
@@ -528,7 +533,7 @@ public class MeasurementService {
     }
 
     public List<String> getTagValues(String tagKey) {
-        return measurementTagsRepository.listTagValues(tagKey);
+        return tempMeasurementTagsRepository.listTagValues(tagKey);
     }
 
     public MeasurementTags getTagById(Long id) {
