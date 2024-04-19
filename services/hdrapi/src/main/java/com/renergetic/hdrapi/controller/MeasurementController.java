@@ -34,6 +34,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.websocket.server.PathParam;
+
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Measurement Controller", description = "Allows add and see Measurements")
@@ -457,6 +459,15 @@ public class MeasurementController {
                                                    @RequestParam(required = false) Optional<Integer> limit) {
         List<TagDAO> tags = new ArrayList<>();
         tags = measurementSv.getTags(null, offset.orElse(0L), limit.orElse(500));
+        return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+    @Operation(summary = "Get All Tags")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "tags/key/{key}", produces = "application/json")
+    public ResponseEntity<List<TagDAO>> getAllTagsByKey(@PathVariable ("key") String key,@RequestParam(required = false) Optional<Long> offset,
+                                                   @RequestParam(required = false) Optional<Integer> limit) {
+        List<TagDAO> tags = new ArrayList<>();
+        tags = measurementSv.getTags(key,  offset.orElse(0L), limit.orElse(500));
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
 

@@ -25,8 +25,6 @@ public class HDRRecommendationService {
     MeasurementRepository measurementRepository;
 
     @Autowired
-    MeasurementTagsRepository measurementTagsRepository;
-    @Autowired
     HDRRecommendationRepository recommendationRepository;
     @Autowired
     HDRMeasurementRepository hdrMeasurementRepository;
@@ -145,7 +143,7 @@ public class HDRRecommendationService {
         }
 
         var t = DateConverter.toLocalDateTime(timestamp);
-        return tempMeasurementRepository.listHDRMeasurement(t,  key, value).stream()
+        return measurementRepository.listHDRMeasurement(t,  key, value).stream()
                 .map(it -> MeasurementDAOResponse.create(it, null, null))
                 .collect(Collectors.toList());
     }

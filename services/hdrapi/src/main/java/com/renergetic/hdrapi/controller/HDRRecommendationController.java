@@ -1,5 +1,6 @@
 package com.renergetic.hdrapi.controller;
 
+import com.renergetic.common.dao.HDRMeasurementDAO;
 import com.renergetic.common.dao.HDRRecommendationDAO;
 import com.renergetic.common.dao.HDRRequestDAO;
 import com.renergetic.common.dao.HDRMeasurementDAO;

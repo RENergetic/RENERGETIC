@@ -442,7 +442,7 @@ public class KubeflowController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PutMapping(path = "/admin/workflow/{experiment_id}/parameters", produces = "application/json")
     public ResponseEntity<Map<String, WorkflowParameterDAO>> setParameters(
-            @PathVariable(name = "experiment_id") String experimentId,
+            @PathVariable(name = "experiment_id") String experimentId,@RequestBody
             Map<String, WorkflowParameterDAO> parameters) {
         //TODO: verify admin roles
         Map<String, WorkflowParameterDAO> params =
