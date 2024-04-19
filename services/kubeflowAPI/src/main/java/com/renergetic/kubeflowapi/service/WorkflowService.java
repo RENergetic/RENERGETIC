@@ -194,8 +194,8 @@ public class WorkflowService {
         Map<String, WorkflowParameterDAO> params = parameters.entrySet().stream().map((entry) -> {
             WorkflowParameterDAO wp = new WorkflowParameterDAO();
             wp.setType("string");
-            wp.setDefaultValue(wp.getDefaultValue());
-            wp.setKey(wp.getKey());
+            wp.setDefaultValue(entry.getValue());
+            wp.setKey(entry.getKey());
             return wp;
         }).collect(Collectors.toMap(WorkflowParameterDAO::getKey, Function.identity()));
         return params;
