@@ -321,12 +321,12 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             "  COALESCE(me.sensor_name like ('%'||  CAST(:sensorName AS text ) ||'%') ,TRUE) " +
             " AND COALESCE(me.domain = CAST(:domain AS text) ,TRUE) " +
             " AND COALESCE(me.name like ('%'||  CAST(:measurementName AS text ) ||'%') ,TRUE) " +
-            " AND (:assetId  is null or me.asset_id  = CAST ( CAST(:assetId AS text ) as bigint )) " +
+            " AND (:assetId  is null or me.asset_id  = :assetId )" +
             " AND COALESCE(asset.name like ('%'||  CAST(:assetName AS text ) ||'%') ,TRUE) " +
             " AND COALESCE(me.direction = CAST(:direction AS text)  ,TRUE) " +
             " AND COALESCE(mt.physical_name = CAST(:physicalName AS text) ,TRUE) " +
             " AND COALESCE(me.measurement_type_id  = CAST ( CAST(:type AS text ) as bigint ) ,TRUE)" +
-            " AND ( :tagValue is null OR tags.value =  :tagValue )" +
+            " AND ( :tagValue is null OR tags.value = CAST(:tagValue AS text )  )" +
             " GROUP by me.id, mt.id,asset.id  " +
             " order by  me.asset_id,me.name, me.sensor_name, me.measurement_type_id, me.direction, me.domain, me.id asc " +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
