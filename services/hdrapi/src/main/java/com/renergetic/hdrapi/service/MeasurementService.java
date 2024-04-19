@@ -499,19 +499,19 @@ public class MeasurementService {
 
     }
 
-    public List<TagDAO> getTags(Map<String, String> filters, long offset, int limit) {
+    public List<TagDAO> getTags(String key, long offset, int limit) {
         Page<MeasurementTags> tags = measurementTagsRepository.findAll(new OffSetPaging(offset, limit));
         Stream<MeasurementTags> stream = tags.stream();
 
-        if (filters != null)
-            stream = stream.filter(Detail -> {
-                boolean equals = true;
-
-                if (filters.containsKey("key"))
-                    equals = Detail.getKey().equalsIgnoreCase(filters.get("key"));
-
-                return equals;
-            });
+//        if (filters != null)
+//            stream = stream.filter(Detail -> {
+//                boolean equals = true;
+//
+//                if (filters.containsKey("key"))
+//                    equals = Detail.getKey().equalsIgnoreCase(filters.get("key"));
+//
+//                return equals;
+//            });
         return stream.map(it -> new TagDAO(it.getKey(), it.getValue(), it.getId())).collect(Collectors.toList());
 
 
