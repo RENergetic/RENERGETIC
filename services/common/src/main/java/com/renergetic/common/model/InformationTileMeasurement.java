@@ -27,7 +27,7 @@ import org.hibernate.annotations.NotFoundAction;
 @Data
 public class InformationTileMeasurement {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "props", nullable = true, insertable = true, updatable = true)

@@ -32,7 +32,7 @@ import java.util.List;
 //@ToString // TODO: java.lang.StackOverflowError occurs when wrapper API is called
 public class Asset {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)

@@ -27,7 +27,7 @@ import javax.persistence.Table;
 @ToString
 public class DemandDefinition {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "action_type", nullable = false, insertable = true, updatable = true)

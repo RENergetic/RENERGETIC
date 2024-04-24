@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 @ToString
 public class DemandSchedule {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@Column(name = "demand_start", nullable = false, insertable = true, updatable = true)

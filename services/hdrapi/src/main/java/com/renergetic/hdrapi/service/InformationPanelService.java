@@ -10,7 +10,6 @@ import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.MeasurementDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
-import com.renergetic.hdrapi.dao.tempcommon.InformationPanelMapperTemp;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

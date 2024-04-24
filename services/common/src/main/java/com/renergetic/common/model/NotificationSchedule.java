@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 @ToString
 public class NotificationSchedule {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	/**

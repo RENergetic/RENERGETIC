@@ -19,9 +19,10 @@ import org.hibernate.annotations.NotFoundAction;
 @ToString
 public class WorkflowParameter {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "parameter_id")
-    private String parameterId;
-
+    private Long parameterId;
+//unique key on "parameter_key"  and "experiment_id"
     @Column(name = "parameter_key",nullable = false)
     private String key;
     @Column(name = "parameter_default_value",nullable = true)

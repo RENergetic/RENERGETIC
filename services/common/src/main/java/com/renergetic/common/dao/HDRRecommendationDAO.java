@@ -4,9 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.model.HDRRecommendation;
 import com.renergetic.common.utilities.DateConverter;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
+@ToString
 public class HDRRecommendationDAO {
 
     // TODO: unique key: name-asset-sensor-type-direction

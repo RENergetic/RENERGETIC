@@ -6,10 +6,13 @@ import com.renergetic.common.dao.SimpleAssetDAO;
 import com.renergetic.common.model.Direction;
 import com.renergetic.common.model.Domain;
 import com.renergetic.common.model.MeasurementType;
+import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -43,6 +46,8 @@ public class MeasurementDAOImpl {
 
     @JsonProperty(value = "panel_count", required = false)
     private int panelCount;
+    @JsonProperty(value = "tags", required = false)
+    private List<MeasurementTagsDAO> tags=null;
 //    @JsonProperty(value = "measurement_details", required = false)
 //    private HashMap<String, ?> measurementDetails;
 

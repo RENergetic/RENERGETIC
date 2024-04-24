@@ -22,7 +22,7 @@ import lombok.ToString;
 @MappedSuperclass
 public class Details {	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@JsonProperty(access = Access.READ_ONLY)
 	private Long id;
 	

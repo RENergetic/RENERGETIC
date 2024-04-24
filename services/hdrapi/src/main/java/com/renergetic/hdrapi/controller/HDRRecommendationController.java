@@ -1,7 +1,9 @@
 package com.renergetic.hdrapi.controller;
 
+import com.renergetic.common.dao.HDRMeasurementDAO;
 import com.renergetic.common.dao.HDRRecommendationDAO;
 import com.renergetic.common.dao.HDRRequestDAO;
+import com.renergetic.common.dao.HDRMeasurementDAO;
 import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.hdrapi.service.HDRRecommendationService;
@@ -41,7 +43,7 @@ public class HDRRecommendationController {
     public ResponseEntity<List<HDRRecommendationDAO>> getAllRecommendations() {
         List<HDRRecommendationDAO> recommendations;
 //        if (!generateDummy)
-            recommendations = hdrService.getRecent().orElse(new ArrayList<>());
+        recommendations = hdrService.getRecent().orElse(new ArrayList<>());
 //        else
 //            recommendations = dummyDataGenerator.getRecommendations();
 
@@ -49,17 +51,17 @@ public class HDRRecommendationController {
     }
 
 
-    @Operation(summary = "Get recommendation's measurements")
-    @ApiResponse(responseCode = "200", description = "Get all measurements related with the recommendation by id ")
-    @GetMapping(path = "/recommendations/id/{id}/measurements", produces = "application/json")
-    public ResponseEntity<List<MeasurementDAOResponse>> listMeasurements(@PathVariable Long id) {
-        List<MeasurementDAOResponse> measurements;
-        if (!generateDummy)
-            measurements = hdrService.getMeasurements(id);
-        else
-            measurements = dummyDataGenerator.getMeasurements(id);
-        return new ResponseEntity<>(measurements, HttpStatus.OK);
-    }
+//    @Operation(summary = "Get recommendation's measurements")
+//    @ApiResponse(responseCode = "200", description = "Get all measurements related with the recommendation by id ")
+//    @GetMapping(path = "/recommendations/id/{id}/measurements", produces = "application/json")
+//    public ResponseEntity<List<MeasurementDAOResponse>> listMeasurements(@PathVariable Long id) {
+//        List<MeasurementDAOResponse> measurements;
+//        if (!generateDummy)
+//            measurements = hdrService.getMeasurements(id);
+//        else
+//            measurements = dummyDataGenerator.getMeasurements(id);
+//        return new ResponseEntity<>(measurements, HttpStatus.OK);
+//    }
 
     @Operation(summary = "List current requests")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -71,16 +73,16 @@ public class HDRRecommendationController {
         return new ResponseEntity<>(request, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get request by id")
-    @ApiResponse(responseCode = "200", description = "HDR request by id ")
-    @GetMapping(path = "/requests/id/{id}", produces = "application/json")
-    public ResponseEntity<List<MeasurementDAOResponse>> getRequest(
-            @PathVariable Long id,
-            @RequestParam(required = false) Optional<Long> offset,
-            @RequestParam(required = false) Optional<Integer> limit) {
-        var measurements = hdrService.getMeasurements(id);
-        return new ResponseEntity<>(measurements, HttpStatus.OK);
-    }
+//    @Operation(summary = "Get request by id")
+//    @ApiResponse(responseCode = "200", description = "HDR request by id ")
+//    @GetMapping(path = "/requests/id/{id}", produces = "application/json")
+//    public ResponseEntity<List<MeasurementDAOResponse>> getRequest(
+//            @PathVariable Long id,
+//            @RequestParam(required = false) Optional<Long> offset,
+//            @RequestParam(required = false) Optional<Integer> limit) {
+//        var measurements = hdrService.getMeasurements(id);
+//        return new ResponseEntity<>(measurements, HttpStatus.OK);
+//    }
 
     //=== UPDATE REQUESTS ===================================================================================
     @Operation(summary = "Insert Recommendation batch")
@@ -105,8 +107,8 @@ public class HDRRecommendationController {
             @ApiResponse(responseCode = "500", description = "Error saving recommendation")
     })
     @PutMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
-    public ResponseEntity saveRecommendation(@RequestParam(name = "t", required = true) Long timestamp,
-                                             @RequestBody List<HDRRecommendationDAO> recommendations) {
+    public ResponseEntity saveRecommendations(@RequestParam(name = "t", required = true) Long timestamp,
+                                              @RequestBody List<HDRRecommendationDAO> recommendations) {
         hdrService.save(timestamp, recommendations);
         return new ResponseEntity(ResponseEntity.noContent(), HttpStatus.CREATED);
     }
@@ -160,5 +162,71 @@ public class HDRRecommendationController {
         }
         return new ResponseEntity<>(res, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    //#region hdrMeasurements
+    @Operation(summary = "Get measurements related with  the timestamp")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Recommendation saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving recommendation")
+    })
+    @GetMapping(path = "/measurement", produces = "application/json")
+    public ResponseEntity<List<MeasurementDAOResponse>> getMeasurements(
+            @RequestParam(name = "t", required = true) Long timestamp) {
+        List<MeasurementDAOResponse> measurements = hdrService.getMeasurements(timestamp);
+        return new ResponseEntity(measurements, HttpStatus.CREATED);
+    }
+    @Operation(summary = "Get measurements related with  the timestamp")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Recommendation saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving recommendation")
+    })
+    @GetMapping(path = "/measurement/key/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<List<MeasurementDAOResponse>> getMeasurements(
+            @RequestParam(name = "t", required = true) Long timestamp, @PathVariable String key,@PathVariable String value) {
+        List<MeasurementDAOResponse> measurements = hdrService.getMeasurements(timestamp,key,value);
+        return new ResponseEntity(measurements, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Insert Measurement ")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Recommendation saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving recommendation")
+    })
+    @PutMapping(path = "/measurement/{id}", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<HDRMeasurementDAO> setMeasurement(@RequestParam(name = "t", required = true) Long timestamp,
+                                                            @PathVariable Long id) {
+        return new ResponseEntity<>( hdrService.setMeasurement(timestamp, id), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Insert Measurements ")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Recommendation saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving recommendation")
+    })
+    @PostMapping(path = "/measurement", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<List<HDRMeasurementDAO>> setMeasurement(
+            @RequestParam(name = "t", required = true) Long timestamp,
+            @RequestBody List<Long> measurementIds) {
+        List<HDRMeasurementDAO> hdrMeasurementDAOs = hdrService.setMeasurements(timestamp, measurementIds);
+        return new ResponseEntity(hdrMeasurementDAOs, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Delete Measurement ")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Recommendation saved correctly"),
+            @ApiResponse(responseCode = "500", description = "Error saving recommendation")
+    })
+    @DeleteMapping(path = "/measurement/{id}", produces = "application/json")
+    public ResponseEntity<HDRMeasurementDAO> deleteMeasurement(
+            @RequestParam(name = "t", required = true) Long timestamp,
+            @PathVariable Long id) {
+        HDRMeasurementDAO hdrMeasurementDAO = hdrService.deleteMeasurement(id, timestamp);
+        if (hdrMeasurementDAO != null) {
+            return new ResponseEntity(hdrMeasurementDAO, HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    //#endregion
 
 }
