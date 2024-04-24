@@ -14,7 +14,8 @@ import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
 import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.hdrapi.dao.tempcommon.MeasurementDAORequestTemp;
+import com.renergetic.hdrapi.dao.tempcommon.TempMeasurementRepository;
+import com.renergetic.hdrapi.dao.tempcommon.TempMeasurementTagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -43,9 +44,12 @@ public class MeasurementService {
 
     @Autowired
     MeasurementRepository measurementRepository;
+    @Autowired
+    TempMeasurementRepository tempMeasurementRepository;
 
     @Autowired
-    MeasurementTypeRepository measurementTypeRepository; ;
+    MeasurementTypeRepository measurementTypeRepository;
+    ;
     @Autowired
     AssetRepository assetRepository;
 
@@ -53,6 +57,8 @@ public class MeasurementService {
     MeasurementDetailsRepository measurementDetailsRepository;
     @Autowired
     MeasurementTagsRepository measurementTagsRepository;
+    @Autowired
+    TempMeasurementTagsRepository tempMeasurementTagsRepository;
     @Autowired
     UuidRepository uuidRepository;
 
@@ -63,7 +69,7 @@ public class MeasurementService {
      * @return
      */
     public MeasurementType verifyMeasurementType(MeasurementType dao) {
-        var dbType = dao.getId()!=null? measurementTypeRepository.findById(dao.getId()).orElse(null):null;
+        var dbType = dao.getId() != null ? measurementTypeRepository.findById(dao.getId()).orElse(null) : null;
         //TODO: remove after common library update
         //hotfix:
 //        if(dao.getPhysicalName()==null && dbType!=null){
@@ -87,8 +93,9 @@ public class MeasurementService {
         }
         return dbType;
     }
-  public MeasurementTypeDAORequest verifyMeasurementType(MeasurementTypeDAORequest dao) {
-        var dbType = dao.getId()!=null? measurementTypeRepository.findById(dao.getId()).orElse(null):null;
+
+    public MeasurementTypeDAORequest verifyMeasurementType(MeasurementTypeDAORequest dao) {
+        var dbType = dao.getId() != null ? measurementTypeRepository.findById(dao.getId()).orElse(null) : null;
         //TODO: remove after common library update
         //hotfix:
 //        if(dao.getPhysicalName()==null && dbType!=null){
@@ -108,40 +115,13 @@ public class MeasurementService {
             if (types.size() != 1) {
                 throw new InvalidCreationIdAlreadyDefinedException("Measurement type does not exists");
             }
-            return  MeasurementTypeDAORequest.create(types.get(0));
+            return MeasurementTypeDAORequest.create(types.get(0));
         }
         return MeasurementTypeDAORequest.create(dbType);
     }
 
 
-
-
     // ASSET CRUD OPERATIONS
-    public MeasurementDAOResponse save(MeasurementDAORequestTemp measurement) {
-        if (measurement.getId() != null && measurementRepository.existsById(measurement.getId()))
-            throw new InvalidCreationIdAlreadyDefinedException(
-                    "Already exists a measurement with ID " + measurement.getId());
-        measurement.setType(verifyMeasurementType(measurement.getType()));
-        var assetDAO = measurement.getAsset();
-        if (assetDAO != null) {
-            var asset = assetRepository.findById(assetDAO.getId()).orElse(null);
-            if (asset == null || !asset.getName().equals(assetDAO.getName())) {
-                measurement.setAsset(SimpleAssetDAO.create(
-                        assetRepository.findByName(assetDAO.getName()).orElseThrow(() ->
-                                new NotFoundException("Asset does not exist " + assetDAO.getName() + " found"))));
-            }
-        }
-        Measurement measurementEntity = measurement.mapToEntity();
-        measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-        measurementRepository.save(measurementEntity);
-        if(measurementEntity.getDetails()!=null){
-            measurementEntity.getDetails().forEach(
-                    it->this.setProperty(measurementEntity.getId(),it)
-            );
-        }
-        return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null, null);
-    }
-    @Deprecated
     public MeasurementDAOResponse save(MeasurementDAORequest measurement) {
         if (measurement.getId() != null && measurementRepository.existsById(measurement.getId()))
             throw new InvalidCreationIdAlreadyDefinedException(
@@ -158,11 +138,36 @@ public class MeasurementService {
         }
         Measurement measurementEntity = measurement.mapToEntity();
         measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+        measurementRepository.save(measurementEntity);
+        if (measurementEntity.getDetails() != null) {
+            measurementEntity.getDetails().forEach(
+                    it -> this.setProperty(measurementEntity.getId(), it)
+            );
+        }
         return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null, null);
     }
+//    @Deprecated
+//    public MeasurementDAOResponse save(MeasurementDAORequest measurement) {
+//        if (measurement.getId() != null && measurementRepository.existsById(measurement.getId()))
+//            throw new InvalidCreationIdAlreadyDefinedException(
+//                    "Already exists a measurement with ID " + measurement.getId());
+//        measurement.setType(verifyMeasurementType(measurement.getType()));
+//        var assetDAO = measurement.getAsset();
+//        if (assetDAO != null) {
+//            var asset = assetRepository.findById(assetDAO.getId()).orElse(null);
+//            if (asset == null || !asset.getName().equals(assetDAO.getName())) {
+//                measurement.setAsset(SimpleAssetDAO.create(
+//                        assetRepository.findByName(assetDAO.getName()).orElseThrow(() ->
+//                                new NotFoundException("Asset does not exist " + assetDAO.getName() + " found"))));
+//            }
+//        }
+//        Measurement measurementEntity = measurement.mapToEntity();
+//        measurementEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+//        return MeasurementDAOResponse.create(measurementRepository.save(measurementEntity), null, null);
+//    }
 
     @Transactional
-    public List<MeasurementDAOResponse> save(List<MeasurementDAORequestTemp> measurements) {
+    public List<MeasurementDAOResponse> save(List<MeasurementDAORequest> measurements) {
         return measurements.stream().map(this::save).collect(Collectors.toList());
     }
 
@@ -242,23 +247,60 @@ public class MeasurementService {
     }
 
     public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
-                                                     String sensorName,
+                                                     String sensorName, Long assetId,
                                                      String assetName, Long typeId, String physicalTypeName,
-                                                     String tagKey,
+                                                     String tagKey, String tagValue,
                                                      Long offset,
                                                      Integer limit) {
         Stream<MeasurementDAO> measurements;
         if (tagKey == null) {
             measurements = measurementRepository.findMeasurements(
-                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName,
+                    offset,
                     limit).stream();
         } else {
-            measurements = measurementRepository.findMeasurements(
-                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,
+            measurements = measurementRepository.findMeasurementsByTag(
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName,
+                    tagKey, tagValue,
                     offset, limit).stream();
         }
 
         return measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
+    }
+
+    public MeasurementDAOImpl findMeasurement(Long id) {
+        MeasurementDAO measurement = measurementRepository.findMeasurement(id)
+                .orElseThrow(() -> new NotFoundException("Measurement not found"));
+
+        return MeasurementDAOImpl.create(measurement);
+    }
+
+    /**
+     * get detailed list of measurements related with the asset
+     *
+     * @param assetId
+     * @param offset
+     * @param limit
+     * @return
+     */
+    public List<MeasurementDAOImpl> findAssetMeasurements(
+            Long assetId,
+            Long offset,
+            Integer limit) {
+        Stream<MeasurementDAO> measurements;
+
+        measurements = measurementRepository.findMeasurements(
+                assetId, null, null, null, null, null, null, null, offset,limit).stream();
+        List<MeasurementDAOImpl> collect = measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
+        collect.forEach(it ->
+        {
+            var tags = measurementTagsRepository.findByMeasurementId(it.getId())
+                    .stream().map(tag -> MeasurementTagsDAO.create(tag, it.getId()))
+                    .collect(Collectors.toList());
+            it.setTags(tags);
+        });
+
+        return collect;
     }
 
     public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {
@@ -350,8 +392,8 @@ public class MeasurementService {
     }
 
     public List<MeasurementType> getTypes(Map<String, String> filters, long offset, int limit) {
-        Page<MeasurementType> types = measurementTypeRepository.findAll(  new OffSetPaging(offset, limit,
-                Sort.by(Sort.Direction.ASC, "id",  "physicalName")));
+        Page<MeasurementType> types = measurementTypeRepository.findAll(new OffSetPaging(offset, limit,
+                Sort.by(Sort.Direction.ASC, "id", "physicalName")));
         Stream<MeasurementType> stream = types.stream();
 
         if (filters != null)
@@ -385,9 +427,17 @@ public class MeasurementService {
     public MeasurementTags saveTag(MeasurementTags tag) {
         if (tag.getId() != null && measurementTagsRepository.existsById(tag.getId()))
             throw new InvalidCreationIdAlreadyDefinedException("Already exists a tag with ID " + tag.getId());
-        if(!measurementTagsRepository.findByKeyAndValue(tag.getKey(),tag.getValue()).isEmpty())
-            throw new InvalidCreationIdAlreadyDefinedException("Tag already exists" + tag.getKey()+"="+tag.getValue());
+        if (!measurementTagsRepository.findByKeyAndValue(tag.getKey(), tag.getValue()).isEmpty())
+            throw new InvalidCreationIdAlreadyDefinedException(
+                    "Tag already exists" + tag.getKey() + "=" + tag.getValue());
         return measurementTagsRepository.save(tag);
+    }
+
+    public MeasurementTags updateTag(MeasurementTags tag, Long id) {
+        if (id != null && measurementTagsRepository.existsById(id)) {
+            tag.setId(id);
+            return measurementTagsRepository.save(tag);
+        } else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
     }
 
     public boolean setTags(Long measurementId, Map<String, String> tags) {
@@ -410,12 +460,21 @@ public class MeasurementService {
         return true;
     }
 
+    public boolean setTag(Long measurementId, String key, String value) {
+        this.deleteMeasurementTag(measurementId, key);
+        Measurement m = this.getById(measurementId);//check is exists
+        var l = measurementTagsRepository.findByKeyAndValue(key, value);
+        if (l.size() == 0) {//  should be    if (l.size() != 1) {
+            throw new InvalidNonExistingIdException(
+                    "No tag with key " + key + " and value: " + value);
+        }
+        var tag = l.get(0);
+        measurementTagsRepository.setTag(tag.getId(), measurementId);//fails on duplicate
+        return true;
+    }
 
-    public MeasurementTags updateTag(MeasurementTags tag, Long id) {
-        if (id != null && measurementTagsRepository.existsById(id)) {
-            tag.setId(id);
-            return measurementTagsRepository.save(tag);
-        } else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
+    public boolean deleteMeasurementTag(Long measurementId, String tagKey) {
+        return measurementTagsRepository.clearTag(measurementId, tagKey) == 1;
     }
 
     public boolean deleteTagById(Long id) {
@@ -441,20 +500,24 @@ public class MeasurementService {
 
     }
 
-    public List<TagDAO> getTags(Map<String, String> filters, long offset, int limit) {
-        Page<MeasurementTags> tags = measurementTagsRepository.findAll(new OffSetPaging(offset, limit));
-        Stream<MeasurementTags> stream = tags.stream();
+    public List<TagDAO> getTags(String key, long offset, int limit) {
 
-        if (filters != null)
-            stream = stream.filter(Detail -> {
-                boolean equals = true;
+        Stream<MeasurementTags> stream;
+        Page<MeasurementTags> tags;
+        if (key == null) stream = measurementTagsRepository.findAll(new OffSetPaging(offset, limit)).stream();
+        else stream = tempMeasurementTagsRepository.findByKey(key).stream();
 
-                if (filters.containsKey("key"))
-                    equals = Detail.getKey().equalsIgnoreCase(filters.get("key"));
 
-                return equals;
-            });
-        return stream.map(it -> new TagDAO(it.getKey(), it.getValue(),it.getId())).collect(Collectors.toList());
+//        if (filters != null)
+//            stream = stream.filter(Detail -> {
+//                boolean equals = true;
+//
+//                if (filters.containsKey("key"))
+//                    equals = Detail.getKey().equalsIgnoreCase(filters.get("key"));
+//
+//                return equals;
+//            });
+        return stream.map(it -> new TagDAO(it.getKey(), it.getValue(), it.getId())).collect(Collectors.toList());
 
 
     }
@@ -470,7 +533,7 @@ public class MeasurementService {
     }
 
     public List<String> getTagValues(String tagKey) {
-        return measurementTagsRepository.listTagValues(tagKey);
+        return tempMeasurementTagsRepository.listTagValues(tagKey);
     }
 
     public MeasurementTags getTagById(Long id) {

@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @ToString
 public class HDRRequest {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(nullable = false)
     private LocalDateTime timestamp;
@@ -40,6 +40,10 @@ public class HDRRequest {
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "measurement_type_id", nullable = true, insertable = true, updatable = true)
     private MeasurementType valueType;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "asset_id", nullable = true, insertable = true, updatable = true)
+    private Asset asset;
     @Column(name = "json_config", columnDefinition = "TEXT")
     private String jsonConfig;
 }

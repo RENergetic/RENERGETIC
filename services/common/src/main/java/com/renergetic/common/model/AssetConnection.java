@@ -21,7 +21,7 @@ import javax.persistence.*;
 public class AssetConnection {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@ManyToOne(optional = false, cascade = CascadeType.REFRESH)

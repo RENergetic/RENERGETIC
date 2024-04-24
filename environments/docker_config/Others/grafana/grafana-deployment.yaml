@@ -10,6 +10,8 @@ spec:
       app: grafana
   template:
     metadata:
+      annotations:
+        backup.velero.io/backup-volumes: grafana-disk
       labels:
         app: grafana
     spec:

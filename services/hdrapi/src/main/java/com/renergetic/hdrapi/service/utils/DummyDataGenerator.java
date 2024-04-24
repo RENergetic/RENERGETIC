@@ -5,10 +5,10 @@ package com.renergetic.hdrapi.service.utils;
 import com.renergetic.common.dao.*;
 import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.model.*;
+import com.renergetic.common.repository.HDRRecommendationRepository;
 import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.common.repository.MeasurementTagsRepository;
 import com.renergetic.common.repository.MeasurementTypeRepository;
-import com.renergetic.common.repository.RecommendationRepository;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class DummyDataGenerator {
     @Autowired
     MeasurementRepository measurementRepository;
     @Autowired
-    RecommendationRepository recommendationRepository;
+    HDRRecommendationRepository recommendationRepository;
     @Autowired
     MeasurementTagsRepository measurementTagsRepository;
     private static final Random random = new Random();
@@ -58,6 +58,7 @@ public class DummyDataGenerator {
             return previousValue + (random.nextInt((max.intValue() / 3) * 100)) / 100.0 - max * 0.1;
         }
     }
+
 
     private static Double getMeasurementValue(MeasurementDAOResponse m) {
         return getMeasurementValue(m, null);

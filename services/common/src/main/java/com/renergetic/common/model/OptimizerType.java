@@ -16,13 +16,13 @@ import java.util.List;
 @ToString
 public class OptimizerType {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name="name", unique = true, nullable = false)
     private String name;
 
-    @Column(name="domains_quantity", unique = true, nullable = true)
+    @Column(name="domains_quantity", unique = false, nullable = true)
     private Integer domainsQuantity;
 
     @Enumerated(EnumType.STRING)
