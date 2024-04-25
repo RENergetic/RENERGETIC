@@ -34,6 +34,7 @@ import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.common.utilities.OffSetPaging;
 
+import io.smallrye.common.constraint.NotNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -210,6 +211,7 @@ public class MeasurementService {
                                                      String sensorName,
                                                      String assetName, Long typeId, String physicalTypeName,
                                                      String tagKey,
+                                                     String tagValue,
                                                      Long offset,
                                                      Integer limit) {
         Stream<MeasurementDAO> measurements;
@@ -218,12 +220,39 @@ public class MeasurementService {
                     null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
                     limit).stream();
         } else {
-            measurements = measurementRepository.findMeasurements(
+            measurements = measurementRepository.findMeasurementsByTag(
                     null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,
-                    offset, limit).stream();
+                    tagValue, offset, limit).stream();
         }
 
         return measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
+    }
+
+    public MeasurementDAOImpl findMeasurement(Long id) {
+        MeasurementDAO measurement = measurementRepository.findMeasurement(id)
+                .orElseThrow(() -> new NotFoundException("Measurement not found"));
+
+        return MeasurementDAOImpl.create(measurement);
+    }
+    
+    public List<MeasurementDAOImpl> findAssetMeasurements(
+            Long assetId,
+            Long offset,
+            Integer limit) {
+        Stream<MeasurementDAO> measurements;
+
+        measurements = measurementRepository.findMeasurements(
+                assetId, null, null, null, null, null, null, null, offset, limit).stream();
+        List<MeasurementDAOImpl> collect = measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
+        collect.forEach(it ->
+        {
+            List<MeasurementTagsDAO> tags = measurementTagsRepository.findByMeasurementId(it.getId())
+                    .stream().map(tag -> MeasurementTagsDAO.create(tag, it.getId()))
+                    .collect(Collectors.toList());
+            it.setTags(tags);
+        });
+
+        return collect;
     }
 
     public List<MeasurementDAOResponse> get(Map<String, String> filters, long offset, int limit) {
@@ -267,7 +296,8 @@ public class MeasurementService {
     public List<MeasurementDAOResponse> find(Map<String, String> filters, long offset, int limit) {
         //TODO: more filtering options
         String s = filters.getOrDefault("name", null);
-        List<Measurement> list = measurementRepository.filterMeasurement(s, s, offset, limit);
+        String l = filters.getOrDefault("label", null);
+        List<Measurement> list = measurementRepository.filterMeasurement(s, l, offset, limit);
         if (!list.isEmpty())
             return list.stream().map(it -> MeasurementDAOResponse.create(it,
                             measurementDetailsRepository.findByMeasurementId(it.getId()), null))
@@ -372,12 +402,39 @@ public class MeasurementService {
         return true;
     }
 
+    public boolean setTags(Long measurementId, String key, String value) {
+        requireMeasurement(measurementId);
+        this.deleteMeasurementTag(measurementId, key);
+        List<MeasurementTags> tags = measurementTagsRepository.findByKeyAndValue(key, value);
+        if (tags.isEmpty()) {
+            throw new InvalidNonExistingIdException("No tag with key " + key + " and value: " + value);
+        }
+        MeasurementTags tag = tags.get(0);
+        measurementTagsRepository.setTag(tag.getId(), measurementId);
+        return true;
+    }
+
+    public boolean setTag(Long measurementId, String key, String value) {
+        requireMeasurement(measurementId);
+        this.deleteMeasurementTag(measurementId, key); //delete all other tags related with the measurement
+        var l = measurementTagsRepository.findByKeyAndValue(key, value); //Check if tag is defined in the tags table
+        if (l.isEmpty()) {
+            throw new InvalidNonExistingIdException("No tag with key " + key + " and value: " + value);
+        }
+        var tag = l.get(0);
+        measurementTagsRepository.setTag(tag.getId(), measurementId);
+        return true;
+    }
 
     public MeasurementTags updateTag(MeasurementTags tag, Long id) {
         if (id != null && measurementTagsRepository.existsById(id)) {
             tag.setId(id);
             return measurementTagsRepository.save(tag);
         } else throw new InvalidNonExistingIdException("No tag with id " + id + "found");
+    }
+
+    public boolean deleteMeasurementTag(Long measurementId, String tagKey) {
+        return measurementTagsRepository.clearTag(measurementId, tagKey) == 1;
     }
 
     public boolean deleteTagById(Long id) {
@@ -403,7 +460,7 @@ public class MeasurementService {
 
     }
 
-    public List<TagDAO> getTags(Map<String, String> filters, long offset, int limit) {
+    public List<TagDAO> getTagsFilter(Map<String, String> filters, long offset, int limit) {
         Page<MeasurementTags> tags = measurementTagsRepository.findAll(new OffSetPaging(offset, limit));
         Stream<MeasurementTags> stream = tags.stream();
 
@@ -417,8 +474,15 @@ public class MeasurementService {
                 return equals;
             });
         return stream.map(it -> new TagDAO(it.getKey(), it.getValue(),it.getId())).collect(Collectors.toList());
+    }
 
+    public List<TagDAO> getTags(@NotNull String key, long offset, int limit) {
 
+        Stream<MeasurementTags> stream;
+        if (key == null) stream = measurementTagsRepository.findAll(new OffSetPaging(offset, limit)).stream();
+        else stream = measurementTagsRepository.findByKey(key).stream();
+
+        return stream.map(it -> new TagDAO(it.getKey(), it.getValue(), it.getId())).collect(Collectors.toList());
     }
 
     public List<MeasurementTagsDAO> getMeasurementTags(Long measurementId) {

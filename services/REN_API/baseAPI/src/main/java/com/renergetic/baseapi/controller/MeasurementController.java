@@ -104,6 +104,7 @@ public class MeasurementController {
             @RequestParam(required = false, name = "sensor_name") String sensorName,
             @RequestParam(required = false, name = "asset_name") String assetName,
             @RequestParam(required = false, name = "tag_key") String tagKey,
+            @RequestParam(required = false, name = "tag_value") String tagValue,
             @RequestParam(required = false, name = "type_id") Long typeId,
             @RequestParam(required = false, name = "type_physical_name") String physicalTypeName) {
 
@@ -111,7 +112,7 @@ public class MeasurementController {
         List<MeasurementDAOImpl> measurements;
 
         measurements = measurementSv.findMeasurements(name, domain, direction, sensorName,
-                assetName, typeId, physicalTypeName, tagKey, offset.orElse(0L), limit.orElse(1000));
+                assetName, typeId, physicalTypeName, tagKey, tagValue, offset.orElse(0L), limit.orElse(1000));
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
@@ -192,6 +193,29 @@ public class MeasurementController {
         return new ResponseEntity<>(type, type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @Operation(summary = "Get Measurement by id")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @ApiResponse(responseCode = "404", description = "No measurements found with this id")
+    @GetMapping(path = {"/id/{id}/report"}, produces = "application/json")
+    public ResponseEntity<MeasurementDAOImpl> getDetailedMeasurement(@PathVariable Long id) {
+        MeasurementDAOImpl m = measurementSv.findMeasurement(id);
+        m.setTags(measurementSv.getMeasurementTags(id));
+        return new ResponseEntity<>(m, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get all asset measurements")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/report/asset/{id}", produces = "application/json")
+    public ResponseEntity<List<MeasurementDAOImpl>> listAssetDetailedMeasurements(
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit,
+            @PathVariable(required = true, name = "id") Long assetId) {
+        List<MeasurementDAOImpl> measurements =
+                measurementSv.findAssetMeasurements(assetId, offset.orElse(0L), limit.orElse(500));
+        return new ResponseEntity<>(measurements, HttpStatus.OK);
+    }
+
+
 
 //=== INFO REQUESTS ===================================================================================
 
@@ -224,7 +248,7 @@ public class MeasurementController {
     @Operation(summary = "Insert measurement detail's property")
     @ApiResponse(responseCode = "200", description = "Details saved correctly")
     @ApiResponse(responseCode = "500", description = "Error saving details")
-    @PostMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
+    @PostMapping(path = {"{measurement_id}/info", "/id/{measurement_id}/info"}, produces = "application/json", consumes = "application/json")
     public ResponseEntity<MeasurementDetails> saveProperty(@RequestBody MeasurementDetails detail,
                                                            @PathVariable("measurement_id") Long id) {
         Measurement measurement = new Measurement();
@@ -239,7 +263,7 @@ public class MeasurementController {
     @ApiResponse(responseCode = "400", description = "Path isn't valid")
     @ApiResponse(responseCode = "404", description = "Detail not exist")
     @ApiResponse(responseCode = "500", description = "Error saving information")
-    @PutMapping(path = "{measurement_id}/info", produces = "application/json", consumes = "application/json")
+    @PutMapping(path = {"{measurement_id}/info", "/id/{measurement_id}/info"}, produces = "application/json", consumes = "application/json")
     public ResponseEntity<MeasurementDetails> updateProperty(@RequestBody MeasurementDetails detail,
                                                              @PathVariable("measurement_id") Long id) {
         Measurement measurement = new Measurement();
@@ -251,7 +275,7 @@ public class MeasurementController {
     @Operation(summary = "Delete Information from its id")
     @ApiResponse(responseCode = "204", description = "Information deleted")
     @ApiResponse(responseCode = "500", description = "Error deleting information")
-    @DeleteMapping(path = "{measurement_id}/info/{info_id}")
+    @DeleteMapping(path = {"{measurement_id}/info/{info_id}", "/id/{measurement_id}/info/{info_id}"})
     public ResponseEntity<MeasurementDetails> deleteInformation(@PathVariable("measurement_id") Long measurementId,
                                                                 @PathVariable("info_id") Long infoId) {
         measurementSv.deleteDetailById(infoId);
@@ -262,7 +286,7 @@ public class MeasurementController {
 
     @Operation(summary = "Insert Details for Measurement")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PostMapping(path = "{measurement_id}/info", produces = "application/json")
+    @PostMapping(path = {"{measurement_id}/info", "/id/{measurement_id}/info"}, produces = "application/json")
     public ResponseEntity<Boolean> setMeasurementProperty(
             @PathVariable(name = "measurement_id") Long measurementId,
             @RequestBody MeasurementDetails detail) {
@@ -273,7 +297,7 @@ public class MeasurementController {
 
     @Operation(summary = "Insert Details for Measurement")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PutMapping(path = "{measurement_id}/properties", produces = "application/json")
+    @PutMapping(path = {"{measurement_id}/properties", "/id/{measurement_id}/properties"}, produces = "application/json")
     public ResponseEntity<Boolean> setMeasurementProperties(
             @PathVariable(name = "measurement_id") Long measurementId,
             @RequestBody Map<String, String> properties) {
@@ -383,7 +407,7 @@ public class MeasurementController {
     public ResponseEntity<List<TagDAO>> getAllTags(@RequestParam(required = false) Optional<Long> offset,
                                                    @RequestParam(required = false) Optional<Integer> limit) {
         List<TagDAO> tags;
-        tags = measurementSv.getTags(null, offset.orElse(0L), limit.orElse(500));
+        tags = measurementSv.getTagsFilter(null, offset.orElse(0L), limit.orElse(500));
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
 
@@ -428,6 +452,15 @@ public class MeasurementController {
         return new ResponseEntity<>(data, data != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
+    @Operation(summary = "Get All Measurement Tags by a key")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "tags/key/{key}", produces = "application/json")
+    public ResponseEntity<List<TagDAO>> getAllTagsByKey(@PathVariable("key") String key,
+                                                        @RequestParam(required = false) Optional<Long> offset,
+                                                        @RequestParam(required = false) Optional<Integer> limit) {
+        List<TagDAO> tags = measurementSv.getTags(key, offset.orElse(0L), limit.orElse(500));
+        return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
 
     @Operation(summary = "Insert Tags for Measurement")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -438,6 +471,15 @@ public class MeasurementController {
 
         boolean res = measurementSv.setTags(measurementId, tags);
 
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+    
+    @Operation(summary = "Add tag to the measurement")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "/id/{id}/tags/key/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<Boolean> setMeasurementTag(
+            @PathVariable(name = "id") Long measurementId, @PathVariable String key, @PathVariable String value) {
+        boolean res = measurementSv.setTag(measurementId, key, value);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -470,6 +512,15 @@ public class MeasurementController {
         measurementSv.deleteTagById(tagId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Remove tag from the measurement")
+    @ApiResponse(responseCode = "204", description = "Tag deleted")
+    @ApiResponse(responseCode = "500", description = "Error deleting tag")
+    @DeleteMapping(path = "/id/{id}/tags/key/{key}")
+    public ResponseEntity<Boolean> deleteMeasurementTag(@PathVariable Long id, @PathVariable String key) {
+        measurementSv.deleteMeasurementTag(id, key);
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
     //endregion
 }
