@@ -290,7 +290,7 @@ public class MeasurementService {
         Stream<MeasurementDAO> measurements;
 
         measurements = measurementRepository.findMeasurements(
-                assetId, null, null, null, null, null, null, null, offset,limit).stream();
+                assetId, null, null, null, null, null, null, null, offset, limit).stream();
         List<MeasurementDAOImpl> collect = measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
         collect.forEach(it ->
         {
@@ -344,7 +344,8 @@ public class MeasurementService {
     public List<MeasurementDAOResponse> find(Map<String, String> filters, long offset, int limit) {
         //TODO: more filtering options
         String s = filters.getOrDefault("name", null);
-        List<Measurement> list = measurementRepository.filterMeasurement(s, s, offset, limit);
+        String l = filters.getOrDefault("label", null);
+        List<Measurement> list = measurementRepository.filterMeasurement(s, l, offset, limit);
         if (list.size() > 0)
             return list.stream().map(it -> MeasurementDAOResponse.create(it,
                             measurementDetailsRepository.findByMeasurementId(it.getId()), null))
@@ -461,15 +462,14 @@ public class MeasurementService {
     }
 
     public boolean setTag(Long measurementId, String key, String value) {
-        this.deleteMeasurementTag(measurementId, key);
-        Measurement m = this.getById(measurementId);//check is exists
-        var l = measurementTagsRepository.findByKeyAndValue(key, value);
-        if (l.size() == 0) {//  should be    if (l.size() != 1) {
-            throw new InvalidNonExistingIdException(
-                    "No tag with key " + key + " and value: " + value);
+        requireMeasurement(measurementId);
+        this.deleteMeasurementTag(measurementId, key); //delete all other tags related with the measurement
+        var l = measurementTagsRepository.findByKeyAndValue(key, value); //Check if tag is defined in the tags table
+        if (l.size() == 0) {
+            throw new InvalidNonExistingIdException("No tag with key " + key + " and value: " + value);
         }
         var tag = l.get(0);
-        measurementTagsRepository.setTag(tag.getId(), measurementId);//fails on duplicate
+        measurementTagsRepository.setTag(tag.getId(), measurementId);
         return true;
     }
 
