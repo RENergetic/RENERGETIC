@@ -156,7 +156,7 @@ public class UserController {
     )
     @PutMapping(path = "/profile", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Boolean> updateProfile(@RequestBody UserDAORequest user) {
-        KeycloakWrapper client = keycloakService.getClient(true);
+        KeycloakWrapper client = keycloakService.getClient(null, true);
         KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
         user.setId(keycloakUser.getId());
         //TODO: synchronized section
@@ -176,7 +176,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Error deleting user")})
     @DeleteMapping(path = "/profile")
     public ResponseEntity<?> deleteCurrentUser() {
-        KeycloakWrapper client = keycloakService.getClient(true);
+        KeycloakWrapper client = keycloakService.getClient(null, true);
         KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
         UserRepresentation userRepresentation = client.deleteUser(keycloakUser.getId());
 
@@ -186,47 +186,6 @@ public class UserController {
     //#endregion
 
     //#region Admin GET REQUESTS
-
-
-    @Operation(summary = "Get All Users")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "", produces = "application/json")
-    public ResponseEntity<List<UserRepresentation>> getAllUsers
-            (@Parameter(description = "Filter by role name") @RequestParam(required = false) Optional<String> role,
-             @RequestParam(required = false) Optional<Integer> offset,
-             @RequestParam(required = false) Optional<Integer> limit) {
-        loggedInService.hasRole(
-                KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        String token = loggedInService.getKeycloakUser().getToken();
-        List<UserRepresentation> users;
-        KeycloakWrapper client = keycloakService.getClient(token, true);
-        int mOffset = offset.orElse(0);
-        int mLimit = limit.orElse(50);
-        if (role.isPresent() && KeycloakRole.roleByName(role.get()) != null) {
-            users = client.listUsers(KeycloakRole.roleByName(role.get()).name, mOffset, mLimit);
-        } else {
-            users = client.listUsers(mOffset, mLimit);
-        }
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Get any user's roles")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/{userId}/roles", produces = "application/json")
-    public ResponseEntity<List<String>> getRoles(@PathVariable String userId) {
-        loggedInService.hasRole(
-                KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
-        String token = loggedInService.getKeycloakUser().getToken();
-        KeycloakWrapper client = keycloakService.getClient(token, true);
-        try {
-            List<String> roles = client.getRoles(userId).stream().map(RoleRepresentation::getName).collect(
-                    Collectors.toList());
-            return new ResponseEntity<>(roles, HttpStatus.OK);
-        } catch (javax.ws.rs.NotAuthorizedException ex) {
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        }
-    }
-
 
     //    TODO: to remove in the future releases
     @Operation(summary = "Get notifications for the current user")
@@ -277,32 +236,14 @@ public class UserController {
     }
     )
     @PostMapping(path = "", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<UserRepresentation> createUser(@RequestBody UserDAORequest userRequest) {
+    public ResponseEntity<UserRepresentation> createUser(@RequestBody UserDAORequest user) {
         loggedInService.hasRole(
                 KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask);//TODO: WebSecurityConfig
         KeycloakWrapper client = keycloakService.getClient(loggedInService.getKeycloakUser().getToken(), true);
         UserRepresentation ur = client.createUser(user);
         user.setId(ur.getId());
         UserDAOResponse save = userSv.save(ur, user);
-        return new ResponseEntity<>(save, HttpStatus.CREATED);
-    }
-
-
-    @Operation(summary = "Create a new User Setting associated to a User")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Setting saved correctly"),
-            @ApiResponse(responseCode = "404", description = "User to assign role not found"),
-            @ApiResponse(responseCode = "500", description = "Error saving role")
-    }
-    )
-    @PostMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
-    @PutMapping(path = "/profile/settings", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<String> saveUserSetting(@RequestBody String settings) {
-//        Long userId = 2l;
-        Long userId = loggedInService.getLoggedInUser().getId();
-        settings = userSv.saveSettings(userId, settings);
-
-        return new ResponseEntity<>(settings, HttpStatus.OK);
+        return new ResponseEntity<>(ur, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Modify user's settings")
@@ -339,33 +280,6 @@ public class UserController {
         return new ResponseEntity<>(true, HttpStatus.OK);
 //        return new ResponseEntity<>(user, user != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);//todo trow not found
     }
-
-    @Operation(summary = "Update current User")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "User saved correctly"),
-            @ApiResponse(responseCode = "404", description = "User not exist"),
-            @ApiResponse(responseCode = "422", description = "Type isn's valid"),
-            @ApiResponse(responseCode = "500", description = "Error saving user")
-    }
-    )
-    @PutMapping(path = "/profile", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<Boolean> updateProfile(@RequestBody UserDAORequest user) {
-        KeycloakWrapper client = keycloakService.getClient(loggedInService.getKeycloakUser().getToken(), true);
-        KeycloakUser keycloakUser = loggedInService.getKeycloakUser();
-        user.setId(keycloakUser.getId());
-        //TODO: synchronized section
-        try {
-
-            client.updateUser(user);
-        } catch (NotAuthorizedException ex) {
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        }
-        if (user.getPassword() != null) {
-            client.updatePassword(keycloakUser.getId(), user.getPassword());
-        }
-        return new ResponseEntity<>(true, HttpStatus.OK);
-    }
-
 
 //    @Operation(summary = "Update a existing User")
 //    @ApiResponses({
