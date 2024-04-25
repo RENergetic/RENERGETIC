@@ -11,9 +11,10 @@ import java.net.URLEncoder;
 import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.net.ssl.HttpsURLConnection;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.renergetic.kubeflowapi.model.HttpsResponseInfo;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +40,11 @@ public class KubeflowUtils {
             parseParams = parseParams.isBlank() ? parseParams : '?' + parseParams;
             url = new URL(urlString + parseParams);
 
+            System.out.println(url);
+
             connection = (HttpURLConnection) url.openConnection();
-            connection.setInstanceFollowRedirects(true);
-            HttpURLConnection.setFollowRedirects(true); /////// TODO: REVISAR QUE ES NECESARIO DE AQUÍ
+            connection.setInstanceFollowRedirects(false);
+            HttpURLConnection.setFollowRedirects(false);
             connection.setRequestMethod(httpMethod);
 
             if (headers != null) {
@@ -59,11 +62,22 @@ public class KubeflowUtils {
                     os.write(input, 0, input.length);
                 }
             }
-
-            HttpsResponseInfo info = new HttpsResponseInfo(connection.getResponseCode(), getBody(connection), connection.getHeaderFields());
             
+            HttpsResponseInfo info = new HttpsResponseInfo(connection.getResponseCode(), getBody(connection),
+                    connection.getHeaderFields());
+            
+            System.out.println(info);
+
+            connection.disconnect();
             return info;
+        } catch (IllegalArgumentException e) {
+            System.err.println("Check that the URL is valid and  the HTTP Method is allowed");
+        } catch (JsonProcessingException e) {
+            System.err.println("Can't parse body to a JSON");
         } catch (IOException e) {
+            System.err.println("Can't get connection with the URL");
+        } catch (Exception e) {
+            System.err.println("Unknow exception");
             e.printStackTrace();
         }
         return null;
@@ -98,12 +112,49 @@ public class KubeflowUtils {
                 response.append(line);
             }
             System.out.println("");
-            System.out.println("Response Body: " + response.toString());
+            /*System.out.println("Response body 1: " + response);
+            System.out.println("Response body 2: " + response.toString());*/
 
+        } catch (IllegalArgumentException e) {
+            System.err.println("Check that the URL is valid and  the HTTP Method is allowed");
+        } catch (JsonProcessingException e) {
+            System.err.println("Can't parse body to a JSON");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            System.err.println("Can't get connection with the URL");
+        } catch (Exception e) {
+            System.err.println("Unknow exception");
             e.printStackTrace();
         }
         return response.toString();
+    }
+
+    public String getState(String response) { //MAYBE IT CAN BE DELETED
+        Pattern pattern = Pattern.compile("state=([^&\"]+)");
+        Matcher matcher = pattern.matcher(response);
+        String stateValue = "";
+
+        // Find the state value if the pattern matches
+        if (matcher.find()) {
+            stateValue = matcher.group(1);
+            System.out.println("State Value: " + stateValue);
+        } else {
+            System.out.println("State value not found.");
+        }
+        return stateValue;
+    }
+
+    public String extractParamValue(String inputString, String paramName, String end) {
+        String paramValue = "";
+        int startIndex = inputString.indexOf(paramName);
+        if (startIndex != -1) {
+            startIndex += paramName.length();
+            int endIndex = inputString.indexOf(end, startIndex);
+            if (endIndex != -1) {
+                paramValue = inputString.substring(startIndex, endIndex);
+            } else {
+                paramValue = inputString.substring(startIndex);
+            }
+        }
+        return paramValue;
     }
 }
