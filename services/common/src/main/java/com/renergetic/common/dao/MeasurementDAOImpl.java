@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.common.model.Direction;
 import com.renergetic.common.model.Domain;
 import com.renergetic.common.model.MeasurementType;
+import com.renergetic.common.dao.details.MeasurementTagsDAO;
+
+import java.util.List;
 
 import lombok.Data;
 
@@ -33,10 +36,10 @@ public class MeasurementDAOImpl {
     @JsonProperty(required = false)
     private SimpleAssetDAO asset;
 
-
     @JsonProperty(value = "panel_count", required = false)
     private int panelCount;
-
+    @JsonProperty(value = "tags", required = false)
+    private List<MeasurementTagsDAO> tags=null;
 
     public static MeasurementDAOImpl create(MeasurementDAO measurement ) {
         MeasurementDAOImpl dao = null;
@@ -64,9 +67,9 @@ public class MeasurementDAOImpl {
                 dao.setAsset(asset);
             }
             dao.setPanelCount(measurement.getPanelCount());
+
         }
         return dao;
     }
-
 
 }
