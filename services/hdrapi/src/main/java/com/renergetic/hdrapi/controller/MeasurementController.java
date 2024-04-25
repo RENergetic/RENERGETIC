@@ -97,7 +97,7 @@ public class MeasurementController {
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
 
-    @Operation(summary = "List Measurements")
+    @Operation(summary = "List basic(initial) measurement - measurement without extra tags.")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/basic", produces = "application/json")
     public ResponseEntity<MeasurementDAOImpl> listMeasurements(

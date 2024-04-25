@@ -255,7 +255,7 @@ public class MeasurementService {
                                                      String sensorName, Long assetId,
                                                      String assetName, Long typeId, String physicalTypeName,
                                                      String tagKey, String tagValue,
-                                                     Long offset, Integer limit, Boolean noTag) {
+                                                     Long offset, Integer limit, boolean noTag) {
         Stream<MeasurementDAO> measurements;
         if (tagKey == null) {
             measurements = measurementRepository.findMeasurements(
@@ -263,7 +263,6 @@ public class MeasurementService {
                     offset,
                     limit).stream();
         } else {
-            noTag = noTag == null ? false : noTag;
             if (noTag)
                 measurements = measurementRepository.findMeasurementNoTag(
                         assetId, measurementName, sensorName, domain, direction, typeId, physicalTypeName,
