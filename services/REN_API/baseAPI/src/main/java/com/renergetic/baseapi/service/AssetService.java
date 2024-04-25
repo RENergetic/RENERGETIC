@@ -1,14 +1,31 @@
 package com.renergetic.baseapi.service;
 
-import com.renergetic.common.dao.*;
+import com.renergetic.common.dao.AssetCategoryDAO;
+import com.renergetic.common.dao.AssetConnectionDAORequest;
+import com.renergetic.common.dao.AssetDAORequest;
+import com.renergetic.common.dao.AssetDAOResponse;
+import com.renergetic.common.dao.AssetPanelDAO;
+import com.renergetic.common.dao.AssetTypeDAO;
+import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.dao.SimpleAssetDAO;
 import com.renergetic.common.exception.InvalidArgumentException;
 import com.renergetic.common.exception.InvalidCreationIdAlreadyDefinedException;
 import com.renergetic.common.exception.InvalidNonExistingIdException;
 import com.renergetic.common.exception.NotFoundException;
-import com.renergetic.common.model.*;
+import com.renergetic.common.model.Asset;
+import com.renergetic.common.model.AssetCategory;
+import com.renergetic.common.model.AssetType;
+import com.renergetic.common.model.ConnectionType;
+import com.renergetic.common.model.InformationPanel;
+import com.renergetic.common.model.Measurement;
 import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.AssetDetails;
-import com.renergetic.common.repository.*;
+import com.renergetic.common.repository.AssetCategoryRepository;
+import com.renergetic.common.repository.AssetConnectionRepository;
+import com.renergetic.common.repository.AssetRepository;
+import com.renergetic.common.repository.AssetTypeRepository;
+import com.renergetic.common.repository.MeasurementRepository;
+import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.common.utilities.OffSetPaging;
@@ -18,8 +35,13 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -95,6 +117,10 @@ public class AssetService {
         if (connection.getType() == ConnectionType.owner && !isUser(asset)) {
             throw new InvalidArgumentException("Non user assets cannot be owners");
         }
+        if(assetConnectionRepository.existsByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
+                connection.getAssetConnectedId(), connection.getType())) {
+            throw new InvalidArgumentException("connection already existing for that type between those assets");
+        }
         requireAsset(connection.getAssetConnectedId());
         assetConnectionRepository.save(connection.mapToEntity());
         if(biDirection){
@@ -105,6 +131,13 @@ public class AssetService {
             assetConnectionRepository.save(reversed.mapToEntity());
         }
         return AssetDAOResponse.create(assetRepository.findById(connection.getAssetId()).orElse(null), null, null);
+    }
+
+    @Transactional
+    public boolean disconnect(AssetConnectionDAORequest connection){
+        assetConnectionRepository.deleteByAssetIdAndConnectedAssetIdAndConnectionType(connection.getAssetId(),
+                connection.getAssetConnectedId(), connection.getType());
+        return true;
     }
 
     public MeasurementDAOResponse assignMeasurement(Long assetId, Long measurementId) {

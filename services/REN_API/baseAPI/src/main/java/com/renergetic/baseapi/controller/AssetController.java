@@ -196,7 +196,7 @@ public class AssetController {
     @Operation(summary = "Delete Information from its key")
     @ApiResponse(responseCode = "204", description = "Information delete")
     @ApiResponse(responseCode = "500", description = "Error deleting information")
-    @DeleteMapping(path = "{asset_id}/info/{key}")
+    @DeleteMapping(path = {"{asset_id}/info/{key}", "{asset_id}/info/key/{key}"})
     public ResponseEntity<AssetDetails> deleteInformationByKey(@PathVariable("asset_id") Long assetId,
                                                                @PathVariable("key") String key) {
         assetSv.deleteDetailByKey(key, assetId);
@@ -336,10 +336,14 @@ public class AssetController {
 
     //=== DELETE REQUESTS ================================================================================
     @DeleteMapping(path = "/connect/{id}", produces = "application/json")
-    public ResponseEntity<Void> connectAssets(@PathVariable Long id, @RequestParam("connected_asset_id") Long connectId) {
+    public ResponseEntity<Void> connectAssets(@PathVariable Long id, @RequestParam("connected_asset_id") Long connectId,
+        @RequestParam("type") ConnectionType connectionType) {
         AssetConnectionDAORequest connection = new AssetConnectionDAORequest();
-        throw new NotImplementedException("TODO:");
-//        return ResponseEntity.noContent().build();
+        connection.setAssetConnectedId(connectId);
+        connection.setAssetId(id);
+        connection.setType(connectionType);
+        assetService.disconnect(connection);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Delete a existing Asset", hidden = false)
