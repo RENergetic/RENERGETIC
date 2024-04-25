@@ -97,7 +97,32 @@ public class MeasurementController {
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get measurements by property key and value")
+    @Operation(summary = "List Measurements")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/basic", produces = "application/json")
+    public ResponseEntity<MeasurementDAOImpl> listMeasurements(
+            @RequestParam(required = false) Optional<Long> offset,
+            @RequestParam(required = false) Optional<Integer> limit,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String domain,
+            @RequestParam(required = false) String direction,
+            @RequestParam(required = false, name = "sensor_name") String sensorName,
+            @RequestParam(required = false, name = "asset_id") Long assetId,
+            @RequestParam(required = false, name = "tag_key") String tagKey,
+            @RequestParam(required = false, name = "type_id") Long typeId,
+            @RequestParam(required = false, name = "type_physical_name") String physicalTypeName) {
+
+        List<MeasurementDAOImpl> measurements =
+                measurementSv.findMeasurements(name, domain, direction, sensorName, assetId,
+                        null, typeId, physicalTypeName, tagKey, null, offset.orElse(0L), limit.orElse(1000), true);
+        if (measurements.isEmpty())
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        var m = measurements.get(0);
+        m.setTags(measurementSv.getMeasurementTags(m.getId()));
+        return new ResponseEntity<>(m, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get measurements by tag key and value")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/key/{key}/value/{value}", produces = "application/json")
     public ResponseEntity<List<MeasurementDAOResponse>> getMeasurementsByProperty(
@@ -161,7 +186,7 @@ public class MeasurementController {
 
     @Operation(summary = "Get linked information panels/dashboards with the measurement")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = {"/{id}/panels","/id/{id}/panels"}, produces = "application/json")
+    @GetMapping(path = {"/{id}/panels", "/id/{id}/panels"}, produces = "application/json")
     public ResponseEntity<List<ResourceDAO>> listLinkedPanels(@PathVariable Long id) {
         List<ResourceDAO> l = measurementSv.listLinkedPanels(id);
         return new ResponseEntity<>(l, HttpStatus.OK);
