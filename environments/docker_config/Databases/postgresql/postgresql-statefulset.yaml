@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       annotations:
-        backup.velero.io/backup-volumes: postgresql-db-disk-postgresql-db-0
+        backup.velero.io/backup-volumes: postgresql-db-disk
       labels:
         app: postgresql-db
     spec:

@@ -355,6 +355,7 @@ installPSNC() {
         # set environment variables
 
         # delete kubernetes resources if exists
+        kubectl delete secrets/kubeflow-api-secrets --namespace=$project
         kubectl delete deployments/kubeflow-api --namespace=$project
         kubectl delete services/kubeflow-api-sv --namespace=$project
 
@@ -363,6 +364,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/kubeflow-api:latest
 
         # create kubernetes resources
+        kubectl apply -f kubeflow-api-secrets.yaml --namespace=$project
         envsubst '$PROJECT' < kubeflow-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f kubeflow-api-service.yaml --namespace=$project
     fi
