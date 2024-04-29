@@ -19,9 +19,11 @@ import java.util.List;
 @Setter
 @ToString
 public class WorkflowDefinition {
-    @Id
-    @Column(name = "experiment_id" )
-    private String experimentId;
+
+    @Column(name = "pipeline_id" )
+    private String pipelineId;
+    @Column(name = "name" )
+    private String name;
 
     @Column( name = "visible")
     private Boolean visible=false;
@@ -33,8 +35,8 @@ public class WorkflowDefinition {
     private List<WorkflowParameter> parameters;
 
     //TODO: maximum time for the task to finish?
-    public  WorkflowDefinition(String experimentId) {
-       this.experimentId=experimentId;
+    public  WorkflowDefinition(String pipelineId) {
+       this.pipelineId=pipelineId;
     }
 
 
