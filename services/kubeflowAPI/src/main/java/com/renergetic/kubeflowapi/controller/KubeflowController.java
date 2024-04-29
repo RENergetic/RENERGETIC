@@ -51,8 +51,8 @@ public class KubeflowController {
 	@Autowired
 	private KubeflowService kubeflowService;
 
-    //@Autowired
-	//private WorkflowService workflowService;
+    @Autowired
+	private WorkflowService workflowService;
 	
 	KubeflowUtils utils = new KubeflowUtils();
 	String homeUrl = "https://kubeflow.test.pcss.pl/";
@@ -294,7 +294,7 @@ public class KubeflowController {
     // ********************************************************************************
     // ********************************************************************************
 
-	/*
+
     @Operation(summary = "Get All workflow for non-admin users")
     // GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR NON ADMINS)
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -374,7 +374,7 @@ public class KubeflowController {
                 workflowService.setParameters(experimentId, parameters);
         return new ResponseEntity<>(params, HttpStatus.OK);
     }
-	*/
+
 
 }
 
