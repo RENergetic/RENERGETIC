@@ -1,7 +1,8 @@
 package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.common.model.WorkflowRun;
+import com.renergetic.common.model.PipelineDefinition;
+import com.renergetic.common.model.PipelineRun;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
 import lombok.Getter;
@@ -17,12 +18,13 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @ToString
-public class WorkflowRunDAO {
+public class PipelineRunDAO {
 
     @JsonProperty(required = true, value = "run_id")
     String runId;
-    @JsonProperty(required = true, value = "workflow")
-    WorkflowDefinitionDAO workflowDefinition;
+    @JsonProperty(required = true, value = "pipeline")
+    PipelineDefinitionDAO pipelineDefinitionDAO;
+    //run parameters
     @JsonProperty(required = true, value = "parameters")
     Map<String, Object> parameters = Collections.emptyMap();
     @JsonProperty(required = false, value = "start_time")
@@ -30,18 +32,19 @@ public class WorkflowRunDAO {
     @JsonProperty(required = false, value = "end_time")
     private Long endTime;
 
-    public WorkflowRunDAO(String runId, WorkflowDefinitionDAO workflowDefinition) {
+    public PipelineRunDAO(String runId, PipelineDefinitionDAO pipelineDefinitionDAO) {
         this.runId = runId;
-        this.workflowDefinition = workflowDefinition;
+        this.pipelineDefinitionDAO = pipelineDefinitionDAO;
     }
 
-    public static WorkflowRunDAO create(WorkflowRun wd) {
-        WorkflowRunDAO dao = new WorkflowRunDAO();
+    public static PipelineRunDAO create(PipelineRun wd) {
+        PipelineRunDAO dao = new PipelineRunDAO();
         dao.setRunId(wd.getRunId());
-        if (wd.getWorkflowDefinition() != null) {
-            WorkflowDefinitionDAO workflowDefinitionDAO = new WorkflowDefinitionDAO();
-            workflowDefinitionDAO.setExperimentId(wd.getWorkflowDefinition().getExperimentId());
-            dao.setWorkflowDefinition(workflowDefinitionDAO);
+        if (wd.getPipelineDefinition() != null) {
+            PipelineDefinitionDAO pipelineDefinitionDAO = new PipelineDefinitionDAO();
+            pipelineDefinitionDAO.setPipelineId(wd.getPipelineDefinition().getPipelineId());
+            pipelineDefinitionDAO.setName(wd.getPipelineDefinition().getName());
+            dao.setPipelineDefinitionDAO(pipelineDefinitionDAO);
         }
         if (wd.getParams() != null && !wd.getParams().isEmpty()) {
             try {
@@ -59,15 +62,16 @@ public class WorkflowRunDAO {
         return dao;
     }
 
-    public WorkflowRun mapToEntity() {
-        WorkflowRun wd = new WorkflowRun();
+    public PipelineRun mapToEntity() {
+        PipelineRun wd = new PipelineRun();
         if (this.endTime != null)
             wd.setEndTime(DateConverter.toLocalDateTime(this.endTime));
         if (this.startTime != null)
             wd.setStartTime(DateConverter.toLocalDateTime(this.startTime));
         wd.setRunId(this.runId);
+
         wd.setParams(Json.toJson(this.parameters));
-        wd.setWorkflowDefinition(this.workflowDefinition.mapToEntity());
+        wd.setPipelineDefinition(this.pipelineDefinitionDAO.mapToEntity());
         return wd;
     }
 }

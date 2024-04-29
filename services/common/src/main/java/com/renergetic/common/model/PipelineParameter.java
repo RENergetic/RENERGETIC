@@ -13,16 +13,16 @@ import org.hibernate.annotations.NotFoundAction;
 
 
 @Entity
-@Table(name = "workflow_property")
+@Table(name = "pipeline_parameter")
 
 @RequiredArgsConstructor
 @Getter
 @Setter
 @ToString
-public class WorkflowParameter {
+public class PipelineParameter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "parameter_id")
+    @Column(name = "id")
     private Long parameterId;
     //unique key on "parameter_key"  and "experiment_id"
     @Column(name = "parameter_key", nullable = false)
@@ -33,14 +33,14 @@ public class WorkflowParameter {
     private String type;
     @Column(name = "parameter_description", nullable = true)
     private String parameterDescription;
-    @Column(name = "visible")
+    @Column(name = "parameter_visible")
     private Boolean visible = false;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "pipeline_id", nullable = false)
     @JsonIgnore()
-    private WorkflowDefinition workflowDefinition;
+    private PipelineDefinition pipelineDefinition;
 
 
 }

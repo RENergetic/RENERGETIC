@@ -13,14 +13,14 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "workflow_definition" )
+@Table(name = "pipeline_definition" )
 @RequiredArgsConstructor
 @Getter
 @Setter
 @ToString
-public class WorkflowDefinition {
+public class PipelineDefinition {
 
-    @Column(name = "pipeline_id" )
+    @Column(name = "id" )
     private String pipelineId;
     @Column(name = "name" )
     private String name;
@@ -29,13 +29,13 @@ public class WorkflowDefinition {
     private Boolean visible=false;
     @OneToOne(cascade = CascadeType.DETACH )
     @JoinColumn(name = "current_run_id"  )
-    private WorkflowRun workflowRun;
-    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "workflowDefinition")
+    private PipelineRun pipelineRun;
+    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "pipelineDefinition")
     @NotFound(action = NotFoundAction.IGNORE)
-    private List<WorkflowParameter> parameters;
+    private List<PipelineParameter> parameters;
 
     //TODO: maximum time for the task to finish?
-    public  WorkflowDefinition(String pipelineId) {
+    public  PipelineDefinition(String pipelineId) {
        this.pipelineId=pipelineId;
     }
 
