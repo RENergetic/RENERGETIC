@@ -1,9 +1,5 @@
 package com.renergetic.kubeflowapi.controller;
 
-import com.renergetic.common.utilities.HttpAPIs;
-import com.renergetic.common.dao.WorkflowDefinitionDAO;
-import com.renergetic.common.dao.WorkflowParameterDAO;
-import com.renergetic.common.dao.WorkflowRunDAO;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.dao.ApiRunPostDAO;
 import com.renergetic.kubeflowapi.dao.ExampleRequest;
@@ -11,8 +7,11 @@ import com.renergetic.kubeflowapi.dao.ExampleResponse;
 import com.renergetic.kubeflowapi.model.*;
 import com.renergetic.kubeflowapi.service.ExampleService;
 import com.renergetic.kubeflowapi.service.KubeflowService;
-import com.renergetic.kubeflowapi.service.WorkflowService;
+import com.renergetic.kubeflowapi.service.KubeflowPipelineService;
 import com.renergetic.kubeflowapi.service.utils.KubeflowUtils;
+import com.renergetic.kubeflowapi.tempcommon.PipelineDefinitionDAO;
+import com.renergetic.kubeflowapi.tempcommon.PipelineParameterDAO;
+import com.renergetic.kubeflowapi.tempcommon.PipelineRunDAO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,12 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.HttpURLConnection;
-import java.net.http.HttpResponse;
 import java.util.*;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.swing.SwingWorker.StateValue;
 
 
 @RestController
@@ -52,7 +46,7 @@ public class KubeflowController {
 	private KubeflowService kubeflowService;
 
     @Autowired
-	private WorkflowService workflowService;
+	private KubeflowPipelineService kubeflowPipelineService;
 	
 	KubeflowUtils utils = new KubeflowUtils();
 	String homeUrl = "https://kubeflow.test.pcss.pl/";
@@ -298,80 +292,80 @@ public class KubeflowController {
     @Operation(summary = "Get All workflow for non-admin users")
     // GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR NON ADMINS)
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/workflow", produces = "application/json")
-    public ResponseEntity<List<WorkflowDefinitionDAO>> listAll() {
-        List<WorkflowDefinitionDAO> res = workflowService.getAll();
+    @GetMapping(path = "/pipeline", produces = "application/json")
+    public ResponseEntity<List<PipelineDefinitionDAO>> listAll() {
+        List<PipelineDefinitionDAO> res = kubeflowPipelineService.getAll();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get All workflow") //GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR ADMINS)
+    @Operation(summary = "Get All pipeline") //GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR ADMINS)
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/admin/workflow", produces = "application/json")
-    public ResponseEntity<List<WorkflowDefinitionDAO>> listAll(
+    @GetMapping(path = "/admin/pipeline", produces = "application/json")
+    public ResponseEntity<List<PipelineDefinitionDAO>> listAll(
             @RequestParam(required = false) Optional<Boolean> visible) {
         //TODO: verify admin roles
-        List<WorkflowDefinitionDAO> res = workflowService.getAllAdmin(visible);
+        List<PipelineDefinitionDAO> res = kubeflowPipelineService.getAllAdmin(visible);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Get experiment run") //GET RUN
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/workflow/{experiment_id}/run", produces = "application/json")
-    public ResponseEntity<WorkflowRunDAO> getExperimentRun(
-            @PathVariable(name = "experiment_id") String experimentId) {
+    @GetMapping(path = "/pipeline/{pipeline_id}/run", produces = "application/json")
+    public ResponseEntity<PipelineRunDAO> getExperimentRun(
+            @PathVariable(name = "pipeline_id") String pipelineId) {
 
-        WorkflowRunDAO res = workflowService.getRun(experimentId);
+        PipelineRunDAO res = kubeflowPipelineService.getRun(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Start experiment run") //RUN PIPELINE
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PostMapping(path = "/workflow/{experiment_id}/run", produces = "application/json")
-    public ResponseEntity<WorkflowRunDAO> startExperimentRun(
-            @PathVariable(name = "experiment_id") String experimentId, @RequestBody Map<String, Object> params) {
+    @PostMapping(path = "/pipeline/{pipeline_id}/run", produces = "application/json")
+    public ResponseEntity<PipelineRunDAO> startExperimentRun(
+            @PathVariable(name = "pipeline_id") String pipelineId, @RequestBody Map<String, Object> params) {
 
-        WorkflowRunDAO res = workflowService.startRun(experimentId, params);
+        PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId, params);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Stop experiment run") //STOP PIPELINE
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @DeleteMapping(path = "/workflow/{experiment_id}/run", produces = "application/json")
+    @DeleteMapping(path = "/pipeline/{pipeline_id}/run", produces = "application/json")
     public ResponseEntity<Boolean> startExperimentRun(
-            @PathVariable(name = "experiment_id") String experimentId) {
+            @PathVariable(name = "pipeline_id") String pipelineId) {
 
-        Boolean res = workflowService.stopRun(experimentId);
+        Boolean res = kubeflowPipelineService.stopRun(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Set visibility")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PutMapping(path = "/admin/workflow/{experiment_id}/visibility", produces = "application/json")
-    public ResponseEntity<Boolean> setVisibility(@PathVariable(name = "experiment_id") String experimentId) {
+    @PutMapping(path = "/admin/pipeline/{pipeline_id}/visibility", produces = "application/json")
+    public ResponseEntity<Boolean> setVisibility(@PathVariable(name = "pipeline_id") String pipelineId) {
         //TODO: verify admin roles
-        Boolean res = workflowService.setVisibility(experimentId);
+        Boolean res = kubeflowPipelineService.setVisibility(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Remove visibility")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @DeleteMapping(path = "/admin/workflow/{experiment_id}/visibility", produces = "application/json")
-    public ResponseEntity<Boolean> removeVisibility(@PathVariable(name = "experiment_id") String experimentId) {
+    @DeleteMapping(path = "/admin/pipeline/{pipeline_id}/visibility", produces = "application/json")
+    public ResponseEntity<Boolean> removeVisibility(@PathVariable(name = "pipeline_id") String pipelineId) {
         //TODO: verify admin roles
-        Boolean res = workflowService.removeVisibility(experimentId);
+        Boolean res = kubeflowPipelineService.removeVisibility(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
 
     @Operation(summary = "Set parameters")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PutMapping(path = "/admin/workflow/{experiment_id}/parameters", produces = "application/json")
-    public ResponseEntity<Map<String, WorkflowParameterDAO>> setParameters(
-            @PathVariable(name = "experiment_id") String experimentId,@RequestBody
-            Map<String, WorkflowParameterDAO> parameters) {
+    @PutMapping(path = "/admin/pipeline/{pipeline_id}/parameters", produces = "application/json")
+    public ResponseEntity<Map<String, PipelineParameterDAO>> setParameters(
+            @PathVariable(name = "pipeline_id") String pipelineId,@RequestBody
+            Map<String, PipelineParameterDAO> parameters) {
         //TODO: verify admin roles
-        Map<String, WorkflowParameterDAO> params =
-                workflowService.setParameters(experimentId, parameters);
+        Map<String, PipelineParameterDAO> params =
+                kubeflowPipelineService.setParameters(pipelineId, parameters);
         return new ResponseEntity<>(params, HttpStatus.OK);
     }
 
