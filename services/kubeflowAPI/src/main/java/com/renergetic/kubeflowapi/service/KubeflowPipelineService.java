@@ -252,7 +252,7 @@ public class KubeflowPipelineService {
             runDAO = new PipelineRunDAO();
             runDAO.setParameters(params);
             runDAO.setPipelineDefinitionDAO(definitionDAO);
-            //            runDAO.setRunId(runId); -> set id
+            //            runDAO.setRunId(runId); -> set id from kubeflow TODO:
             // fill the fields of the run object
         }
 
