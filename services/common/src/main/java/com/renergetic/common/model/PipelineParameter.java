@@ -33,7 +33,7 @@ public class PipelineParameter {
     private String type;
     @Column(name = "parameter_description", nullable = true)
     private String parameterDescription;
-    @Column(name = "parameter_visible")
+    @Column(name = "parameter_visible", nullable = false)
     private Boolean visible = false;
 
     @ManyToOne(cascade = CascadeType.REFRESH)

@@ -35,4 +35,6 @@ public class PipelineRun {
     @Column(nullable = true, name = "end_time")
     private LocalDateTime endTime;
 
+    @Column(nullable = true, name = "state")
+    private String state;
 }

@@ -31,6 +31,8 @@ public class PipelineRunDAO {
     private Long startTime;
     @JsonProperty(required = false, value = "end_time")
     private Long endTime;
+    @JsonProperty(required = false, value = "state")
+    private String state;
 
     public PipelineRunDAO(String runId, PipelineDefinitionDAO pipelineDefinitionDAO) {
         this.runId = runId;
@@ -46,6 +48,7 @@ public class PipelineRunDAO {
             pipelineDefinitionDAO.setName(wd.getPipelineDefinition().getName());
             dao.setPipelineDefinitionDAO(pipelineDefinitionDAO);
         }
+        dao.setState(wd.getState());
         if (wd.getParams() != null && !wd.getParams().isEmpty()) {
             try {
                 Map<String, Object> map = Json.toMap(wd.getParams());
@@ -69,7 +72,7 @@ public class PipelineRunDAO {
         if (this.startTime != null)
             wd.setStartTime(DateConverter.toLocalDateTime(this.startTime));
         wd.setRunId(this.runId);
-
+        wd.setState(this.state);
         wd.setParams(Json.toJson(this.parameters));
         wd.setPipelineDefinition(this.pipelineDefinitionDAO.mapToEntity());
         return wd;
