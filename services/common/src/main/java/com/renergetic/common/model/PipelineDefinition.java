@@ -20,6 +20,7 @@ import java.util.List;
 @ToString
 public class PipelineDefinition {
 
+    @Id
     @Column(name = "id" )
     private String pipelineId;
     @Column(name = "name" )
