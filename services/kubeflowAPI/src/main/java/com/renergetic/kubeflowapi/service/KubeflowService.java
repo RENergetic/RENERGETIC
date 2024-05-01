@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.renergetic.kubeflowapi.tempcommon.PipelineDefinitionDAO;
+import com.renergetic.kubeflowapi.tempcommon.PipelineParameterDAO;
 import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.renergetic.kubeflowapi.model.HttpsResponseInfo;
@@ -16,9 +19,25 @@ import com.renergetic.common.utilities.Json;
 
 @Service
 public class KubeflowService {
-    
+    //#region properties
+    @Value("${kubeflow.user.name}")
+    private String kubeflowUsername;
+
+    @Value("${kubeflow.user.password}")
+    private String kubeflowPassword;
+    @Value("${kubeflow.namespace}")
+    private String kubeflowNamespace;
+    @Value("${kubeflow.experiment.id}")
+    private String kubeflowExperimentId;
+    @Value("${kubeflow.url}")
+    private String kubeflowUrl;
+    @Value("${kubeflow.host}")
+    private String kubeflowHost;
+//#endregion
+
+    //    #region kubeflowmethods
     public String getListPipelines(String cookie) {
-        String urlString = "https://kubeflow.test.pcss.pl/pipeline/apis/v1beta1/pipelines";
+        String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines";
         String httpsMethod = "GET";
         Object body = null;
         HashMap params = new HashMap<>();
@@ -30,17 +49,18 @@ public class KubeflowService {
         headers.put("Accept-Language", "en-US,en;q=0.9");
         headers.put("Connection", "keep-alive");
         headers.put("Cookie", cookie);
-        headers.put("Host", "kubeflow.test.pcss.pl");
+        headers.put("Host", kubeflowHost);
 
         //params.put("page_size", "10");
         params.put("sort_by", "created_at desc");
+
         //params.put("filter", "");
 
         return utils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
     }
 
     public String getListRuns(String cookie) {
-        String urlString = "https://kubeflow.test.pcss.pl/pipeline/apis/v1beta1/runs";
+        String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/runs";
         String httpsMethod = "GET";
         Object body = null;
         HashMap params = new HashMap<>();
@@ -52,9 +72,11 @@ public class KubeflowService {
 
         params.put("page_size", "10");
         params.put("resource_reference_key.type", "NAMESPACE");
+        params.put("resource_reference_key.id", kubeflowNamespace);
         params.put("sort_by", "created_at desc");
-        params.put("resource_reference_key.id", "kubeflow-renergetic");
-        params.put("filter","{\"predicates\":[{\"key\":\"storage_state\",\"op\":\"NOT_EQUALS\",\"string_value\":\"STORAGESTATE_ARCHIVED\"}]}");
+//        params.put("resource_reference_key.id", "kubeflow-renergetic");
+        params.put("filter",
+                "{\"predicates\":[{\"key\":\"storage_state\",\"op\":\"NOT_EQUALS\",\"string_value\":\"STORAGESTATE_ARCHIVED\"}]}");
 
         headers.put("Accept", "*/*");
         headers.put("Accept-Encoding", "gzip, deflat, br");
@@ -65,12 +87,12 @@ public class KubeflowService {
 
         return utils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
     }
-    
+
     public String getRunsFromPipeline(String cookie) {
         return getListPipelines(cookie);
     }
 
-    
+
     public List<String> getListIDRuns(String cookie) {
         String listPipelines = getListRuns(cookie);
         List<String> idPipelines = new ArrayList<>(); //no sirve porque necesito idrun, idpipeline, fecha
@@ -88,9 +110,9 @@ public class KubeflowService {
 
         return idPipelines;
     }
-    
+
     public String getCookie(String user, String password) {
-        
+
         KubeflowUtils utils = new KubeflowUtils();
         String homeUrl = "https://kubeflow.test.pcss.pl/";
         String urlString = homeUrl;
@@ -311,4 +333,93 @@ public class KubeflowService {
         System.out.println("Expiration: " + stateValue);
         return cookie;
     }
+//#endregion
+
+    //    #region GET
+    public HashMap<String, PipelineDefinitionDAO> getPipelines() throws ParseException {
+        String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines";
+        String httpsMethod = "GET";
+        Object body = null;
+        HashMap params = initParams();
+        HashMap headers = this.initHeaders();
+        KubeflowUtils utils = new KubeflowUtils();
+        //params.put("page_size", "10");
+        params.put("sort_by", "created_at desc");
+        //params.put("filter", "");
+
+        String pipelinesJSON = utils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
+        var pipelineObj = Json.parse(pipelinesJSON);
+        JSONArray pipelinesArr = pipelineObj.getJSONArray("pipelines");
+        HashMap<String, PipelineDefinitionDAO> pipelineMap = new HashMap<>();
+        for (int i = 0; i < pipelinesArr.length(); i++) {
+            // Get the current object
+            JSONObject obj = pipelinesArr.getJSONObject(i);
+            var dao = this.parsePipelineObj(obj);
+
+            pipelineMap.put(dao.getPipelineId(), dao);
+        }
+        return pipelineMap;
+    }
+
+    public PipelineDefinitionDAO getPipeline(String id) throws ParseException {
+        String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines/" + id;
+        String httpsMethod = "GET";
+        Object body = null;
+        HashMap params = initParams();
+        HashMap headers = this.initHeaders();
+        KubeflowUtils utils = new KubeflowUtils();
+
+        String pipelinesJSON = utils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
+        var pipelineObj = Json.parse(pipelinesJSON);
+        var dao = this.parsePipelineObj(pipelineObj);
+        return dao;
+    }
+
+    private PipelineDefinitionDAO parsePipelineObj(JSONObject obj) {
+        var dao = new PipelineDefinitionDAO();
+        dao.setPipelineId(obj.getString("id"));
+        dao.setName(obj.getString("name"));
+        dao.setDescription(obj.getString("description"));
+        HashMap<String, PipelineParameterDAO> paramsMap = new HashMap<>();
+        JSONArray paramArr;
+        try {
+            paramArr = obj.getJSONArray("parameters");
+        } catch (org.json.JSONException ex) {
+            paramArr = null;
+        }
+        if (paramArr != null) {
+            for (int j = 0; j < paramArr.length(); j++) {
+                var param = paramArr.getJSONObject(j);
+                var paramDAO = new PipelineParameterDAO();
+                paramDAO.setKey(param.getString("name"));
+                paramDAO.setType("string");
+                paramDAO.setDefaultValue(param.optString("value", null));
+                paramsMap.put(paramDAO.getKey(), paramDAO);
+            }
+            dao.setParameters(paramsMap);
+        }
+        return dao;
+    }
+
+    //#endregion
+    //    #region intitialization kubeflow metadata
+    private HashMap<String, String> initHeaders() {
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put("Accept", "*/*");
+        headers.put("Accept-Encoding", "gzip, deflat, br");
+        headers.put("Accept-Language", "en-US,en;q=0.9");
+        headers.put("Connection", "keep-alive");
+        String cookie = this.getCookie(kubeflowUsername, kubeflowPassword);
+        headers.put("Cookie", cookie);
+        headers.put("Host", kubeflowHost);
+        return headers;
+    }
+
+    private HashMap<String, String> initParams() {
+        HashMap<String, String> params = new HashMap<>();
+//        params.put("resource_reference_key.type", "NAMESPACE");
+//        params.put("resource_reference_key.id", kubeflowNamespace);
+        return params;
+    }
+//    #endregion
 }

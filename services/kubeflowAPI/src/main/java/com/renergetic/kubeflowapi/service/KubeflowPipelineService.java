@@ -5,6 +5,7 @@ import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.kubeflowapi.tempcommon.PipelineParameterRepository;
 import com.renergetic.kubeflowapi.service.utils.DummyDataGenerator;
 import com.renergetic.kubeflowapi.tempcommon.*;
+import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ public class KubeflowPipelineService {
     private PipelineParameterRepository pipelineParameterRepository;
     @Autowired
     private PipelineRunRepository pipelineRunRepository;
+    @Autowired
+    private KubeflowService kubeflowService;
 
     public List<PipelineDefinitionDAO> getAll() {
         Map<String, PipelineDefinitionDAO> kubeflowMap = this.getKubeflowMap();
@@ -140,15 +143,20 @@ public class KubeflowPipelineService {
 
 
     public Map<String, PipelineParameterDAO> setParameters(String pipelineId,
-                                                           Map<String, PipelineParameterDAO> parameters) {
+                                                           Map<String, PipelineParameterDAO> parameters) throws ParseException {
         Map<String, String> kfParameters;
+        Map<String, PipelineParameterDAO> kubeflowParameters;
         if (generateDummy) {
             kfParameters = DummyDataGenerator.getParameters(pipelineId);
+           kubeflowParameters = mapKubeflowParameters(kfParameters);
+//todo remove
+            PipelineDefinitionDAO pipeline = kubeflowService.getPipeline(pipelineId);
+            kubeflowParameters = pipeline.getParameters();
         } else {
-            kfParameters =
-                    Collections.emptyMap();//TODO: Yago -> download parameters for the pipeline from the kubeflow API. just key-value dict
+            PipelineDefinitionDAO pipeline = kubeflowService.getPipeline(pipelineId);
+            kubeflowParameters = pipeline.getParameters();
         }
-        Map<String, PipelineParameterDAO> kubeflowParameters = mapKubeflowParameters(kfParameters);
+
         List<PipelineParameter> userParams =
                 parameters.values().stream().map(PipelineParameterDAO::mapToEntity).collect(Collectors.toList());
         Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
@@ -293,10 +301,25 @@ public class KubeflowPipelineService {
         HashMap<String, PipelineDefinitionDAO> kubeflowMap;
         if (generateDummy) {
             kubeflowMap = DummyDataGenerator.getAllKubeflowWorkflowsMap(15);
+//TODO: remove
+            try {
+                kubeflowMap = kubeflowService.getPipelines();
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
         } else {
-            //		TODO: list all pipelines in the kubeflow with the paramaters -> Yago
-            kubeflowMap = new HashMap<>();
+
+            try {
+                kubeflowMap = kubeflowService.getPipelines();
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
         }
+//        try {
+//            kubeflowService.getPipelines();
+//        } catch (ParseException e) {
+//            throw new RuntimeException(e);
+//        }
         return kubeflowMap;
     }
 
