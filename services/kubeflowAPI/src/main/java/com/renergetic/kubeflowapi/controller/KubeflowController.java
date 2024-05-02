@@ -48,7 +48,6 @@ public class KubeflowController {
     @Autowired
     private KubeflowPipelineService kubeflowPipelineService;
 
-    KubeflowUtils utils = new KubeflowUtils();
     @Value("${kubeflow.url}")
     String homeUrl = "https://kubeflow.test.pcss.pl/";
     private String cookie;
@@ -118,7 +117,7 @@ public class KubeflowController {
         System.out.println("++++++++++++++++++  BODY  ++++++++++++++++++");
         System.out.println("+++++++++++++++++++++++++++++++++++++");
         System.out.println(body);
-        String response = utils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
+        String response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
         System.out.println("++++++++++++++++++  REQUEST  +++++++++++++++++++");
         System.out.println(response);
         System.out.println("Pipeline ID: " + id_pipeline);
@@ -194,7 +193,7 @@ public class KubeflowController {
         headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
         headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
 
-        return new ResponseEntity<>(utils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody(),
+        return new ResponseEntity<>(KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody(),
                 HttpStatus.OK);
     }
 
@@ -224,7 +223,7 @@ public class KubeflowController {
         headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
         headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
 
-        String response = utils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
+        String response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
         String[] lines = response.split("\n");
         String stateValue = "";
         for (String line : lines) {

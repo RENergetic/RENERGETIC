@@ -23,6 +23,8 @@ public class PipelineDefinitionDAO {
     String name;
     @JsonProperty(required = false, value = "description")
     String description;
+    @JsonProperty(required = false, value = "version")
+    String version;
     @JsonProperty(required = false, value = "parameters")
     Map<String, PipelineParameterDAO> parameters = Collections.emptyMap();
     @JsonProperty(required = true, value = "visible")

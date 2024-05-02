@@ -68,7 +68,7 @@ public class KubeflowPipelineService {
             }
         });
 
-        return kubeflowMap.values().stream().toList();
+        return kubeflowMap.values().stream().filter(it -> (mVisible == null || !mVisible) || it.isVisible()).toList();
 
 
     }
@@ -78,10 +78,12 @@ public class KubeflowPipelineService {
                 .orElseThrow(() -> new NotFoundException(
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
         if (wd.getPipelineRun() != null) {
-            if (wd.getPipelineRun().getEndTime() == null) { //TODO: YAGO -> check kubeflow API only if the task hasnt finished or ended with error,
-//            TODO:  TODO: Yago - update the status here and store state in the db
+            if (wd.getPipelineRun().getEndTime() == null && !generateDummy) {
                 var run = wd.getPipelineRun();
-                var kubeflowrunId = run.getRunId();
+                PipelineRunDAO kubeflowRun = kubeflowService.getRun(run.getRunId());
+                run.setState(kubeflowRun.getState());
+                if (kubeflowRun.getEndTime() != null)
+                    run.setEndTime(DateConverter.toLocalDateTime(kubeflowRun.getEndTime()));
                 pipelineRunRepository.save(run); //update the db state
             }
             return PipelineRunDAO.create(wd.getPipelineRun());
@@ -96,6 +98,8 @@ public class KubeflowPipelineService {
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
         if (wd.getPipelineRun() != null && wd.getPipelineRun().getStartTime() != null && wd.getPipelineRun().getEndTime() == null) {
             //task hasn't finished
+            PipelineRunDAO run = this.getRun(pipelineId);
+            if (run.getEndTime() == null) ;
             throw new RuntimeException("Current task is still running");
         }
         PipelineRunDAO runDAO = startKubeflowRun(wd, params);
@@ -148,7 +152,7 @@ public class KubeflowPipelineService {
         Map<String, PipelineParameterDAO> kubeflowParameters;
         if (generateDummy) {
             kfParameters = DummyDataGenerator.getParameters(pipelineId);
-           kubeflowParameters = mapKubeflowParameters(kfParameters);
+            kubeflowParameters = mapKubeflowParameters(kfParameters);
 //todo remove
             PipelineDefinitionDAO pipeline = kubeflowService.getPipeline(pipelineId);
             kubeflowParameters = pipeline.getParameters();
@@ -256,12 +260,11 @@ public class KubeflowPipelineService {
         if (generateDummy) {
             runDAO = DummyDataGenerator.startKubeflowRun(definitionDAO, params);
 
-        } else {//	 TODO: get and start kubeflow run YAGO:
-            runDAO = new PipelineRunDAO();
+        } else {
+
+            runDAO = kubeflowService.runPipeline(definitionDAO.getPipelineId(), params);
             runDAO.setParameters(params);
             runDAO.setPipelineDefinitionDAO(definitionDAO);
-            //            runDAO.setRunId(runId); -> set id from kubeflow TODO:
-            // fill the fields of the run object
         }
 
         // in case of error:             throw new RuntimeException("Pipeline hasn't started");
@@ -275,21 +278,28 @@ public class KubeflowPipelineService {
             workflowRun.setEndTime(DateConverter.toLocalDateTime(DateConverter.now()));
 
         } else {
-            //	 TODO: stop kubeflow run? currently end time is just set Yago
-            var kubeflowRunId = workflowRun.getRunId();
-            workflowRun.setEndTime(DateConverter.toLocalDateTime(DateConverter.now()));
+            //
+            if (workflowRun.getEndTime() == null) {
+
+                var kubeflowRunId = workflowRun.getRunId();
+                kubeflowService.stopRun(kubeflowRunId);
+                var kubeflowRun = kubeflowService.getRun(kubeflowRunId);
+                if (kubeflowRun.getEndTime() != null) {
+                    workflowRun.setEndTime(DateConverter.toLocalDateTime(kubeflowRun.getEndTime()));
+                }
+                workflowRun.setState(kubeflowRun.getState());
+                pipelineRunRepository.save(workflowRun);
+            }
+
+
+//            kubeflowService.stopRun(kubeflowRunId);
+
+
         }
 
         return PipelineRunDAO.create(workflowRun);
     }
 
-    private PipelineRunDAO getKubeflowRun(PipelineDefinitionDAO wd) {
-        if (generateDummy) {
-            return DummyDataGenerator.getKubeflowRun(wd);
-        } else {//	 TODO: get kubeflow run
-            return null;
-        }
-    }
 
     /**
      * Get all kubeflow pipelines
@@ -301,12 +311,12 @@ public class KubeflowPipelineService {
         HashMap<String, PipelineDefinitionDAO> kubeflowMap;
         if (generateDummy) {
             kubeflowMap = DummyDataGenerator.getAllKubeflowWorkflowsMap(15);
-//TODO: remove
-            try {
-                kubeflowMap = kubeflowService.getPipelines();
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+//
+//            try {
+//                kubeflowMap = kubeflowService.getPipelines();
+//            } catch (ParseException e) {
+//                throw new RuntimeException(e);
+//            }
         } else {
 
             try {
@@ -340,8 +350,15 @@ public class KubeflowPipelineService {
                 if (generateDummy) {
 
                 } else {
-                    var runId = item.getPipelineRun().getRunId();
-                    //           TODO:     verify run id in the kubeflow       -> Yago
+                    var run = item.getPipelineRun();
+                    var runId = run.getRunId();
+
+                    PipelineRunDAO kbfRun = kubeflowService.getRun(runId);
+                    if (kbfRun.getEndTime() != null)
+                        run.setEndTime(DateConverter.toLocalDateTime(kbfRun.getEndTime()));
+
+                    run.setState(kbfRun.getState());
+                    pipelineRunRepository.save(run);
                 }
             }
 
