@@ -31,6 +31,7 @@ import java.util.*;
 @Tag(name = "Kubeflow Controller", description = "Manage the connection to Kubeflow API")
 @RequestMapping("/api/kubeflow")
 public class KubeflowController {
+    //#region fields
     @Value("${api.generate.dummy-data}")
     private Boolean generateDummy;
 
@@ -50,16 +51,12 @@ public class KubeflowController {
 
     @Value("${kubeflow.url}")
     String homeUrl = "https://kubeflow.test.pcss.pl/";
+
+//#endregion
     private String cookie;
             //= "authservice_session=MTcxMTM2ODUxOHxOd3dBTkZKT05VMU5XRVpVVjA5TVFWZFBVMUJNVDFGTVVrcE1TMWRDTWtOWVVVa3lVRlZGUmxKTlJrOUhUVEpRVWtsWFZraEZTa0U9fP6c_WZhE0UgbxeoNjBjExcwvdA8rm_Cm7uJc4VrheSg";
 
-    // ********************************************************************************
-    // ********************************************************************************
-    // ********************************************************************************
-    // KUBEFLOW INTEGRATION
-    // ********************************************************************************
-    // ********************************************************************************
-    // ********************************************************************************
+    //#region kubeflow integration
 
     @Operation(summary = "Get all pipelines from kubeflow")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -239,57 +236,10 @@ public class KubeflowController {
         return new ResponseEntity<>(String.format("%s: %s", kubeflowUsername, kubeflowPassword), HttpStatus.OK);
     }
 
-    // ********************************************************************************
-    // ********************************************************************************
-    // ********************************************************************************
-    // EXAMPLE TESTS
-    // ********************************************************************************
-    // ********************************************************************************
-    // ********************************************************************************
+//#endregion
 
-    @Operation(summary = "Get all examples saved on the repository")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "", produces = "application/json")
-    public ResponseEntity<List<ExampleResponse>> getAllUsers(@RequestParam(required = false) Optional<Integer> offset,
-                                                             @RequestParam(required = false) Optional<Integer> limit) {
-        return ResponseEntity.ok(exampleService.get(offset.orElse(0), limit.orElse(1000)));
-    }
-
-    // Endpoint to save ExampleRequest to the repository
-    @Operation(summary = "Save an example")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PostMapping(path = "", produces = "application/json")
-    public ResponseEntity<ExampleResponse> saveExample(@RequestBody ExampleRequest example) {
-        return ResponseEntity.ok(exampleService.create(example));
-    }
-
-    @Operation(summary = "Update an example")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PutMapping(path = "{id}", produces = "application/json")
-    public ResponseEntity<ExampleResponse> updateExample(
-            @PathVariable("id") Long id,
-            @RequestBody ExampleRequest example) {
-        return ResponseEntity.ok(exampleService.update(id, example));
-    }
-
-    @Operation(summary = "Delete an example")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @DeleteMapping(path = "", produces = "application/json")
-    public ResponseEntity<Void> deleteExample(@RequestParam Long id) {
-        exampleService.delete(id);
-        return ResponseEntity.ok().build();
-    }
-
-    // ********************************************************************************
-    // ********************************************************************************
-    // ********************************************************************************
-    // TOMEK'S TESTS
-    // ********************************************************************************
-    // ********************************************************************************
-    // ********************************************************************************
-
-
-    @Operation(summary = "Get All workflow for non-admin users")
+    //#region Renergetic API
+    @Operation(summary = "Get All pipelines for non-admin users")
     // GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR NON ADMINS)
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/pipeline", produces = "application/json")
@@ -298,7 +248,7 @@ public class KubeflowController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get All pipeline") //GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR ADMINS)
+    @Operation(summary = "Get All pipelines") //GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR ADMINS)
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/admin/pipeline", produces = "application/json")
     public ResponseEntity<List<PipelineDefinitionDAO>> listAll(
@@ -308,37 +258,36 @@ public class KubeflowController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get experiment run") //GET RUN
+    @Operation(summary = "Get pipeline run") //GET RUN
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/pipeline/{pipeline_id}/run", produces = "application/json")
     public ResponseEntity<PipelineRunDAO> getExperimentRun(
             @PathVariable(name = "pipeline_id") String pipelineId) {
-
         PipelineRunDAO res = kubeflowPipelineService.getRun(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Start experiment run") //RUN PIPELINE
+    @Operation(summary = "Start pipeline") //RUN PIPELINE
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = "/pipeline/{pipeline_id}/run", produces = "application/json")
-    public ResponseEntity<PipelineRunDAO> startExperimentRun(
+    public ResponseEntity<PipelineRunDAO> startPipeline(
             @PathVariable(name = "pipeline_id") String pipelineId, @RequestBody Map<String, Object> params) {
 
         PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId, params);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Stop experiment run") //STOP PIPELINE
+    @Operation(summary = "Stop run") //STOP PIPELINE
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @DeleteMapping(path = "/pipeline/{pipeline_id}/run", produces = "application/json")
-    public ResponseEntity<Boolean> startExperimentRun(
+    public ResponseEntity<Boolean> stopRun(
             @PathVariable(name = "pipeline_id") String pipelineId) {
 
         Boolean res = kubeflowPipelineService.stopRun(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Set visibility")
+    @Operation(summary = "Set pipeline visibility in the UI")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PutMapping(path = "/admin/pipeline/{pipeline_id}/visibility", produces = "application/json")
     public ResponseEntity<Boolean> setVisibility(@PathVariable(name = "pipeline_id") String pipelineId) {
@@ -357,7 +306,7 @@ public class KubeflowController {
     }
 
 
-    @Operation(summary = "Set parameters")
+    @Operation(summary = "Set pipeline parameters metadata")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PutMapping(path = "/admin/pipeline/{pipeline_id}/parameters", produces = "application/json")
     public ResponseEntity<Map<String, PipelineParameterDAO>> setParameters(
@@ -375,6 +324,41 @@ public class KubeflowController {
 
 
 }
+//
+//
+//
+//    // Endpoint to save ExampleRequest to the repository
+//    @Operation(summary = "Save an example")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @PostMapping(path = "", produces = "application/json")
+//    public ResponseEntity<ExampleResponse> saveExample(@RequestBody ExampleRequest example) {
+//        return ResponseEntity.ok(exampleService.create(example));
+//    }
+//
+//    @Operation(summary = "Update an example")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @PutMapping(path = "{id}", produces = "application/json")
+//    public ResponseEntity<ExampleResponse> updateExample(
+//            @PathVariable("id") Long id,
+//            @RequestBody ExampleRequest example) {
+//        return ResponseEntity.ok(exampleService.update(id, example));
+//    }
+//
+//    @Operation(summary = "Delete an example")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @DeleteMapping(path = "", produces = "application/json")
+//    public ResponseEntity<Void> deleteExample(@RequestParam Long id) {
+//        exampleService.delete(id);
+//        return ResponseEntity.ok().build();
+//    }
+
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
+// TOMEK'S TESTS
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
 
 //TODO: INSERT AUTOMATIC HEADERS
 //TODO: INSERT AUTOMATIC PARAMS

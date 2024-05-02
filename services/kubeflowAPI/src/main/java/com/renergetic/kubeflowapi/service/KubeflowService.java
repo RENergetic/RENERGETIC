@@ -108,9 +108,11 @@ public class KubeflowService {
         return idPipelines;
     }
 
-    public String getCookie(String user, String password) {
 
-        String homeUrl = "https://kubeflow.test.pcss.pl/";
+    //old get cookie
+    public String getCookie2(String user, String password) {
+
+        String homeUrl = kubeflowUrl.endsWith("/") ? kubeflowUrl : kubeflowUrl + "/";// "https://kubeflow.test.pcss.pl/";
         String urlString = homeUrl;
         String httpsMethod = "GET";
         Object body = null;
@@ -125,22 +127,22 @@ public class KubeflowService {
         headers.put("Accept-Encoding", "gzip, deflate, br, zstd");
         headers.put("Accept-Language", "en-US,en;q=0.9");
         headers.put("Connection", "keep-alive");
-        headers.put("Host", "kubeflow.test.pcss.pl");
+        headers.put("Host", kubeflowHost);
 
         // Step 1 Obtain state value WORKING
         response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers);
         stateValue = KubeflowUtils.getState(response.getResponseBody());
-        System.out.println("***************************");
-        System.out.println("***************************");
+//        System.out.println("***************************");
+//        System.out.println("***************************");
         System.out.println("STEP 1:");
         System.out.println("Code: " + response.getResponseCode());
-        System.out.println("Body: " + response.getResponseBody());
-        System.out.println("Headers: " + response.getResponseHeaders());
-        System.out.println("");
+//        System.out.println("Body: " + response.getResponseBody());
+//        System.out.println("Headers: " + response.getResponseHeaders());
+//        System.out.println("");
         System.out.println("State value: " + stateValue);
-        System.out.println("");
-        System.out.println("***************************");
-        System.out.println("***************************");
+//        System.out.println("");
+//        System.out.println("***************************");
+//        System.out.println("***************************");
 
         // Step 2 Get info from home
         urlString = homeUrl + "dex/auth";
@@ -159,14 +161,14 @@ public class KubeflowService {
         headers.put("Host", "kubeflow.test.pcss.pl");
 
         response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers);
-        System.out.println("***************************");
-        System.out.println("***************************");
+//        System.out.println("***************************");
+//        System.out.println("***************************");
         System.out.println("STEP 2:");
         System.out.println("Code: " + response.getResponseCode());
-        System.out.println("Body: " + response.getResponseBody());
-        System.out.println("Headers: " + response.getResponseHeaders());
-        System.out.println("***************************");
-        System.out.println("***************************");
+//        System.out.println("Body: " + response.getResponseBody());
+//        System.out.println("Headers: " + response.getResponseHeaders());
+//        System.out.println("***************************");
+//        System.out.println("***************************");
 
         // Step 3 Get real state
         urlString = homeUrl + "dex/auth/ldap";
@@ -186,17 +188,17 @@ public class KubeflowService {
 
         response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers);
         stateValue = KubeflowUtils.getState(response.getResponseBody());
-        System.out.println("***************************");
-        System.out.println("***************************");
+//        System.out.println("***************************");
+//        System.out.println("***************************");
         System.out.println("STEP 3:");
         System.out.println("Code: " + response.getResponseCode());
-        System.out.println("Body: " + response.getResponseBody());
-        System.out.println("Headers: " + response.getResponseHeaders());
-        System.out.println("");
+//        System.out.println("Body: " + response.getResponseBody());
+//        System.out.println("Headers: " + response.getResponseHeaders());
+//        System.out.println("");
         System.out.println("State: " + stateValue);
-        System.out.println("");
-        System.out.println("***************************");
-        System.out.println("***************************");
+//        System.out.println("");
+//        System.out.println("***************************");
+//        System.out.println("***************************");
 
         // Step 4
         urlString = homeUrl + "dex/auth/ldap/login";
@@ -206,24 +208,24 @@ public class KubeflowService {
         headers.clear();
         headers.put("Accept", "*/*");
         headers.put("Accept-Encoding", "deflate, br, zstd");
-        // headers.put("Accept-Language", "en-US,en;q=0.9");
+         headers.put("Accept-Language", "en-US,en;q=0.9");
         headers.put("Connection", "keep-alive");
         headers.put("Host", "kubeflow.test.pcss.pl");
         headers.put("Content-Type", "application/x-www-form-urlencoded");
-        headers.put("Content-Length", "52");
+//        headers.put("Content-Length", "52");
 
         params.clear();
         params.put("state", stateValue);
         params.put("back", "");
 
         response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers);
-        System.out.println("***************************");
-        System.out.println("***************************");
+//        System.out.println("***************************");
+//        System.out.println("***************************");
         System.out.println("STEP 4:");
         System.out.println("Code: " + response.getResponseCode());
-        System.out.println("Body: " + response.getResponseBody());
-        System.out.println("Headers: " + response.getResponseHeaders());
-        System.out.println("ResponseHeaders");
+//        System.out.println("Body: " + response.getResponseBody());
+//        System.out.println("Headers: " + response.getResponseHeaders());
+//        System.out.println("ResponseHeaders");
         String reqValue = "";
         for (Map.Entry<String, List<String>> entry : response.getResponseHeaders().entrySet()) {
             String key = entry.getKey();
@@ -330,10 +332,11 @@ public class KubeflowService {
         System.out.println("Expiration: " + stateValue);
         return cookie;
     }
+
 //#endregion
 
-    //#region GET
-    public HashMap<String, PipelineDefinitionDAO> getPipelines() throws ParseException {
+    //#region renergetic kubeflowmethods
+     public HashMap<String, PipelineDefinitionDAO> getPipelines() throws ParseException {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines";
         String httpsMethod = "GET";
         Object body = null;
@@ -372,16 +375,16 @@ public class KubeflowService {
         return dao;
     }
 
-    public void stopRun(String id)   {
+    public void stopRun(String id) {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/runs/" + id + "/terminate";
         ;
         String httpsMethod = "POST";
         HashMap headers = this.initHeaders();
-     KubeflowUtils.sendRequest(urlString, httpsMethod, null, null, headers).getResponseBody();
+        KubeflowUtils.sendRequest(urlString, httpsMethod, null, null, headers).getResponseBody();
 
     }
 
-    public PipelineRunDAO getRun(String id)  {
+    public PipelineRunDAO getRun(String id) {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/runs/" + id;
         String httpsMethod = "GET";
         HashMap headers = this.initHeaders();
@@ -492,7 +495,153 @@ public class KubeflowService {
     }
 
     //#endregion
-    //#region intitialization kubeflow metadata
+
+    //#region initialization of the kubeflow metadata
+    public String getCookie(String user, String password) {
+
+        String homeUrl = kubeflowUrl.endsWith("/") ? kubeflowUrl : kubeflowUrl + "/";// "https://kubeflow.test.pcss.pl/";
+        String urlString = homeUrl;
+        String httpsMethod = "GET";
+        Object body = null;
+        HashMap params = new HashMap<>();
+        HashMap headers = new HashMap<>();
+        String stateValue = "";
+        String code = "";
+        HttpsResponseInfo response;
+        String cookie = "";
+//        headers.put("Accept", "*/*");
+        // Step 1 Obtain state value WORKING
+        response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, Collections.emptyMap());
+        stateValue = KubeflowUtils.getState(response.getResponseBody());
+        System.out.println("STEP 1:");
+        System.out.println("Code: " + response.getResponseCode());
+        System.out.println("State value: " + stateValue);
+
+        // Step 2 Get info from home
+        urlString = homeUrl + "dex/auth";
+        params.clear();
+        params.put("client_id", "kubeflow-oidc-authservice");
+        params.put("redirect_uri", "/login/oidc");
+        params.put("response_type", "code");
+        params.put("scope", "profile+email+groups+openid");
+        params.put("state", stateValue);
+
+//        headers.clear();
+//        headers.put("Accept", "*/*");
+        response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, Collections.emptyMap());
+        System.out.println("STEP 2:");
+        System.out.println("Code: " + response.getResponseCode());
+
+        // Step 3 Get real state
+        urlString = homeUrl + "dex/auth/ldap";
+//        headers.clear();
+        headers.put("Accept", "*/*");
+        params.clear();
+        params.put("client_id", "kubeflow-oidc-authservice");
+        params.put("redirect_uri", "/login/oidc");
+        params.put("response_type", "code");
+        params.put("scope", "profile email groups openid");
+        params.put("state", stateValue);
+
+        response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, Collections.emptyMap());
+        stateValue = KubeflowUtils.getState(response.getResponseBody());
+        System.out.println("STEP 3:");
+        System.out.println("Code: " + response.getResponseCode());
+        System.out.println("State: " + stateValue);
+
+        // Step 4
+        urlString = homeUrl + "dex/auth/ldap/login";
+        httpsMethod = "POST";
+        body = "login=" + user + "&password=" + password;
+
+        headers.clear();
+        headers.put("Accept", "*/*");
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
+        params.clear();
+        params.put("state", stateValue);
+        params.put("back", "");
+
+        response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers);
+        System.out.println("STEP 4:");
+        System.out.println("Code: " + response.getResponseCode());
+        String reqValue = "";
+        for (Map.Entry<String, List<String>> entry : response.getResponseHeaders().entrySet()) {
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+            if (key != null && key.equals("location")) {
+                for (String value : values) {
+                    System.out.println("  - " + value);
+                    int reqIndex = value.indexOf("req=");
+                    if (reqIndex != -1) {
+                        // Get the substring after "req="
+                        reqValue = value.substring(reqIndex + 4);
+                        System.out.println("Value after req=: " + reqValue);
+                    } else {
+                        System.out.println("String does not contain 'req='.");
+                    }
+                }
+            }
+        }
+        System.out.println("Reqvalue -" + reqValue + "-");
+        urlString = homeUrl + "dex/approval";
+        httpsMethod = "GET";
+        body = null;
+        params.clear();
+        params.put("req", reqValue);
+//        headers.clear();
+//        headers.put("Accept", "*/*");
+
+        response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, Collections.emptyMap());
+        System.out.println("STEP 5:");
+        System.out.println("Code: " + response.getResponseCode());
+        System.out.println("ResponseHeaders");
+        for (Map.Entry<String, List<String>> entry : response.getResponseHeaders().entrySet()) {
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+//            System.out.println("Key: " + key);
+//            System.out.println("Values:");
+            if (key != null && key.equals("location")) {
+                for (String value : values) {
+                    System.out.println("  - " + value);
+                    code = KubeflowUtils.extractParamValue(value, "code=", "&");
+                    stateValue = KubeflowUtils.extractParamValue(value, "state=", "&");
+                }
+            }
+        }
+        System.out.println("Location: " + code + " - " + stateValue);
+
+        // Step 6
+        urlString = homeUrl + "login/oidc";
+
+        params.clear();
+        params.put("code", code);
+        params.put("state", stateValue);
+//        headers.clear();
+//        headers.put("Accept", "*/*");
+
+        response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, Collections.emptyMap());
+        System.out.println("STEP 6:");
+        System.out.println("Code: " + response.getResponseCode());
+        for (Map.Entry<String, List<String>> entry : response.getResponseHeaders().entrySet()) {
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+            System.out.println("Key: " + key);
+            System.out.println("Values:");
+            if (key != null && key.equals("set-cookie")) {
+                for (String value : values) {
+                    System.out.println("  - " + value);
+                    cookie = "authservice_session=" + KubeflowUtils.extractParamValue(value, "authservice_session=",
+                            ";");
+                    stateValue = KubeflowUtils.extractParamValue(value, "Expires=", ";");
+                }
+            }
+            System.out.println();
+        }
+        System.out.println("Cookie: " + cookie);
+        System.out.println("Expiration: " + stateValue);
+        return cookie;
+    }
+
     private HashMap<String, String> initHeaders() {
         HashMap<String, String> headers = new HashMap<String, String>();
         headers.put("Accept", "*/*");
