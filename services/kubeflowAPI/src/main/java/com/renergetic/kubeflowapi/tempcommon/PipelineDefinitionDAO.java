@@ -1,8 +1,6 @@
-package com.renergetic.common.dao;
+package com.renergetic.kubeflowapi.tempcommon;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.common.model.PipelineDefinition;
-import com.renergetic.common.model.PipelineParameter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
