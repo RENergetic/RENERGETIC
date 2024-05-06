@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.model.HttpsResponseInfo;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,22 +24,25 @@ import lombok.extern.slf4j.Slf4j;
 public class KubeflowUtils {
 
     // Create here methods with generic funtionalities that can be used in the project
-    
-    public HttpsResponseInfo sendRequest(String urlString, String httpMethod, Map<String, String> params, Object body,
-            Map<String, String> headers) {
 
-        String response = new String();
-        String jsonResponse = "";
-        String paramsString = "";
+    public static HttpsResponseInfo sendRequest(String urlString, String httpMethod, Map<String, String> params,
+                                                Object body,
+                                                Map<String, String> headers) {
+
+//        String response = new String();
+//        String jsonResponse = "";
+//        String paramsString = "";
         HttpURLConnection connection;
         URL url;
         try {
-            System.out.println("SEND REQUEST *******************************************");
+//            System.out.println("SEND REQUEST *******************************************");
             // Specify the URL you want to connect to
-
-            String parseParams = mapParams(params);
-            parseParams = parseParams.isBlank() ? parseParams : '?' + parseParams;
-            url = new URL(urlString + parseParams);
+            if (params != null) {
+                String parseParams = mapParams(params);
+                parseParams = parseParams.isBlank() ? parseParams : '?' + parseParams;
+                url = new URL(urlString + parseParams);
+            } else
+                url = new URL(urlString  );
 
             System.out.println(url);
 
@@ -57,16 +61,21 @@ public class KubeflowUtils {
             connection.setDoOutput(true);
 
             if (body != null) {
+                String mBody=null;
+                if(body instanceof String){
+                    mBody=(String)body;
+                }else
+                    mBody=Json.toJson(body);
                 try (OutputStream os = connection.getOutputStream()) {
-                    byte[] input = body.toString().getBytes("utf-8");
+                    byte[] input = mBody.getBytes("utf-8");
                     os.write(input, 0, input.length);
                 }
             }
-            
+
             HttpsResponseInfo info = new HttpsResponseInfo(connection.getResponseCode(), getBody(connection),
                     connection.getHeaderFields());
-            
-            System.out.println(info);
+
+//            System.out.println(info);
 
             connection.disconnect();
             return info;
@@ -82,7 +91,7 @@ public class KubeflowUtils {
         }
         return null;
     }
-    
+
     static public String mapParams(Map<String, String> params) {
         StringBuilder result = new StringBuilder();
 
@@ -104,7 +113,7 @@ public class KubeflowUtils {
                 : resultString;
     }
 
-    public String getBody(HttpURLConnection connection) {
+    private static String getBody(HttpURLConnection connection) {
         StringBuilder response = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             String line;
@@ -128,7 +137,7 @@ public class KubeflowUtils {
         return response.toString();
     }
 
-    public String getState(String response) { //MAYBE IT CAN BE DELETED
+    public static String getState(String response) { //MAYBE IT CAN BE DELETED
         Pattern pattern = Pattern.compile("state=([^&\"]+)");
         Matcher matcher = pattern.matcher(response);
         String stateValue = "";
@@ -143,7 +152,7 @@ public class KubeflowUtils {
         return stateValue;
     }
 
-    public String extractParamValue(String inputString, String paramName, String end) {
+    public static String extractParamValue(String inputString, String paramName, String end) {
         String paramValue = "";
         int startIndex = inputString.indexOf(paramName);
         if (startIndex != -1) {

@@ -9,13 +9,12 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import com.renergetic.common.dao.*;
+import com.renergetic.common.exception.InvalidArgumentException;
 import com.renergetic.common.repository.*;
 import com.renergetic.hdrapi.dao.MeasurementDAOImpl;
 import com.renergetic.hdrapi.dao.ResourceDAOImpl;
 import com.renergetic.hdrapi.dao.details.MeasurementTagsDAO;
-import com.renergetic.hdrapi.dao.details.TagDAO;
-import com.renergetic.hdrapi.dao.tempcommon.TempMeasurementRepository;
-import com.renergetic.hdrapi.dao.tempcommon.TempMeasurementTagsRepository;
+import com.renergetic.hdrapi.dao.details.TagDAO ;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -44,8 +43,6 @@ public class MeasurementService {
 
     @Autowired
     MeasurementRepository measurementRepository;
-    @Autowired
-    TempMeasurementRepository tempMeasurementRepository;
 
     @Autowired
     MeasurementTypeRepository measurementTypeRepository;
@@ -57,8 +54,6 @@ public class MeasurementService {
     MeasurementDetailsRepository measurementDetailsRepository;
     @Autowired
     MeasurementTagsRepository measurementTagsRepository;
-    @Autowired
-    TempMeasurementTagsRepository tempMeasurementTagsRepository;
     @Autowired
     UuidRepository uuidRepository;
 
@@ -250,8 +245,17 @@ public class MeasurementService {
                                                      String sensorName, Long assetId,
                                                      String assetName, Long typeId, String physicalTypeName,
                                                      String tagKey, String tagValue,
-                                                     Long offset,
-                                                     Integer limit) {
+                                                     Long offset, Integer limit ) {
+        return this.findMeasurements(measurementName, domain, direction, sensorName, assetId,
+                assetName, typeId, physicalTypeName, tagKey, tagValue, offset, limit, false);
+
+    }
+
+    public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
+                                                     String sensorName, Long assetId,
+                                                     String assetName, Long typeId, String physicalTypeName,
+                                                     String tagKey, String tagValue,
+                                                     Long offset, Integer limit, boolean noTag) {
         Stream<MeasurementDAO> measurements;
         if (tagKey == null) {
             measurements = measurementRepository.findMeasurements(
@@ -259,10 +263,16 @@ public class MeasurementService {
                     offset,
                     limit).stream();
         } else {
-            measurements = measurementRepository.findMeasurementsByTag(
-                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName,
-                    tagKey, tagValue,
-                    offset, limit).stream();
+            if (noTag)
+                measurements = measurementRepository.findMeasurementNoTag(
+                        assetId, measurementName, sensorName, domain, direction, typeId, physicalTypeName,
+                        tagKey,
+                        offset, limit).stream();
+            else
+                measurements = measurementRepository.findMeasurementsByTag(
+                        assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName,
+                        tagKey, tagValue,
+                        offset, limit).stream();
         }
 
         return measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
@@ -452,17 +462,52 @@ public class MeasurementService {
             return l.get(0);
         }).collect(Collectors.toList());
         measurementTagsRepository.clearTags(measurementId);
-        Optional<Boolean> hasFail =
-                tagList.stream().map(it -> measurementTagsRepository.setTag(it.getId(), measurementId) == 0).filter(
-                        it -> it).findAny();
-        if (hasFail.isPresent()) {
-            //todo: rallback
-        }
+//        Optional<Boolean> hasFail =
+//                tagList.stream().map(it -> measurementTagsRepository.setTag(it.getId(), measurementId) == 0).filter(
+//                        it -> it).findAny();
+
+                tagList.forEach( it -> this.setTag(measurementId,it.getKey(),it.getValue()));
+//        if (hasFail.isPresent()) {
+//            //t odo: rollback
+//        }
         return true;
     }
 
     public boolean setTag(Long measurementId, String key, String value) {
-        requireMeasurement(measurementId);
+
+        if (!value.equals("no_tag")) {
+            //check if no tag measurement exists
+            Measurement m = getById(measurementId);
+            Long assetId = m.getAsset() != null ? m.getAsset().getId() : null;
+            String domain = m.getDomain() != null ? m.getDomain().name() : null;
+            String direction = m.getDirection() != null ? m.getDirection().name() : null;
+            List<MeasurementDAOImpl> noTag =
+                    this.findMeasurements(m.getName(), domain, direction, m.getSensorName(), assetId,
+                            null, m.getType().getId(), null, key, "no_tag", 0L, 1);
+            if (noTag.isEmpty()) {
+                throw new InvalidArgumentException("Assign first 'no_tag' tag to the basic measurement");
+//                if there would be a decision to assign no_tag automatically if not exist - but this might cause some issues
+//                Optional<MeasurementDAOImpl> any =
+//                        this.findMeasurements(m.getName(), domain, direction, m.getSensorName(), assetId,
+//                                null, m.getType().getId(), null, null, null, 0L, 100).stream().filter(
+//                                it -> it.getId().longValue() != measurementId).findAny();
+//                if (any.isEmpty()) {
+//                    throw new InvalidArgumentException("Can't automatically assign the 'no_tag' tag");
+//                }
+//                var l = measurementTagsRepository.findByKeyAndValue(key,
+//                        value); //Check if tag is defined in the tags table
+//                if (l.size() == 0) {
+//                    throw new InvalidNonExistingIdException("No tag with key " + key + " and value: no_tag ");
+//                }
+//                var mId = any.get().getId();
+//                this.deleteMeasurementTag(mId, key);
+//                measurementTagsRepository.setTag(l.get(0).getId(), mId);
+
+            }
+        } else {
+            requireMeasurement(measurementId);
+        }
+
         this.deleteMeasurementTag(measurementId, key); //delete all other tags related with the measurement
         var l = measurementTagsRepository.findByKeyAndValue(key, value); //Check if tag is defined in the tags table
         if (l.size() == 0) {
@@ -505,7 +550,7 @@ public class MeasurementService {
         Stream<MeasurementTags> stream;
         Page<MeasurementTags> tags;
         if (key == null) stream = measurementTagsRepository.findAll(new OffSetPaging(offset, limit)).stream();
-        else stream = tempMeasurementTagsRepository.findByKey(key).stream();
+        else stream = measurementTagsRepository.findByKey(key).stream();
 
 
 //        if (filters != null)
@@ -533,7 +578,7 @@ public class MeasurementService {
     }
 
     public List<String> getTagValues(String tagKey) {
-        return tempMeasurementTagsRepository.listTagValues(tagKey);
+        return measurementTagsRepository.listTagValues(tagKey);
     }
 
     public MeasurementTags getTagById(Long id) {

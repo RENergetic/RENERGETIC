@@ -2,7 +2,8 @@ package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.renergetic.common.model.WorkflowParameter;
+
+import com.renergetic.common.model.PipelineParameter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import lombok.ToString;
 @Setter
 @RequiredArgsConstructor
 @ToString
-public class WorkflowParameterDAO {
+public class PipelineParameterDAO {
 
 
     @JsonProperty(required = true)
@@ -23,31 +24,36 @@ public class WorkflowParameterDAO {
     String defaultValue;
     @JsonProperty(required = true)
     String type;
+    @JsonProperty(required = true)
+    Boolean visible = false;
 
     @JsonProperty(required = true)
     String description;
 
-    public WorkflowParameterDAO(String key, String defaultValue, String type, String description) {
+    public PipelineParameterDAO(String key, String defaultValue, String type, Boolean visible, String description) {
         this.key = key;
         this.defaultValue = defaultValue;
         this.type = type;
         this.description = description;
+        this.visible = visible;
     }
 
-    public static WorkflowParameterDAO create(WorkflowParameter wp) {
-        WorkflowParameterDAO dao = new WorkflowParameterDAO();
+    public static PipelineParameterDAO create(PipelineParameter wp) {
+        PipelineParameterDAO dao = new PipelineParameterDAO();
         dao.setKey(wp.getKey());
         dao.setType(wp.getType());
+        dao.setVisible(wp.getVisible());
         dao.setDefaultValue(wp.getDefaultValue());
         dao.setDescription(wp.getParameterDescription());
         return dao;
     }
 
-    public WorkflowParameter mapToEntity() {
+    public PipelineParameter mapToEntity() {
 
-        WorkflowParameter wp = new WorkflowParameter();
+        PipelineParameter wp = new PipelineParameter();
         wp.setKey(this.getKey());
         wp.setType(this.getType());
+        wp.setVisible(this.getVisible());
         wp.setDefaultValue(this.getDefaultValue());
         wp.setParameterDescription(this.getDescription());
         return wp;
