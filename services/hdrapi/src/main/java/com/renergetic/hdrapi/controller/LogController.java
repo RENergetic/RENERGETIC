@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated // SEE BASE API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Log Controller", description = "Allows to create log entries or list them")

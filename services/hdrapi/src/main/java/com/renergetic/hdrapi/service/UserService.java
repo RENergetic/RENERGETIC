@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Deprecated // SEE USER API
 @Service
 @Slf4j
 public class UserService {

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Deprecated // SEE DATA API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Data Controller", description = "Allows collect data about Influx measurement")

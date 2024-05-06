@@ -21,6 +21,7 @@ import com.renergetic.common.repository.InformationTileMeasurementRepository;
 import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
+@Deprecated // SEE BASE API
 @Service
 public class InformationTileMeasurementService {
 	@PersistenceContext

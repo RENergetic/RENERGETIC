@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Deprecated // SEE BASE API
 @Service
 public class DemandRequestService {
     @Autowired

@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Deprecated // SEE BASE API
 @Service
 public class DataService {
     @Value("${influx.api.url}")

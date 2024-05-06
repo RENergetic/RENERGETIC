@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Deprecated // SEE BASE API
 @Service
 @Slf4j
 public class AssetService {

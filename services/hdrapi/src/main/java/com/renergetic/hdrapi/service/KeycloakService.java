@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Deprecated // SEE USER API
 @Service
 @Slf4j
 public class KeycloakService {

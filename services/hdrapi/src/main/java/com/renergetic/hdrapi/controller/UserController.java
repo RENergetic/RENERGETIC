@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.NotAuthorizedException;
 
+@Deprecated // SEE USER API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "User Controller", description = "Allows add and see Users")

@@ -23,6 +23,7 @@ import com.renergetic.common.repository.NotificationDefinitionRepository;
 import com.renergetic.common.repository.NotificationScheduleRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
+@Deprecated // SEE BASE API
 @Service
 public class NotificationService {
     @PersistenceContext

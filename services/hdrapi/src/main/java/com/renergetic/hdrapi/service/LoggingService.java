@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Deprecated // SEE USER API
 @Service
 public class LoggingService {
     @Autowired
