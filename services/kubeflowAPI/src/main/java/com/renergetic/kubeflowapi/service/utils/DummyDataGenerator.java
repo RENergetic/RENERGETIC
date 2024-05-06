@@ -1,8 +1,9 @@
 package com.renergetic.kubeflowapi.service.utils;
 
 
+import com.renergetic.common.dao.*;
+import com.renergetic.common.model.*;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.kubeflowapi.tempcommon.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

@@ -17,7 +17,6 @@ public class MeasurementTagsDAO extends DetailsDAO {
         this.tagId = measurementId;
     }
 
-
     public static MeasurementTagsDAO create(MeasurementTags tag) {
         MeasurementTagsDAO dao = null;
         if (tag != null) {
@@ -25,6 +24,14 @@ public class MeasurementTagsDAO extends DetailsDAO {
         }
         return dao;
     }
+
+    public static MeasurementTagsDAO create(MeasurementTags tag, Long measurementId) {
+		MeasurementTagsDAO dao = null;
+		if (tag != null) {
+			dao = new MeasurementTagsDAO(tag.getKey(), tag.getValue(), measurementId);
+		}
+		return dao;
+	}
 
     public   MeasurementTags mapToEntity() {
         MeasurementTags  tag = new MeasurementTags( );

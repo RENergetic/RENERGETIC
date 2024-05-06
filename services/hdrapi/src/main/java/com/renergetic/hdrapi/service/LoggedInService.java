@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-
+@Deprecated // SEE USER API
 @Service
 @RequiredArgsConstructor
 public class LoggedInService {

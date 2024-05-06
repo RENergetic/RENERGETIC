@@ -2,7 +2,7 @@ package com.renergetic.hdrapi.config;
 
 import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import com.renergetic.common.model.security.KeycloakRole;
-import com.renergetic.hdrapi.service.CustomAccessDeniedHandler;
+import com.renergetic.common.config.CustomAccessDeniedHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,8 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//import static pl.psnc.vtl.portal.model.users.SecurityGroup.SUPER_ADMIN;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -48,9 +46,6 @@ public class WebSecurityConfig {
 
     @Value(value = "${keycloak.client-id}")
     private String clientId;
-
-    @Autowired
-    JwtAuthenticationProvider authProvider;
 
     @Bean
     protected JwtAuthenticationProvider authenticationProvider() throws Exception {
@@ -70,21 +65,12 @@ public class WebSecurityConfig {
 
         http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(filter, FilterSecurityInterceptor.class);
-        //for some reason it doesnt work
-//        http.csrf().disable().authorizeRequests().antMatchers("/api/users")
-//                .hasAnyRole(KeycloakRole.REN_ADMIN.getAuthority(),
-//                        KeycloakRole.REN_TECHNICAL_MANAGER.getAuthority())
-//                .and().exceptionHandling().accessDeniedHandler(
-//                accessDeniedHandler()
-//        );
-//        http.csrf().disable().antMatcher("/api/users").addFilterAfter(
-//                new RoleFilter(KeycloakRole.REN_ADMIN.mask | KeycloakRole.REN_TECHNICAL_MANAGER.mask),
-//                JwtAuthenticationFilter.class);
+        
         Map<String, String[]> getUrls = new HashMap<>();
         Map<String, String[]> postUrls = new HashMap<>();
         Map<String, String[]> putUrls = new HashMap<>();
         Map<String, String[]> deleteUrls = new HashMap<>();
-//        #TODO
+        
 //    ### GET METHODS ###
         getUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
                 KeycloakRole.REN_TECHNICAL_MANAGER.name});
@@ -203,19 +189,10 @@ public class WebSecurityConfig {
             if (authentication.hasRole(expectedMask)) {
                 chain.doFilter(req, res);
             } else {
-                System.err.println("TODO:");
                 //TODO:
             }
 
         }
 
     }
-//
-//    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-//    @Override
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
-
-
 }

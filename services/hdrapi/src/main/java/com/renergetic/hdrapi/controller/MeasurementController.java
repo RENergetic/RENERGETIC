@@ -36,6 +36,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.websocket.server.PathParam;
 
+@Deprecated // SEE BASE API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Measurement Controller", description = "Allows add and see Measurements")

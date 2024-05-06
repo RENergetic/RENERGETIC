@@ -5,14 +5,12 @@ import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.AssetType;
 import com.renergetic.common.model.ConnectionType;
 import com.renergetic.common.model.details.AssetDetails;
-import com.renergetic.common.repository.AssetRepository;
 import com.renergetic.common.repository.information.AssetDetailsRepository;
 import com.renergetic.hdrapi.service.AssetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@Deprecated // SEE BASE API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Asset Controller", description = "Allows add and see Assets")

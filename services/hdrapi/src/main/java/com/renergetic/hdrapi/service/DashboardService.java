@@ -26,6 +26,7 @@ import com.renergetic.common.repository.UserRepository;
 import com.renergetic.common.repository.UuidRepository;
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
+@Deprecated // SEE BASE API
 @Service
 public class DashboardService {
 	@PersistenceContext

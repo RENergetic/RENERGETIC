@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated // SEE USER API
 //TODO: handle errors
 @Getter
 public class KeycloakWrapper {

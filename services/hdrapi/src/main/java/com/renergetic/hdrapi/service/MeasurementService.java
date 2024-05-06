@@ -35,6 +35,7 @@ import com.renergetic.hdrapi.service.utils.OffSetPaging;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Deprecated // SEE BASE API
 @Slf4j
 @Service
 public class MeasurementService {

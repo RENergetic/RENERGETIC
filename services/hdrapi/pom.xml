@@ -5,8 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.5.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>2.7.18</version>
 	</parent>
 	<groupId>com.renergetic</groupId>
 	<artifactId>hdrapi</artifactId>
@@ -14,7 +13,7 @@
 	<name>backdb</name>
 	<description>Project to access the relational database</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -24,17 +23,11 @@
 		</repository>
 	</repositories>
 	<dependencies>
-		<dependency>
-			<groupId>com.renergetic</groupId>
-			<artifactId>common</artifactId>
-			<version>1.1.28</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-keycloak-admin-client -->
-<!--		<dependency>-->
-<!--			<groupId>io.quarkus</groupId>-->
-<!--			<artifactId>quarkus-keycloak-admin-client</artifactId>-->
-<!--			<version>2.16.2.Final</version>-->
-<!--		</dependency>-->
+        <dependency>
+            <groupId>com.renergetic</groupId>
+            <artifactId>common</artifactId>
+            <version>1.2.1</version>
+        </dependency>
 		<dependency>
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-admin-client</artifactId>
@@ -45,34 +38,8 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt</artifactId>
-			<version>0.9.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-starter-security</artifactId>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.security</groupId>-->
-<!--			<artifactId>spring-security-config</artifactId>-->
-<!--		</dependency>-->
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
 		</dependency>
 	    <dependency>
 	       <groupId>org.springdoc</groupId>
@@ -84,10 +51,10 @@
 		    <artifactId>springdoc-openapi-data-rest</artifactId>
 		    <version>1.6.4</version>
 		</dependency>
-
 		<dependency>
-		    <groupId>mysql</groupId>
-		    <artifactId>mysql-connector-java</artifactId>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -95,9 +62,9 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.modelmapper</groupId>
-			<artifactId>modelmapper</artifactId>
-			<version>2.4.5</version>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 		    <groupId>org.json</groupId>
@@ -108,7 +75,21 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>2.4.5</version>
+		</dependency>
 	</dependencies>
 
 	<build>

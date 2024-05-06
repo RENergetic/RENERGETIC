@@ -1,6 +1,6 @@
 package com.renergetic.common.model;
 
-import lombok.*;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -9,11 +9,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "uuid")
-@Getter
-@Setter
-@AllArgsConstructor
-@RequiredArgsConstructor
-@ToString
+@Data
 public class UUID {
 	@Id
 	private String uuid;

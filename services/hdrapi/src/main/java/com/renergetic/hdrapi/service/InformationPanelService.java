@@ -19,6 +19,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Deprecated // SEE BASE API
 @Service
 public class InformationPanelService {
     @Autowired

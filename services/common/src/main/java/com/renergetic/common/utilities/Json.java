@@ -25,6 +25,8 @@ public class Json {
 //        return new JSONObject(json);
 //    }
 
+    private Json() {}
+
     public static JSONObject parse(Object json) throws ParseException {
     	String jsonStr;
     	
