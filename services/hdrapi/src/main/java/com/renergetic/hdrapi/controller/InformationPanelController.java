@@ -40,10 +40,10 @@ public class InformationPanelController {
     })
     @PostMapping(path = "/infermeasurements", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationPanelDAO> inferMeasurementsForPanel(
-             @RequestBody InformationPanelDAO informationPanelDAORequest) {
+            @RequestBody InformationPanelDAO informationPanelDAORequest) {
 
 
-        return new ResponseEntity<>(informationPanelService.inferMeasurements(informationPanelDAORequest ),
+        return new ResponseEntity<>(informationPanelService.inferMeasurements(informationPanelDAORequest),
                 HttpStatus.OK);
     }
 
@@ -83,6 +83,7 @@ public class InformationPanelController {
     public ResponseEntity<InformationPanelDAOResponse> createInformationPanel(
             @RequestBody InformationPanelDAORequest informationPanelDAORequest) {
         informationPanelDAORequest.setId(null);
+
         return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
     }
 
@@ -97,6 +98,8 @@ public class InformationPanelController {
         informationPanelDAORequest.setName(name);
         informationPanelDAORequest.setId(null);
         informationPanelDAORequest.setFeatured(false);
+        if (informationPanelDAORequest.getIsTemplate() == null)
+            informationPanelDAORequest.setIsTemplate(false);
         return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
     }
 

@@ -1,17 +1,14 @@
 package com.renergetic.kubeflowapi.controller;
 
+import com.renergetic.common.dao.PipelineDefinitionDAO;
+import com.renergetic.common.dao.PipelineParameterDAO;
+import com.renergetic.common.dao.PipelineRunDAO;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.dao.ApiRunPostDAO;
-import com.renergetic.kubeflowapi.dao.ExampleRequest;
-import com.renergetic.kubeflowapi.dao.ExampleResponse;
 import com.renergetic.kubeflowapi.model.*;
-import com.renergetic.kubeflowapi.service.ExampleService;
 import com.renergetic.kubeflowapi.service.KubeflowService;
 import com.renergetic.kubeflowapi.service.KubeflowPipelineService;
 import com.renergetic.kubeflowapi.service.utils.KubeflowUtils;
-import com.renergetic.kubeflowapi.tempcommon.PipelineDefinitionDAO;
-import com.renergetic.kubeflowapi.tempcommon.PipelineParameterDAO;
-import com.renergetic.kubeflowapi.tempcommon.PipelineRunDAO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,8 +38,8 @@ public class KubeflowController {
     @Value("${kubeflow.user.password}")
     private String kubeflowPassword;
 
-    @Autowired
-    private ExampleService exampleService;
+//    @Autowired
+//    private ExampleService exampleService;
     @Autowired
     private KubeflowService kubeflowService;
 
