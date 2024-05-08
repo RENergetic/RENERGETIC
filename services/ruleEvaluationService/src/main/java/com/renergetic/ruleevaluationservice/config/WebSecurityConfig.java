@@ -47,9 +47,6 @@ public class WebSecurityConfig {
     @Value(value = "${keycloak.client-id}")
     private String clientId;
     
-    @Autowired
-    JwtAuthenticationProvider authProvider;
-    
     @Bean
     protected JwtAuthenticationProvider authenticationProvider() throws Exception {
     	JwtAuthenticationProvider provider = new JwtAuthenticationProvider();

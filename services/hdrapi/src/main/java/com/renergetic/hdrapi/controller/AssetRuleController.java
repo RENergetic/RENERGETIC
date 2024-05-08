@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import java.util.List;
 
+@Deprecated // SEE BASE API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Asset Rule Controller", description = "Allows to manage and retrieve asset rules")

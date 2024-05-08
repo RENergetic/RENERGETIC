@@ -17,7 +17,11 @@ hdr=$(grep -ioP "(hdr\s*=\s*)\K.+" _installers.properties)
 kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
-kubeflow=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _installers.properties)
+user=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
+baseApi=$(grep -ioP "(base\s*=\s*)\K.+" _installers.properties)
+wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
+dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
+kubeflowApi=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -77,6 +81,28 @@ then
         kubectl apply -f influxdb-service.yaml --namespace=$project
     fi
 # DEPLOY APIs
+
+    if [[ $baseApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/baseApi"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/base-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/base-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/base-api --namespace=$project
+        kubectl delete services/base-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=base-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f base-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f base-api-service.yaml --namespace=$project
+    fi
 
     if [[ $hdr = 'true' ]]
     then
@@ -166,7 +192,73 @@ then
         kubectl apply -f ingestion-api-service.yaml --namespace=$project
     fi
 
-    if [[ $kubeflow = 'true' ]]
+    if [[ $user = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/userAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/user-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/user-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/user-api --namespace=$project
+        kubectl delete services/user-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=user-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f user-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f user-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $wrapperApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/wrapperAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/wrapper-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/wrapper-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/wrapper-api --namespace=$project
+        kubectl delete services/wrapper-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=wrapper-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f wrapper-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f wrapper-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $dataApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/dataAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/data-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/data-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/data-api --namespace=$project
+        kubectl delete services/data-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=data-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f data-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f data-api-service.yaml --namespace=$project
+    fi
+    
+    if [[ $kubeflowApi = 'true' ]]
     then
         cd "${apisPath}/kubeflowAPI"
         mvn clean package -Dmaven.test.skip

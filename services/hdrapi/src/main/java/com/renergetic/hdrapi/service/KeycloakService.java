@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Deprecated // SEE USER API
 @Service
 @Slf4j
 public class KeycloakService {
@@ -33,9 +34,6 @@ public class KeycloakService {
     private String adminPassword;
     @Value(value = "${keycloak.admin.client-id}")
     private String adminClient;
-
-    @Autowired
-    private LoggedInService loggedInService;
 
 
 //    public Keycloak getInstance(String token) {
@@ -75,11 +73,6 @@ public class KeycloakService {
 //            return new KeycloakWrapper(this.realm, clientId, this.getAdminInstance(authToken));
         }
         return new KeycloakWrapper(this.realm, clientId, this.getInstance(authToken));
-    }
-
-    public KeycloakWrapper getClient(boolean admin) {
-        String token = loggedInService.getKeycloakUser().getToken();
-        return this.getClient(token, admin);
     }
 
 

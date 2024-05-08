@@ -16,6 +16,7 @@ import com.renergetic.hdrapi.service.InformationTileService;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated // SEE BASE API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Information Tile Controller", description = "Allows to add and retrieve tiles")

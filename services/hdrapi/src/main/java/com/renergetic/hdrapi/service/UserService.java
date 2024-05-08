@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Deprecated // SEE USER API
 @Service
 @Slf4j
 public class UserService {
@@ -54,34 +55,34 @@ public class UserService {
     KeycloakService keycloakService;
 
     // USER CRUD OPERATIONS
-//    @Transactional
-//    public UserDAOResponse save(UserRepresentation keycloakUser, UserDAORequest user) {
-//        KeycloakWrapper client = keycloakService.getClient(true);
-//        if (client.userExists(user.getUsername()) || userSv.) {
-//            throw new DuplicateKeyException("User exists: " + user.getUsername());
-//        }
-//        UserRepresentation ur = client.createUser(user);
-//        user.setId(ur.getId());
-//        if (user.getId() != null && userRepository.findByKeycloakId(user.getId()) != null)
-//            throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
-//
-//        User userEntity = user.mapToEntity();
-//        userEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
-//        userEntity = userRepository.save(userEntity);
-//        userSettingsRepository.save(new UserSettings(userEntity, "{}"));
-//        Optional<AssetType> type = assetTypeRepository.findByName("user");
-//        AssetType assetType;
-//        if (type.isEmpty()) {
-//            assetType = new AssetType("user");
-//            assetTypeRepository.save(assetType);
-//        } else {
-//            assetType = type.get();
-//        }
-//        Asset asset = Asset.initUserAsset(user.getUsername(), userEntity, assetType, null);
-//        asset.setUuid(uuidRepository.saveAndFlush(new UUID()));
-//        assetRepository.save(asset);
-//        return UserDAOResponse.create(keycloakUser, null, null);
-//    }
+   @Transactional
+   public UserDAOResponse save(UserRepresentation keycloakUser, UserDAORequest user) {
+       KeycloakWrapper client = keycloakService.getClient(null, true);
+       if (Boolean.TRUE.equals(client.userExists(user.getUsername()))) {
+           throw new DuplicateKeyException("User exists: " + user.getUsername());
+       }
+       UserRepresentation ur = client.createUser(user);
+       user.setId(ur.getId());
+       if (user.getId() != null && userRepository.findByKeycloakId(user.getId()) != null)
+           throw new InvalidCreationIdAlreadyDefinedException("Already exists a user with ID " + user.getId());
+
+       User userEntity = user.mapToEntity();
+       userEntity.setUuid(uuidRepository.saveAndFlush(new UUID()));
+       userEntity = userRepository.save(userEntity);
+       userSettingsRepository.save(new UserSettings(userEntity, "{}"));
+       Optional<AssetType> type = assetTypeRepository.findByName("user");
+       AssetType assetType;
+       if (type.isEmpty()) {
+           assetType = new AssetType("user");
+           assetTypeRepository.save(assetType);
+       } else {
+           assetType = type.get();
+       }
+       Asset asset = Asset.initUserAsset(user.getUsername(), userEntity, assetType, null);
+       asset.setUuid(uuidRepository.saveAndFlush(new UUID()));
+       assetRepository.save(asset);
+       return UserDAOResponse.create(keycloakUser, null, null);
+   }
 
     @Transactional
     public UserRepresentation create(KeycloakWrapper client, UserDAORequest request) {

@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        backup.velero.io/backup-volumes: grafana-disk
+        backup.velero.io/backup-volumes: grafana-diskc
       labels:
         app: grafana
     spec:

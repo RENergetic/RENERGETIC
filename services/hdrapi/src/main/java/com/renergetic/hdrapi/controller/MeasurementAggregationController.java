@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Deprecated // SEE DATA API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Measurement Aggregation Controller", description = "Allows to manage Measurements aggregation")

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wrapper-api
+spec:
+  selector:
+      matchLabels:
+        app: wrapper-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wrapper-api
+    spec:
+      containers:
+        - name: wrapper-api
+          image: wrapper-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8082
+          resources:
+            requests:
+              cpu: 200m
+              memory: 275Mi
+            limits:
+              cpu: 300m
+              memory: 525Mi
+          readinessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 60
+            periodSeconds: 120
+            successThreshold: 1
+            timeoutSeconds: 1
+      restartPolicy: Always

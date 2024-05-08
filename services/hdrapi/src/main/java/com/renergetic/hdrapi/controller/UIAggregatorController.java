@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Deprecated // SEE WRAPPER API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Ui aggregator Controller", description = "Aggregates data from multiple controller to simplify UI requests")

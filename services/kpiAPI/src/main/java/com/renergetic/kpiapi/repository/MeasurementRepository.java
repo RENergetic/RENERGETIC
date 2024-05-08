@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.renergetic.kpiapi.model.*;
 import org.springframework.data.repository.query.Param;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
