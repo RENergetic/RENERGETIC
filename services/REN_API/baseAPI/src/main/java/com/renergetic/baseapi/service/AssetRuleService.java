@@ -1,6 +1,8 @@
 package com.renergetic.baseapi.service;
 
 import com.renergetic.common.dao.AssetRuleDAO;
+import com.renergetic.common.dao.AssetRuleMultiListWithAssetsDAO;
+import com.renergetic.common.dao.SimpleAssetDAO;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.Asset;
 import com.renergetic.common.model.AssetRule;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +32,22 @@ public class AssetRuleService {
     private AssetRepository assetRepository;
     @Autowired
     private MeasurementRepository measurementRepository;
+
+    public List<AssetRuleMultiListWithAssetsDAO> getAllRulesAsset(){
+        List<AssetRule> rules = assetRuleRepository.findAll();
+        List<AssetRuleMultiListWithAssetsDAO> assetRules = new ArrayList<>();
+        List<Asset> assets = assetRepository.findAll();
+        assets.forEach(asset -> {
+            AssetRuleMultiListWithAssetsDAO multi = new AssetRuleMultiListWithAssetsDAO();
+            multi.setAsset(SimpleAssetDAO.create(asset));
+            multi.setAssetRules(
+                    rules.stream().filter(
+                            rule -> rule.getAsset() != null && rule.getAsset().getId().equals(asset.getId()))
+                            .map(AssetRuleDAO::fromEntity).collect(Collectors.toList()));
+            assetRules.add(multi);
+        });
+        return assetRules;
+    }
 
     public List<AssetRuleDAO> getAllRulesAssetForAssetId(Long id){
         List<AssetRule> assetRules = assetRuleRepository.findByAssetId(id);
@@ -89,13 +108,19 @@ public class AssetRuleService {
         Asset asset = null;
         Measurement measurement1 = null;
         Measurement measurement2 = null;
+        Asset demandAssetTrue = null;
+        Asset demandAssetFalse = null;
         if(assetRuleDAO.getAssetId() != null)
             asset = assetRepository.findById(assetRuleDAO.getAssetId()).orElseThrow(() -> new NotFoundException("Asset id not found."));
         if(assetRuleDAO.getMeasurement1Id() != null)
             measurement1 = measurementRepository.findById(assetRuleDAO.getMeasurement1Id()).orElseThrow(() -> new NotFoundException("Measurement1 id not found."));
         if(assetRuleDAO.getMeasurement2Id() != null)
             measurement2 = measurementRepository.findById(assetRuleDAO.getMeasurement2Id()).orElseThrow(() -> new NotFoundException("Measurement2 id not found."));
-        AssetRule assetRule = assetRuleDAO.mapToEntity(asset, measurement1, measurement2);
+        if(assetRuleDAO.getDemandAssetTrue() != null)
+            demandAssetTrue = assetRepository.findById(assetRuleDAO.getDemandAssetTrue()).orElseThrow(() -> new NotFoundException("Asset demand true id not found."));
+        if(assetRuleDAO.getDemandAssetFalse() != null)
+            demandAssetFalse = assetRepository.findById(assetRuleDAO.getDemandAssetFalse()).orElseThrow(() -> new NotFoundException("Asset demand false id not found."));
+        AssetRule assetRule = assetRuleDAO.mapToEntity(asset, measurement1, measurement2, demandAssetTrue, demandAssetFalse);
         assetRuleValidator.validate(assetRule);
         return assetRule;
     }

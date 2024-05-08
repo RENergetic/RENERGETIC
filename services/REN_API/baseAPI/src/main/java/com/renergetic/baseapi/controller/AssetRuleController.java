@@ -1,6 +1,7 @@
 package com.renergetic.baseapi.controller;
 
 import com.renergetic.common.dao.AssetRuleDAO;
+import com.renergetic.common.dao.AssetRuleMultiListWithAssetsDAO;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.baseapi.service.AssetRuleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +23,13 @@ import java.util.List;
 public class AssetRuleController {
 	@Autowired
 	private AssetRuleService assetRuleService;
+
+	@Operation(summary = "Get All Rule with all existing assets")
+	@ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "list/all", produces = "application/json")
+	public ResponseEntity<List<AssetRuleMultiListWithAssetsDAO>> getAllRules (){
+		return new ResponseEntity<>(assetRuleService.getAllRulesAsset(), HttpStatus.OK);
+	}
 
 	@Operation(summary = "Get All Rule for a given asset id")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
