@@ -8,7 +8,7 @@ import com.renergetic.kpiapi.model.AbstractMeter;
 import com.renergetic.kpiapi.model.AbstractMeterConfig;
 import com.renergetic.kpiapi.model.Domain;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 
 public interface AbstractMeterRepository extends JpaRepository<AbstractMeterConfig, Long> {
 

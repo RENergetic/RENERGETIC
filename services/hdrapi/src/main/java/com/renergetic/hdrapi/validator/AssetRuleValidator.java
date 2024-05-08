@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Deprecated // SEE BASE API
 @Component
 public class AssetRuleValidator {
     public void validate(AssetRule assetRule) throws ValidatorException {

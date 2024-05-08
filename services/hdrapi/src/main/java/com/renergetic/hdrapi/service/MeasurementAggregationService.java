@@ -23,6 +23,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Deprecated // SEE DATA API
 @Service
 public class MeasurementAggregationService {
     @Autowired

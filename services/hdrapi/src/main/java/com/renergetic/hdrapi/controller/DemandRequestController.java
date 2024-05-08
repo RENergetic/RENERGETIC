@@ -16,6 +16,7 @@ import com.renergetic.hdrapi.service.DemandRequestService;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated // SEE BASE API
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/demandRequests")

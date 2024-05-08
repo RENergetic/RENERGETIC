@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Id;
-
 @Getter
 @Setter
 //@Entity
@@ -16,7 +14,6 @@ import javax.persistence.Id;
 @RequiredArgsConstructor
 @ToString
 public class AssetTypeDAO {
-    @Id
     @JsonProperty(required = true, access = JsonProperty.Access.READ_ONLY)
     private Long id;
 

@@ -4,7 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Entity
 @Data

@@ -2,16 +2,27 @@ package com.renergetic.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.renergetic.common.model.details.AssetDetails;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import javax.persistence.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "asset")
@@ -20,9 +31,6 @@ import java.util.Map;
 @Setter
 //@ToString // TODO: java.lang.StackOverflowError occurs when wrapper API is called
 public class Asset {
-    @JsonIgnore
-    public static Map<String, AssetTypeCategory> ALLOWED_TYPES;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -87,16 +95,14 @@ public class Asset {
     private List<AssetDetails> details;
 
 
-    public Asset(String name, AssetType type, String label, String description, String location, Asset part_of_asset,
-                 User owner, User user) {
+    public Asset(String name, AssetType type, String label, String location, Asset partOfAsset, User user) {
         super();
         this.name = name;
         this.type = type;
         this.label = label;
 
         this.location = location;
-        this.parentAsset = part_of_asset;
-        //this.owner = owner;
+        this.parentAsset = partOfAsset;
         this.user = user;
     }
 
@@ -108,33 +114,5 @@ public class Asset {
         asset.setType(assetType);
         asset.setUser(user);
         return asset;
-
-    }
-
-    static {
-        ALLOWED_TYPES = new HashMap<>();
-
-        ALLOWED_TYPES.put("user", AssetTypeCategory.user);
-
-        ALLOWED_TYPES.put("room", AssetTypeCategory.structural);
-        ALLOWED_TYPES.put("flat", AssetTypeCategory.structural);
-        ALLOWED_TYPES.put("building", AssetTypeCategory.structural);
-        ALLOWED_TYPES.put("energy island", AssetTypeCategory.structural);
-
-        ALLOWED_TYPES.put("ev charging station", AssetTypeCategory.energy);
-        ALLOWED_TYPES.put("generation plant", AssetTypeCategory.energy);
-        ALLOWED_TYPES.put("heatpump", AssetTypeCategory.energy);
-        ALLOWED_TYPES.put("gas boiler", AssetTypeCategory.energy);
-        ALLOWED_TYPES.put("co-generation unit", AssetTypeCategory.energy);
-        ALLOWED_TYPES.put("coal plant", AssetTypeCategory.energy);
-        ALLOWED_TYPES.put("pv plant", AssetTypeCategory.energy);
-        ALLOWED_TYPES.put("external heat grid", AssetTypeCategory.energy);
-        ALLOWED_TYPES.put("external electricity grid", AssetTypeCategory.energy);
-        ALLOWED_TYPES.put("solar thermal collector", AssetTypeCategory.energy);
-
-        ALLOWED_TYPES.put("steam", AssetTypeCategory.infrastructure);
-        ALLOWED_TYPES.put("district heating", AssetTypeCategory.infrastructure);
-        ALLOWED_TYPES.put("district cooling", AssetTypeCategory.infrastructure);
-        ALLOWED_TYPES.put("electricity", AssetTypeCategory.infrastructure);
     }
 }

@@ -24,7 +24,11 @@ kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _installers.properties)
 influx=$(grep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
 ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
 rules=$(grep -ioP "(rules\s*=\s*)\K.+" _installers.properties)
-kubeflow=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _installers.properties)
+baseApi=$(grep -ioP "(base\s*=\s*)\K.+" _installers.properties)
+userApi=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
+wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
+dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
+kubeflowApi=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -43,6 +47,13 @@ resetConnection() {
 }
 
 compileApp() {
+    if [[ $baseApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/baseAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/base-api/api.jar"
+    fi
+
     if [[ $hdr = 'true' ]]
     then
         cd "${apisPath}/hdrAPI"
@@ -78,7 +89,28 @@ compileApp() {
         cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
     fi
 
-    if [[ $kubeflow = 'true' ]]
+    if [[ $userApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/userAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/user-api/api.jar"
+    fi
+
+    if [[ $wrapperApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/wrapperAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/wrapper-api/api.jar"
+    fi
+
+    if [[ $dataApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/dataAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/data-api/api.jar"
+    fi
+    
+    if [[ $kubeflowApi = 'true' ]]
     then
         cd "${apisPath}/kubeflowAPI"
         mvn clean package -Dmaven.test.skip
@@ -142,7 +174,26 @@ installPSNC() {
         envsubst '$PROJECT' < influxdb-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f influxdb-service.yaml --namespace=$project
     fi
-# DEPLOY APIs
+# DEPLOY 
+
+    if [[ $baseApi = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/base-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/base-api --namespace=$project
+        kubectl delete services/base-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/base-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/base-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < base-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f base-api-service.yaml --namespace=$project
+    fi
 
     if [[ $hdr = 'true' ]]
     then
@@ -239,13 +290,72 @@ installPSNC() {
         kubectl apply -f rules-api-service.yaml --namespace=$project
     fi
 
-    if [[ $kubeflow = 'true' ]]
+    if [[ $userApi = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/user-api"
+    
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/user-api --namespace=$project
+        kubectl delete services/user-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/user-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/user-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < user-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f user-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $wrapperApi = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/wrapper-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/wrapper-api --namespace=$project
+        kubectl delete services/wrapper-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/wrapper-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/wrapper-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < wrapper-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f wrapper-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $dataApi = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/data-api"
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/data-api --namespace=$project
+        kubectl delete services/data-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/data-api:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/data-api:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < data-api-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f data-api-service.yaml --namespace=$project
+    fi
+    
+    if [[ $kubeflowApi = 'true' ]]
     then
         cd "${current}/docker_config/APIs/kubeflow-api"
         # API INSTALLATION
         # set environment variables
 
         # delete kubernetes resources if exists
+        kubectl delete secrets/kubeflow-api-secrets --namespace=$project
         kubectl delete deployments/kubeflow-api --namespace=$project
         kubectl delete services/kubeflow-api-sv --namespace=$project
 
@@ -254,6 +364,7 @@ installPSNC() {
         docker push registry.apps.paas-dev.psnc.pl/$project/kubeflow-api:latest
 
         # create kubernetes resources
+        kubectl apply -f kubeflow-api-secrets.yaml --namespace=$project
         envsubst '$PROJECT' < kubeflow-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f kubeflow-api-service.yaml --namespace=$project
     fi
@@ -344,7 +455,6 @@ installPSNC() {
         envsubst '$PROJECT' < keycloak-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f keycloak-service.yaml --namespace=$project
     fi
-
 
     if [[ $ui = 'true' ]]
     then        

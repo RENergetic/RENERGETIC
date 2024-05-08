@@ -10,9 +10,7 @@ import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.AssetDetailsRepository;
-import com.renergetic.common.repository.information.MeasurementDetailsRepository;
-import com.renergetic.hdrapi.dao.tempcommon.TempAssetRepository;
-import com.renergetic.hdrapi.dao.tempcommon.TempMeasurementRepository;
+import com.renergetic.common.repository.information.MeasurementDetailsRepository; 
 import com.renergetic.hdrapi.service.utils.OffSetPaging;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Deprecated // SEE BASE API
 @Service
 @Slf4j
 public class AssetService {
@@ -35,8 +34,6 @@ public class AssetService {
     @Autowired
     AssetRepository assetRepository;
 
-    @Autowired
-    TempAssetRepository tempAssetRepository;
     @Autowired
     MeasurementRepository measurementRepository;
     @Autowired
@@ -170,7 +167,7 @@ public class AssetService {
 
     public List<SimpleAssetDAO> getByDetail(String key, String value, long offset, int limit) {
 
-        Stream<Asset> stream = tempAssetRepository.filterByDetail(key, value, null, null, offset, limit).stream();
+        Stream<Asset> stream = assetRepository.filterByDetail(key, value, null, null, offset, limit).stream();
         List<SimpleAssetDAO> assets;
 //        assets = stream.map(asset -> AssetDAOResponse.create(asset, assetRepository.findByParentAsset(asset),
 //                        measurementRepository.findByAsset(asset))).collect(Collectors.toList());

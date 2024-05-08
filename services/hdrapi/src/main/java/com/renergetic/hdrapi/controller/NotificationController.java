@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Deprecated // SEE BASE API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Notification Controller", description = "Allows add and see Notifications")

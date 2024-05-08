@@ -27,7 +27,6 @@ public class DashboardDAO {
     @JsonProperty(required = false )
     private Long id;
 
-
     @JsonProperty(required = false)
     private String name;
 
@@ -51,6 +50,7 @@ public class DashboardDAO {
     @JsonInclude(value = Include.NON_NULL)
     @JsonProperty(access = Access.READ_ONLY, required = false)
     private Integer status;
+    
     @JsonProperty(value = "measurement_type", required = false)
     private MeasurementType measurementType;
 

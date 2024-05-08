@@ -3,6 +3,7 @@ package com.renergetic.kubeflowapi.dao;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import com.renergetic.kubeflowapi.model.ApiResourceReference;
 import com.renergetic.kubeflowapi.model.ApiRun;
 import com.renergetic.kubeflowapi.model.PipelineSpec;
@@ -23,12 +24,15 @@ public class ApiRunPostDAO {
     private String name;
 
     @JsonProperty(required = true, value = "pipeline_spec")
+    @SerializedName("pipeline_spec")
     private PipelineSpec pipelineSpec;
 
     @JsonProperty(required = true, value = "resource_references")
+    @SerializedName("resource_references")
     private List<ApiResourceReference> resourceReferences;
 
     @JsonProperty(required = true, value = "service_account")
+    @SerializedName("service_account")
     private String serviceAccount;
 
     public static ApiRunPostDAO create(ApiRun run) {

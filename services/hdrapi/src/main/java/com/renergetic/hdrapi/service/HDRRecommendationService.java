@@ -1,15 +1,14 @@
 package com.renergetic.hdrapi.service;
 
+import com.renergetic.common.dao.HDRMeasurementDAO;
 import com.renergetic.common.dao.HDRRecommendationDAO;
 import com.renergetic.common.dao.HDRRequestDAO;
 import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.exception.InvalidArgumentException;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.*;
-import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.hdrapi.dao.tempcommon.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +25,11 @@ public class HDRRecommendationService {
     MeasurementRepository measurementRepository;
 
     @Autowired
-    MeasurementTagsRepository measurementTagsRepository;
+    HDRRecommendationRepository recommendationRepository;
     @Autowired
-    RecommendationRepository recommendationRepository;
+    HDRMeasurementRepository hdrMeasurementRepository;
     @Autowired
-    TempHDRMeasurementRepository tempHDRMeasurementRepository;
-    @Autowired
-    TempMeasurementRepository tempMeasurementRepository;
+    MeasurementRepository tempMeasurementRepository;
     @Autowired
     HDRRequestRepository hdrRequestRepository;
     @Autowired
@@ -135,7 +132,7 @@ public class HDRRecommendationService {
             throw new InvalidArgumentException("Empty timestamp");
         }
         var t = DateConverter.toLocalDateTime(timestamp);
-        return tempHDRMeasurementRepository.listMeasurement(t).stream()
+        return hdrMeasurementRepository.listMeasurement(t).stream()
                 .map(it -> MeasurementDAOResponse.create(it.getMeasurement(), null, null))
                 .collect(Collectors.toList());
     }
@@ -146,7 +143,7 @@ public class HDRRecommendationService {
         }
 
         var t = DateConverter.toLocalDateTime(timestamp);
-        return tempMeasurementRepository.listHDRMeasurement(t,  key, value).stream()
+        return measurementRepository.listHDRMeasurement(t,  key, value).stream()
                 .map(it -> MeasurementDAOResponse.create(it, null, null))
                 .collect(Collectors.toList());
     }
@@ -157,7 +154,7 @@ public class HDRRecommendationService {
         }
         var t = DateConverter.toLocalDateTime(timestamp);
 //        hdrRequestRepository.findRequestByTimestamp(t);
-        HDRMeasurement hdrMeasurement = tempHDRMeasurementRepository.findByIdAndTimestamp(measurementId,
+        HDRMeasurement hdrMeasurement = hdrMeasurementRepository.findByIdAndTimestamp(measurementId,
                 DateConverter.toLocalDateTime(timestamp)).orElse(null);
 
         if (hdrMeasurement == null) {
@@ -165,7 +162,7 @@ public class HDRRecommendationService {
             hdrMeasurement = new HDRMeasurement();
             hdrMeasurement.setMeasurement(measurement);
             hdrMeasurement.setTimestamp(t);
-            tempHDRMeasurementRepository.save(hdrMeasurement);
+            hdrMeasurementRepository.save(hdrMeasurement);
         }
         return HDRMeasurementDAO.create(hdrMeasurement);
 
@@ -187,7 +184,7 @@ public class HDRRecommendationService {
                     hdrMeasurement.setTimestamp(t);
                     return hdrMeasurement;
                 }
-        ).map(it -> tempHDRMeasurementRepository.save(it)).map(HDRMeasurementDAO::create).collect(
+        ).map(it -> hdrMeasurementRepository.save(it)).map(HDRMeasurementDAO::create).collect(
                 Collectors.toList());
         return l;
     }
@@ -198,13 +195,13 @@ public class HDRRecommendationService {
         }
         var t = DateConverter.toLocalDateTime(timestamp);
 //        hdrRequestRepository.findRequestByTimestamp(t);
-        Optional<HDRMeasurement> byIdAndTimestamp = tempHDRMeasurementRepository.findByIdAndTimestamp(measurementId, t);
+        Optional<HDRMeasurement> byIdAndTimestamp = hdrMeasurementRepository.findByIdAndTimestamp(measurementId, t);
         if (byIdAndTimestamp.isEmpty()) {
             throw new NotFoundException("Maasurement: " + measurementId + " , at " + t + " -does not exist");
         }
         HDRMeasurement hdrMeasurement = byIdAndTimestamp.get();
         var dao = HDRMeasurementDAO.create(hdrMeasurement);
-        tempHDRMeasurementRepository.delete(hdrMeasurement);
+        hdrMeasurementRepository.delete(hdrMeasurement);
         return dao;
     }
 

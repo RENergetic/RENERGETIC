@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -23,6 +25,7 @@ public class PipelineSpec {
     @Id
     @Column(name = "pipeline_id")
     @JsonProperty(required = true, value = "pipeline_id")
+    @SerializedName("pipeline_id")
     private String pipelineId;
 
     @Column(nullable = true, name = "pipeline_name")

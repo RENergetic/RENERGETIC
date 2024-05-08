@@ -7,7 +7,19 @@ import lombok.ToString;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 import java.util.List;
 
 @Entity
@@ -23,7 +35,7 @@ public class User {
     private Long id;
 
     //TODO: change to nonnullable field
-    @Column(name = "keycloak_id", nullable = true, insertable = true, updatable = true, unique = true)
+    @Column(name = "keycloak_id", nullable = false, insertable = true, updatable = true, unique = true)
     private String keycloakId;
 
 

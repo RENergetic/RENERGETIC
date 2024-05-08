@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-api
+spec:
+  selector:
+      matchLabels:
+        app: user-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: user-api
+    spec:
+      containers:
+        - name: user-api
+          image: user-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8082
+          resources:
+            requests:
+              cpu: 200m
+              memory: 275Mi
+            limits:
+              cpu: 300m
+              memory: 525Mi
+          readinessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 60
+            periodSeconds: 120
+            successThreshold: 1
+            timeoutSeconds: 1
+      restartPolicy: Always

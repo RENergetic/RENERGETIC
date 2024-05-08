@@ -14,9 +14,9 @@ public interface NotificationScheduleRepository extends JpaRepository<Notificati
     NotificationSchedule save(NotificationSchedule notification);
 
     @Query("select n from NotificationSchedule n "
-            + "WHERE n.dateFrom <= current_date AND "
+            + "WHERE n.dateFrom <= NOW() AND "
             + "(n.dateTo IS NULL OR "
-            + "n.dateTo  >= current_date)")
+            + "n.dateTo  >= NOW())")
     List<NotificationSchedule> findNotExpired(Pageable pageable);
 
     List<NotificationSchedule> findByAssetId(Long asset_id);

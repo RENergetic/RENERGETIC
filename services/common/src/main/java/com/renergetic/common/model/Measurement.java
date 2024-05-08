@@ -1,6 +1,21 @@
 package com.renergetic.common.model;
 
 import com.renergetic.common.model.details.MeasurementDetails;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -8,7 +23,6 @@ import lombok.ToString;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -77,6 +91,7 @@ public class Measurement {
 	private List<MeasurementDetails> details;
 	
 	@Transient
+	// TODO: ask about if we need this field and its actual use
 	String function;
 	
 	public Measurement(Long id, String uuid, String name, String label,Asset asset, String description,   Direction direction ) {

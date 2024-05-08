@@ -1,5 +1,6 @@
 package com.renergetic.common.utilities;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.tomcat.util.json.ParseException;
@@ -12,6 +13,8 @@ public class Json {
 
     static {
         GsonBuilder gb = new GsonBuilder();
+        gb.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+
 //        gb.registerTypeAdapter(DashboardUnit.class, new DashboardUnit.DashboardUnitAdapter());
         gson = gb.create();
     }
@@ -21,6 +24,8 @@ public class Json {
 //        }
 //        return new JSONObject(json);
 //    }
+
+    private Json() {}
 
     public static JSONObject parse(Object json) throws ParseException {
     	String jsonStr;

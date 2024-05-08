@@ -14,17 +14,12 @@ import java.util.List;
 public interface TempMeasurementTagsRepository extends JpaRepository<MeasurementTags, Long> {
 
 
-    @Modifying
-    @Transactional
-    @Query(value = " DELETE   from measurement_tags using tags " +
-            " WHERE tags.id = measurement_tags.tag_id  and" +
-            " measurement_id =  :measurement_id and tags.key = :tagKey  ", nativeQuery = true)
-    public int clearTag(@Param("measurement_id") Long measurementId, @Param("tagKey") String tagKey);
+    @Query(value = "SELECT mt.* " +
+            " FROM tags mt " +
+            " WHERE mt.key=:key   ", nativeQuery = true)
+    List<MeasurementTags> findByKey(@Param("key") String key);
 
-//    @Modifying
-//    @Transactional
-//    @Query(value = " DELETE   from measurement_tags using tags " +
-//            " WHERE tags.id = measurement_tags.tag_id  and" +
-//            " measurement_id =  :measurement_id and tags.key = :tagKey  ", nativeQuery = true)
-//    public int clearTag(@Param("measurement_id") Long measurementId, @Param("tagKey") String tagKey);
+    @Query(value = "SELECT distinct tags.value  from tags WHERE tags.key = :tagKey", nativeQuery = true)
+    List<String> listTagValues(String tagKey);
+
 }

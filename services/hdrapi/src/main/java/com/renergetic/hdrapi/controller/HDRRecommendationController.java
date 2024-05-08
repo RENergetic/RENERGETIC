@@ -1,10 +1,11 @@
 package com.renergetic.hdrapi.controller;
 
+import com.renergetic.common.dao.HDRMeasurementDAO;
 import com.renergetic.common.dao.HDRRecommendationDAO;
 import com.renergetic.common.dao.HDRRequestDAO;
+import com.renergetic.common.dao.HDRMeasurementDAO;
 import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.hdrapi.dao.tempcommon.HDRMeasurementDAO;
 import com.renergetic.hdrapi.service.HDRRecommendationService;
 import com.renergetic.hdrapi.service.utils.DummyDataGenerator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 

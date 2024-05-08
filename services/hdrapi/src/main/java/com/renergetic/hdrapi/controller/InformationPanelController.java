@@ -15,6 +15,7 @@ import com.renergetic.hdrapi.service.InformationPanelService;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated // SEE BASE API
 @CrossOrigin(origins = "*")
 @RestController
 @Tag(name = "Information Panel Controller", description = "Allows to add and retrieve panels")
