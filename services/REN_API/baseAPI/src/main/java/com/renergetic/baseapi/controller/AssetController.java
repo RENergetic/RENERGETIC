@@ -5,6 +5,7 @@ import com.renergetic.common.dao.AssetConnectionDAORequest;
 import com.renergetic.common.dao.AssetDAORequest;
 import com.renergetic.common.dao.AssetDAOResponse;
 import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.dao.SimpleAssetDAO;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.AssetType;
 import com.renergetic.common.model.ConnectionType;
@@ -130,6 +131,20 @@ public class AssetController {
         type = assetSv.getTypeById(id);
 
         return new ResponseEntity<>(type, type != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+    @Operation(summary = "list by details")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "key/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<List<SimpleAssetDAO>> getAllAssets(@PathVariable String key, @PathVariable String value,
+                                                             @RequestParam(required = false) Optional<Long> offset,
+                                                             @RequestParam(required = false) Optional<Integer> limit ) {
+        try {
+            List<SimpleAssetDAO> assets  = assetSv.getByDetail(key,value, offset.orElse(0L), limit.orElse(50));
+            return new ResponseEntity<>(assets, HttpStatus.OK);
+        } catch (NotFoundException ex) {
+            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+        }
     }
 
 //=== INFO REQUESTS ===================================================================================
