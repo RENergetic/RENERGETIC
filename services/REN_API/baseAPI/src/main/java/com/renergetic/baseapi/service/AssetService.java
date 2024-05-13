@@ -207,6 +207,22 @@ public class AssetService {
     }
 
     /**
+     * Get assets with a key value in its detail table
+     * 
+     * @param key detail key
+     * @param value detail value
+     * @param offset from which asset retrieve the data
+     * @param limit until which asset retrive the data
+     * @return A SimpleAssetDAO list with all assets with the specified detail
+     */
+    public List<SimpleAssetDAO> getByDetail(String key, String value, long offset, int limit) {
+        Stream<Asset> stream = assetRepository.filterByDetail(key, value, null, null, offset, limit).stream();
+        List<SimpleAssetDAO> assets;
+        assets = stream.map(asset -> SimpleAssetDAO.create(asset)).collect(Collectors.toList());
+        return assets;
+    }
+
+    /**
      * Get the asset connected to the asset with the given id
      *
      * @param id Asset ID used to search asset connected to it
