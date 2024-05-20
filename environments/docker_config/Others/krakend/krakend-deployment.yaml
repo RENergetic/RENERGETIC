@@ -33,4 +33,7 @@ spec:
         - name: krakend-disk
           configMap:
             name: krakend-config
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
       restartPolicy: Always
