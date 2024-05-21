@@ -378,11 +378,11 @@ installPSNC() {
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl apply -f configmaps/krakend-config --namespace=$project
-        kubectl delete deployments/wso --namespace=$project
-        kubectl delete services/wso-sv --namespace=$project
+        kubectl delete configmaps/krakend-config --namespace=$project
+        kubectl delete deployments/krakend --namespace=$project
+        kubectl delete services/krakend-sv --namespace=$project
 
-        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/wso:latest .
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/krakend:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
         docker push registry.apps.paas-dev.psnc.pl/$project/krakend:latest
 
