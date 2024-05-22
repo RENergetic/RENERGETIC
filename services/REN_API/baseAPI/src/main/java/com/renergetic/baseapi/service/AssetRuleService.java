@@ -89,6 +89,19 @@ public class AssetRuleService {
                 .stream().map(AssetRuleDAO::fromEntity).collect(Collectors.toList());
     }
 
+    @Transactional
+    public List<AssetRuleDAO> updateAndCreateBatchAssetRules(List<AssetRuleDAO> assetRuleDAOs){
+        //TODO: When have time optimizer this request by creating a query to delete all entries in db not in a list of ids.
+        List<AssetRule> assetRules = assetRuleRepository.findAll();
+        List<AssetRule> assetRulesFromClient = assetRuleDAOs.stream().map(this::extractEntityWithDependencies).collect(Collectors.toList());
+        List<Long> existingIds = assetRulesFromClient.stream().map(AssetRule::getId).filter(Objects::nonNull).toList();
+        assetRules = assetRules.stream().filter(x -> !existingIds.contains(x.getId())).collect(Collectors.toList());
+        assetRuleRepository.deleteAll(assetRules);
+
+        return assetRuleRepository.saveAll(assetRulesFromClient)
+                .stream().map(AssetRuleDAO::fromEntity).collect(Collectors.toList());
+    }
+
     public AssetRuleDAO updateAssetRule(AssetRuleDAO assetRuleDAO){
         if(!assetRuleRepository.existsById(assetRuleDAO.getId()))
             throw new NotFoundException("Asset rule id does not exist.");

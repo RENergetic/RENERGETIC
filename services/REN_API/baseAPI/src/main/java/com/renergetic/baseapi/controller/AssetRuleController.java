@@ -65,8 +65,8 @@ public class AssetRuleController {
 	@ApiResponse(responseCode = "500", description = "Error saving asset category")
 	@PostMapping(path = "/batch", produces = "application/json", consumes = "application/json")
 	@Transactional
-	public ResponseEntity<List<AssetRuleDAO>> createNewRuleBatch(@RequestBody List<AssetRuleDAO> assetCategoryDAO) {
-		return new ResponseEntity<>(assetRuleService.createBatchAssetRule(assetCategoryDAO), HttpStatus.CREATED);
+	public ResponseEntity<List<AssetRuleDAO>> createNewRuleBatch(@RequestBody List<AssetRuleDAO> assetRulesDAO) {
+		return new ResponseEntity<>(assetRuleService.createBatchAssetRule(assetRulesDAO), HttpStatus.CREATED);
 	}
 
 	@Operation(summary = "Update an existing Rule")
@@ -74,8 +74,8 @@ public class AssetRuleController {
 	@ApiResponse(responseCode = "404", description = "Asset category not exist")
 	@ApiResponse(responseCode = "500", description = "Error saving asset category")
 	@PutMapping(path = "", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<AssetRuleDAO> updateRule(@RequestBody AssetRuleDAO assetCategoryDAO) {
-		return new ResponseEntity<>(assetRuleService.updateAssetRule(assetCategoryDAO), HttpStatus.OK);
+	public ResponseEntity<AssetRuleDAO> updateRule(@RequestBody AssetRuleDAO assetRuleDAO) {
+		return new ResponseEntity<>(assetRuleService.updateAssetRule(assetRuleDAO), HttpStatus.OK);
 	}
 
 	@Operation(summary = "Update and create Rule by batch")
@@ -83,17 +83,26 @@ public class AssetRuleController {
 	@ApiResponse(responseCode = "500", description = "Error saving asset category")
 	@PostMapping(path = "/batch/update-create", produces = "application/json", consumes = "application/json")
 	@Transactional
-	public ResponseEntity<List<AssetRuleDAO>> updateCreateRuleBatch(@RequestBody List<AssetRuleDAO> assetCategoryDAO) {
-		return new ResponseEntity<>(assetRuleService.updateAndCreateBatchAssetRule(assetCategoryDAO), HttpStatus.CREATED);
+	public ResponseEntity<List<AssetRuleDAO>> updateCreateRuleBatch(@RequestBody List<AssetRuleDAO> assetRulesDAO) {
+		return new ResponseEntity<>(assetRuleService.updateAndCreateBatchAssetRule(assetRulesDAO), HttpStatus.CREATED);
 	}
 
-	@Operation(summary = "Update and create Rule by batch for asset id")
+	@Operation(summary = "Update, create and delete Rule by batch for asset id")
 	@ApiResponse(responseCode = "200", description = "Asset category saved correctly")
 	@ApiResponse(responseCode = "500", description = "Error saving asset category")
 	@PostMapping(path = "/batch/update-create-delete/{assetId}", produces = "application/json", consumes = "application/json")
 	@Transactional
-	public ResponseEntity<List<AssetRuleDAO>> updateCreateRuleBatch(@PathVariable Long assetId, @RequestBody List<AssetRuleDAO> assetCategoryDAO) {
-		return new ResponseEntity<>(assetRuleService.updateAndCreateBatchAssetRuleForAssetId(assetId, assetCategoryDAO), HttpStatus.CREATED);
+	public ResponseEntity<List<AssetRuleDAO>> updateCreateRuleBatchForAssetId(@PathVariable Long assetId, @RequestBody List<AssetRuleDAO> assetRulesDAO) {
+		return new ResponseEntity<>(assetRuleService.updateAndCreateBatchAssetRuleForAssetId(assetId, assetRulesDAO), HttpStatus.CREATED);
+	}
+
+	@Operation(summary = "Update, create and delete Rule by batch")
+	@ApiResponse(responseCode = "200", description = "Asset category saved correctly")
+	@ApiResponse(responseCode = "500", description = "Error saving asset category")
+	@PostMapping(path = "/batch/update-create-delete", produces = "application/json", consumes = "application/json")
+	@Transactional
+	public ResponseEntity<List<AssetRuleDAO>> updateCreateDeleteRuleBatch(@RequestBody List<AssetRuleDAO> assetRulesDAO) {
+		return new ResponseEntity<>(assetRuleService.updateAndCreateBatchAssetRules(assetRulesDAO), HttpStatus.CREATED);
 	}
 
 	@Operation(summary = "Delete Rule by id")
