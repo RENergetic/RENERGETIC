@@ -17,14 +17,17 @@ spec:
         image: keycloak:latest
         imagePullPolicy: Never
         env:
-        - name: KEYCLOAK_USER
+        #https://github.com/bitnami/containers/blob/main/bitnami/keycloak/24/debian-12/rootfs/opt/bitnami/scripts/keycloak-env.sh
+        - name: KEYCLOAK_ADMIN
           value: "admin"
-        - name: KEYCLOAK_PASSWORD
+        - name: KEYCLOAK_ADMIN_PASSWORD
           value: "admin"
         - name: PROXY_ADDRESS_FORWARDING
           value: "true"
         - name: DB_VENDOR
-          value: "POSTGRES"
+          value: "postgres"
+ #       - name: KC_DB_URL
+ #         value: "jdbc:postgresql://postgresql-db-sv:5432/keycloak"
         - name: DB_ADDR
           value: "postgresql-db-sv"
         - name: DB_PORT
@@ -44,10 +47,10 @@ spec:
           containerPort: 8443
         resources:
           requests:
-            cpu: 250m
+            cpu: 150m
             memory: 500Mi
           limits:
-            cpu: 650m
+            cpu: 450m
             memory: 650Mi
 #        volumeMounts:
 #        - name: keycloak-diskc

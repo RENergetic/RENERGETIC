@@ -77,6 +77,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/profile/settings", produces = "application/json")
     public ResponseEntity<String> getAllUsersSettings() {
+
         String userId = loggedInSv.getAuthenticationData().getPrincipal().getId();
         return new ResponseEntity<>(userSv.getSettings(userId).getSettingsJson(), HttpStatus.OK);
     }

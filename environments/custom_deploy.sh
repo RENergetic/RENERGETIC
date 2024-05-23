@@ -1,34 +1,51 @@
+#!/bin/bash
+####!/usr/bin/env sh
+function kubectl () {
+    minikube.exe kubectl "--" "$@"
+}
+function minikube () {
+    minikube.exe "$@"
+}
+#alias kubectl="minikube.exe kubectl --"
+#alias minikube="minikube.exe"
+#current=$(pwd -W tr / \\)
 current=$(pwd)
-
-
-# HINT: gnu grep is required to use the -P option
-apisPath=$(ggrep -ioP "(apisPath\s*=\s*)\K.+" _installers.properties)
-uiPath=$(ggrep -ioP "(uiPath\s*=\s*)\K.+" _installers.properties)
+echo $current
+apisPath=$(grep -ioP "(apisPath\s*=\s*)\K.+" _custom_deploy.properties)
+uiPath=$(grep -ioP "(uiPath\s*=\s*)\K.+" _custom_deploy.properties)
 
 [[ "$apisPath" = "default"  ]] && apisPath="${current}/../services"
 [[ "$uiPath" = "default" ]] && uiPath="${current}/../front"
 
 # Minikube namespace
-project=$(ggrep -ioP "(project\s*=\s*)\K.+" _installers.properties)
+project=$(grep -ioP "(project\s*=\s*)\K.+" _custom_deploy.properties)
 
 # Databases
-postgreSQL=$(ggrep -ioP "(postgreSQL\s*=\s*)\K.+" _installers.properties)
-influxDB=$(ggrep -ioP "(influxDB\s*=\s*)\K.+" _installers.properties)
+postgreSQL=$(grep -ioP "(postgreSQL\s*=\s*)\K.+" _custom_deploy.properties)
+influxDB=$(grep -ioP "(influxDB\s*=\s*)\K.+" _custom_deploy.properties)
 # APIs
-hdr=$(ggrep -ioP "(hdr\s*=\s*)\K.+" _installers.properties)
-influx=$(ggrep -ioP "(influx\s*=\s*)\K.+" _installers.properties)
-ingestion=$(ggrep -ioP "(ingestion\s*=\s*)\K.+" _installers.properties)
+hdr=$(grep -ioP "(hdr\s*=\s*)\K.+" _custom_deploy.properties)
+kpi=$(grep -ioP "(kpi\s*=\s*)\K.+" _custom_deploy.properties)
+influx=$(grep -ioP "(influx\s*=\s*)\K.+" _custom_deploy.properties)
+ingestion=$(grep -ioP "(ingestion\s*=\s*)\K.+" _custom_deploy.properties)
+user=$(grep -ioP "(user\s*=\s*)\K.+" _custom_deploy.properties)
+baseApi=$(grep -ioP "(base\s*=\s*)\K.+" _custom_deploy.properties)
+wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _custom_deploy.properties)
+dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _custom_deploy.properties)
+kubeflowApi=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _custom_deploy.properties)
 # Others
-ui=$(ggrep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
-keycloak=$(ggrep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
-grafana=$(ggrep -ioP "(grafana\s*=\s*)\K.+" _installers.properties)
-nifi=$(ggrep -ioP "(nifi\s*=\s*)\K.+" _installers.properties)
-wso2=$(ggrep -ioP "(wso2\s*=\s*)\K.+" _installers.properties)
+ui=$(grep -ioP "(ui\s*=\s*)\K.+" _custom_deploy.properties)
+keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _custom_deploy.properties)
+grafana=$(grep -ioP "(grafana\s*=\s*)\K.+" _custom_deploy.properties)
+nifi=$(grep -ioP "(nifi\s*=\s*)\K.+" _custom_deploy.properties)
+wso2=$(grep -ioP "(wso2\s*=\s*)\K.+" _custom_deploy.properties)
 
+
+echo "Start"
 # Connect to Minikube
 if ! minikube status &> /dev/null;
 then 
-    minikube start --driver=docker
+    minikube start --driver=hyperv 
 fi
 if minikube status;
 then
@@ -41,7 +58,7 @@ then
         cd  "${current}/docker_config_local/Databases/postgresql"
         # POSTGRESQL INSTALLATION
         # set environment variables
-        eval $(minikube docker-env --shell bash)
+        eval $(minikube docker-env)
 
         kubectl delete configmaps/postgresql-db-config --namespace=$project
         kubectl delete statefulsets/postgresql-db --namespace=$project
@@ -64,7 +81,7 @@ then
         cd  "${current}/docker_config_local/Databases/influxdb"
         # INFLUXDB INSTALLATION
         # set environment variables
-        eval $(minikube docker-env --shell bash)
+        eval $(minikube docker-env)
 
         kubectl delete deployments/influx-db --namespace=$project
         kubectl delete services/influx-db-sv --namespace=$project
@@ -78,6 +95,28 @@ then
     fi
 # DEPLOY APIs
 
+    if [[ $baseApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/baseApi"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/base-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/base-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/base-api --namespace=$project
+        kubectl delete services/base-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=base-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f base-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f base-api-service.yaml --namespace=$project
+    fi
+
     if [[ $hdr = 'true' ]]
     then
         cd "${apisPath}/hdrAPI"
@@ -87,7 +126,7 @@ then
         cd "${current}/docker_config_local/APIs/hdr-api"
         # API INSTALLATION
         # set environment variables
-        eval $(minikube docker-env --shell bash)
+        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/hdr-api --namespace=$project
@@ -109,7 +148,7 @@ then
         cd "${current}/docker_config_local/APIs/influx-api"
         # API INSTALLATION
         # set environment variables
-        eval $(minikube docker-env --shell bash)
+        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/influx-api --namespace=$project
@@ -122,6 +161,28 @@ then
         kubectl apply -f influx-api-service.yaml --namespace=$project
     fi
 
+    if [[ $kpi = 'true' ]]
+    then
+        cd "${apisPath}/kpiAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/kpi-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/kpi-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/kpi-api --namespace=$project
+        kubectl delete services/kpi-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=kpi-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f kpi-api-deployment.yaml --namespace=$project
+        kubectl apply -f kpi-api-service.yaml --namespace=$project
+    fi
+
     if [[ $ingestion = 'true' ]]
     then
         cd "${apisPath}/ingestionAPI"
@@ -131,7 +192,7 @@ then
         cd "${current}/docker_config_local/APIs/ingestion-api"
         # API INSTALLATION
         # set environment variables
-        eval $(minikube docker-env --shell bash)
+        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/ingestion-api --namespace=$project
@@ -143,6 +204,94 @@ then
         kubectl apply -f ingestion-api-deployment.yaml --force=true --namespace=$project
         kubectl apply -f ingestion-api-service.yaml --namespace=$project
     fi
+
+    if [[ $user = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/userAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/user-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/user-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/user-api --namespace=$project
+        kubectl delete services/user-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=user-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f user-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f user-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $wrapperApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/wrapperAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/wrapper-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/wrapper-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/wrapper-api --namespace=$project
+        kubectl delete services/wrapper-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=wrapper-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f wrapper-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f wrapper-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $dataApi = 'true' ]]
+    then
+        cd "${apisPath}/REN_API/dataAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/data-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/data-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/data-api --namespace=$project
+        kubectl delete services/data-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=data-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f data-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f data-api-service.yaml --namespace=$project
+    fi
+    
+    if [[ $kubeflowApi = 'true' ]]
+    then
+        cd "${apisPath}/kubeflowAPI"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/kubeflow-api/api.jar"
+
+        cd "${current}/docker_config_local/APIs/kubeflow-api"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/kubeflow-api --namespace=$project
+        kubectl delete services/kubeflow-api-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=kubeflow-api:latest .
+
+        # create kubernetes resources
+        kubectl apply -f kubeflow-api-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f kubeflow-api-service.yaml --namespace=$project
+    fi
 # DEPLOY WSO2 API MANAGER
 
     if [[ $wso2 = 'true' ]]
@@ -150,7 +299,7 @@ then
         cd "${current}/docker_config_local/Others/wso2"
         # WSO2 INSTALLATION
         # set environment variables
-        eval $(minikube docker-env --shell bash)
+        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/wso --namespace=$project
@@ -169,7 +318,7 @@ then
         cd "${current}/docker_config_local/Others/grafana"
         # GRAFANA INSTALLATION
         # set environment variables
-        eval $(minikube docker-env --shell bash)
+        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/grafana --namespace=$project
@@ -189,12 +338,12 @@ then
     then
         rm -f -r "${current}/docker_config_local/Others/Keycloak/themes"
         mkdir -p "${current}/docker_config_local/Others/keycloak/themes"
-        cp -f -r "${current}/keycloak_themes" "${current}/docker_config_local/Others/keycloak/themes"
+        cp -f -rT "${current}/keycloak_themes" "${current}/docker_config_local/Others/keycloak/themes"
 
         cd "${current}/docker_config_local/Others/keycloak"
         # KEYCLOAK INSTALLATION
         # set environment variables
-        eval $(minikube docker-env --shell bash)
+        eval $(minikube docker-env)
 
         # delete kubernetes resources if exists
         kubectl delete deployments/keycloak --namespace=$project
@@ -220,7 +369,15 @@ then
         cd "${current}/docker_config_local/Others/renergetic-ui"
         # FRONT INSTALLATION
         # set environment variables
-        eval $(minikube docker-env --shell bash)
+        eval $(minikube docker-env)
+        # prepare SSL certificates
+        mkdir -p certs
+        if ! [ "$(ls -A certs)" ]
+        then
+            cd "${current}/docker_config_local/Others/renergetic-ui/certs"
+            openssl req --new --newkey rsa:4096 --x509 --sha256 --days 365 --nodes --out nginx-certificate.crt --subj '//C=ES\ST=Madrid\L=Madrid\O=Inetum\OU=IT\CN=front-ren-prototype.apps.paas-dev.psnc.pl' --keyout nginx.key
+            cd "${current}/docker_config_local/Others/renergetic-ui"
+        fi
 
         # delete kubernetes resources if exists
         kubectl delete deployments/renergetic-ui --namespace=$project
