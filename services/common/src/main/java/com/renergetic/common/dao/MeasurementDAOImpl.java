@@ -1,6 +1,7 @@
 package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.common.dao.details.TagDAO;
 import com.renergetic.common.model.Direction;
 import com.renergetic.common.model.Domain;
 import com.renergetic.common.model.MeasurementType;
@@ -39,7 +40,7 @@ public class MeasurementDAOImpl {
     @JsonProperty(value = "panel_count", required = false)
     private int panelCount;
     @JsonProperty(value = "tags", required = false)
-    private List<MeasurementTagsDAO> tags=null;
+    private List<TagDAO> tags=null;
 
     public static MeasurementDAOImpl create(MeasurementDAO measurement ) {
         MeasurementDAOImpl dao = null;

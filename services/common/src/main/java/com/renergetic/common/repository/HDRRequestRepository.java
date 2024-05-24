@@ -19,6 +19,6 @@ public interface HDRRequestRepository extends JpaRepository<HDRRequest, Long> {
     @Query("SELECT hdrr FROM HDRRequest hdrr WHERE hdrr.timestamp = :timestamp ")
     Optional<HDRRequest> findRequestByTimestamp(LocalDateTime timestamp);
 
-    @Query(value = "DELETE hdr_request WHERE hdr_request.timestamp = :timestamp ", nativeQuery = true)
+    @Query(value = "DELETE FROM hdr_request WHERE hdr_request.timestamp = :timestamp ", nativeQuery = true)
     void deleteByTimestamp(LocalDateTime timestamp);
 }
