@@ -126,7 +126,7 @@ public class RuleEvaluationService {
 
     private String evaluateString(String expression) throws ScriptException {
         ScriptEngineManager mgr = new ScriptEngineManager();
-        ScriptEngine engine = mgr.getEngineByName("JavaScript");
+        ScriptEngine engine = mgr.getEngineByName("Graal.js");
         return engine.eval(expression).toString();
     }
 
