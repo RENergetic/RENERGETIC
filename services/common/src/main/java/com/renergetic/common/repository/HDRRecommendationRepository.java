@@ -4,9 +4,11 @@ import com.renergetic.common.model.HDRMeasurement;
 import com.renergetic.common.model.HDRRecommendation;
 import com.renergetic.common.model.Measurement;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -18,23 +20,25 @@ public interface HDRRecommendationRepository extends JpaRepository<HDRRecommenda
     HDRRecommendation save(HDRRecommendation recommendation);
 
     @Query(value = "SELECT max(\"timestamp\") as \"timestamp\" from hdr_recommendation", nativeQuery = true)
-    Optional<LocalDateTime> getRecentRecommendation();
+    Optional<Long> getRecentRecommendation();
 
     @Query(value = "SELECT DISTINCT \"timestamp\"  from hdr_recommendation where COALESCE(\"timestamp\" >= :timestamp, TRUE)" +
             " order by \"timestamp\" desc", nativeQuery = true)
-    List<LocalDateTime> listRecentRecommendations(LocalDateTime timestamp);
+    List<Long> listRecentRecommendations(Long timestamp);
 
+    @Modifying
+    @Transactional
     @Query(value = "DELETE from hdr_recommendation WHERE hdr_recommendation.timestamp = :timestamp ", nativeQuery = true)
-    void deleteByTimestamp(LocalDateTime timestamp);
+    void deleteByTimestamp(Long timestamp);
 
     @Query("SELECT hdr FROM HDRRecommendation hdr WHERE hdr.timestamp = :timestamp ")
-    List<HDRRecommendation> findByTimestamp(LocalDateTime timestamp);
+    List<HDRRecommendation> findByTimestamp(Long timestamp);
 
     @Query("SELECT hdrr FROM HDRRecommendation hdrr WHERE hdrr.timestamp = :timestamp and hdrr.tag.id = :tagId ")
-    Optional<HDRRecommendation> findByTimestampTag(LocalDateTime timestamp, Long tagId);
+    Optional<HDRRecommendation> findByTimestampTag(Long timestamp, Long tagId);
 
     @Query("SELECT hdrm FROM HDRMeasurement hdrm WHERE hdrm.timestamp = :timestamp   ")
-    List<HDRMeasurement> listMeasurement(LocalDateTime timestamp );
+    List<HDRMeasurement> listMeasurement(Long timestamp);
 
 
 }
