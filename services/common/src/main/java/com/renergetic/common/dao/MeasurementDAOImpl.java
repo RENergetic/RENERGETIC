@@ -40,7 +40,7 @@ public class MeasurementDAOImpl {
     @JsonProperty(value = "panel_count", required = false)
     private int panelCount;
     @JsonProperty(value = "tags", required = false)
-    private List<TagDAO> tags=null;
+    private List<MeasurementTagsDAO> tags=null;
 
     public static MeasurementDAOImpl create(MeasurementDAO measurement ) {
         MeasurementDAOImpl dao = null;
