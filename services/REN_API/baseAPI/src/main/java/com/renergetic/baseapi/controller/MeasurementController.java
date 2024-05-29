@@ -357,7 +357,7 @@ public class MeasurementController {
     @ApiResponse(responseCode = "404", description = "Measurement not exist")
     @ApiResponse(responseCode = "422", description = "Type isn's valid")
     @ApiResponse(responseCode = "500", description = "Error saving measurement")
-    @PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
+    @PutMapping(path = {"/{id}", "/id/{id}"}, produces = "application/json", consumes = "application/json")
     public ResponseEntity<MeasurementDAOResponse> updateMeasurement(@RequestBody MeasurementDAORequest measurement,
                                                                     @PathVariable Long id) {
         measurement.setId(id);
