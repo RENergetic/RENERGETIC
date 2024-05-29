@@ -406,12 +406,11 @@ public class AssetService {
         AssetDetails entity = assetDetailsRepository.findByKeyAndAssetId(detail.getKey(), assetId).orElse(null);
         if (entity != null) {
             detail.setId(entity.getId());
-            Asset asset = new Asset();
-            asset.setId(assetId);
-            detail.setAsset(asset);
-            return assetDetailsRepository.save(detail);
-        } else throw new InvalidNonExistingIdException(
-                "No asset detail with key " + detail.getKey() + " related with " + assetId + " found");
+        }
+        Asset asset = new Asset();
+        asset.setId(assetId);
+        detail.setAsset(asset);
+        return assetDetailsRepository.save(detail);
     }
 
     public AssetDAOResponse updateAssetCategory(AssetCategoryDAO category, Long assetId) {
@@ -441,6 +440,7 @@ public class AssetService {
                 "No asset detail with id " + id + " related with " + assetId + " found");
     }
 
+    @Transactional
     public boolean deleteDetailByKey(String key, Long assetId) {
         if (key != null && assetDetailsRepository.existsByKeyAndAssetId(key, assetId)) {
             assetDetailsRepository.deleteByKeyAndAssetId(key, assetId);
