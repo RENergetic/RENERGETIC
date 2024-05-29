@@ -111,8 +111,12 @@ public class WrapperService {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getDemands();
             wrapperResponseDAO.setDemands(getDemandSchedules(userId, Optional.ofNullable(data.getOffset()),
                     Optional.ofNullable(data.getLimit())));
+            wrapperResponseDAO.setDemandsFuture(getFutureDemandSchedules(userId));
+            wrapperResponseDAO.setDemandsPast(getPastDemandSchedules(userId));
 
             wrapperResponseDAO.appendData(getDemandData(wrapperResponseDAO.getDemands()));
+            wrapperResponseDAO.appendData(getDemandData(wrapperResponseDAO.getDemandsFuture()));
+            wrapperResponseDAO.appendData(getDemandData(wrapperResponseDAO.getDemandsPast()));
         }
         return wrapperResponseDAO;
     }
@@ -177,15 +181,49 @@ public class WrapperService {
 
     private List<DemandScheduleDAO> getDemandSchedules(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         List<DemandScheduleDAO> demands = demandScheduleRepo.findByUserId(userId, LocalDateTime.now(), offset.orElse(0L), limit.orElse(20))
-            .stream()
-            .map(DemandScheduleDAO::create)
-            .collect(Collectors.toList());
-
-        if (demands.isEmpty() && generateDummy) {
-            List<DemandScheduleDAO> schedule = demandScheduleRepo.findByUserIdGroup(userId, 0, 10)
                 .stream()
                 .map(DemandScheduleDAO::create)
                 .collect(Collectors.toList());
+
+        if (demands.isEmpty() && generateDummy) {
+            List<DemandScheduleDAO> schedule = demandScheduleRepo.findByUserIdGroup(userId, 0, 10)
+                    .stream()
+                    .map(DemandScheduleDAO::create)
+                    .collect(Collectors.toList());
+
+            demands = DummyDataGenerator.getDemand(schedule);
+        }
+        return demands;
+    }
+
+    private List<DemandScheduleDAO> getFutureDemandSchedules(Long userId) {
+        List<DemandScheduleDAO> demands = demandScheduleRepo.findByUserIdFuture24H(userId, 0L, 20)
+                .stream()
+                .map(DemandScheduleDAO::create)
+                .collect(Collectors.toList());
+
+        if (demands.isEmpty() && generateDummy) {
+            List<DemandScheduleDAO> schedule = demandScheduleRepo.findByUserIdGroup(userId, 0, 10)
+                    .stream()
+                    .map(DemandScheduleDAO::create)
+                    .collect(Collectors.toList());
+
+            demands = DummyDataGenerator.getDemand(schedule);
+        }
+        return demands;
+    }
+
+    private List<DemandScheduleDAO> getPastDemandSchedules(Long userId) {
+        List<DemandScheduleDAO> demands = demandScheduleRepo.findByUserIdPast24H(userId, 0L, 20)
+                .stream()
+                .map(DemandScheduleDAO::create)
+                .collect(Collectors.toList());
+
+        if (demands.isEmpty() && generateDummy) {
+            List<DemandScheduleDAO> schedule = demandScheduleRepo.findByUserIdGroup(userId, 0, 10)
+                    .stream()
+                    .map(DemandScheduleDAO::create)
+                    .collect(Collectors.toList());
 
             demands = DummyDataGenerator.getDemand(schedule);
         }
