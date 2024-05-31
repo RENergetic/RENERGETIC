@@ -94,7 +94,14 @@ public class HDRRecommendationController {
     public ResponseEntity<Long> saveRecommendations(@RequestParam(name = "t") Optional<Long> timestamp,
                                                     @RequestBody List<HDRRecommendationDAO> recommendations) {
         Long t;
-        t = timestamp.orElse(DateConverter.now());
+        if (timestamp.isEmpty()) {
+            t = DateConverter.now();
+        } else if (timestamp.get() > DateConverter.now()) {
+            throw new IllegalArgumentException("future timestamp");
+        } else {
+            t = timestamp.get();
+        }
+
         if (hdrService.save(t, recommendations))
             return new ResponseEntity<>(t, HttpStatus.CREATED);
 
@@ -109,7 +116,11 @@ public class HDRRecommendationController {
     @PutMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
     public ResponseEntity saveRecommendations(@RequestParam(name = "t", required = true) Long timestamp,
                                               @RequestBody List<HDRRecommendationDAO> recommendations) {
-        hdrService.save(timestamp, recommendations);
+        if (timestamp   > DateConverter.now()) {
+            throw new IllegalArgumentException("future timestamp");
+        }
+
+        hdrService.append(timestamp, recommendations);
         return new ResponseEntity(ResponseEntity.noContent(), HttpStatus.CREATED);
     }
 
@@ -123,6 +134,9 @@ public class HDRRecommendationController {
 
         if (request.getTimestamp() == null) {
             request.setTimestamp(DateConverter.toEpoch(LocalDateTime.now()));
+        }
+        else if(request.getTimestamp() > DateConverter.now()){
+            throw new IllegalArgumentException("future timestamp");
         }
         HDRRequestDAO r = hdrService.save(request);
         return new ResponseEntity<>(r, HttpStatus.CREATED);

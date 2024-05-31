@@ -69,10 +69,18 @@ public class HDRRecommendationService {
 
     }
 
-    public Boolean save(long timestamp, List<HDRRecommendationDAO> recommendations) {
-        recommendations.forEach(it -> it.setTimestamp(it.getTimestamp() != null ? it.getTimestamp() : timestamp));
+    public boolean append(long t, List<HDRRecommendationDAO> recommendations) {
+        if (recommendationRepository.timestampExists(t).isPresent())
+            return this.save(t, recommendations);
+        else
+            throw  new InvalidArgumentException("Timestamp does not exist");
+    }
+
+    public Boolean save(long t, List<HDRRecommendationDAO> recommendations) {
+
+        recommendations.forEach(it -> it.setTimestamp(it.getTimestamp() != null ? it.getTimestamp() : t));
         var differentTimestamp = recommendations.stream()
-                .filter(it -> it.getTimestamp() != timestamp).findAny();
+                .filter(it -> it.getTimestamp() != t).findAny();
         if (differentTimestamp.isPresent()) {
             throw new InvalidArgumentException("Recommendation has different timestamp");
         }
@@ -86,7 +94,7 @@ public class HDRRecommendationService {
 
             recommendations.forEach(this::save);
         } catch (Exception ex) {
-            deleteByTimestamp(timestamp);
+            deleteByTimestamp(t);
             // todo: more logging details?
             return false;
         }
@@ -109,9 +117,16 @@ public class HDRRecommendationService {
 
     public Optional<List<HDRRecommendationDAO>> getRecent() {
         var t = recommendationRepository.getRecentRecommendation();
+
         List<HDRRecommendationDAO> r = null;
-        if (t.isPresent())
+        if (t.isPresent()) {
+            var requestTimestamp = hdrRequestRepository.getRecentRequestTimestamp();
+            if (requestTimestamp.isPresent() && requestTimestamp.get() > t.get()) {
+//                throw new InvalidArgumentException("recommendations are out outdated");
+                return Optional.ofNullable(r);
+            }
             r = this.getRecommendations(t.get());
+        }
         return Optional.ofNullable(r);
     }
 
