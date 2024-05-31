@@ -22,6 +22,12 @@ public interface HDRRecommendationRepository extends JpaRepository<HDRRecommenda
     @Query(value = "SELECT max(\"timestamp\") as \"timestamp\" from hdr_recommendation", nativeQuery = true)
     Optional<Long> getRecentRecommendation();
 
+    @Query(
+            value = "SELECT   \"timestamp\" from hdr_recommendation  where hdr_recommendation.timestamp = :timestamp",
+            nativeQuery = true
+    )
+    Optional<Long> timestampExists(Long timestamp);
+
     @Query(value = "SELECT DISTINCT \"timestamp\"  from hdr_recommendation where COALESCE(\"timestamp\" >= :timestamp, TRUE)" +
             " order by \"timestamp\" desc", nativeQuery = true)
     List<Long> listRecentRecommendations(Long timestamp);
