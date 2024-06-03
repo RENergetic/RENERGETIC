@@ -30,10 +30,12 @@ public class PipelineRun {
     //Run paramaters
     @Column(name = "params", columnDefinition = "TEXT")
     private String params;
+    @Column(nullable = false, name = "init_time")
+    private Long initTime;
     @Column(nullable = true, name = "start_time")
-    private LocalDateTime startTime;
+    private Long startTime;
     @Column(nullable = true, name = "end_time")
-    private LocalDateTime endTime;
+    private Long endTime;
 
     @Column(nullable = true, name = "state")
     private String state;

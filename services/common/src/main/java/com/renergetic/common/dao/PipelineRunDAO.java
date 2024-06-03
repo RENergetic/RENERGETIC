@@ -27,6 +27,9 @@ public class PipelineRunDAO {
     //run parameters
     @JsonProperty(required = true, value = "parameters")
     Map<String, Object> parameters = Collections.emptyMap();
+
+    @JsonProperty(required = false, value = "init_time")
+    private Long initTime;
     @JsonProperty(required = false, value = "start_time")
     private Long startTime;
     @JsonProperty(required = false, value = "end_time")
@@ -59,22 +62,24 @@ public class PipelineRunDAO {
             }
         }
         if (wd.getStartTime() != null)
-            dao.setStartTime(DateConverter.toEpoch(wd.getStartTime()));
+            dao.setStartTime(wd.getStartTime());
         if (wd.getEndTime() != null)
-            dao.setEndTime(DateConverter.toEpoch(wd.getEndTime()));
+            dao.setEndTime(wd.getEndTime());
+        dao.setInitTime(wd.getInitTime());
         return dao;
     }
 
     public PipelineRun mapToEntity() {
         PipelineRun wd = new PipelineRun();
         if (this.endTime != null)
-            wd.setEndTime(DateConverter.toLocalDateTime(this.endTime));
+            wd.setEndTime(this.endTime);
         if (this.startTime != null)
-            wd.setStartTime(DateConverter.toLocalDateTime(this.startTime));
+            wd.setStartTime(this.startTime);
         wd.setRunId(this.runId);
         wd.setState(this.state);
         wd.setParams(Json.toJson(this.parameters));
         wd.setPipelineDefinition(this.pipelineDefinitionDAO.mapToEntity());
+        wd.setInitTime(this.initTime);
         return wd;
     }
 }

@@ -98,6 +98,7 @@ public class DummyDataGenerator {
         wr.setPipelineDefinitionDAO(wd);
         wr.setStartTime(ts);
         wr.setStartTime(ts);
+        wr.setInitTime(ts);
         return wr;
     }
 }

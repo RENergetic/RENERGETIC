@@ -38,7 +38,7 @@ public class KubeflowController {
     @Value("${kubeflow.user.password}")
     private String kubeflowPassword;
 
-//    @Autowired
+    //    @Autowired
 //    private ExampleService exampleService;
     @Autowired
     private KubeflowService kubeflowService;
@@ -49,9 +49,9 @@ public class KubeflowController {
     @Value("${kubeflow.url}")
     String homeUrl = "https://kubeflow.test.pcss.pl/";
 
-//#endregion
+    //#endregion
     private String cookie;
-            //= "authservice_session=MTcxMTM2ODUxOHxOd3dBTkZKT05VMU5XRVpVVjA5TVFWZFBVMUJNVDFGTVVrcE1TMWRDTWtOWVVVa3lVRlZGUmxKTlJrOUhUVEpRVWtsWFZraEZTa0U9fP6c_WZhE0UgbxeoNjBjExcwvdA8rm_Cm7uJc4VrheSg";
+    //= "authservice_session=MTcxMTM2ODUxOHxOd3dBTkZKT05VMU5XRVpVVjA5TVFWZFBVMUJNVDFGTVVrcE1TMWRDTWtOWVVVa3lVRlZGUmxKTlJrOUhUVEpRVWtsWFZraEZTa0U9fP6c_WZhE0UgbxeoNjBjExcwvdA8rm_Cm7uJc4VrheSg";
 
     //#region kubeflow integration
 
@@ -255,12 +255,26 @@ public class KubeflowController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get pipeline run") //GET RUN
+    @Operation(summary = "Get pipeline current/recent run") //GET RUN
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/pipeline/{pipeline_id}/run", produces = "application/json")
     public ResponseEntity<PipelineRunDAO> getExperimentRun(
             @PathVariable(name = "pipeline_id") String pipelineId) {
         PipelineRunDAO res = kubeflowPipelineService.getRun(pipelineId);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get pipeline runs") //GET RUN
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/pipeline/{pipeline_id}/runs", produces = "application/json")
+    public ResponseEntity<List<PipelineRunDAO>>
+    getExperimentRun(@PathVariable(name = "pipeline_id") String pipelineId,
+                     @RequestParam(value = "from", required = false) Long from,
+                     @RequestParam(value = "to", required = false) Long to,
+                     @RequestParam(name = "offset", required = false) Optional<Long> offset,
+                     @RequestParam(name = "limit", required = false) Optional<Long> limit) {
+        List<PipelineRunDAO> res =
+                kubeflowPipelineService.listRuns(pipelineId, from, to, limit.orElse(100L),offset.orElse(0L));
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
