@@ -27,7 +27,7 @@ public class RuleEvaluationController {
 	@Operation(summary = "Trigger All Rule Evaluation")
 	@ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "", produces = "application/json")
-	public ResponseEntity<List<EvaluationResult>> triggerAllRules (){
+	public ResponseEntity<List<List<EvaluationResult>>> triggerAllRules (){
 		//TODO: Add a parameter to allow to return at the same time the data used for computation.
 		return new ResponseEntity<>(ruleEvaluationService.retrieveAndExecuteAllRules(), HttpStatus.OK);
 	}
@@ -39,21 +39,9 @@ public class RuleEvaluationController {
 		@ApiResponse(responseCode = "404", description = "No alert found with this id")
 	})
 	@GetMapping(path = "{id}", produces = "application/json")
-	public ResponseEntity<EvaluationResult> triggerRuleById (@PathVariable Long id){
+	public ResponseEntity<List<EvaluationResult>> triggerRuleById (@PathVariable Long id){
 		//TODO: Add a parameter to allow to return at the same time the data used for computation.
-		EvaluationResult evaluationResult = ruleEvaluationService.executeRule(id);
+		List<EvaluationResult> evaluationResult = ruleEvaluationService.executeRule(id);
 		return new ResponseEntity<>(evaluationResult, evaluationResult != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-	}
-
-	@Operation(summary = "Trigger Rule Evaluation by asset id")
-	@ApiResponses({
-			@ApiResponse(responseCode = "201", description = "AlertThreshold saved correctly"),
-			@ApiResponse(responseCode = "500", description = "Error saving alert")
-		}
-	)
-	@GetMapping(path = "asset/{id}", produces = "application/json")
-	public ResponseEntity<List<EvaluationResult>> triggerAllAssetRules (@PathVariable Long id) {
-		//TODO: Add a parameter to allow to return at the same time the data used for computation.
-		return new ResponseEntity<>(ruleEvaluationService.retrieveAndExecuteAllRulesForAssetId(id), HttpStatus.OK);
 	}
 }

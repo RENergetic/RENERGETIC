@@ -21,8 +21,10 @@ public class RuleDefinitionDAO {
     public RuleDefinition mapToEntity(){
         RuleDefinition entity = new RuleDefinition();
         entity.setId(getId());
-        entity.setMeasurement1(getMeasurement1().mapToEntity(false));
-        entity.setMeasurement2(getMeasurement2().mapToEntity(false));
+        if(getMeasurement1() != null)
+            entity.setMeasurement1(getMeasurement1().mapToEntity(false));
+        if(getMeasurement2() != null)
+            entity.setMeasurement2(getMeasurement2().mapToEntity(false));
         entity.setManualThreshold(getManualThreshold());
         entity.setComparator(getComparator());
         return entity;
@@ -31,8 +33,10 @@ public class RuleDefinitionDAO {
     public static RuleDefinitionDAO fromEntity(RuleDefinition entity){
         RuleDefinitionDAO dao = new RuleDefinitionDAO();
         dao.setId(entity.getId());
-        dao.setMeasurement1(RuleDefinitionMeasurementDAO.fromEntity(entity.getMeasurement1()));
-        dao.setMeasurement2(RuleDefinitionMeasurementDAO.fromEntity(entity.getMeasurement2()));
+        if(entity.getMeasurement1() != null)
+            dao.setMeasurement1(RuleDefinitionMeasurementDAO.fromEntity(entity.getMeasurement1()));
+        if(entity.getMeasurement2() != null)
+            dao.setMeasurement2(RuleDefinitionMeasurementDAO.fromEntity(entity.getMeasurement2()));
         dao.setManualThreshold(entity.getManualThreshold());
         dao.setComparator(entity.getComparator());
         return dao;

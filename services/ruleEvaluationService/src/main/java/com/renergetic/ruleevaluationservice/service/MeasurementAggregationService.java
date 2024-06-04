@@ -81,20 +81,8 @@ public class MeasurementAggregationService {
         }
 
         List<Measurement> children = new ArrayList<>(measurementAggregation.getAggregatedMeasurements());
-        Long from = null;
-        if(mad.getTimeMin().equals("now"))
-            from = Instant.now().toEpochMilli();
-        else if(mad.getTimeMin().contains("now-"))
-            from = TimeUtils.offsetNegativeCurrentInstant(mad.getTimeMin().substring(4)).toEpochMilli();
-        else if(mad.getTimeMin().contains("now+"))
-            from = TimeUtils.offsetPositiveCurrentInstant(mad.getTimeMin().substring(4)).toEpochMilli();
-        Optional<Long> to = Optional.empty();
-        if(mad.getTimeMax().equals("now"))
-            to = Optional.of(Instant.now().toEpochMilli());
-        else if(mad.getTimeMax().contains("now-"))
-            to = Optional.of(TimeUtils.offsetNegativeCurrentInstant(mad.getTimeMax().substring(4)).toEpochMilli());
-        else if(mad.getTimeMax().contains("now+"))
-            to = Optional.of(TimeUtils.offsetPositiveCurrentInstant(mad.getTimeMax().substring(4)).toEpochMilli());
+        Long from = TimeUtils.convertLiteralDiffToInstantMillis(mad.getTimeMin());
+        Optional<Long> to = Optional.ofNullable(TimeUtils.convertLiteralDiffToInstantMillis(mad.getTimeMin()));
 
         List<MeasurementSimplifiedDAO> msd = dataService.getData(children, mad.getAggregationType(), mad.getTimeRange(), from, to);
 

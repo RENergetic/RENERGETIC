@@ -24,8 +24,9 @@ public class RuleDefinitionMeasurementDAO {
     private String rangeTo;
 
     public RuleDefinitionMeasurement mapToEntity(boolean includeFullMeasurement){
-        if(includeFullMeasurement)
-            return mapToEntity(measurementRepository.findById(getMeasurementId()).orElseThrow(NotFoundException::new));
+        //TODO: Fix later by moving this in a separate mapper acting as a service.
+        /*if(includeFullMeasurement)
+            return mapToEntity(measurementRepository.findById(getMeasurementId()).orElseThrow(NotFoundException::new));*/
 
         Measurement measurement = new Measurement();
         measurement.setId(getMeasurementId());

@@ -17,25 +17,25 @@ public class Rule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(optional = true)
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "rule_definition", nullable = true, insertable = true, updatable = true)
     private RuleDefinition ruleDefinition;
 
-    @OneToOne(optional = true)
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "rule_action", nullable = true, insertable = true, updatable = true)
     private RuleAction ruleAction;
 
-    @OneToOne(optional = true)
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "positive_rule", nullable = true, insertable = true, updatable = true)
     private Rule positiveRule;
 
-    @OneToOne(optional = true)
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "negative_rule", nullable = true, insertable = true, updatable = true)
     private Rule negativeRule;
 
     @Column(name = "active", nullable = true)
     private Boolean active;
 
-    @Column(name = "active", nullable = false)
+    @Column(name = "root", nullable = false)
     private Boolean root;
 }

@@ -1,28 +1,25 @@
 package com.renergetic.ruleevaluationservice.utils;
 
-import com.renergetic.common.model.details.AssetDetails;
-import com.renergetic.common.model.AssetRule;
+import com.renergetic.common.model.RuleDefinition;
 
 public class AssetRuleUtils {
-    public static String transformRuleToReadableName(AssetRule assetRule){
+    public static String transformRuleToReadableName(RuleDefinition ruleDefinition){
         StringBuilder sb = new StringBuilder();
-        sb.append(assetRule.getFunctionMeasurement1()).append("(id:")
-                .append(assetRule.getMeasurement1().getId()).append(",")
-                .append(assetRule.getTimeRangeMeasurement1()).append(") ").append(assetRule.getComparator())
+        sb.append(ruleDefinition.getMeasurement1().getMultiplier()).append("*")
+                .append(ruleDefinition.getMeasurement1().getFunction()).append("(id:")
+                .append(ruleDefinition.getMeasurement1().getId()).append(",")
+                .append(ruleDefinition.getMeasurement1().getRangeFrom()).append("->")
+                .append(ruleDefinition.getMeasurement1().getRangeTo()).append(") ").append(ruleDefinition.getComparator())
                 .append(" ");
 
-        if(assetRule.getMeasurement2() != null){
-            sb.append(assetRule.getFunctionMeasurement2()).append("(id:")
-                    .append(assetRule.getMeasurement2().getId()).append(",")
-                    .append(assetRule.getTimeRangeMeasurement2()).append(")");
+        if(ruleDefinition.getMeasurement2() != null){
+            sb.append(ruleDefinition.getMeasurement2().getMultiplier()).append("*")
+                    .append(ruleDefinition.getMeasurement2().getFunction()).append("(id:")
+                    .append(ruleDefinition.getMeasurement2().getId()).append(",")
+                    .append(ruleDefinition.getMeasurement2().getRangeFrom()).append("->")
+                    .append(ruleDefinition.getMeasurement2().getRangeTo()).append(")");
         } else {
-            if(assetRule.isCompareToConfigThreshold()){
-                //TODO: Handle exception here.
-                AssetDetails assetDetails = assetRule.getAsset().getDetails().stream().filter(ad -> ad.getKey().equals("rule_threshold")).findFirst().orElseThrow();
-                sb.append(assetDetails.getValue());
-            } else {
-                sb.append(assetRule.getManualThreshold());
-            }
+            sb.append(ruleDefinition.getManualThreshold());
         }
         return sb.toString();
     }

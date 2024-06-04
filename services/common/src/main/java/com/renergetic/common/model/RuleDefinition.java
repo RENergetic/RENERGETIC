@@ -17,11 +17,11 @@ public class RuleDefinition {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "measurement_1", nullable = false, insertable = true, updatable = true)
     private RuleDefinitionMeasurement measurement1;
 
-    @OneToOne(optional = true)
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "measurement_2", nullable = true, insertable = true, updatable = true)
     private RuleDefinitionMeasurement measurement2;
 

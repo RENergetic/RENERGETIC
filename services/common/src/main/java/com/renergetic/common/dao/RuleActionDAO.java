@@ -26,7 +26,8 @@ public class RuleActionDAO {
 
         entity.setId(getId());
         entity.setAsset(asset);
-        entity.setDemandDefinition(demandDefinition.mapToEntity());
+        if(getDemandDefinition() != null)
+            entity.setDemandDefinition(getDemandDefinition().mapToEntity());
         entity.setFixedDuration(getFixedDuration());
         return entity;
     }
@@ -35,7 +36,8 @@ public class RuleActionDAO {
         RuleActionDAO dao = new RuleActionDAO();
         dao.setId(entity.getId());
         dao.setAssetId(entity.getAsset().getId());
-        dao.setDemandDefinition(DemandDefinitionDAO.create(entity.getDemandDefinition()));
+        if(entity.getDemandDefinition() != null)
+            dao.setDemandDefinition(DemandDefinitionDAO.create(entity.getDemandDefinition()));
         dao.setFixedDuration(entity.getFixedDuration());
         return dao;
     }

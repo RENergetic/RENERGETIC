@@ -1,5 +1,6 @@
 package com.renergetic.common.dao;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.renergetic.common.exception.InvalidNeedActionOrDefinitionException;
 import com.renergetic.common.exception.InvalidRootNestedException;
 import com.renergetic.common.model.Rule;
@@ -7,13 +8,11 @@ import com.renergetic.common.repository.RuleRepository;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 @Getter
 @Setter
 public class RuleDAO {
-    @Autowired
-    private RuleRepository ruleRepository;
-
     private Long id;
     private RuleDefinitionDAO ruleDefinition;
     private RuleActionDAO ruleAction;
@@ -22,8 +21,9 @@ public class RuleDAO {
     private boolean active;
 
     public Rule mapToEntity(){
-        if(ruleRepository.existsByIdAndByRootTrue(getId()))
-            throw new InvalidRootNestedException();
+        //TODO: Fix later by moving this in a separate mapper acting as a service.
+        /*if(this.getId() != null && ruleRepository.existsByIdAndRootTrue(getId()))
+            throw new InvalidRootNestedException();*/
         return (mapToEntity(true));
     }
 

@@ -5,16 +5,24 @@ import java.time.temporal.ChronoUnit;
 
 public class TimeUtils {
 
+    public static Long convertLiteralDiffToInstantMillis(String literalDiff){
+        if(literalDiff.equals("now"))
+            return Instant.now().toEpochMilli();
+        else if(literalDiff.contains("now-"))
+            return TimeUtils.offsetNegativeCurrentInstant(literalDiff.substring(4)).toEpochMilli();
+        else if(literalDiff.contains("now+"))
+            return TimeUtils.offsetPositiveCurrentInstant(literalDiff.substring(4)).toEpochMilli();
+        return null;
+    }
+
     public static Instant offsetNegativeCurrentInstant(String durationLiteral){
         durationLiteral = durationLiteral.replace(" ", "");
-        Instant now = Instant.now();
         Instant offset = Instant.now().minus(TimeUtils.extractValue(durationLiteral), TimeUtils.extractUnit(durationLiteral));
         return offset;
     }
 
     public static Instant offsetPositiveCurrentInstant(String durationLiteral){
         durationLiteral = durationLiteral.replace(" ", "");
-        Instant now = Instant.now();
         Instant offset = Instant.now().plus(TimeUtils.extractValue(durationLiteral), TimeUtils.extractUnit(durationLiteral));
         return offset;
     }
