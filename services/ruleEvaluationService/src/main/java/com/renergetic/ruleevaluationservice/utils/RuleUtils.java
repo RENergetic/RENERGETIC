@@ -2,7 +2,7 @@ package com.renergetic.ruleevaluationservice.utils;
 
 import com.renergetic.common.model.RuleDefinition;
 
-public class AssetRuleUtils {
+public class RuleUtils {
     public static String transformRuleToReadableName(RuleDefinition ruleDefinition){
         StringBuilder sb = new StringBuilder();
         sb.append(ruleDefinition.getMeasurement1().getMultiplier()).append("*")

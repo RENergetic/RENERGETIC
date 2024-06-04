@@ -5,7 +5,7 @@ import com.renergetic.common.repository.*;
 import com.renergetic.ruleevaluationservice.dao.EvaluationResult;
 import com.renergetic.ruleevaluationservice.dao.MeasurementSimplifiedDAO;
 import com.renergetic.ruleevaluationservice.exception.RuleEvaluationException;
-import com.renergetic.ruleevaluationservice.utils.AssetRuleUtils;
+import com.renergetic.ruleevaluationservice.utils.RuleUtils;
 import com.renergetic.ruleevaluationservice.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +43,7 @@ public class RuleEvaluationService {
     DataService dataService;
 
     public List<List<EvaluationResult>> retrieveAndExecuteAllRules(){
-        List<Rule> rules = ruleRepository.findByActiveTrueAndByRootTrue();
+        List<Rule> rules = ruleRepository.findByActiveTrueAndRootTrue();
         return executeAllRules(rules);
     }
 
@@ -100,7 +100,7 @@ public class RuleEvaluationService {
         else if (rule.getRuleDefinition() != null) {
             RuleDefinition ruleDefinition = rule.getRuleDefinition();
             try{
-                evaluationResult.setExecutedReadableString(AssetRuleUtils.transformRuleToReadableName(ruleDefinition));
+                evaluationResult.setExecutedReadableString(RuleUtils.transformRuleToReadableName(ruleDefinition));
                 setEvaluationStringAndData(ruleDefinition, evaluationResult);
                 evaluationResult.setExecutionResult(evaluateString(evaluationResult.getExecutedString()));
             } catch (RuleEvaluationException ree){
@@ -123,11 +123,18 @@ public class RuleEvaluationService {
             RuleAction ruleAction = rule.getRuleAction();
             //LocalDateTime nextExecution = cronTrigger.next(currentTime);
 
-            DemandSchedule demandSchedule = new DemandSchedule();
-            demandSchedule.setAsset(ruleAction.getAsset());
-            demandSchedule.setDemandDefinition(ruleAction.getDemandDefinition());
-            demandSchedule.setDemandStart(currentTime);
-            //demandSchedule.setDemandStop(nextExecution);
+            DemandSchedule demandSchedule = demandScheduleRepository
+                    .findByAssetIdAndDemandDefinitionIdAndDemandStartLessThanEqualAndDemandStopGreaterThanEqual(
+                            ruleAction.getAsset().getId(),
+                            ruleAction.getDemandDefinition().getId(),
+                            LocalDateTime.now(),
+                            LocalDateTime.now()).stream().findFirst().orElse(new DemandSchedule());
+
+            if (demandSchedule.getId() == null) {
+                demandSchedule.setAsset(ruleAction.getAsset());
+                demandSchedule.setDemandDefinition(ruleAction.getDemandDefinition());
+                demandSchedule.setDemandStart(currentTime);
+            }
             demandSchedule.setDemandStop(
                     LocalDateTime.ofInstant(
                             TimeUtils.offsetPositiveCurrentInstant(ruleAction.getFixedDuration()),
@@ -170,7 +177,7 @@ public class RuleEvaluationService {
 
     private String evaluateString(String expression) throws ScriptException {
         ScriptEngineManager mgr = new ScriptEngineManager();
-        ScriptEngine engine = mgr.getEngineByName("JavaScript");
+        ScriptEngine engine = mgr.getEngineByName("Graal.js");
         return engine.eval(expression).toString();
     }
 
