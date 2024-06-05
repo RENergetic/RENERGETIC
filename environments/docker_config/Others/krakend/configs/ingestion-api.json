@@ -1,0 +1,36 @@
+// INGESTION API
+
+      {
+        "endpoint": "/api/ingestion/1.0/api/requirements",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/requirements",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://ingestion-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api/ingestion/1.0/api/ingest",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/ingest",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://ingestion-api-sv:8080"
+            ]
+          }
+        ]
+      },

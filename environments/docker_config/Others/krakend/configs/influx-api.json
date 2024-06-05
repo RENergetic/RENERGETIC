@@ -1,0 +1,19 @@
+// INFLUX API
+
+      {
+        "endpoint": "/v0/{NOMBRE-PROYECTO}/{API-ENDPOINT}",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/{API-ENDPOINT}",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://influx-api-sv:8080"
+            ]
+          }
+        ]
+      },

@@ -1,0 +1,223 @@
+// KPI API
+
+      {
+        "endpoint": "/api-kpi/1.0/api/meter",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter/list",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter/list",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter/list/{domain}/{meter_name}",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}/data",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter/list/{domain}/{meter_name}/data",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}/data/{operation}",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter/list/{domain}/{meter_name}/data/{operation}",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter",
+        "method": "POST",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter",
+            "encoding": "no-op",
+            "method": "POST",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter",
+        "method": "PUT",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter",
+            "encoding": "no-op",
+            "method": "PUT",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter",
+        "method": "DELETE",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter",
+            "encoding": "no-op",
+            "method": "DELETE",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}",
+        "method": "DELETE",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter/{domain}/{meter_name}",
+            "encoding": "no-op",
+            "method": "DELETE",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}/data",
+        "method": "POST",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter/{domain}/{meter_name}/data",
+            "encoding": "no-op",
+            "method": "POST",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/meter/data",
+        "method": "POST",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/meter/data",
+            "encoding": "no-op",
+            "method": "POST",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/kpi/{domain}/{meter_name}/data",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data/{operation}",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/kpi/{domain}/{meter_name}/data/{operation}",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
