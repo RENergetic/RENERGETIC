@@ -19,7 +19,7 @@
       },
       {
         "endpoint": "/api/ingestion/1.0/api/ingest",
-        "method": "GET",
+        "method": "POST",
         "output_encoding": "no-op",
         "input_headers": ["authorization", "accept", "content-type"],
         "input_query_strings": ["*"],
@@ -27,7 +27,7 @@
           {
             "url_pattern": "/api/ingest",
             "encoding": "no-op",
-            "method": "GET",
+            "method": "POST",
             "host": [
               "http://ingestion-api-sv:8080"
             ]

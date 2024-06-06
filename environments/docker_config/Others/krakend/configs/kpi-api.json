@@ -221,3 +221,37 @@
           }
         ]
       },
+      {
+        "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/kpi/{domain}/{meter_name}/data",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data/{operation}",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/kpi/{domain}/{meter_name}/data/{operation}",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://kpi-api-sv:8080"
+            ]
+          }
+        ]
+      },

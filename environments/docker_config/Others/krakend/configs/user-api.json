@@ -1,16 +1,271 @@
 // USER API
 
       {
-        "endpoint": "/v0/{NOMBRE-PROYECTO}/{API-ENDPOINT}",
+        "endpoint": "/api-user/1.0/api/manage/user/test",
         "method": "GET",
         "output_encoding": "no-op",
         "input_headers": ["authorization", "accept", "content-type"],
         "input_query_strings": ["*"],
         "backend": [
           {
-            "url_pattern": "/{API-ENDPOINT}",
+            "url_pattern": "/api/manage/user/test",
             "encoding": "no-op",
             "method": "GET",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/manage/user",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/manage/user/",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/manage/user/{userId}/roles",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/manage/user/{userId}/roles",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/manage/user",
+        "method": "POST",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/manage/user",
+            "encoding": "no-op",
+            "method": "POST",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/manage/user",
+        "method": "PUT",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/manage/user",
+            "encoding": "no-op",
+            "method": "PUT",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/manage/user/{id}/roles/{roleName}",
+        "method": "PUT",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/manage/user/{id}/roles/{roleName}",
+            "encoding": "no-op",
+            "method": "PUT",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/manage/user/{id}",
+        "method": "DELETE",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/manage/user/{id}",
+            "encoding": "no-op",
+            "method": "DELETE",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/manage/user/{id}/roles/{roleName}",
+        "method": "DELETE",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/manage/user/{id}/roles/{roleName}",
+            "encoding": "no-op",
+            "method": "DELETE",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/user/test",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/user/test",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/user/profile",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/user/profile",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/user/profile/settings",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/user/profile/settings",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/user/notifications",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/user/notifications",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/user/assets/{id}",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/user/assets/{id}",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/user/assets/{id}/{categoryId}",
+        "method": "GET",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/user/assets/{id}/{categoryId}",
+            "encoding": "no-op",
+            "method": "GET",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/user/profile/settings",
+        "method": "POST",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/user/profile/settings",
+            "encoding": "no-op",
+            "method": "POST",
+            "host": [
+              "http://user-api-sv:8080"
+            ]
+          }
+        ]
+      },
+      {
+        "endpoint": "/api-user/1.0/api/user/profile",
+        "method": "PUT",
+        "output_encoding": "no-op",
+        "input_headers": ["authorization", "accept", "content-type"],
+        "input_query_strings": ["*"],
+        "backend": [
+          {
+            "url_pattern": "/api/user/profile",
+            "encoding": "no-op",
+            "method": "PUT",
             "host": [
               "http://user-api-sv:8080"
             ]
