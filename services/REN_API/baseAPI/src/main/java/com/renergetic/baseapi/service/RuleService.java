@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AssetRuleService {
+public class RuleService {
     @Autowired
     private RuleRepository ruleRepository;
     @Autowired

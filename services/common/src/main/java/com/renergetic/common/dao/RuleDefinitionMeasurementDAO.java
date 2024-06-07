@@ -13,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Getter
 @Setter
 public class RuleDefinitionMeasurementDAO {
-    @Autowired
-    private MeasurementRepository measurementRepository;
-
     private Long id;
     private String function;
     private Float multiplier;

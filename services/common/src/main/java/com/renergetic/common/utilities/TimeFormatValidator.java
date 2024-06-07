@@ -4,9 +4,9 @@ import com.renergetic.common.exception.InvalidTimeFormatException;
 
 public class TimeFormatValidator {
     public static void validateTimeDifferenceFromNow(String value){
-        if(value == null || !startsWithCorrectPrefix(value)
+        if(value == null || (!containsOnlyNow(value) && (!startsWithCorrectPrefix(value)
                 || !endsWithCorrectTimeValue(value)
-                || value.length() < 6 || !containsOnlyNumbers(value.substring(4, value.length()-1)))
+                || value.length() < 6 || !containsOnlyNumbers(value.substring(4, value.length()-1)))))
             throw new InvalidTimeFormatException();
     }
 
@@ -18,6 +18,10 @@ public class TimeFormatValidator {
 
     private static boolean startsWithCorrectPrefix(String value){
         return value.startsWith("now-") || value.startsWith("now+");
+    }
+
+    private static boolean containsOnlyNow(String value){
+        return value.equals("now") || value.equals("day-start") || value.equals("day-end");
     }
 
     private static boolean endsWithCorrectTimeValue(String value){

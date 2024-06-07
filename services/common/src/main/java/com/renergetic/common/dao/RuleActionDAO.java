@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class RuleActionDAO {
     private Long id;
-    private Long assetId;
+    private SimpleAssetDAO asset;
     private DemandDefinitionDAO demandDefinition;
     private String fixedDuration;
 
@@ -21,8 +21,11 @@ public class RuleActionDAO {
 
         RuleAction entity = new RuleAction();
 
-        Asset asset = new Asset();
-        asset.setId(getAssetId());
+        Asset asset = null;
+        if(getAsset() != null) {
+            asset = new Asset();
+            asset.setId(getAsset().getId());
+        }
 
         entity.setId(getId());
         entity.setAsset(asset);
@@ -35,7 +38,7 @@ public class RuleActionDAO {
     public static RuleActionDAO fromEntity(RuleAction entity){
         RuleActionDAO dao = new RuleActionDAO();
         dao.setId(entity.getId());
-        dao.setAssetId(entity.getAsset().getId());
+        dao.setAsset(SimpleAssetDAO.create(entity.getAsset()));
         if(entity.getDemandDefinition() != null)
             dao.setDemandDefinition(DemandDefinitionDAO.create(entity.getDemandDefinition()));
         dao.setFixedDuration(entity.getFixedDuration());
