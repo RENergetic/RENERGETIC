@@ -1,10 +1,17 @@
 package com.renergetic.kubeflowapi.service;
 
+import com.renergetic.common.dao.PipelineDefinitionDAO;
+import com.renergetic.common.dao.PipelineParameterDAO;
+import com.renergetic.common.dao.PipelineRunDAO;
 import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.model.PipelineDefinition;
+import com.renergetic.common.model.PipelineParameter;
+import com.renergetic.common.model.PipelineRun;
+import com.renergetic.common.repository.PipelineParameterRepository;
+import com.renergetic.common.repository.PipelineRepository;
+import com.renergetic.common.repository.PipelineRunRepository;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.kubeflowapi.tempcommon.PipelineParameterRepository;
 import com.renergetic.kubeflowapi.service.utils.DummyDataGenerator;
-import com.renergetic.kubeflowapi.tempcommon.*;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
