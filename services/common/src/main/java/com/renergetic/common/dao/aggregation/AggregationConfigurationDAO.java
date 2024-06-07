@@ -29,12 +29,8 @@ public class AggregationConfigurationDAO {
         AggregationConfigurationDAO aggregationConfigurationDAO = new AggregationConfigurationDAO();
         aggregationConfigurationDAO.setMeasurementAggregations(MeasurementAggregationDAO.create(measurementAggregations));
 
-        if(measurementAggregations != null && !measurementAggregations.isEmpty())
-            aggregationConfigurationDAO.setMvoComponentType(MuVeCoTypeDAO
-                .create(asset, optimizerType));
-        else
-            aggregationConfigurationDAO.setMvoComponentType(MuVeCoTypeDAO
-                    .create(null, optimizerType));
+        aggregationConfigurationDAO.setMvoComponentType(MuVeCoTypeDAO
+            .create(asset, optimizerType));
 
         //TODO: in the caller, get the optimizer type based on the one selected and set in MuVeCoTypeDOA.
         /*aggregationConfigurationDAO.setParameterAggregationConfigurations(
