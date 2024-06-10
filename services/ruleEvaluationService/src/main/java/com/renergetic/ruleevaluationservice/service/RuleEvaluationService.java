@@ -112,7 +112,7 @@ public class RuleEvaluationService {
             }
 
             if(evaluationResult.getExecutionResult() != null && evaluationResult.getExecutionResult().equals("true")){
-                evaluationResult.setNotificationSchedule(createNotification(ruleDefinition, evaluationResult));
+                //evaluationResult.setNotificationSchedule(createNotification(ruleDefinition, evaluationResult));
                 executeRule(rule.getPositiveRule());
             } else if (evaluationResult.getExecutionResult() != null && evaluationResult.getExecutionResult().equals("false")) {
                 executeRule(rule.getNegativeRule());
