@@ -198,6 +198,7 @@ public class MeasurementAggregationService {
 
             assetConnectionRepository.deleteAllInBatch(expiredConnections);
         }
+        existingOptimizer = null;
 
         if(optimizerType != null) {
             if(domainA != null && optimizerType.getConnectionTypeA() != null){
