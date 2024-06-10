@@ -287,9 +287,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " LEFT JOIN information_tile it on it.id = itm.information_tile_id" +
             " WHERE  me.id = :id GROUP  by me.id , mt.id,asset.id ", nativeQuery = true
     )
-    Optional<MeasurementDAO> findMeasurement(Long id );
-
-
+    Optional<MeasurementDAO> findMeasurement(Long id);
 
 
     @Query(
@@ -304,6 +302,17 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     List<Measurement> listHDRMeasurement(@Param("timestamp") LocalDateTime timestamp, @Param("tagKey") String tagKey,
                                          @Param("tagValue") String tagValue);
 
+    @Query(
+            value = "SELECT m.*   FROM ( measurement m" +
+                    " JOIN hdr_measurement hdrm ON hdrm.measurement_id = m.id  " +
+                    " JOIN measurement_tags mt ON mt.measurement_id = m.id" +
+                    " JOIN tags   ON tags.id = mt.tag_id  )" +
+                    " WHERE hdrm.timestamp  = :timestamp and " +
+                    " tags.key =  :tagKey   AND COALESCE(tags.value = CAST(:tagValue AS text)  ,TRUE) ",
+            nativeQuery = true
+    )
+    List<Measurement> listHDRMeasurement(@Param("timestamp") Long timestamp, @Param("tagKey") String tagKey,
+                                         @Param("tagValue") String tagValue);
 
     @Query(value = "SELECT " +
             " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
@@ -333,7 +342,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<MeasurementDAO> findMeasurementsByTag(Long assetId, String assetName, String measurementName,
                                                       String sensorName, String domain, String direction, Long type,
-                                                      String physicalName, String tagKey,  String tagValue,  long offset, Integer limit);
+                                                      String physicalName, String tagKey, String tagValue, long offset, Integer limit);
 
     @Query(value = "SELECT distinct " +
             " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
@@ -361,7 +370,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " GROUP by me.id, mt.id,asset.id  " +
             " order by  me.asset_id,me.name, me.sensor_name, me.measurement_type_id, me.direction, me.domain, me.id asc " +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
-    public List<MeasurementDAO> findMeasurementNoTag(Long assetId,   String measurementName,
+    public List<MeasurementDAO> findMeasurementNoTag(Long assetId, String measurementName,
                                                      String sensorName, String domain, String direction, Long type,
                                                      String physicalName, String tagKey, long offset, Integer limit);
 

@@ -29,7 +29,7 @@ public class HDRMeasurementDAO {
 
         if (mHDRMeasurement != null) {
             dao = new HDRMeasurementDAO();
-            dao.setTimestamp(DateConverter.toEpoch(mHDRMeasurement.getTimestamp()));
+            dao.setTimestamp( mHDRMeasurement.getTimestamp() );
 
             dao.setMeasurement(MeasurementDAOResponse.create(mHDRMeasurement.getMeasurement(), null, null));
             dao.setId(mHDRMeasurement.getId());
@@ -41,7 +41,7 @@ public class HDRMeasurementDAO {
         HDRMeasurement mHDRMeasurement = new HDRMeasurement();
         if (this.id != null)
             mHDRMeasurement.setId(this.id);
-        mHDRMeasurement.setTimestamp(DateConverter.toLocalDateTime(this.getTimestamp()));
+        mHDRMeasurement.setTimestamp( this.getTimestamp()) ;
         mHDRMeasurement.setMeasurement(this.measurement.mapToEntity());
         return mHDRMeasurement;
     }
