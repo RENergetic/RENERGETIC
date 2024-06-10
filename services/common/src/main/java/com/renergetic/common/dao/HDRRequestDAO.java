@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.tomcat.util.json.ParseException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,9 +46,9 @@ public class HDRRequestDAO {
 
         if (request != null) {
             dao = new HDRRequestDAO();
-            dao.setTimestamp(DateConverter.toEpoch(request.getTimestamp()));
-            dao.setDateFrom(DateConverter.toEpoch(request.getDateFrom()));
-            dao.setDateTo(DateConverter.toEpoch(request.getDateTo()));
+            dao.setTimestamp(request.getTimestamp());
+            dao.setDateFrom(request.getDateFrom());
+            dao.setDateTo(request.getDateTo());
             dao.setId(request.getId());
             dao.setMaxValue(request.getMaxValue());
             dao.setValueChange(request.getValueChange());
@@ -70,9 +71,9 @@ public class HDRRequestDAO {
     public HDRRequest mapToEntity() {
         HDRRequest request = new HDRRequest();
         request.setId(this.getId());
-        request.setTimestamp(DateConverter.toLocalDateTime(this.getTimestamp()));
-        request.setDateFrom(DateConverter.toLocalDateTime(this.getDateFrom()));
-        request.setDateTo(DateConverter.toLocalDateTime(this.getDateTo()));
+        request.setTimestamp( this.getTimestamp() );
+        request.setDateFrom( this.getDateFrom() );
+        request.setDateTo( this.getDateTo()) ;
         request.setId(this.getId());
         request.setMaxValue(this.getMaxValue());
         request.setValueChange(this.getValueChange());

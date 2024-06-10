@@ -52,6 +52,7 @@ public interface DemandScheduleRepository extends JpaRepository<DemandSchedule, 
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<DemandSchedule> findByUserIdGroup(Long userId,  long offset, int limit);
 
-    Optional<DemandSchedule> findByAssetIdAndDemandDefinitionId(Long assetId, Long demandId);
+    List<DemandSchedule> findByAssetIdAndDemandDefinitionIdAndDemandStartLessThanEqualAndDemandStopGreaterThanEqual(
+            Long assetId, Long demandId, LocalDateTime dateTime, LocalDateTime dateTime2);
 
 }

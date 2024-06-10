@@ -25,8 +25,8 @@ public class InformationPanelDAO {
 
     @JsonProperty()
     private String label;
-    @JsonProperty(value = "is_template")
-    private Boolean isTemplate;
+    @JsonProperty(value = "is_template",required = true)
+    private Boolean isTemplate = false;
     @JsonProperty(value = "featured")
     private Boolean featured;
 
