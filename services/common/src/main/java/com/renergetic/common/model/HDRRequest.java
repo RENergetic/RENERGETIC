@@ -32,12 +32,12 @@ public class HDRRequest {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private Long timestamp;
 
     @Column(name = "date_from", nullable = false)
-    private LocalDateTime dateFrom;
+    private Long dateFrom;
     @Column(name = "date_to", nullable = false)
-    private LocalDateTime dateTo;
+    private Long dateTo;
     @Column(name = "max_value")
     private Double maxValue;
     @Column(name = "value_change")

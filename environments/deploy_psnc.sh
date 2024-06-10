@@ -34,7 +34,7 @@ ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
 grafana=$(grep -ioP "(grafana\s*=\s*)\K.+" _installers.properties)
 nifi=$(grep -ioP "(nifi\s*=\s*)\K.+" _installers.properties)
-wso2=$(grep -ioP "(wso2\s*=\s*)\K.+" _installers.properties)
+krakend=$(grep -ioP "(krakend\s*=\s*)\K.+" _installers.properties)
 nexus=$(grep -ioP "(nexus\s*=\s*)\K.+" _installers.properties)
 
 resetConnection() {
@@ -369,25 +369,27 @@ installPSNC() {
         kubectl apply -f kubeflow-api-service.yaml --namespace=$project
     fi
 
-# DEPLOY WSO2 API MANAGER
+# DEPLOY krakend API MANAGER
 
-    if [[ $wso2 = 'true' ]]
+    if [[ $krakend = 'true' ]]
     then
-        cd "${current}/docker_config/Others/wso2"
-        # WSO2 INSTALLATION
+        cd "${current}/docker_config/Others/krakend"
+        # KRAKEND INSTALLATION
         # set environment variables
 
         # delete kubernetes resources if exists
-        kubectl delete deployments/wso --namespace=$project
-        kubectl delete services/wso-sv --namespace=$project
+        kubectl delete configmaps/krakend-config --namespace=$project
+        kubectl delete deployments/krakend --namespace=$project
+        kubectl delete services/krakend-sv --namespace=$project
 
-        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/wso:latest .
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/krakend:latest .
         docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-        docker push registry.apps.paas-dev.psnc.pl/$project/wso:latest
+        docker push registry.apps.paas-dev.psnc.pl/$project/krakend:latest
 
         # create kubernetes resources
-        envsubst '$PROJECT' < wso2-deployment.yaml | kubectl apply --namespace=$project -f -
-        kubectl apply -f wso2-service.yaml --namespace=$project
+        kubectl apply -f krakend-config.yaml --namespace=$project
+        envsubst '$PROJECT' < krakend-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f krakend-service.yaml --namespace=$project
     fi
 # DEPLOY NEXUS API MANAGER
 

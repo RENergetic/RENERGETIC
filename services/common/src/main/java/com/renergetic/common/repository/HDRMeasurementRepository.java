@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface HDRMeasurementRepository extends JpaRepository<HDRMeasurement, Long> {
 
     @Query("SELECT hdrm FROM HDRMeasurement hdrm WHERE hdrm.timestamp = :timestamp   ")
-    List<HDRMeasurement> listMeasurement(LocalDateTime timestamp);
+    List<HDRMeasurement> listMeasurement(Long timestamp);
     @Query("SELECT hdrm FROM HDRMeasurement hdrm WHERE hdrm.measurement.id = :measurementId and hdrm.timestamp = :timestamp   ")
-    Optional<HDRMeasurement> findByIdAndTimestamp(Long measurementId, LocalDateTime timestamp );
+    Optional<HDRMeasurement> findByIdAndTimestamp(Long measurementId, Long timestamp );
 }

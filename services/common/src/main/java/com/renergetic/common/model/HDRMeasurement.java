@@ -23,7 +23,7 @@ public class HDRMeasurement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private Long timestamp;
     @ManyToOne(cascade = CascadeType.REFRESH, optional = false)
     @JoinColumn(name = "measurement_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

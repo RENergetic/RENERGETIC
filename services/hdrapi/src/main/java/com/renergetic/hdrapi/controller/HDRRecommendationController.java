@@ -94,7 +94,14 @@ public class HDRRecommendationController {
     public ResponseEntity<Long> saveRecommendations(@RequestParam(name = "t") Optional<Long> timestamp,
                                                     @RequestBody List<HDRRecommendationDAO> recommendations) {
         Long t;
-        t = timestamp.orElse(DateConverter.toEpoch(LocalDateTime.now()));
+        if (timestamp.isEmpty()) {
+            t = DateConverter.now();
+        } else if (timestamp.get() > DateConverter.now()) {
+            throw new IllegalArgumentException("future timestamp");
+        } else {
+            t = timestamp.get();
+        }
+
         if (hdrService.save(t, recommendations))
             return new ResponseEntity<>(t, HttpStatus.CREATED);
 
@@ -109,7 +116,11 @@ public class HDRRecommendationController {
     @PutMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
     public ResponseEntity saveRecommendations(@RequestParam(name = "t", required = true) Long timestamp,
                                               @RequestBody List<HDRRecommendationDAO> recommendations) {
-        hdrService.save(timestamp, recommendations);
+        if (timestamp   > DateConverter.now()) {
+            throw new IllegalArgumentException("future timestamp");
+        }
+
+        hdrService.append(timestamp, recommendations);
         return new ResponseEntity(ResponseEntity.noContent(), HttpStatus.CREATED);
     }
 
@@ -124,6 +135,9 @@ public class HDRRecommendationController {
         if (request.getTimestamp() == null) {
             request.setTimestamp(DateConverter.toEpoch(LocalDateTime.now()));
         }
+        else if(request.getTimestamp() > DateConverter.now()){
+            throw new IllegalArgumentException("future timestamp");
+        }
         HDRRequestDAO r = hdrService.save(request);
         return new ResponseEntity<>(r, HttpStatus.CREATED);
     }
@@ -135,10 +149,10 @@ public class HDRRecommendationController {
     })
     @DeleteMapping(path = "/recommendations", produces = "application/json", consumes = "application/json")
     public ResponseEntity<List<HDRRecommendationDAO>> deleteRecommendations(@RequestParam(name = "t") Long timestamp) {
-        var dt = DateConverter.toLocalDateTime(timestamp);
-        var res = hdrService.getRecommendations(dt);
-        hdrService.deleteByTimestamp(LocalDateTime.now());
-        if (hdrService.getRecommendations(dt).isEmpty()) {
+//        var dt = DateConverter.toLocalDateTime(timestamp);
+        var res = hdrService.getRecommendations(timestamp);
+        hdrService.deleteByTimestamp(timestamp);
+        if (hdrService.getRecommendations(timestamp).isEmpty()) {
             return new ResponseEntity<>(res, HttpStatus.OK);
 
         }
@@ -154,9 +168,9 @@ public class HDRRecommendationController {
     public ResponseEntity<List<HDRRequestDAO>> deleteRequest(@RequestParam(name = "t") Long timestamp) {
         var dt = DateConverter.toLocalDateTime(timestamp);
 
-        var res = hdrService.getRequests(dt);
-        hdrService.deleteByTimestamp(LocalDateTime.now());
-        if (hdrService.getRequests(dt).isEmpty()) {
+        var res = hdrService.getRequests(timestamp);
+        hdrService.deleteByTimestamp(timestamp);
+        if (hdrService.getRequests(timestamp).isEmpty()) {
             return new ResponseEntity<>(res, HttpStatus.OK);
 
         }
@@ -184,7 +198,7 @@ public class HDRRecommendationController {
     public ResponseEntity<List<MeasurementDAOResponse>> getMeasurements(
             @RequestParam(name = "t", required = true) Long timestamp, @PathVariable String key,@PathVariable String value) {
         List<MeasurementDAOResponse> measurements = hdrService.getMeasurements(timestamp,key,value);
-        return new ResponseEntity(measurements, HttpStatus.CREATED);
+        return new ResponseEntity(measurements, HttpStatus.OK);
     }
 
     @Operation(summary = "Insert Measurement ")

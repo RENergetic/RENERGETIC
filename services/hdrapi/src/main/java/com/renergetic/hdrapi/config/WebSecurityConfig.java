@@ -2,7 +2,6 @@ package com.renergetic.hdrapi.config;
 
 import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import com.renergetic.common.model.security.KeycloakRole;
-import com.renergetic.common.config.CustomAccessDeniedHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -144,10 +143,10 @@ public class WebSecurityConfig {
     }
 
 
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return new CustomAccessDeniedHandler();
-    }
+//    @Bean
+//    public AccessDeniedHandler accessDeniedHandler() {
+//        return new CustomAccessDeniedHandler();
+//    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

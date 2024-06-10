@@ -90,12 +90,19 @@ public class KubeflowPipelineService {
                 PipelineRunDAO kubeflowRun = kubeflowService.getRun(run.getRunId());
                 run.setState(kubeflowRun.getState());
                 if (kubeflowRun.getEndTime() != null)
-                    run.setEndTime(DateConverter.toLocalDateTime(kubeflowRun.getEndTime()));
+                    run.setEndTime(kubeflowRun.getEndTime());
                 pipelineRunRepository.save(run); //update the db state
             }
             return PipelineRunDAO.create(wd.getPipelineRun());
         }
         return null;
+
+    }
+
+    public List<PipelineRunDAO> listRuns(String pipelineId, Long from, Long to, Long limit, Long offset) {
+        return pipelineRunRepository.getPipelineRuns(pipelineId, from, to, offset, limit)
+                .stream().map(PipelineRunDAO::create).toList();
+
 
     }
 
@@ -110,7 +117,9 @@ public class KubeflowPipelineService {
             throw new RuntimeException("Current task is still running");
         }
         PipelineRunDAO runDAO = startKubeflowRun(wd, params);
+        var now = DateConverter.now();
         PipelineRun currentRun = runDAO.mapToEntity();
+        currentRun.setInitTime(now);
         pipelineRunRepository.save(currentRun);
         wd.setPipelineRun(currentRun);
         pipelineRepository.save(wd);
@@ -282,7 +291,7 @@ public class KubeflowPipelineService {
     private PipelineRunDAO stopKubeflowRun(PipelineDefinition wd) {
         PipelineRun workflowRun = wd.getPipelineRun();
         if (generateDummy) {
-            workflowRun.setEndTime(DateConverter.toLocalDateTime(DateConverter.now()));
+            workflowRun.setEndTime(DateConverter.now());
 
         } else {
             //
@@ -292,7 +301,7 @@ public class KubeflowPipelineService {
                 kubeflowService.stopRun(kubeflowRunId);
                 var kubeflowRun = kubeflowService.getRun(kubeflowRunId);
                 if (kubeflowRun.getEndTime() != null) {
-                    workflowRun.setEndTime(DateConverter.toLocalDateTime(kubeflowRun.getEndTime()));
+                    workflowRun.setEndTime(kubeflowRun.getEndTime());
                 }
                 workflowRun.setState(kubeflowRun.getState());
                 pipelineRunRepository.save(workflowRun);
@@ -362,7 +371,7 @@ public class KubeflowPipelineService {
 
                     PipelineRunDAO kbfRun = kubeflowService.getRun(runId);
                     if (kbfRun.getEndTime() != null)
-                        run.setEndTime(DateConverter.toLocalDateTime(kbfRun.getEndTime()));
+                        run.setEndTime(kbfRun.getEndTime());
 
                     run.setState(kbfRun.getState());
                     pipelineRunRepository.save(run);
