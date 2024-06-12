@@ -13,6 +13,5158 @@ data:
       "timeout": "90s",
       "output_encoding": "no-op",
       "endpoints": [
+        {
+          "endpoint": "/api-base/1.0/api/threshold",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/threshold",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/threshold/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/threshold/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/threshold",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/threshold",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/threshold/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/threshold/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/threshold/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/threshold/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/area",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/area",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/area/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/area/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/area",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/area",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/area/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/area/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/area/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/area/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetCategories",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetCategories",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetCategories",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetCategories",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetCategories",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetCategories",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetCategories/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetCategories/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetCategories/search/{term}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetCategories/search/{term}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetCategories/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetCategories/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetCategories/{id}/assets",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetCategories/{id}/assets",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/connect/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/connect/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/measurement/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/measurement/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/type",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/type",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/type/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/type/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/key/{key}/value/{value}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "api/assets/key/{key}/value/{value}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/info",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/info",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/info",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/info",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/info/{info_id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/info/{info_id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/info",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/info",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/info/{info_id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "api/assets/{id}/info/{info_id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/type",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/type",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/parent/{parentId}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/parent/{parentId}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/parent",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/parent",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/connect/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/connect/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/measurement",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/measurement",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/measurement/{measurementId}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/measurement/{measurementId}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/measurement/{measurementId}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/measurement/{measurementId}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/type/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/type/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/category",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/category",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/connect/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/connect/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/type/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/type/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assets/{id}/category",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assets/{id}/category",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetRules/asset/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetRules/asset/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetRules/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetRules/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetRules",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetRules",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetRules/batch",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetRules/batch",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetRules",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetRules",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetRules/batch/update-create",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetRules/batch/update-create",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetRules/batch/update-create-delete/{assetId}",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetRules/batch/update-create-delete/{assetId}",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/assetRules/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/assetRules/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/dashboard",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/dashboard",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/dashboard/user/{user_id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/dashboard/user/{user_id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/dashboard/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/dashboard/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/dashboard/test/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/dashboard/test/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/dashboard",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/dashboard",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/dashboard/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/dashboard/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/dashboard/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/dashboard/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests/batch",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests/batch",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests/id/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests/id/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests/userId/{userId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests/userId/{userId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests/assetId/{assetId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests/assetId/{assetId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests/definition/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests/definition/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests/definition",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests/definition",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests/definition",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests/definition",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests/definition",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests/definition",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/demandRequests/definition/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/demandRequests/definition/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/infermeasurements",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/infermeasurements",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/owner/{ownerId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/owner/{ownerId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/id/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/id/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/name/{name}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/name/{name}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/name/{name}",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/name/{name}",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/id/{id}/featured/{featured}",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/id/{id}/featured/{featured}",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/id/{id}/asset",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/id/{id}/asset",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/id/{id}/asset/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/id/{id}/asset/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/id/{id}/asset/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/id/{id}/asset/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationPanel/id/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationPanel/id/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationTile/panel/{panelId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationTile/panel/{panelId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationTile/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationTile/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationTile/name/{name}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationTile/name/{name}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationTile",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationTile",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationTile",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationTile",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/informationTile/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/informationTile/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/log/list",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/log/list",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/log/create",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/log/create",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/log/delete/{logId}",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/log/delete/{logId}",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurementskey/{key}/value/{value}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurementskey/{key}/value/{value}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/report",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/report",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/panels",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/panels",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/panels",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/panels",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/copy",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/copy",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/copy",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/tags/key",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/tags/key",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/tags/key/{key}/values",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/tags/key/{key}/values",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/type",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/type",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/type/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/type/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/report",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/report",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/report/asset/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/report/asset/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/info",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/info",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/properties",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/properties",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/properties",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/properties",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/info",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/info",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/info",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/info",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/info",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/info",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/info",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/info",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/info/{info_id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/info/{info_id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/info/{info_id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/info/{info_id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/properties",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/properties",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/properties",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/properties",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/batch",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/batch",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/type",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/type",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/type/{id}/dashboard/{visibility}",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/type/{id}/dashboard/{visibility}",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/type/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/type/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/type/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/type/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/tags",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/tags",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/tags",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/tags",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/tags",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/tags",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/tags",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/tags",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/values",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/values",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/values",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/values",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/tags/key/{key}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/tags/key/{key}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/tags",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/tags",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/{id}/tags",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/{id}/tags",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/tags/key/{key}/value/{value}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/tags/key/{key}/value/{value}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/tags/key/{key}/value/{value}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/tags/key/{key}/value/{value}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/tags/{tag_id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/tags/{tag_id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/tags/{tag_id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/tags/{tag_id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}/tags/key/{key}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurements/id/{id}/tags/key/{key}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/notification",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/notification",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/notification/asset/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/notification/asset/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/notification/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/notification/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/notification/definition",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/notification/definition",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/notification",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/notification",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/batch",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/batch",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/definition",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/definition",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/definition/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/definition/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/data/panel/{panelId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/data/panel/{panelId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/data/panel/{panelId}/asset/{assetId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/data/panel/{panelId}/asset/{assetId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/data/timeseries/tile/{tileId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/data/timeseries/tile/{tileId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/data/timeseries/measurements/{measurements}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/data/timeseries/measurements/{measurements}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/data/timeseries/tile/{tileId}/asset/{assetId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/data/timeseries/tile/{tileId}/asset/{assetId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/measurementsAggregation/list/{assetId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurementsAggregation/list/{assetId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/measurementsAggregation/save/{assetId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurementsAggregation/save/{assetId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/measurementsAggregation/optimizerParameters/{assetId}/{optimizerType}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurementsAggregation/optimizerParameters/{assetId}/{optimizerType}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/measurementsAggregation/optimizerTypes",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurementsAggregation/optimizerTypes",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/measurementsAggregation/measurements/{assetId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurementsAggregation/measurements/{assetId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/measurementsAggregation/compatibleMeasurements/{assetId}/{measurementId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurementsAggregation/compatibleMeasurements/{assetId}/{measurementId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations/current",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations/current",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/requests/current",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/requests/current",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations/id/{id}/measurements",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations/id/{id}/measurements",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/requests/id/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/requests/id/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/requests",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/requests",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/requests",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/requests",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement/key/{key}/value/{value}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement/key/{key}/value/{value}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/dashboard/unit/{grafanaId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/dashboard/unit/{grafanaId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurement",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/tag",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/measurement/tag",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/tag/{tag_name}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/tag/{tag_name}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/data",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/data",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/data",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/data",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/data/{function}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/data/{function}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "api/measurement",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/{measurement_name}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/{measurement_name}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api/ingestion/1.0/api/requirements",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/requirements",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://ingestion-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api/ingestion/1.0/api/ingest",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/ingest",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://ingestion-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter/list",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter/list",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter/list/{domain}/{meter_name}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}/data",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter/list/{domain}/{meter_name}/data",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}/data/{operation}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter/list/{domain}/{meter_name}/data/{operation}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter/{domain}/{meter_name}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter/{domain}/{meter_name}/data",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter/{domain}/{meter_name}/data",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/meter/data",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter/data",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/kpi/{domain}/{meter_name}/data",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data/{operation}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/kpi/{domain}/{meter_name}/data/{operation}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/kpi/{domain}/{meter_name}/data",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data/{operation}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/kpi/{domain}/{meter_name}/data/{operation}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-rules/1.0/api/trigger",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/trigger",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://rules-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-rules/1.0/api/trigger/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/trigger/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://rules-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-rules/1.0/api/trigger/asset/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/trigger/asset/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://rules-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/manage/user/test",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/manage/user/test",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/manage/user",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/manage/user/",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/manage/user/{userId}/roles",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/manage/user/{userId}/roles",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/manage/user",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/manage/user",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/manage/user",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/manage/user",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/manage/user/{id}/roles/{roleName}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/manage/user/{id}/roles/{roleName}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/manage/user/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/manage/user/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/manage/user/{id}/roles/{roleName}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/manage/user/{id}/roles/{roleName}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/user/test",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/user/test",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/user/profile",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/user/profile",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/user/profile/settings",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/user/profile/settings",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/user/notifications",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/user/notifications",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/user/assets/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/user/assets/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/user/assets/{id}/{categoryId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/user/assets/{id}/{categoryId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/user/profile/settings",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/user/profile/settings",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/user/profile",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/user/profile",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-wrapper/1.0/api/ui/test",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/ui/test",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://wrapper-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-wrapper/1.0/api/ui/wrapper",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/ui/wrapper",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://wrapper-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-wrapper/1.0/api/ui/wrapper/{userId}",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/ui/wrapper/{userId}",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://wrapper-api-sv:8082"
+              ]
+            }
+          ]
+        }
       ],
       "extra_config": {
         "security/cors": {

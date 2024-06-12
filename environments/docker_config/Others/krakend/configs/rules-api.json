@@ -1,53 +1,53 @@
 // RULES API
 
-      {
-        "endpoint": "/api-rules/1.0/api/trigger",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/trigger",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://rules-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-rules/1.0/api/trigger/{id}",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/trigger/{id}",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://rules-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-rules/1.0/api/trigger/asset/{id}",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/trigger/asset/{id}",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://rules-api-sv:8080"
-            ]
-          }
-        ]
-      },
+        {
+          "endpoint": "/api-rules/1.0/api/trigger",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/trigger",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://rules-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-rules/1.0/api/trigger/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/trigger/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://rules-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-rules/1.0/api/trigger/asset/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/trigger/asset/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://rules-api-sv:8082"
+              ]
+            }
+          ]
+        },

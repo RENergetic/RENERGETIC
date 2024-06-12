@@ -1,240 +1,240 @@
 // HDR API
 
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/recommendations/current",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/recommendations/current",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/requests/current",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/requests/current",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/recommendations/id/{id}/measurements",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/recommendations/id/{id}/measurements",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/requests/id/{id}",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/requests/id/{id}",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/recommendations",
-        "method": "POST",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/recommendations",
-            "encoding": "no-op",
-            "method": "POST",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/recommendations",
-        "method": "PUT",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/recommendations",
-            "encoding": "no-op",
-            "method": "PUT",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/recommendations",
-        "method": "DELETE",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/recommendations",
-            "encoding": "no-op",
-            "method": "DELETE",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/requests",
-        "method": "POST",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/requests",
-            "encoding": "no-op",
-            "method": "POST",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/requests",
-        "method": "DELETE",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/requests",
-            "encoding": "no-op",
-            "method": "DELETE",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/measurement",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/measurement",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/measurement/key/{key}/value/{value}",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/measurement/key/{key}/value/{value}",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/measurement",
-        "method": "POST",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/measurement",
-            "encoding": "no-op",
-            "method": "POST",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/measurement/{id}",
-        "method": "PUT",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/measurement/{id}",
-            "encoding": "no-op",
-            "method": "PUT",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-hdr/1.0/api/hdr/measurement/{id}",
-        "method": "DELETE",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/hdr/measurement/{id}",
-            "encoding": "no-op",
-            "method": "DELETE",
-            "host": [
-              "http://hdr-api-sv:8080"
-            ]
-          }
-        ]
-      },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations/current",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations/current",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/requests/current",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/requests/current",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations/id/{id}/measurements",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations/id/{id}/measurements",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/requests/id/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/requests/id/{id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/requests",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/requests",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/requests",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/requests",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement/key/{key}/value/{value}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement/key/{key}/value/{value}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement/{id}",
+          "method": "PUT",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement/{id}",
+              "encoding": "no-op",
+              "method": "PUT",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/measurement/{id}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/measurement/{id}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },

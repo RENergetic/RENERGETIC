@@ -1,155 +1,155 @@
 // INFLUX API
 
-      {
-        "endpoint": "/api-influx/1.0/api/dashboard/unit/{grafanaId}",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/dashboard/unit/{grafanaId}",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://influx-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-influx/1.0/api/measurement",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/measurement",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://influx-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-influx/1.0/api/measurement/tag",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "/api/measurement/tag",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://influx-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-influx/1.0/api/measurement/tag/{tag_name}",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "api/measurement/tag/{tag_name}",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://influx-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-influx/1.0/api/measurement/data",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "api/measurement/data",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://influx-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-influx/1.0/api/measurement/data",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "api/measurement/data",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://influx-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-influx/1.0/api/measurement/data/{function}",
-        "method": "GET",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "api/measurement/data/{function}",
-            "encoding": "no-op",
-            "method": "GET",
-            "host": [
-              "http://influx-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-influx/1.0/api/measurement",
-        "method": "POST",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "api/measurement",
-            "encoding": "no-op",
-            "method": "POST",
-            "host": [
-              "http://influx-api-sv:8080"
-            ]
-          }
-        ]
-      },
-      {
-        "endpoint": "/api-influx/1.0/api/measurement/{measurement_name}",
-        "method": "DELETE",
-        "output_encoding": "no-op",
-        "input_headers": ["authorization", "accept", "content-type"],
-        "input_query_strings": ["*"],
-        "backend": [
-          {
-            "url_pattern": "api/measurement/{measurement_name}",
-            "encoding": "no-op",
-            "method": "DELETE",
-            "host": [
-              "http://influx-api-sv:8080"
-            ]
-          }
-        ]
-      },
+        {
+          "endpoint": "/api-influx/1.0/api/dashboard/unit/{grafanaId}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/dashboard/unit/{grafanaId}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/measurement",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/tag",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/measurement/tag",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/tag/{tag_name}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/tag/{tag_name}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/data",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/data",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/data",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/data",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/data/{function}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/data/{function}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "api/measurement",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-influx/1.0/api/measurement/{measurement_name}",
+          "method": "DELETE",
+          "output_encoding": "no-op",
+          "input_headers": ["authorization", "accept", "content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "api/measurement/{measurement_name}",
+              "encoding": "no-op",
+              "method": "DELETE",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
