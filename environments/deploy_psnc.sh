@@ -35,6 +35,7 @@ keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
 grafana=$(grep -ioP "(grafana\s*=\s*)\K.+" _installers.properties)
 nifi=$(grep -ioP "(nifi\s*=\s*)\K.+" _installers.properties)
 krakend=$(grep -ioP "(krakend\s*=\s*)\K.+" _installers.properties)
+swagger=$(grep -ioP "(swagger\s*=\s*)\K.+" _installers.properties)
 nexus=$(grep -ioP "(nexus\s*=\s*)\K.+" _installers.properties)
 
 resetConnection() {
@@ -432,6 +433,26 @@ installPSNC() {
         kubectl apply -f grafana-volume.yaml --namespace=$project
         envsubst '$PROJECT' < grafana-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f grafana-service.yaml --namespace=$project
+    fi
+# DEPLOY SWAGGER
+
+    if [[ $swagger = 'true' ]]
+    then
+        cd "${current}/docker_config/Others/swagger"
+        # SWAGGER INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/swagger-ui  --namespace=ren-prototype-devops
+        kubectl delete services/swagger-ui-sv  --namespace=ren-prototype-devops
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype-devops/swagger-ui:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/ren-prototype-devops/swagger-ui:latest
+
+        # create kubernetes resources
+        kubectl apply -f swagger-config.yaml  --namespace=ren-prototype-devops
+        kubectl apply -f swagger-service.yaml  --namespace=ren-prototype-devops
     fi
 # DEPLOY UI AND KEYCLOAK
 

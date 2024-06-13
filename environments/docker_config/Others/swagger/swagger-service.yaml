@@ -1,0 +1,13 @@
+# Backdb Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: swagger-ui-sv
+spec:
+  selector:
+    app: swagger-ui
+  ports:
+    - name: api-http
+      port: 8080
+      targetPort: 8080
+  type: NodePort
