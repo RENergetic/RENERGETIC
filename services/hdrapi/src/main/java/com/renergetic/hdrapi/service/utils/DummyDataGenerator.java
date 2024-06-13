@@ -4,6 +4,7 @@ package com.renergetic.hdrapi.service.utils;
 
 import com.renergetic.common.dao.*;
 import com.renergetic.common.dao.details.MeasurementTagsDAO;
+import com.renergetic.common.dao.details.TagDAO;
 import com.renergetic.common.model.*;
 import com.renergetic.common.repository.HDRRecommendationRepository;
 import com.renergetic.common.repository.MeasurementRepository;
@@ -151,7 +152,7 @@ public class DummyDataGenerator {
                     var it = tags.get(idx);
                     var hdr = new HDRRecommendationDAO();
                     hdr.setTimestamp(timestamp);
-                    hdr.setTag(MeasurementTagsDAO.create(it));
+                    hdr.setTag(TagDAO.create(it));
                     if(random.nextBoolean()){
                         hdr.setLabel("Decrease temperature by " + random.nextInt());
                     }

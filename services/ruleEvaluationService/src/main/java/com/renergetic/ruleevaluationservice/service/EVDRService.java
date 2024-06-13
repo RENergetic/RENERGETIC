@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 @Service
 public class EVDRService {
-
+/*
     @Value("${ev-dr.executionCRON}")
     private String executionCRON;
 
@@ -62,12 +62,6 @@ public class EVDRService {
             if(!assetPVGroup.getDetails().stream().anyMatch(d -> d.getKey().equals("ev-dr-asset-recommendation")))
                 continue;
             try{
-
-                /*
-                    TODO:
-                    For now this is fine as there is only one for the PMB !
-                    Later, should define a way to uniquely retrieve the aggregation for the EV-DR
-                 */
                 // Looking for a measurement that contains all pvIds in details.
                 List<MeasurementAggregation> ma = measurementAggregationRepository.findByOutputMeasurementsAsset(assetPVGroup);
 
@@ -128,5 +122,5 @@ public class EVDRService {
         if(foundAsset == null)
             throw new ConfigurationError("Asset with name '"+name+"' could not be found for asset: "+asset.getName());
         return foundAsset;
-    }
+    }*/
 }

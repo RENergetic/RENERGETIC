@@ -1,6 +1,5 @@
 package com.renergetic.baseapi.service.validator;
 
-import com.renergetic.common.model.AssetRule;
 import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.baseapi.exception.MissingMember;
 import com.renergetic.baseapi.exception.ValidatorException;
@@ -10,7 +9,7 @@ import java.util.Optional;
 
 @Component
 public class AssetRuleValidator {
-    public void validate(AssetRule assetRule) throws ValidatorException {
+    /*public void validate(AssetRule assetRule) throws ValidatorException {
         if(assetRule.getAsset() == null)
             throw new MissingMember("Asset link is mandatory but missing.");
 
@@ -36,5 +35,5 @@ public class AssetRuleValidator {
 
         if(assetRule.getComparator() == null || assetRule.getComparator().isEmpty())
             throw new MissingMember("Comparator is mandatory.");
-    }
+    }*/
 }

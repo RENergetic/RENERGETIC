@@ -34,7 +34,7 @@ public class HDRRecommendation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private Long timestamp;
     @ManyToOne(cascade = CascadeType.REFRESH, optional = false)
     @JoinColumn(name = "tag_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
