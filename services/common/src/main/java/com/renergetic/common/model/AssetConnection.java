@@ -1,7 +1,6 @@
 package com.renergetic.common.model;
 
 import com.renergetic.common.model.listeners.AssetConnectionListener;
-import com.renergetic.common.model.listeners.AssetDetailsListener;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -12,6 +11,7 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -22,6 +22,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
+@EntityListeners(AssetConnectionListener.class)
 @Table(name = "asset_connection")
 @RequiredArgsConstructor
 @Getter

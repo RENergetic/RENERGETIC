@@ -13,11 +13,13 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
+@EntityListeners(AssetDetailsListener.class)
 @Table(name = "asset_details")
 @RequiredArgsConstructor
 @Getter
