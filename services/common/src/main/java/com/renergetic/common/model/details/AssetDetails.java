@@ -11,14 +11,11 @@ import lombok.ToString;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "asset_details")
+@EntityListeners(AssetDetailsListener.class)
 @RequiredArgsConstructor
 @Getter
 @Setter
