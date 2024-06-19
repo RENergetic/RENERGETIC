@@ -1,7 +1,6 @@
 package com.renergetic.common.model;
 
 import com.renergetic.common.model.listeners.AssetConnectionListener;
-import com.renergetic.common.model.listeners.AssetDetailsListener;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -9,9 +8,21 @@ import lombok.ToString;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
+@EntityListeners(AssetConnectionListener.class)
 @Table(name = "asset_connection")
 @EntityListeners(AssetConnectionListener.class)
 @RequiredArgsConstructor
