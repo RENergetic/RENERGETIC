@@ -82,7 +82,7 @@ public class MeasurementAggregationService {
 
         List<Measurement> children = new ArrayList<>(measurementAggregation.getAggregatedMeasurements());
         Long from = TimeUtils.convertLiteralDiffToInstantMillis(mad.getTimeMin());
-        Optional<Long> to = Optional.ofNullable(TimeUtils.convertLiteralDiffToInstantMillis(mad.getTimeMin()));
+        Optional<Long> to = Optional.ofNullable(TimeUtils.convertLiteralDiffToInstantMillis(mad.getTimeMax()));
 
         List<MeasurementSimplifiedDAO> msd = dataService.getData(children, mad.getAggregationType(), mad.getTimeRange(), from, to);
 
