@@ -24,6 +24,7 @@ import javax.persistence.Table;
 @Entity
 @EntityListeners(AssetConnectionListener.class)
 @Table(name = "asset_connection")
+@EntityListeners(AssetConnectionListener.class)
 @RequiredArgsConstructor
 @Getter
 @Setter
