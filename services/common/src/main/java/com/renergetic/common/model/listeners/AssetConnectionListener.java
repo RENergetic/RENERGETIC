@@ -1,8 +1,6 @@
 package com.renergetic.common.model.listeners;
 
-import com.renergetic.common.model.Asset;
 import com.renergetic.common.model.AssetConnection;
-import com.renergetic.common.model.ConnectionType;
 import com.renergetic.common.model.details.AssetDetails;
 import com.renergetic.common.repository.AssetRepository;
 import com.renergetic.common.repository.information.AssetDetailsRepository;
@@ -15,10 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
-import javax.persistence.PostUpdate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
