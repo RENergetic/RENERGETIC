@@ -445,7 +445,11 @@ public class KubeflowService {
         var dao = new PipelineDefinitionDAO();
         dao.setPipelineId(obj.getString("id"));
         dao.setName(obj.getString("name"));
-        dao.setDescription(obj.getString("description"));
+        try {
+            dao.setDescription(obj.getString("description"));
+        } catch (org.json.JSONException ex) {
+            dao.setDescription(null);
+        }
         HashMap<String, PipelineParameterDAO> paramsMap = new HashMap<>();
         JSONArray paramArr;
         try {
