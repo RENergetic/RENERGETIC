@@ -4177,29 +4177,6 @@ data:
           ]
         },
         {
-          "endpoint": "/api-influx/1.0/api/measurement/data",
-          "method": "GET",
-          "output_encoding": "no-op",
-          "input_headers": [
-            "authorization",
-            "accept",
-            "content-type"
-          ],
-          "input_query_strings": [
-            "*"
-          ],
-          "backend": [
-            {
-              "url_pattern": "api/measurement/data",
-              "encoding": "no-op",
-              "method": "GET",
-              "host": [
-                "http://influx-api-sv:8082"
-              ]
-            }
-          ]
-        },
-        {
           "endpoint": "/api-influx/1.0/api/measurement/data/{function}",
           "method": "GET",
           "output_encoding": "no-op",
@@ -4561,52 +4538,6 @@ data:
               "url_pattern": "/api/meter/data",
               "encoding": "no-op",
               "method": "POST",
-              "host": [
-                "http://kpi-api-sv:8082"
-              ]
-            }
-          ]
-        },
-        {
-          "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data",
-          "method": "GET",
-          "output_encoding": "no-op",
-          "input_headers": [
-            "authorization",
-            "accept",
-            "content-type"
-          ],
-          "input_query_strings": [
-            "*"
-          ],
-          "backend": [
-            {
-              "url_pattern": "/api/kpi/{domain}/{meter_name}/data",
-              "encoding": "no-op",
-              "method": "GET",
-              "host": [
-                "http://kpi-api-sv:8082"
-              ]
-            }
-          ]
-        },
-        {
-          "endpoint": "/api-kpi/1.0/api/kpi/{domain}/{meter_name}/data/{operation}",
-          "method": "GET",
-          "output_encoding": "no-op",
-          "input_headers": [
-            "authorization",
-            "accept",
-            "content-type"
-          ],
-          "input_query_strings": [
-            "*"
-          ],
-          "backend": [
-            {
-              "url_pattern": "/api/kpi/{domain}/{meter_name}/data/{operation}",
-              "encoding": "no-op",
-              "method": "GET",
               "host": [
                 "http://kpi-api-sv:8082"
               ]
