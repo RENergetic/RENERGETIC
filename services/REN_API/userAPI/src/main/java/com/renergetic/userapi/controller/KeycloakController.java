@@ -67,7 +67,7 @@ public class KeycloakController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/{userId}/roles", produces = "application/json")
     public ResponseEntity<List<String>> getRoles(@PathVariable String userId) {
-        List<String> roles = keycloakSv.getRoles(userId)
+        List<String> roles = keycloakSv.getRoles(userSv.translateDbIdToKeycloakId(userId))
         		.stream()
         		.map(RoleRepresentation::getName).collect(Collectors.toList());
         return new ResponseEntity<>(roles, HttpStatus.OK);
@@ -91,6 +91,7 @@ public class KeycloakController {
     @ApiResponse(responseCode = "500", description = "Error saving user")
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Boolean> updateUser(@PathVariable String userId, @RequestBody UserDAORequest user) {
+        user.setId(userSv.translateDbIdToKeycloakId(user.getId()));
     	UserRepresentation keycloakUser = keycloakSv.updateUser(user);
         userSv.update(keycloakUser);
         return new ResponseEntity<>(true, HttpStatus.OK);
@@ -103,7 +104,7 @@ public class KeycloakController {
     @ApiResponse(responseCode = "500", description = "Error saving user")
     @PutMapping(path = "/{id}/roles/{roleName}", produces = "application/json")
     public ResponseEntity<List<String>> addRole(@PathVariable String id, @PathVariable String roleName) {
-        List<String> roles = keycloakSv.assignRole(id, roleName)
+        List<String> roles = keycloakSv.assignRole(userSv.translateDbIdToKeycloakId(id), roleName)
         		.stream()
         		.map(RoleRepresentation::getName)
         		.collect(Collectors.toList());
@@ -114,7 +115,7 @@ public class KeycloakController {
     @ApiResponse(responseCode = "500", description = "Error deleting user")
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
-        UserRepresentation userRepresentation = keycloakSv.getUser(id).toRepresentation();
+        UserRepresentation userRepresentation = keycloakSv.getUser(userSv.translateDbIdToKeycloakId(id)).toRepresentation();
         keycloakSv.deleteUser(userRepresentation.getId());
         userSv.delete(userRepresentation);
         return ResponseEntity.ok(null);
@@ -126,7 +127,7 @@ public class KeycloakController {
     @ApiResponse(responseCode = "500", description = "Error deleting user")
     @DeleteMapping(path = "/{id}/roles/{roleName}")
     public ResponseEntity<List<String>> deleteRole(@PathVariable String id, @PathVariable String roleName) {
-        List<String> roles = keycloakSv.revokeRole(id, roleName)
+        List<String> roles = keycloakSv.revokeRole(userSv.translateDbIdToKeycloakId(id), roleName)
             .stream()
             .map(RoleRepresentation::getName)
             .collect(Collectors.toList());
