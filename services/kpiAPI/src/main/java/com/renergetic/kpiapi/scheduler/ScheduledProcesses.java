@@ -38,8 +38,10 @@ public class ScheduledProcesses {
     @Async
     @Scheduled(fixedDelayString = "${scheduled.abstrac-meter.period}", timeUnit = TimeUnit.MINUTES)
     public void calculateMeters() {
+        var tsFrom = Instant.now().toEpochMilli();
+        var to = Instant.now().toEpochMilli();
         List<AbstractMeterDataDAO> data = meterService
-                .calculateAndInsertAll(Instant.now().toEpochMilli() - (60000 * meterPeriod), Instant.now().toEpochMilli(), null);
+                .calculateAndInsertAll(tsFrom - (60000 * meterPeriod), to, null);
 
         log.info(String.format("Abtract meters calculated (Period: %d minutes)", meterPeriod));
         data.forEach(obj -> obj.getData().forEach((time, value) ->
