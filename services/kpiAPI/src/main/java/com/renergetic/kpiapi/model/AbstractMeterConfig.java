@@ -26,10 +26,13 @@ public class AbstractMeterConfig {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "name", nullable = false, insertable = true, updatable = true, unique = false)
-	private AbstractMeter name;
+	private AbstractMeter name; //-> change to type
 
 	@Column(name = "formula", nullable = false, insertable = true, updatable = true, unique = false)
 	private String formula;
+
+	@Column(name = "custom_name", nullable = true, insertable = true, updatable = true, unique = false)
+	private String customName;
 
 	@Column(name = "condition", nullable = true, insertable = true, updatable = true, unique = false)
 	private String condition;

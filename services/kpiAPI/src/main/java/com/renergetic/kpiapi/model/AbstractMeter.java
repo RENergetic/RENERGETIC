@@ -12,8 +12,9 @@ public enum AbstractMeter {
 	EXCESS ("Excess", "Energy Excess"),
 	STORAGE ("Storage", "Energy Storage"),
 	RES ("Storage RES", "Renewable energy storage"),
-	NONRES ("Storage non RES", "Non renewable energy storage");
-	
+	NONRES ("Storage non RES", "Non renewable energy storage"),
+	CUSTOM ("Custom", "Custom abstract meter"); //Custom type to calculate own abstract meter
+
 	public final String meter;
 	public final String description;
 	

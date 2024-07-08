@@ -11,9 +11,11 @@ import lombok.Data;
 public class AbstractMeterDAO {
 	@JsonProperty(required = false)
 	Long id;
-	
+
 	@JsonProperty(required = true)
 	String name;
+	@JsonProperty(required = false,value = "custom_name")
+	String customName;
 	
 	@JsonProperty(required = true)
 	String formula;
@@ -25,10 +27,12 @@ public class AbstractMeterDAO {
 	Domain domain;
 	
 	public static AbstractMeterDAO create(AbstractMeterConfig meter) {
+
 		AbstractMeterDAO dao = null;
 		
 		if(meter != null) {
 			dao = new AbstractMeterDAO();
+			dao.customName= meter.getCustomName();
 
 			dao.setId(meter.getId());
 			
@@ -48,6 +52,7 @@ public class AbstractMeterDAO {
 
 		entity.setId(this.id);
 		entity.setName(AbstractMeter.obtain(this.name));
+		entity.setCustomName(this.getCustomName());
 		entity.setFormula(this.formula);
 		entity.setCondition(this.condition);
 		entity.setDomain(this.domain);
