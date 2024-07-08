@@ -88,7 +88,7 @@ public class UserService {
         
         assetRepo.save(asset);
         
-        return UserDAOResponse.create(user, null, null);
+        return UserDAOResponse.create(entity.getId(), user, null, null);
 	}
 	
 	public UserDAOResponse update(UserRepresentation user) {
@@ -120,7 +120,7 @@ public class UserService {
         
         assetRepo.save(asset);
         
-        return UserDAOResponse.create(user, null, null);
+        return UserDAOResponse.create(entity.getId(), user, null, null);
 	}
 	
 	public UserDAOResponse delete(UserRepresentation user) {
@@ -143,7 +143,7 @@ public class UserService {
         // Remove user
         userRepo.delete(entity);
         
-        return UserDAOResponse.create(user, null, null);
+        return UserDAOResponse.create(entity.getId(), user, null, null);
 	}
 	
 
@@ -218,5 +218,16 @@ public class UserService {
         if (list.isEmpty())
             return list;
         else throw new NotFoundException("No roles found");
+    }
+
+    public String translateDbIdToKeycloakId(String userId){
+        return userRepo.findById(Long.valueOf(userId)).orElseThrow(() -> new NotFoundException("User with id %s not found", userId)).getKeycloakId();
+    }
+
+    public Long translateKeycloakIdToDbId(String userId){
+        User user = userRepo.findByKeycloakId(userId);
+        if(user == null)
+            throw new NotFoundException("User with id %s not found", userId);
+        return user.getId();
     }
 }

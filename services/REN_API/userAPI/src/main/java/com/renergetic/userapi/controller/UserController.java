@@ -68,7 +68,7 @@ public class UserController {
         		.collect(Collectors.toList());
         
         String settingsJson = userSv.getSettings(user.getId()).getSettingsJson();
-        UserDAOResponse profile = UserDAOResponse.create(keycloakProfile, roles, settingsJson);
+        UserDAOResponse profile = UserDAOResponse.create(userSv.translateKeycloakIdToDbId(keycloakProfile.getId()), keycloakProfile, roles, settingsJson);
         
         return new ResponseEntity<>(profile, HttpStatus.OK);
     }
