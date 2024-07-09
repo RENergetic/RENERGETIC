@@ -222,8 +222,13 @@ public class AbstractMeterDataService {
                 influxRequest.getFields().put("time", DateConverter.toString(time));
 
             BigDecimal value = new BigDecimal(0);
-            if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to))
+            if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to)) {
                 value = calculator.calculateFormula(meter.getFormula(), from, to);
+                if (meter.getType() != null) {
+//                    convert to user defined scale
+                    value = value.multiply(BigDecimal.valueOf(1 / meter.getType().getFactor()));
+                }
+            }
 
             influxRequest.getFields().put("value", calculator.bigDecimalToDoubleString(value));
 

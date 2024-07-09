@@ -6,7 +6,7 @@ import com.renergetic.kpiapi.exception.HttpRuntimeException;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
 import com.renergetic.kpiapi.model.*;
 import com.renergetic.kpiapi.repository.KPIConstantRepository;
-import com.renergetic.kpiapi.service.kpi.AbstractMeterConfig;
+import com.renergetic.kpiapi.service.kpi.AbstractMeterKPIConfig;
 import com.renergetic.kpiapi.service.kpi.KPIFormula;
 import com.renergetic.kpiapi.service.utils.DateConverter;
 import com.renergetic.kpiapi.service.utils.HttpAPIs;
@@ -172,7 +172,7 @@ public class KPIService {
     }
 
     public List<KPIDataDAO> calculateAndInsertAll(Domain domain, Long from, Long to, Long time) {
-
+//TODO unify units convert them
         // Prepare Abstract meter needed values
         Set<Thread> threads = new HashSet<>();
 
@@ -253,19 +253,19 @@ public class KPIService {
 
     public List<KPIDataDAO> calculateAndInsert(Domain domain, List<KPIFormula> kpis, Long from, Long to, Long time) {
 
-        AbstractMeterConfig[] meters = KPIFormula.getRequiredAbstractMeters(kpis);
+        AbstractMeterKPIConfig[] meters = KPIFormula.getRequiredAbstractMeters(kpis);
         // Prepare Abstract meter needed values
         Set<Thread> threads = new HashSet<>();
 
         Map<AbstractMeter, Double> values= Arrays.stream(meters)
                 .filter(it -> it.getPeriod() == 0 && it.getFunction() == InfluxFunction.SUM)
-                .collect(Collectors.toMap(AbstractMeterConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
+                .collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
            Map<AbstractMeter, Double> previousValues= Arrays.stream(meters)
                 .filter(it -> it.getPeriod() == -1 && it.getFunction() == InfluxFunction.SUM)
-                .collect(Collectors.toMap(AbstractMeterConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
+                .collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
         Map<AbstractMeter, Double> maxValues= Arrays.stream(meters)
                 .filter(it -> it.getPeriod() == 0 && it.getFunction() == InfluxFunction.MAX)
-                .collect(Collectors.toMap(AbstractMeterConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
+                .collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
 
 
         values.forEach((key, value) ->
@@ -337,8 +337,8 @@ public class KPIService {
     }
 
     public BigDecimal calculateESS(Map<AbstractMeter, Double> values) {
-
-        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) -
+//TODO this is percentage (0-1 values) - modify measurement table and set measurement type there
+         Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) -
                 (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 
@@ -348,7 +348,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateEP(Map<AbstractMeter, Double> values) {
-
+//TODO this is ratio - modify measurement table and set measurement type there
         Double result = (values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) +
                 (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
@@ -359,7 +359,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateEE(Map<AbstractMeter, Double> values) {
-
+//TODO this is percentage (0-1 values) - modify measurement table and set measurement type there
         Double result = 1 - (values.get(AbstractMeter.LOSSES) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
 
@@ -369,7 +369,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateES(Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previousValues) {
-
+//TODO this is ratio  - modify measurement table and set measurement type there
         Double result = ((previousValues.get(AbstractMeter.LOAD) + previousValues.get(AbstractMeter.LOSSES) + previousValues.get(AbstractMeter.STORAGE)) -
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
@@ -380,7 +380,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateSRES(Map<AbstractMeter, Double> values) {
-
+//TODO this is ratio- modify measurement table and set measurement type there
         Double result = (values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES));
 
@@ -390,7 +390,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateSNES(Map<AbstractMeter, Double> values) {
-
+//TODO this is ratio - modify measurement table and set measurement type there
         Double result = 1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)));
 
@@ -400,6 +400,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateCO2(Map<AbstractMeter, Double> values) {
+//        todo review this kpi
         KPIConstant c = constantRepository.findAll().stream().findFirst().orElse(new KPIConstant(1L, 1., 1., 1., 1.));
 
         log.debug(String.format("Constants: a -> %.2f | b -> %.2f | g -> %.2f | d -> %.2f", c.getAlpha(), c.getBeta(), c.getGamma(), c.getDelta()));

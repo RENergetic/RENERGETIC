@@ -201,6 +201,12 @@ public class AbstractMeterService {
         } else {
             allDomainMeter = new AbstractMeterConfig();
             allDomainMeter.setDomain(Domain.none);
+
+            if (meter.getType() != null )
+                allDomainMeter.setType(meter.getType());
+            else if (otherMeter != null && otherMeter.getType() != null ) {
+                allDomainMeter.setType(otherMeter.getType());
+            }
             if (meter.getCondition() != null && !meter.getCondition().isEmpty())
                 allDomainMeter.setCondition(meter.getCondition());
             else if (otherMeter != null && otherMeter.getCondition() != null && !otherMeter.getCondition().isEmpty()) {

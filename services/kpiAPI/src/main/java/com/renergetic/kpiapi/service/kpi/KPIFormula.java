@@ -10,17 +10,20 @@ import java.util.Map;
 public interface KPIFormula {
     public BigDecimal calculate(Map<AbstractMeter, Double> values);
 
-    public AbstractMeterConfig[] getRequiredAbstractMeters();
+    public AbstractMeterKPIConfig[] getRequiredAbstractMeters();
 
-    public static AbstractMeterConfig[] getRequiredAbstractMeters(List<KPIFormula> kpis) {
-        Map<String, AbstractMeterConfig> m = new HashMap<>();
+
+    public static AbstractMeterKPIConfig[] getRequiredAbstractMeters(List<KPIFormula> kpis) {
+        Map<String, AbstractMeterKPIConfig> m = new HashMap<>();
         for (var kpi : kpis) {
             for (var meter : kpi.getRequiredAbstractMeters()) {
                 m.put(meter.getKey(), meter);
             }
         }
-        return m.values().toArray(new AbstractMeterConfig[0]);
+        return m.values().toArray(new AbstractMeterKPIConfig[0]);
     }
+
+
 }
 
 

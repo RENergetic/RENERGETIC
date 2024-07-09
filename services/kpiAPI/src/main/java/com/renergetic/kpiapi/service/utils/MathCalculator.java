@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
 import com.renergetic.kpiapi.model.Asset;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +90,7 @@ public class MathCalculator {
 		
 		Stack<BigDecimal> numbers = new Stack<>();
 		Stack<Character> operators = new Stack<>();
-		
+		String compareBaseUnits = null;
 		for (int i = 0; i < formula.length(); i++) {
 			char c = formula.charAt(i);
 			log.debug("Read character: " + c);
@@ -113,7 +114,14 @@ public class MathCalculator {
 			} else if (c == '(' || c == '[') {
 				operators.push(c);
 			} else if (c == ']') {
-				getValueFromMeasurement(numbers, from, to);
+				String baseUnit = getValueFromMeasurement(numbers, from, to);
+				if(compareBaseUnits==null ){
+					compareBaseUnits=baseUnit;
+				}
+				else if(!compareBaseUnits.equals(baseUnit)){
+//					different unit
+					throw new IllegalArgumentException("invalid units ");
+				}
 				operators.pop();
 			} else if (c == ')') {
 				while (!operators.empty() && operators.peek() != '(') {
@@ -186,11 +194,21 @@ public class MathCalculator {
         numbers.push(result);
 	}
 	
-	private void getValueFromMeasurement(Stack<BigDecimal> numbers, Long from, Long to) {
+	private String getValueFromMeasurement(Stack<BigDecimal> numbers, Long from, Long to) {
 		Long measurementId = numbers.pop().longValue();
-		
-		numbers.push(getMeasurementData(measurementId, from, to));
-		
+		Measurement measurement = measurementRepository.findById(measurementId).orElse(null);
+		if(measurement==null){
+			log.debug(String.format("Measurement not exists: %d ", measurementId));
+		}
+		else{
+			var measurementValue = getMeasurementData(measurement, from, to);
+//convert to SI unit value
+
+			numbers.push(measurementValue.multiply(BigDecimal.valueOf(measurement.getType().getFactor())));
+			return measurement.getType().getBaseUnit();
+		}
+
+		return null;
 	}
 		
 	private static boolean isOperator(Character c) {
@@ -204,8 +222,8 @@ public class MathCalculator {
         return (op1 == '^' && op2 != '^') || ((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-'));
     }
 	
-	private BigDecimal getMeasurementData(Long id, Long from, Long to) {
-		Measurement measurement = measurementRepository.findById(id).orElse(null);
+	private BigDecimal getMeasurementData(Measurement measurement , Long from, Long to) {
+
 		BigDecimal ret = null;
 		
 		if (measurement != null) {
@@ -273,8 +291,9 @@ public class MathCalculator {
 	                    }
 	                }
 	        } else ret = new BigDecimal(0);
+			log.debug(String.format("Value for measurement %d: %s", measurement.getId(), ret));
 		}
-		log.debug(String.format("Value for measurement %d: %s", id, ret));
+
 		
 		return ret;
 	}

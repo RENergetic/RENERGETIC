@@ -10,12 +10,12 @@ public class ESS implements KPIFormula {
 
     public final static ESS Instance = new ESS();
 
-    private static AbstractMeterConfig[] requiredMeters = {
-            new  AbstractMeterConfig( AbstractMeter.LOAD, InfluxFunction.SUM,0),
-            new  AbstractMeterConfig( AbstractMeter.LOSSES, InfluxFunction.SUM,0),
-            new  AbstractMeterConfig( AbstractMeter.STORAGE, InfluxFunction.SUM,0),
-            new  AbstractMeterConfig( AbstractMeter.ENS, InfluxFunction.SUM,0),
-            new  AbstractMeterConfig( AbstractMeter.ERS, InfluxFunction.SUM,0)
+    private static AbstractMeterKPIConfig[] requiredMeters = {
+            new AbstractMeterKPIConfig( AbstractMeter.LOAD, InfluxFunction.SUM,0),
+            new AbstractMeterKPIConfig( AbstractMeter.LOSSES, InfluxFunction.SUM,0),
+            new AbstractMeterKPIConfig( AbstractMeter.STORAGE, InfluxFunction.SUM,0),
+            new AbstractMeterKPIConfig( AbstractMeter.ENS, InfluxFunction.SUM,0),
+            new AbstractMeterKPIConfig( AbstractMeter.ERS, InfluxFunction.SUM,0)
 
     };
 
@@ -31,9 +31,11 @@ public class ESS implements KPIFormula {
     }
 
     @Override
-    public AbstractMeterConfig[] getRequiredAbstractMeters() {
+    public AbstractMeterKPIConfig[] getRequiredAbstractMeters() {
         return requiredMeters;
     }
+
+    e
 
 
 }

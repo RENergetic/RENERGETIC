@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class AbstractMeterConfig {
+public class AbstractMeterKPIConfig {
 
     AbstractMeter abstractMeter;
     InfluxFunction function;
