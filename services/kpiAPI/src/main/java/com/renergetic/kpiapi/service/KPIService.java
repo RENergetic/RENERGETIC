@@ -234,8 +234,8 @@ public class KPIService {
                 influxRequest.getFields().put("time", DateConverter.toString(time));
 
             BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
-
-            influxRequest.getFields().put("value", calculator.bigDecimalToDoubleString(value));
+//kpi. TODO:
+            influxRequest.getFields().put(kpi.type, calculator.bigDecimalToDoubleString(value));
 
             HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 
@@ -305,7 +305,7 @@ public class KPIService {
 
             BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
 
-            influxRequest.getFields().put("value", calculator.bigDecimalToDoubleString(value));
+            influxRequest.getFields().put(kpi.typeName, calculator.bigDecimalToDoubleString(value));
 
             HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 
@@ -337,7 +337,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateESS(Map<AbstractMeter, Double> values) {
-//TODO this is percentage (0-1 values) - modify measurement table and set measurement type there
+
          Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) -
                 (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
@@ -348,7 +348,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateEP(Map<AbstractMeter, Double> values) {
-//TODO this is ratio - modify measurement table and set measurement type there
+
         Double result = (values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) +
                 (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
