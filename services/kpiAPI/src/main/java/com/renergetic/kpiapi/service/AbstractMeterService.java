@@ -94,8 +94,9 @@ public class AbstractMeterService {
      * @throws NotFoundException if an abstract meter with the given name and domain doesn't exist
      */
     public AbstractMeterDAO get(String name, Domain domain) {
-        return AbstractMeterDAO.create(amRepo.findByNameAndDomain(AbstractMeter.obtain(name), domain)
-                .orElseThrow(() -> new NotFoundException("The abstract meter with name %s and domain %s isn't configured", name, domain)));
+        AbstractMeterConfig byNameAndDomain = amRepo.findByNameAndDomain(AbstractMeter.obtain(name), domain)
+                .orElseThrow(() -> new NotFoundException("The abstract meter with name %s and domain %s isn't configured", name, domain));
+        return AbstractMeterDAO.create(byNameAndDomain,byNameAndDomain.getMeasurement()                );
     }
 
     /**
@@ -193,9 +194,9 @@ public class AbstractMeterService {
         Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(meter, domain);
         if (previousConfig.isPresent()) {
             if (domain != Domain.none)
-                updateAllDomainMeter(AbstractMeterDAO.create(previousConfig.get()), true);
+                updateAllDomainMeter(AbstractMeterDAO.create(previousConfig.get(),null), true);
             amRepo.deleteByNameAndDomain(meter, domain);
-            return AbstractMeterDAO.create(previousConfig.get());
+            return AbstractMeterDAO.create(previousConfig.get(),null);
         } else
             throw new IdNoDefinedException("The abstract meter with name %s and domain %s isn't configured", meter, domain);
     }
@@ -212,9 +213,9 @@ public class AbstractMeterService {
         if (previousConfig.isPresent()) {
             var prev = previousConfig.get();
             if (prev.getDomain() != Domain.none)
-                updateAllDomainMeter(AbstractMeterDAO.create(prev), true);
+                updateAllDomainMeter(AbstractMeterDAO.create(prev,null), true);
             amRepo.delete(prev);
-            return AbstractMeterDAO.create(previousConfig.get());
+            return AbstractMeterDAO.create(previousConfig.get(),null);
         } else
             throw new IdNoDefinedException("The abstract meter with name %s and domain %s isn't configured", meter.getName(), meter.getDomain());
     }
