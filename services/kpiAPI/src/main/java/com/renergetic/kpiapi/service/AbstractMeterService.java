@@ -1,12 +1,13 @@
 package com.renergetic.kpiapi.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.renergetic.kpiapi.dao.AbstractMeterTypeDAO;
+import com.renergetic.kpiapi.dao.MeasurementDAO;
+import com.renergetic.kpiapi.model.Measurement;
+import com.renergetic.kpiapi.repository.MeasurementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -31,17 +32,29 @@ public class AbstractMeterService {
     @Autowired
     private MathCalculator calculator;
 
+    @Autowired
+    MeasurementRepository measurementRepository;
+
     /**
      * Returns a map of meter names and their descriptions.
      *
      * @return a map containing meter names as keys and their respective descriptions as values.
      */
-    public Map<String, String> list() {
+    public Map<String, String> map() {
         Map<String, String> meters = new TreeMap<>();
         for (AbstractMeter meter : AbstractMeter.values()) {
             meters.put(meter.meter, meter.description);
         }
         return meters;
+    }
+
+    /**
+     * Returns a map of meter names and their descriptions.
+     *
+     * @return a map containing meter names as keys and their respective descriptions as values.
+     */
+    public List<AbstractMeterTypeDAO> list() {
+        return Arrays.stream(AbstractMeter.values()).map(AbstractMeterTypeDAO::new).toList();
     }
 
     /**
@@ -94,7 +107,7 @@ public class AbstractMeterService {
      * @throws InvalidArgumentException  if the given formula is not a valid mathematical formula
      */
     public AbstractMeterDAO create(AbstractMeterDAO meter) {
-        this.checkDomain(meter);
+
         if (!calculator.validateFormula(meter.getFormula()))
             throw new InvalidArgumentException("%s isn't a valid mathematical formula", meter.getFormula());
 
@@ -103,13 +116,32 @@ public class AbstractMeterService {
 
         if (!amRepo.existsByNameAndDomain(AbstractMeter.obtain(meter.getName()), meter.getDomain())) {
             meter.setId(null);
-            var newMeter = AbstractMeterDAO.create(amRepo.save(meter.mapToEntity()));
-            this.updateAllDomainMeter(newMeter, false);
+            var entity= meter.mapToEntity();
+            if (meter.getMeasurement() != null) {
+//check if exists
+               entity.setMeasurement(measurementRepository.findById(meter.getMeasurement().getId()).orElseThrow());
+            } else {
+//             infer measurement
+                var m = this.findMeasurement(meter);
+                entity.setMeasurement(m);
+            }
+
+            var newMeter = AbstractMeterDAO.create(amRepo.save(entity),entity.getMeasurement());
+            if (newMeter.getDomain() != Domain.none)
+                this.updateAllDomainMeter(newMeter, false);
             return newMeter;
         } else
             throw new IdAlreadyDefinedException("The abstract meter with name %s and domain %s already is configured, use PUT request", meter.getName(), meter.getDomain());
     }
 
+    private Measurement findMeasurement(AbstractMeterDAO meter) {
+        var m = measurementRepository.inferMeasurement(meter.getName().toLowerCase(),
+                "abstract_meter", meter.getDomain().name(), null, null, null);
+        if (m.size() == 1) {
+            return m.get(0);
+        }
+        return null;
+    }
 
     /**
      * Updates an instance of AbstractMeterDAO.
@@ -120,7 +152,6 @@ public class AbstractMeterService {
      * @throws InvalidArgumentException if the given formula is not a valid mathematical formula
      */
     public AbstractMeterDAO update(AbstractMeterDAO meter) {
-
         if (!calculator.validateFormula(meter.getFormula()))
             throw new InvalidArgumentException("%s isn't a valid mathematical formula", meter.getFormula());
 
@@ -129,9 +160,16 @@ public class AbstractMeterService {
 
         Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(AbstractMeter.obtain(meter.getName()), meter.getDomain());
         if (previousConfig.isPresent()) {
+
             AbstractMeterConfig config = meter.mapToEntity();
+            if (meter.getMeasurement() != null) {
+//check if measurement exists
+                var measurement = measurementRepository.findById(meter.getMeasurement().getId()).orElseThrow();
+                config.setMeasurement(measurement);
+            } else
+                config.setMeasurement(null);
             config.setId(previousConfig.get().getId());
-            AbstractMeterDAO updatedMeter = AbstractMeterDAO.create(amRepo.save(config));
+            AbstractMeterDAO updatedMeter = AbstractMeterDAO.create(amRepo.save(config),config.getMeasurement());
             if (meter.getDomain() != Domain.none) {
                 this.updateAllDomainMeter(updatedMeter, false);
             }
@@ -180,8 +218,9 @@ public class AbstractMeterService {
             throw new IdNoDefinedException("The abstract meter with name %s and domain %s isn't configured", meter.getName(), meter.getDomain());
     }
 
-    private AbstractMeterDAO updateAllDomainMeter(AbstractMeterDAO meter, boolean delete) {
+    private void updateAllDomainMeter(AbstractMeterDAO meter, boolean delete) {
         String formula = delete ? "0" : meter.getFormula();
+
         AbstractMeterConfig otherMeter;
         if (meter.getDomain() == Domain.none) {
             throw new IllegalArgumentException("Only heat and electricity domains are possible");
@@ -201,12 +240,10 @@ public class AbstractMeterService {
         } else {
             allDomainMeter = new AbstractMeterConfig();
             allDomainMeter.setDomain(Domain.none);
+            var measurement = this.findMeasurement(meter);
+            if (measurement != null)
+                meter.setMeasurement(MeasurementDAO.create(measurement));
 
-            if (meter.getType() != null )
-                allDomainMeter.setType(meter.getType());
-            else if (otherMeter != null && otherMeter.getType() != null ) {
-                allDomainMeter.setType(otherMeter.getType());
-            }
             if (meter.getCondition() != null && !meter.getCondition().isEmpty())
                 allDomainMeter.setCondition(meter.getCondition());
             else if (otherMeter != null && otherMeter.getCondition() != null && !otherMeter.getCondition().isEmpty()) {
@@ -215,7 +252,7 @@ public class AbstractMeterService {
             allDomainMeter.setName(AbstractMeter.obtain(meter.getName()));
         }
         allDomainMeter.setFormula(formula);
-        return AbstractMeterDAO.create(amRepo.save(allDomainMeter));
+        AbstractMeterDAO.create(amRepo.save(allDomainMeter),allDomainMeter.getMeasurement());
     }
 
     private void checkDomain(AbstractMeterDAO meter) {

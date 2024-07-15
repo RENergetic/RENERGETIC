@@ -37,8 +37,18 @@ public class AbstractMeterConfig {
     @Column(name = "domain", nullable = false, insertable = true, updatable = true, unique = false)
     private Domain domain;
 
-    @ManyToOne(cascade = CascadeType.REFRESH)
-    @NotFound(action = NotFoundAction.IGNORE)
-    @Column(name = "measurement_type", nullable = true, insertable = true, updatable = true, unique = false)
-    private MeasurementType type;
+    @ManyToOne(
+            optional = true,
+            cascade = {CascadeType.REFRESH}
+    )
+    @NotFound(
+            action = NotFoundAction.IGNORE
+    )
+    @JoinColumn(
+            name = "measurement_id",
+            nullable = true,
+            insertable = true,
+            updatable = true
+    )
+    private Measurement measurement;
 }

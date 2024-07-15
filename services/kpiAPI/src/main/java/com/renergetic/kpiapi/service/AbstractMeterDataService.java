@@ -189,7 +189,10 @@ public class AbstractMeterDataService {
             influxRequest.getFields().put("time", DateConverter.toString(time));
 
         BigDecimal value = calculator.calculateFormula(meter.getFormula(), from, to);
-        influxRequest.getFields().put("value", calculator.bigDecimalToDoubleString(value));
+
+        var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
+        influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
+
 
         HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 
@@ -224,13 +227,14 @@ public class AbstractMeterDataService {
             BigDecimal value = new BigDecimal(0);
             if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to)) {
                 value = calculator.calculateFormula(meter.getFormula(), from, to);
-                if (meter.getType() != null) {
+                if (meter.getMeasurement() != null) {
 //                    convert to user defined scale
-                    value = value.multiply(BigDecimal.valueOf(1 / meter.getType().getFactor()));
+                    var type = meter.getMeasurement().getType();
+                    value = value.multiply(BigDecimal.valueOf(1 / type.getFactor()));
                 }
             }
-
-            influxRequest.getFields().put("value", calculator.bigDecimalToDoubleString(value));
+            var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
+            influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
 
             HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 

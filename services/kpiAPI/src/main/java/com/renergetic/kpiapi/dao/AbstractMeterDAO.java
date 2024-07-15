@@ -1,11 +1,8 @@
 package com.renergetic.kpiapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.kpiapi.model.AbstractMeter;
-import com.renergetic.kpiapi.model.AbstractMeterConfig;
-import com.renergetic.kpiapi.model.Domain;
+import com.renergetic.kpiapi.model.*;
 
-import com.renergetic.kpiapi.model.MeasurementType;
 import lombok.Data;
 
 @Data
@@ -26,11 +23,14 @@ public class AbstractMeterDAO {
 
     @JsonProperty(required = true)
     Domain domain;
-    //type is used to convert units of the  data put into influx
-    @JsonProperty(required = false)
-    MeasurementType type;
 
+
+    @JsonProperty(required = false)
+    MeasurementDAO measurement;
     public static AbstractMeterDAO create(AbstractMeterConfig meter) {
+        return create(meter,null);
+    }
+    public static AbstractMeterDAO create(AbstractMeterConfig meter, Measurement m  ) {
 
         AbstractMeterDAO dao = null;
 
@@ -46,13 +46,16 @@ public class AbstractMeterDAO {
             dao.setFormula(meter.getFormula());
             dao.setCondition(meter.getCondition());
             dao.setDomain(meter.getDomain());
-            dao.setType(meter.getType());
+            if (m != null)
+                dao.setMeasurement(MeasurementDAO.create(m));
         }
 
         return dao;
     }
-
-    public AbstractMeterConfig mapToEntity() {
+    public AbstractMeterConfig mapToEntity( ){
+        return mapToEntity(null);
+    }
+    public AbstractMeterConfig mapToEntity(Measurement m) {
         AbstractMeterConfig entity = new AbstractMeterConfig();
 
         entity.setId(this.id);
@@ -61,7 +64,8 @@ public class AbstractMeterDAO {
         entity.setFormula(this.formula);
         entity.setCondition(this.condition);
         entity.setDomain(this.domain);
-        entity.setType(this.type);
+        if (m != null)
+            entity.setMeasurement(m);
 
         return entity;
     }

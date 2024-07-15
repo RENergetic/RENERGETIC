@@ -235,7 +235,7 @@ public class KPIService {
 
             BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
 //kpi. TODO:
-            influxRequest.getFields().put(kpi.type, calculator.bigDecimalToDoubleString(value));
+            influxRequest.getFields().put(kpi.typeName, calculator.bigDecimalToDoubleString(value));
 
             HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 
@@ -359,7 +359,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateEE(Map<AbstractMeter, Double> values) {
-//TODO this is percentage (0-1 values) - modify measurement table and set measurement type there
+
         Double result = 1 - (values.get(AbstractMeter.LOSSES) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
 
@@ -369,7 +369,7 @@ public class KPIService {
     }
 
     public BigDecimal calculateES(Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previousValues) {
-//TODO this is ratio  - modify measurement table and set measurement type there
+
         Double result = ((previousValues.get(AbstractMeter.LOAD) + previousValues.get(AbstractMeter.LOSSES) + previousValues.get(AbstractMeter.STORAGE)) -
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
@@ -380,9 +380,9 @@ public class KPIService {
     }
 
     public BigDecimal calculateSRES(Map<AbstractMeter, Double> values) {
-//TODO this is ratio- modify measurement table and set measurement type there
+        //in the original equation storage was subtracted in the nominator , in order to preserve the renewables values between 0-1 we need to add all storage in the denominator
         Double result = (values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES));
+                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)+ values.get(AbstractMeter.STORAGE));
 
         if (!Double.isNaN(result) && !Double.isInfinite(result))
             return BigDecimal.valueOf(result);
@@ -390,9 +390,8 @@ public class KPIService {
     }
 
     public BigDecimal calculateSNES(Map<AbstractMeter, Double> values) {
-//TODO this is ratio - modify measurement table and set measurement type there
         Double result = 1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)));
+                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)+ values.get(AbstractMeter.STORAGE)));
 
         if (!Double.isNaN(result) && !Double.isInfinite(result))
             return BigDecimal.valueOf(result);
