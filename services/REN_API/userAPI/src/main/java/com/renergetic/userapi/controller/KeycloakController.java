@@ -60,6 +60,7 @@ public class KeycloakController {
         } else {
             users = keycloakSv.listUsers(offset.orElse(0), limit.orElse(50));
         }
+        users.forEach(x -> x.setId(String.valueOf(userSv.translateKeycloakIdToDbId(x.getId()))));
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
@@ -90,7 +91,7 @@ public class KeycloakController {
     @ApiResponse(responseCode = "422", description = "Type isn's valid")
     @ApiResponse(responseCode = "500", description = "Error saving user")
     @PutMapping(path = "", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<Boolean> updateUser(@PathVariable String userId, @RequestBody UserDAORequest user) {
+    public ResponseEntity<Boolean> updateUser(@RequestBody UserDAORequest user) {
         user.setId(userSv.translateDbIdToKeycloakId(user.getId()));
     	UserRepresentation keycloakUser = keycloakSv.updateUser(user);
         userSv.update(keycloakUser);

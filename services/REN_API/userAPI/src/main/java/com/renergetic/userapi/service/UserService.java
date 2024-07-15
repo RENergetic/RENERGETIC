@@ -2,6 +2,7 @@ package com.renergetic.userapi.service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.keycloak.representations.idm.UserRepresentation;
@@ -109,8 +110,15 @@ public class UserService {
         Asset asset = assetRepo.findByUserId(entity.getId());
         asset = asset != null ? asset : new Asset();
 
-        AssetType type = typeRepo.findByName("user")
-        		.orElse(typeRepo.save(new AssetType("user")));
+
+        //orElse are always evaluated, even if there is a value, this can't be simplified.
+        Optional<AssetType> userType = typeRepo.findByName("user");
+        AssetType type;
+        if(userType.isEmpty()) {
+            type = typeRepo.save(new AssetType("user"));
+        } else {
+            type = userType.get();
+        }
 
         asset.setName(user.getUsername());
         asset.setLabel(user.getUsername());
