@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.renergetic.kpiapi.dao.AbstractMeterIdentifier;
 import com.renergetic.kpiapi.dao.AbstractMeterTypeDAO;
 import com.renergetic.kpiapi.model.AbstractMeter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,15 @@ public class AbstractMeterController {
     public ResponseEntity<List<AbstractMeterTypeDAO>> listAbstractMeters() {
 
         return ResponseEntity.ok(amSv.list());
+    }
+
+
+    @Operation(summary = "Get all Abstract Meters names and its description")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "list/notconfigured", produces = "application/json")
+    public ResponseEntity<List<AbstractMeterIdentifier>> getNotConfigured() {
+
+        return ResponseEntity.ok(amSv.getNotConfigured());
     }
 
     @Operation(summary = "Get an Abstract Meter configuration")

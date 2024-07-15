@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.renergetic.kpiapi.dao.AbstractMeterIdentifier;
 import com.renergetic.kpiapi.dao.AbstractMeterTypeDAO;
 import com.renergetic.kpiapi.dao.MeasurementDAO;
 import com.renergetic.kpiapi.model.Measurement;
@@ -259,5 +260,9 @@ public class AbstractMeterService {
         if (!(meter.getDomain() == Domain.electricity || meter.getDomain() == Domain.heat)) {
             throw new InvalidArgumentException("Invalid meter domain");
         }
+    }
+
+    public List<AbstractMeterIdentifier> getNotConfigured() {
+        return amRepo.listNotConfiguredMeters();
     }
 }
