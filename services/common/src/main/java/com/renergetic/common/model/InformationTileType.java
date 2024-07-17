@@ -1,6 +1,7 @@
 package com.renergetic.common.model;
 
 public enum InformationTileType {
+    empty,
     knob,
     chart,
     doughnut,
