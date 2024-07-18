@@ -15,8 +15,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @ToString
 public class UserDAOResponse {
-//	@JsonProperty(required = false, access = Access.READ_ONLY)
-//	private Long id;
+	@JsonProperty(required = false)
+	private Long id;
 
     @JsonProperty(required = true)
     private String username;
@@ -33,8 +33,9 @@ public class UserDAOResponse {
     @JsonProperty(required = true)
     private String settingsJson;
 
-    public static UserDAOResponse create(UserRepresentation user, List<String> roles, String settingsJson) {
+    public static UserDAOResponse create(Long id, UserRepresentation user, List<String> roles, String settingsJson) {
         UserDAOResponse dao = new UserDAOResponse();
+        dao.setId(id);
         dao.setEmail(user.getEmail());
         dao.setFirstName(user.getFirstName());
         dao.setLastName(user.getLastName());

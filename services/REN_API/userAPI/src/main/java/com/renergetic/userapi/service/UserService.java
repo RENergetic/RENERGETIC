@@ -2,6 +2,7 @@ package com.renergetic.userapi.service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.keycloak.representations.idm.UserRepresentation;
@@ -88,7 +89,7 @@ public class UserService {
         
         assetRepo.save(asset);
         
-        return UserDAOResponse.create(user, null, null);
+        return UserDAOResponse.create(entity.getId(), user, null, null);
 	}
 	
 	public UserDAOResponse update(UserRepresentation user) {
@@ -109,8 +110,15 @@ public class UserService {
         Asset asset = assetRepo.findByUserId(entity.getId());
         asset = asset != null ? asset : new Asset();
 
-        AssetType type = typeRepo.findByName("user")
-        		.orElse(typeRepo.save(new AssetType("user")));
+
+        //orElse are always evaluated, even if there is a value, this can't be simplified.
+        Optional<AssetType> userType = typeRepo.findByName("user");
+        AssetType type;
+        if(userType.isEmpty()) {
+            type = typeRepo.save(new AssetType("user"));
+        } else {
+            type = userType.get();
+        }
 
         asset.setName(user.getUsername());
         asset.setLabel(user.getUsername());
@@ -120,7 +128,7 @@ public class UserService {
         
         assetRepo.save(asset);
         
-        return UserDAOResponse.create(user, null, null);
+        return UserDAOResponse.create(entity.getId(), user, null, null);
 	}
 	
 	public UserDAOResponse delete(UserRepresentation user) {
@@ -143,7 +151,7 @@ public class UserService {
         // Remove user
         userRepo.delete(entity);
         
-        return UserDAOResponse.create(user, null, null);
+        return UserDAOResponse.create(entity.getId(), user, null, null);
 	}
 	
 
@@ -218,5 +226,16 @@ public class UserService {
         if (list.isEmpty())
             return list;
         else throw new NotFoundException("No roles found");
+    }
+
+    public String translateDbIdToKeycloakId(String userId){
+        return userRepo.findById(Long.valueOf(userId)).orElseThrow(() -> new NotFoundException("User with id %s not found", userId)).getKeycloakId();
+    }
+
+    public Long translateKeycloakIdToDbId(String userId){
+        User user = userRepo.findByKeycloakId(userId);
+        if(user == null)
+            throw new NotFoundException("User with id %s not found", userId);
+        return user.getId();
     }
 }
