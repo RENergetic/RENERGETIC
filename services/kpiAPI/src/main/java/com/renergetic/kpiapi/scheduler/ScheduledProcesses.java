@@ -43,7 +43,7 @@ public class ScheduledProcesses {
 //        var tsNow = ( (int)(Instant.now().toEpochMilli()/60000)*60000); round to minutes ? TODO:
         var tsFrom = tsNow - 60000 * meterPeriod;
         List<AbstractMeterDataDAO> data = meterService
-                .calculateAndInsertAll(tsFrom, tsNow, null);
+                .calculateAndInsertAll(tsFrom, tsNow, tsNow);
 
         log.info(String.format("Abtract meters calculated (Period: %d minutes)", meterPeriod));
         data.forEach(obj -> obj.getData().forEach((time, value) ->
@@ -59,13 +59,13 @@ public class ScheduledProcesses {
 //        var tsNow = ( (int)(Instant.now().toEpochMilli()/60000)*60000); round to minutes ? TODO:
         var tsFrom = tsNow - 60000 * meterPeriod;
         List<KPIDataDAO> electricityData = kpiService
-                .calculateAndInsertAll(Domain.electricity, tsFrom, tsNow, null);
+                .calculateAndInsertAll(Domain.electricity, tsFrom, tsNow, tsNow);
 
         List<KPIDataDAO> heatData = kpiService
-                .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, null);
+                .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, tsNow);
 //TODO: comments if its not calculating properly the following KPIS
         List<KPIDataDAO> allDomain = kpiService
-                .calculateAndInsert(Domain.none, List.of(ESS.Instance), tsFrom, tsNow, null);
+                .calculateAndInsert(Domain.none, List.of(ESS.Instance), tsFrom, tsNow, tsNow);
 
         log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", kpiPeriod));
         electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
