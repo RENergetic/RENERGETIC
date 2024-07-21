@@ -415,12 +415,12 @@ public class MeasurementService {
     }
 
     public boolean setTag(Long measurementId, String key, String value) {
-        requireMeasurement(measurementId);
-        this.deleteMeasurementTag(measurementId, key); //delete all other tags related with the measurement
+        requireMeasurement(measurementId); //delete all other tags related with the measurement
         var l = measurementTagsRepository.findByKeyAndValue(key, value); //Check if tag is defined in the tags table
         if (l.isEmpty()) {
             throw new InvalidNonExistingIdException("No tag with key " + key + " and value: " + value);
         }
+        this.deleteMeasurementTag(measurementId, key);
         var tag = l.get(0);
         measurementTagsRepository.setTag(tag.getId(), measurementId);
         return true;
@@ -483,6 +483,15 @@ public class MeasurementService {
         else stream = measurementTagsRepository.findByKey(key).stream();
 
         return stream.map(it -> new TagDAO(it.getKey(), it.getValue(), it.getId())).collect(Collectors.toList());
+    }
+    public  TagDAO  getTag(@NotNull String key,String value) {
+       //delete all other tags related with the measurement
+        var l = measurementTagsRepository.findByKeyAndValue(key, value); //Check if tag is defined in the tags table
+        if (l.isEmpty()) {
+          return  null;
+        }
+        var tag = l.get(0);
+        return  new TagDAO(tag.getKey(), tag.getValue(), tag.getId());
     }
 
     public List<MeasurementTagsDAO> getMeasurementTags(Long measurementId) {
