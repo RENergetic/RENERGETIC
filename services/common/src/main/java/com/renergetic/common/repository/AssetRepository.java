@@ -73,7 +73,7 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
             " AND COALESCE(m_asset.name ilike CONCAT('%', :name, '%'),:name is null ) " +
             " AND COALESCE(m_asset.label ilike CONCAT('%', :label,'%'),:label is null ) " +
             " AND COALESCE(asset_type.name ilike CONCAT('%', :typeName, '%'),:typeName is null) " +
-            " ORDER BY  m_asset.asset_type_id , COALESCE (m_asset.label, m_asset.name) " +
+            " ORDER BY m_asset.name ASC " +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<Asset> filterAssets(@Param("name") String name, @Param("label") String label,
                                     @Param("categoryName") String categoryName, @Param("typeName") String typeName,
@@ -86,6 +86,7 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
             " WHERE COALESCE(m_asset.name ilike CONCAT('%', :name, '%'),:name is null ) " +
             " AND COALESCE(asset_type.name ilike CONCAT('%', :typeName, '%'),:typeName is null) " +
             " AND  asset_details.key =:mKey AND asset_details.value =:mValue  " +
+            " ORDER BY m_asset.name ASC " +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<Asset> filterByDetail(@Param("mKey") String key, @Param("mValue") String value,
                                       @Param("name") String name, @Param("typeName") String typeName,
