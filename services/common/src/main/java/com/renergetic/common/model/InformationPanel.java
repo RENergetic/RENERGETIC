@@ -44,6 +44,8 @@ public class InformationPanel {
     private Boolean isTemplate;
     @Column(name = "featured",nullable = false )
     private Boolean featured=false;
+    @Column(name = "priority",nullable = true )
+    private Integer priority;
 
     @ManyToOne(cascade = CascadeType.REFRESH)
     @NotFound(action = NotFoundAction.IGNORE)
@@ -59,6 +61,8 @@ public class InformationPanel {
 			inverseJoinColumns = @JoinColumn(name = "asset_id"))
 	private List<Asset> assets;
 
+
+
 	@OneToOne(cascade = CascadeType.REFRESH)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
@@ -67,6 +71,7 @@ public class InformationPanel {
 	@OneToMany(cascade = CascadeType.REFRESH, mappedBy = "informationPanel")
     @NotFound(action = NotFoundAction.IGNORE)
     private List<InformationTile> tiles;
+
 
     @Column(name = "props", nullable = true, insertable = true, updatable = true, unique = false,columnDefinition="TEXT")
     private String props;
