@@ -20,6 +20,10 @@ public class ESS implements KPIFormula {
     };
 
     @Override
+    public BigDecimal calculate(Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previous) {
+        return this.calculate(values);
+    }
+    @Override
     public BigDecimal calculate(Map<AbstractMeter, Double> values) {
         Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) -
                 (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) /
