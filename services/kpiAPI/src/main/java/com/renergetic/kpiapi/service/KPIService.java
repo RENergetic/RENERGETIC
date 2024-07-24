@@ -291,7 +291,8 @@ public class KPIService {
                 e.printStackTrace();
             }
         });
-
+//        Map<String,Double> metersValues = new HashMap<>(); TODO: map values with AbstractMeterKPIConfig.getKey()
+//       values.forEach();
         Map<String, String> headers = Map.of("Content-Type", "application/json");
 
         List<KPIDataDAO> configuredMeters = new LinkedList<>();

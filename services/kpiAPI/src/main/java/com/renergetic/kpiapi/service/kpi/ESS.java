@@ -2,6 +2,7 @@ package com.renergetic.kpiapi.service.kpi;
 
 import com.renergetic.kpiapi.model.AbstractMeter;
 import com.renergetic.kpiapi.model.InfluxFunction;
+import com.renergetic.kpiapi.model.KPI;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -9,6 +10,10 @@ import java.util.Map;
 public class ESS implements KPIFormula {
 
     public final static ESS Instance = new ESS();
+    @Override
+    public KPI getKPI() {
+        return KPI.ESS;
+    }
 
     private static AbstractMeterKPIConfig[] requiredMeters = {
             new AbstractMeterKPIConfig( AbstractMeter.LOAD, InfluxFunction.SUM,0),

@@ -3,6 +3,7 @@ package com.renergetic.kpiapi.service.kpi;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
 import com.renergetic.kpiapi.model.AbstractMeter;
 import com.renergetic.kpiapi.model.InfluxFunction;
+import com.renergetic.kpiapi.model.KPI;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -10,6 +11,10 @@ import java.util.Map;
 public class ES implements KPIFormula {
 
     public final static ES Instance = new ES();
+    @Override
+    public KPI getKPI() {
+        return KPI.ES;
+    }
 
     private static final AbstractMeterKPIConfig[] requiredMeters = {
             new AbstractMeterKPIConfig(AbstractMeter.LOAD, InfluxFunction.SUM, -1),
