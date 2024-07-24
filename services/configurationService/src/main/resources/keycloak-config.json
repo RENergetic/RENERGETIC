@@ -1,0 +1,122 @@
+{
+    "realm": "realm-renergetic",
+    "registrationAllowed": false,
+    "clients": [
+        {
+            "clientId": "renergetic-app",
+            "protocol": "openid-connect",
+            "enabled": true,
+            "standardFlowEnabled": true,
+            "directAccessGrantsEnabled": true,
+            "rootUrl": "http://localhost:8080/",
+            "baseUrl": "http://localhost:8080/",
+            "adminUrl": "http://localhost:8080/",
+            "validRedirectUris": [
+                "http://localhost:8080/*","http://localhost:8081/*"
+            ],
+            "webOrigins": [
+                "http://localhost:8080","http://localhost:8081"
+            ],
+            "roles": [
+                {
+                    "name": "ren-admin",
+                    "description": "Registered user with skills to admin the Energy Island and the system",
+                    "composite": true,
+                    "clientComposite": {
+                        "realm-management": [
+                            "manage-users","query-groups","query-users","view-users"
+                        ]
+                    }
+                },
+                {
+                    "name": "ren-dev",
+                    "description": "Developer user with all privileges related with the Realm and Application",
+                    "composite": true,
+                    "clientComposite": {
+                        "realm-management": [
+                            "realm-admin"
+                        ],
+                        "renergetic-app": [
+                            "ren-admin"
+                        ]
+                    }
+                },
+                {
+                    "name": "ren-guest",
+                    "description": "",
+                    "composite": false
+                },
+                {
+                    "name": "ren-manager",
+                    "description": "Registered user with access to assets, dashboards and application panels and edit it",
+                    "composite": false
+                },
+                {
+                    "name": "ren-staff",
+                    "description": "",
+                    "composite": false
+                },
+                {
+                    "name": "ren-technical-manager",
+                    "description": "",
+                    "composite": false
+                },
+                {
+                    "name": "ren-user",
+                    "description": "Registered user with a relationship with some asset/s - owners, residents...",
+                    "composite": false
+                },
+                {
+                    "name": "ren-visitor",
+                    "description": "",
+                    "composite": false
+                }
+            ]
+
+        }
+    ],
+    "users": [
+        {
+            "email": "",
+            "username": "admin",
+            "firstname": "",
+            "lastname": "",
+            "enabled": true,
+            "emailVerified": false,
+            "passwordTemporary": false,
+            "passwordType": "password",
+            "passwordValue": "admin",
+            "roles": {
+                "realm": [
+                    "default-roles-realm-renergetic"
+                ],
+                "clients": {
+                    "realm-management": [
+                        "realm-admin"
+                    ]
+                }
+            }
+        },
+        {
+            "email": "",
+            "username": "jeremy",
+            "firstname": "",
+            "lastname": "",
+            "enabled": true,
+            "emailVerified": false,
+            "passwordTemporary": false,
+            "passwordType": "password",
+            "passwordValue": "jeremy",
+            "roles": {
+                "realm": [
+                    "default-roles-realm-renergetic"
+                ],
+                "clients": {
+                    "renergetic-app": [
+                        "ren-admin"
+                    ]
+                }
+            }
+        }
+    ]
+}
