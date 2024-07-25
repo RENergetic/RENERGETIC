@@ -72,6 +72,34 @@
                     "composite": false
                 }
             ]
+        },
+        {
+            "clientId": "grafana",
+            "protocol": null,
+            "enabled": true,
+            "standardFlowEnabled": true,
+            "directAccessGrantsEnabled": true,
+            "rootUrl": "http://localhost:8080/",
+            "baseUrl": null,
+            "adminUrl": "http://localhost:8080/",
+            "validRedirectUris": [
+                "http://localhost:8080/*"
+            ],
+            "webOrigins": [
+                "http://localhost:8080"
+            ],
+            "roles": [
+                {
+                    "name": "admin",
+                    "description": "",
+                    "composite": false
+                },
+                {
+                    "name": "editor",
+                    "description": "",
+                    "composite": false
+                }
+            ]
 
         }
     ],
