@@ -188,7 +188,9 @@ public class AbstractMeterDataService {
         if (time != null)
             influxRequest.getFields().put("time", DateConverter.toString(time));
 
-        BigDecimal value = calculator.calculateFormula(meter.getFormula(), from, to);
+        BigDecimal value = calculator.calcFormula(meter.getFormula(), from, to);
+          value = calculator.calcFormula(meter.getFormula(), from, to);
+//          value = calculator.calculateFormula(meter.getFormula(), from, to);
 
         var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
         influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
@@ -219,6 +221,7 @@ public class AbstractMeterDataService {
                                 0 : Integer.compare(m1.getDomain().value, m2.getDomain().value));
 
         for (AbstractMeterConfig meter : meters) {
+
             MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
 
             if (time != null)
@@ -226,7 +229,9 @@ public class AbstractMeterDataService {
 
             BigDecimal value = new BigDecimal(0);
             if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to)) {
-                value = calculator.calculateFormula(meter.getFormula(), from, to);
+
+//                value = calculator.calculateFormula(meter.getFormula(), from, to);
+                value = calculator.calcFormula(meter.getFormula(), from, to);
                 if (meter.getMeasurement() != null) {
 //                    convert to user defined scale
                     var type = meter.getMeasurement().getType();
