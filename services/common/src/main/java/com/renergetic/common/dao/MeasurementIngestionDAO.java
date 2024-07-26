@@ -1,24 +1,21 @@
-package com.renergetic.ingestionapi.dao;
-
-import java.util.Map;
-
-import javax.annotation.Nonnull;
+package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Map;
+
 @Getter
 @Setter
 @RequiredArgsConstructor
 @ToString
-public class MeasurementDAO {
+public class MeasurementIngestionDAO {
 	String measurement;
 	Map<String, String> fields;
 	Map<String, String> tags;

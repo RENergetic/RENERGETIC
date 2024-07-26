@@ -16,6 +16,8 @@ import java.util.Optional;
 
 @SuppressWarnings("unchecked")
 public interface MeasurementRepository extends JpaRepository<Measurement, Long> {
+    List<Measurement> findByAssetIsNullAndAssetCategoryIsNull();
+
     List<Measurement> findByName(String name);
 
     Measurement save(Measurement measurement);

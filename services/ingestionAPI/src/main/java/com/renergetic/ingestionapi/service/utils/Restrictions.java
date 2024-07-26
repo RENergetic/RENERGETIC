@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import com.renergetic.ingestionapi.dao.FieldRestrictionsDAO;
-import com.renergetic.ingestionapi.dao.MeasurementDAO;
-import com.renergetic.ingestionapi.dao.RestrictionsDAO;
-import com.renergetic.ingestionapi.model.PrimitiveType;
+import com.renergetic.common.dao.FieldRestrictionsDAO;
+import com.renergetic.common.dao.MeasurementIngestionDAO;
+import com.renergetic.common.dao.RestrictionsDAO;
+import com.renergetic.common.model.PrimitiveType;
 
 public class Restrictions {
 	
@@ -22,12 +22,12 @@ public class Restrictions {
 	 * @param restrictions List of restrictions to apply to measurements
 	 * @return A map with measurements and if its meet the requirements
 	 */
-	public static Map<MeasurementDAO, Boolean> check(List<MeasurementDAO> measurements, RestrictionsDAO restrictions) {
-		Map<MeasurementDAO, Boolean> ret = new HashMap<>();
+	public static Map<MeasurementIngestionDAO, Boolean> check(List<MeasurementIngestionDAO> measurements, RestrictionsDAO restrictions) {
+		Map<MeasurementIngestionDAO, Boolean> ret = new HashMap<>();
 		boolean isValid = true;
 
 		ArrayList<String> errors = new ArrayList<>();
-		for (MeasurementDAO measurement : measurements) {
+		for (MeasurementIngestionDAO measurement : measurements) {
 			// Check measurement name
 			isValid = restrictions.getMeasurements().contains(measurement.getMeasurement().toLowerCase());
 

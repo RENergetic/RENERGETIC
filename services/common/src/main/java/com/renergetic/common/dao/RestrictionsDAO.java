@@ -1,11 +1,11 @@
-package com.renergetic.ingestionapi.dao;
-
-import java.util.List;
-import java.util.Map;
+package com.renergetic.common.dao;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter

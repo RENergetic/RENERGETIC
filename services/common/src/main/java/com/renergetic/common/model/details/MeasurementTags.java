@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -40,6 +41,9 @@ public class MeasurementTags extends Details{
 			inverseJoinColumns = @JoinColumn(name = "measurement_id"))
 	@JsonIgnore()
 	private   List<Measurement> measurements;
+
+	@Formula("(select m.measurement_id from measurement_tags m where m.tag_id = id limit 1)")
+	private Long measurementId;
 
 	public MeasurementTags(String key, String value) {
 		super(key, value);

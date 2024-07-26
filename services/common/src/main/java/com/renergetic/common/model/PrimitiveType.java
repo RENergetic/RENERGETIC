@@ -1,4 +1,4 @@
-package com.renergetic.ingestionapi.model;
+package com.renergetic.common.model;
 
 public enum PrimitiveType {
 	INTEGER ("^-?\\d+$"),

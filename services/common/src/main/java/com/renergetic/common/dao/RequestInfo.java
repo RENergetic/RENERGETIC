@@ -1,10 +1,10 @@
-package com.renergetic.ingestionapi.dao;
-
-import java.util.List;
+package com.renergetic.common.dao;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
