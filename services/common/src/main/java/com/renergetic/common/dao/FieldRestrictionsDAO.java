@@ -1,7 +1,6 @@
-package com.renergetic.ingestionapi.dao;
+package com.renergetic.common.dao;
 
-import com.renergetic.ingestionapi.model.PrimitiveType;
-
+import com.renergetic.common.model.PrimitiveType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

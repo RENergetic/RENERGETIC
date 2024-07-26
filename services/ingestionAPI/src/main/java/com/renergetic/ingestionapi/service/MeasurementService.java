@@ -18,19 +18,19 @@ import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
-import com.renergetic.ingestionapi.dao.FieldRestrictionsDAO;
-import com.renergetic.ingestionapi.dao.MeasurementDAO;
-import com.renergetic.ingestionapi.dao.RestrictionsDAO;
+import com.renergetic.common.dao.FieldRestrictionsDAO;
+import com.renergetic.common.dao.MeasurementIngestionDAO;
+import com.renergetic.common.dao.RestrictionsDAO;
 import com.renergetic.ingestionapi.exception.ConnectionException;
-import com.renergetic.ingestionapi.model.Measurement;
-import com.renergetic.ingestionapi.model.MeasurementType;
-import com.renergetic.ingestionapi.model.PrimitiveType;
-import com.renergetic.ingestionapi.model.Request;
-import com.renergetic.ingestionapi.model.RequestError;
-import com.renergetic.ingestionapi.model.Tags;
-import com.renergetic.ingestionapi.repository.MeasurementRepository;
-import com.renergetic.ingestionapi.repository.MeasurementTypeRepository;
-import com.renergetic.ingestionapi.repository.TagsRepository;
+import com.renergetic.common.model.Measurement;
+import com.renergetic.common.model.MeasurementType;
+import com.renergetic.common.model.PrimitiveType;
+import com.renergetic.common.model.Request;
+import com.renergetic.common.model.RequestError;
+import com.renergetic.common.model.details.MeasurementTags;
+import com.renergetic.common.repository.MeasurementRepository;
+import com.renergetic.common.repository.MeasurementTypeRepository;
+import com.renergetic.common.repository.MeasurementTagsRepository;
 import com.renergetic.ingestionapi.service.utils.Restrictions;
 
 @Service
@@ -45,14 +45,14 @@ public class MeasurementService {
 	private MeasurementTypeRepository typeRepository;
 	
 	@Autowired
-	private TagsRepository tagsRepository;
+	private MeasurementTagsRepository tagsRepository;
 	
 	@Autowired
 	private LogsService logs;
 	
 	private final int INFLUX_TRIES = 5;
 
-	public Map<MeasurementDAO, Boolean> insert(List<MeasurementDAO> measurements, String bucket, RestrictionsDAO restrictions) {
+	public Map<MeasurementIngestionDAO, Boolean> insert(List<MeasurementIngestionDAO> measurements, String bucket, RestrictionsDAO restrictions) {
 		int tries = 0;
 		while (tries < INFLUX_TRIES)
 			if (influxDB.ping()) {
@@ -60,7 +60,7 @@ public class MeasurementService {
 				List<Point> entries = new ArrayList<>();
 				
 				// Create a list of entries to save
-				Map<MeasurementDAO, Boolean> checkedMeasurements = Restrictions.check(measurements, restrictions);
+				Map<MeasurementIngestionDAO, Boolean> checkedMeasurements = Restrictions.check(measurements, restrictions);
 				checkedMeasurements.forEach((key, value) -> {
 					if (key != null && value != null) {	
 						this.addDefaultTags(key);
@@ -122,8 +122,8 @@ public class MeasurementService {
 		throw new ConnectionException("Can't connect with InfluxDB");
 	}
 	
-	public Map<MeasurementDAO, Boolean> insert(List<MeasurementDAO> measurements, String bucket, RestrictionsDAO restrictions, Request request) {
-		Map<MeasurementDAO, Boolean> ret = insert(measurements, bucket, restrictions);
+	public Map<MeasurementIngestionDAO, Boolean> insert(List<MeasurementIngestionDAO> measurements, String bucket, RestrictionsDAO restrictions, Request request) {
+		Map<MeasurementIngestionDAO, Boolean> ret = insert(measurements, bucket, restrictions);
 		
 		Request requestInfo = logs.save(request);
 		ret.forEach((measurement, inserted) -> {
@@ -164,23 +164,23 @@ public class MeasurementService {
 //		tags.put("predictive_model", null);
 //		tags.put("direction", "(?i)((in)|(out)|(none))");
 //		tags.put("domain", "(?i)((heat)|(electricity))");
-		List<Tags> tags = tagsRepository.findByMeasurementIdIsNull();
+		List<MeasurementTags> tags = tagsRepository.findByMeasurementIdIsNull();
 
 		return tags.stream().collect(HashMap<String, String>::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
 	}
 
-	public void addDefaultTags(MeasurementDAO measurement) {
+	public void addDefaultTags(MeasurementIngestionDAO measurement) {
 		if (measurement != null) {
 			// Measurement type tag
-			Optional<MeasurementType> measurementType = typeRepository.findByName(measurement
+			MeasurementType measurementType = typeRepository.findByName(measurement
 				.getFields()
 				.keySet()
 				.stream()
 				.filter((value) -> !value.equalsIgnoreCase("time"))
 				.findFirst().orElse(null));
 			
-			if (measurementType.isPresent())
-				measurement.getTags().putIfAbsent("measurement_type", measurementType.get().getPhysicalName());
+			if (measurementType != null)
+				measurement.getTags().putIfAbsent("measurement_type", measurementType.getPhysicalName());
 			else
 				measurement.getTags().putIfAbsent("measurement_type", "default");
 		}
