@@ -6,6 +6,7 @@ import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.service.AbstractMeterDataService;
 import com.renergetic.kpiapi.service.KPIService;
 
+import com.renergetic.kpiapi.service.kpi.ESC;
 import com.renergetic.kpiapi.service.kpi.ESS;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,7 @@ public class ScheduledProcesses {
                 .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, tsNow);
 //TODO: comments if its not calculating properly the following KPIS
         List<KPIDataDAO> allDomain = kpiService
-                .calculateAndInsert(Domain.none, List.of(ESS.Instance), tsFrom, tsNow, tsNow);
+                .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance), tsFrom, tsNow, tsNow);
 
         log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", kpiPeriod));
         electricityData.forEach(obj -> obj.getData().forEach((time, value) ->

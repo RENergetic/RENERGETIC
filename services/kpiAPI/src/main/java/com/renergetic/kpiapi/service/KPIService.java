@@ -334,6 +334,7 @@ public class KPIService {
             case SNES -> this.calculateSNES(values);
             case CO2 -> this.calculateCO2(values);
             case PEAK -> this.calculatePEAK(maxValues);
+            case ESC -> this.calculateESC(values);
         };
     }
 
@@ -342,6 +343,16 @@ public class KPIService {
          Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) -
                 (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+
+        if (!Double.isNaN(result) && !Double.isInfinite(result))
+            return BigDecimal.valueOf(result);
+        else return new BigDecimal(0);
+    }
+
+    public BigDecimal calculateESC(Map<AbstractMeter, Double> values) {
+
+        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)) /
+                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS) );
 
         if (!Double.isNaN(result) && !Double.isInfinite(result))
             return BigDecimal.valueOf(result);

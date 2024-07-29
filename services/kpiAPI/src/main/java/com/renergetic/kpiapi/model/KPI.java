@@ -5,6 +5,7 @@ import com.renergetic.kpiapi.exception.InvalidArgumentException;
 public enum KPI {
     ESS("ESS", "Energy Self Sufficiency","ratio_norm"),
     EP("EP", "Energy Potency","ratio"),
+    ESC("ESC", "Energy self consumption","ratio"),
     EE("EE", "Energy Efficiency","ratio_norm"),
     ES("ES", "Energy Saving","ratio"),
     SRES("SRES", "Share of RES","ratio_norm"),
