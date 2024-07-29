@@ -18,7 +18,7 @@ public final class ShuntingYardParser {
         if (Character.isLetter(c)) {
             throw new IllegalArgumentException("invalid token:" + c);
         }
-        return Character.isDigit(c);
+        return Character.isDigit(c) || c=='.';
     }
 
 
