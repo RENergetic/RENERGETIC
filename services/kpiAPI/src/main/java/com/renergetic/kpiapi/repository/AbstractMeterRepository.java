@@ -37,7 +37,7 @@ public interface AbstractMeterRepository extends JpaRepository<AbstractMeterConf
 			" ('LOAD'),('EXCESS'),('STORAGE'),('RES'),('NONRES')) as meters(\"name\") " +
 			" JOIN (VALUES('heat'),('electricity'),('none')) AS domains(\"domain\") on TRUE " +
 			" LEFT JOIN abstract_meter on abstract_meter.name = meters.name and abstract_meter.domain = domains.domain" +
-			" WHERE abstract_meter.name is NULL ", nativeQuery = true)
+			" WHERE abstract_meter.name is NULL or abstract_meter.measurement_id is NULL ", nativeQuery = true)
 	public List<AbstractMeterIdentifier> listNotConfiguredMeters();
 
 }
