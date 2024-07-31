@@ -135,7 +135,22 @@ public class MeasurementService {
 
     @Transactional
     public List<MeasurementDAOResponse> save(List<MeasurementDAORequest> measurements) {
-        return measurements.stream().map(this::save).collect(Collectors.toList());
+        var filtered = measurements.stream().filter(it -> {
+            Long typeId = null;
+            if (it.getType() != null) {
+                var t = measurementTypeRepository.findMeasurementType(it.getType().getName(),
+                        it.getType().getUnit(), it.getType().getPhysicalName()).stream().findFirst();
+                if (t.isPresent()) {
+                    typeId = t.get().getId();
+                }
+            }
+            return !measurementRepository.findMeasurements(
+                    null, null, it.getName(), it.getSensorName(),
+                    it.getDomain() != null ? it.getDomain().name() : null, it.getDirection() != null ? it.getDirection().name() : null,
+                    typeId, null, 0, 1).isEmpty();
+
+        });
+        return filtered.map(this::save).collect(Collectors.toList());
     }
 
     public MeasurementDAOResponse duplicate(Long id) {
