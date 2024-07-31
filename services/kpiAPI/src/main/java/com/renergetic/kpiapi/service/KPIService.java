@@ -234,8 +234,12 @@ public class KPIService {
                 influxRequest.getFields().put("time", DateConverter.toString(time));
 
             BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
-//kpi. TODO:
-            influxRequest.getFields().put(kpi.typeName, calculator.bigDecimalToDoubleString(value));
+//kpi. TODO: link KPI with measurements
+//            hotfix
+            if (kpi.typeName.equals("energy")) {
+                influxRequest.getFields().put("energy_kwh", calculator.bigDecimalToDoubleString(value));
+            } else
+                influxRequest.getFields().put(kpi.typeName, calculator.bigDecimalToDoubleString(value));
 
             HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 
@@ -257,13 +261,13 @@ public class KPIService {
         // Prepare Abstract meter needed values
         Set<Thread> threads = new HashSet<>();
 
-        Map<AbstractMeter, Double> values= Arrays.stream(meters)
+        Map<AbstractMeter, Double> values = Arrays.stream(meters)
                 .filter(it -> it.getPeriod() == 0 && it.getFunction() == InfluxFunction.SUM)
                 .collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
-           Map<AbstractMeter, Double> previousValues= Arrays.stream(meters)
+        Map<AbstractMeter, Double> previousValues = Arrays.stream(meters)
                 .filter(it -> it.getPeriod() == -1 && it.getFunction() == InfluxFunction.SUM)
                 .collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
-        Map<AbstractMeter, Double> maxValues= Arrays.stream(meters)
+        Map<AbstractMeter, Double> maxValues = Arrays.stream(meters)
                 .filter(it -> it.getPeriod() == 0 && it.getFunction() == InfluxFunction.MAX)
                 .collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
 
@@ -340,7 +344,7 @@ public class KPIService {
 
     public BigDecimal calculateESS(Map<AbstractMeter, Double> values) {
 
-         Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) -
+        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) -
                 (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 
@@ -352,7 +356,7 @@ public class KPIService {
     public BigDecimal calculateESC(Map<AbstractMeter, Double> values) {
 
         Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)) /
-                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS) );
+                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS));
 
         if (!Double.isNaN(result) && !Double.isInfinite(result))
             return BigDecimal.valueOf(result);
@@ -394,7 +398,7 @@ public class KPIService {
     public BigDecimal calculateSRES(Map<AbstractMeter, Double> values) {
         //in the original equation storage was subtracted in the nominator , in order to preserve the renewables values between 0-1 we need to add all storage in the denominator
         Double result = (values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)+ values.get(AbstractMeter.STORAGE));
+                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 
         if (!Double.isNaN(result) && !Double.isInfinite(result))
             return BigDecimal.valueOf(result);
@@ -403,7 +407,7 @@ public class KPIService {
 
     public BigDecimal calculateSNES(Map<AbstractMeter, Double> values) {
         Double result = 1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)+ values.get(AbstractMeter.STORAGE)));
+                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
 
         if (!Double.isNaN(result) && !Double.isInfinite(result))
             return BigDecimal.valueOf(result);
