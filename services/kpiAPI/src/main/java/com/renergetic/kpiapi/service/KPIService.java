@@ -228,6 +228,7 @@ public class KPIService {
 
         // Calculate and save each KPI
         for (KPI kpi : KPI.values()) {
+            log.info("Start Calculate: " + kpi.kpi + " for: " + domain.name());
             MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
 
             if (time != null)
@@ -303,6 +304,8 @@ public class KPIService {
 
         // Calculate and save each KPI
         for (KPI kpi : KPI.values()) {
+
+            log.info("Start Calculate: " + kpi.kpi + " for: " + domain.name());
             MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
 
             if (time != null)

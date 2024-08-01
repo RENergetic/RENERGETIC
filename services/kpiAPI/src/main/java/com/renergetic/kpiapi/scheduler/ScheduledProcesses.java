@@ -59,9 +59,10 @@ public class ScheduledProcesses {
         var tsNow = Instant.now().toEpochMilli();
 //        var tsNow = ( (int)(Instant.now().toEpochMilli()/60000)*60000); round to minutes ? TODO:
         var tsFrom = tsNow - 60000 * meterPeriod;
+
         List<KPIDataDAO> electricityData = kpiService
                 .calculateAndInsertAll(Domain.electricity, tsFrom, tsNow, tsNow);
-
+        log.info( "Start Calculate KPIs ");
         List<KPIDataDAO> heatData = kpiService
                 .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, tsNow);
 //TODO: comments if its not calculating properly the following KPIS
