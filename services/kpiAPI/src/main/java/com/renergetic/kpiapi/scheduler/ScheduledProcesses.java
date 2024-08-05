@@ -6,6 +6,7 @@ import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.service.AbstractMeterDataService;
 import com.renergetic.kpiapi.service.KPIService;
 
+import com.renergetic.kpiapi.service.kpi.EP;
 import com.renergetic.kpiapi.service.kpi.ESC;
 import com.renergetic.kpiapi.service.kpi.ESS;
 import lombok.extern.slf4j.Slf4j;
@@ -62,12 +63,12 @@ public class ScheduledProcesses {
 
         List<KPIDataDAO> electricityData = kpiService
                 .calculateAndInsertAll(Domain.electricity, tsFrom, tsNow, tsNow);
-        log.info( "Start Calculate KPIs ");
+        log.info("Start Calculate KPIs ");
         List<KPIDataDAO> heatData = kpiService
                 .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, tsNow);
 //TODO: comments if its not calculating properly the following KPIS
         List<KPIDataDAO> allDomain = kpiService
-                .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance), tsFrom, tsNow, tsNow);
+                .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance, EP.Instance), tsFrom, tsNow, tsNow);
 
         log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", kpiPeriod));
         electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
