@@ -382,6 +382,7 @@ public class KubeflowPipelineService {
 
             dao = PipelineDefinitionDAO.create(item);
             dao.setName(kb.getName());
+            dao.setVersion(kb.getVersion());
             dao.setDescription(kb.getDescription());
 
         }
