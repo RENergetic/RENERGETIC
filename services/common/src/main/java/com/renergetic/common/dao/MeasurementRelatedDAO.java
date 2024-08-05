@@ -1,4 +1,4 @@
-package com.renergetic.ingestionapi.dao;
+package com.renergetic.common.dao;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,5 +14,5 @@ public class MeasurementRelatedDAO {
 	String label;
 	String sensor_name;
 	MeasurementDAO data;
-	AssetDAO asset;
+	AssetDAORequest asset;
 }
