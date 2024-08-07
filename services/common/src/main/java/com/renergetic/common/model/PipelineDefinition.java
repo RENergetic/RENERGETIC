@@ -40,6 +40,9 @@ public class PipelineDefinition {
     @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "pipelineDefinition")
     @NotFound(action = NotFoundAction.IGNORE)
     private List<PipelineParameter> parameters;
+    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "pipelineDefinition")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private List<PipelineDefinitionProperty> properties;
 
     //TODO: maximum time for the task to finish?
     public  PipelineDefinition(String pipelineId) {
