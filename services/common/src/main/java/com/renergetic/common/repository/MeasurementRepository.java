@@ -280,7 +280,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
 
     @Query(value = "SELECT  me.id, me.direction, me.domain, me.label,me.description, me.name, " +
             " me.sensor_name as sensorName,me.sensor_id as sensorId, me.measurement_type_id as typeId, " +
-            " mt.name as typeName, mt.label as typeLabel,mt.unit, mt.physical_name as physicalName," +
+            " mt.name as typeName, mt.label as typeLabel,mt.unit,mt.factor,mt.base_unit, mt.physical_name as physicalName," +
             " me.asset_id as assetId, asset.name as assetName, asset.label as assetLabel," +
             " sum(CASE WHEN it.id is not null THEN 1 ELSE 0 END)  as panelCount" +
             " FROM public.measurement me" +

@@ -208,7 +208,7 @@ public class KubeflowService {
         headers.clear();
         headers.put("Accept", "*/*");
         headers.put("Accept-Encoding", "deflate, br, zstd");
-         headers.put("Accept-Language", "en-US,en;q=0.9");
+        headers.put("Accept-Language", "en-US,en;q=0.9");
         headers.put("Connection", "keep-alive");
         headers.put("Host", "kubeflow.test.pcss.pl");
         headers.put("Content-Type", "application/x-www-form-urlencoded");
@@ -336,7 +336,7 @@ public class KubeflowService {
 //#endregion
 
     //#region renergetic kubeflowmethods
-     public HashMap<String, PipelineDefinitionDAO> getPipelines() throws ParseException {
+    public HashMap<String, PipelineDefinitionDAO> getPipelines() throws ParseException {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines";
         String httpsMethod = "GET";
         Object body = null;
@@ -451,15 +451,23 @@ public class KubeflowService {
             dao.setDescription(null);
         }
         HashMap<String, PipelineParameterDAO> paramsMap = new HashMap<>();
+
+        var defaultVersion = obj.getJSONObject("default_version");
         JSONArray paramArr;
         try {
-            paramArr = obj.getJSONArray("parameters");
+            paramArr = defaultVersion.getJSONArray("parameters");
         } catch (org.json.JSONException ex) {
             paramArr = null;
         }
+        if (paramArr == null)
+            try {
+                paramArr = obj.getJSONArray("parameters");
+            } catch (org.json.JSONException ex) {
+                paramArr = null;
+            }
 
-        var defaultVersion = obj.getJSONObject("default_version").getString("id");
-        dao.setVersion(defaultVersion);
+        var defaultVersionId = defaultVersion.getString("id");
+        dao.setVersion(defaultVersionId);
         if (paramArr != null) {
             for (int j = 0; j < paramArr.length(); j++) {
                 var param = paramArr.getJSONObject(j);

@@ -19,6 +19,8 @@ public class InformationPanelDAORequest {
 
     @JsonProperty()
     private String label;
+    @JsonProperty()
+    private Integer priority;
 
 //    @JsonProperty()
 //    private String uuid;
