@@ -12,7 +12,7 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(name = "pipeline_definition_property")
+@Table(name = "pipeline_definition_property", uniqueConstraints = @UniqueConstraint(columnNames = {"pipeline_id", "property_key"}))
 @RequiredArgsConstructor
 @Getter
 @Setter
