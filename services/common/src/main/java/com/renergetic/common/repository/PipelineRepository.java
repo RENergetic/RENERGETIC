@@ -18,6 +18,10 @@ public interface PipelineRepository extends JpaRepository<PipelineDefinition, St
     @Query(value = "SELECT wd FROM PipelineDefinition wd WHERE wd.visible = :visible order by wd.pipelineId ASC")
     public List<PipelineDefinition> findByVisible(boolean visible);
 
-    @Query(value = "SELECT wd FROM PipelineDefinition wd WHERE wd.pipelineId = :pipelineId order by wd.pipelineId ASC")
+    @Query(value = "SELECT wd FROM PipelineDefinition wd WHERE wd.pipelineId = :pipelineId ")
     public Optional<PipelineDefinition> findById(String pipelineId);
+
+    @Query(value = "SELECT wd FROM PipelineDefinition wd JOIN wd.properties properties " +
+            " WHERE wd.properties.key = :key AND wd.properties.value = :value order by wd.pipelineId ASC ")
+    public Optional<PipelineDefinition> findByProperty(String key, String value);
 }

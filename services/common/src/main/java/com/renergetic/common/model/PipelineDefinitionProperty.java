@@ -25,7 +25,9 @@ public class PipelineDefinitionProperty {
     //unique key on "parameter_key"  and "experiment_id"
     @Column(name = "property_key", nullable = false)
     private String key;
-    @Column(name = "property_type", nullable = false)
+    @Column(name = "property_value", nullable = true)
+    private String value;
+    @Column(name = "property_type", nullable = true)
     private String type;
     @Column(name = "property_description", nullable = true)
     private String description;

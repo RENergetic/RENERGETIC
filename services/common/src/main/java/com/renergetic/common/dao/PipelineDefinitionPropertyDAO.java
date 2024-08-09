@@ -18,15 +18,19 @@ public class PipelineDefinitionPropertyDAO {
     @JsonProperty(required = true)
     String key;
 
-    @JsonProperty(required = true)
+    @JsonProperty(required = false)
+    String value;
+
+    @JsonProperty(required = false)
     String type;
 
-    @JsonProperty(required = true)
+    @JsonProperty(required = false)
     String description;
 
-    public PipelineDefinitionPropertyDAO(String key, String type, String description) {
+    public PipelineDefinitionPropertyDAO(String key, String value,String type, String description) {
         this.key = key;
         this.type = type;
+        this.value=value;
         this.description = description;
     }
 
@@ -34,6 +38,7 @@ public class PipelineDefinitionPropertyDAO {
         PipelineDefinitionPropertyDAO dao = new PipelineDefinitionPropertyDAO();
         dao.setKey(wp.getKey());
         dao.setType(wp.getType());
+        dao.setValue(wp.getValue());
         dao.setDescription(wp.getDescription());
         return dao;
     }
@@ -43,6 +48,7 @@ public class PipelineDefinitionPropertyDAO {
         PipelineDefinitionProperty wp = new PipelineDefinitionProperty();
         wp.setKey(this.getKey());
         wp.setType(this.getType());
+        wp.setValue(this.getValue());
         wp.setDescription(this.getDescription());
         return wp;
     }
