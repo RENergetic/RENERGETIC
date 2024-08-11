@@ -28,6 +28,9 @@ public class PipelineDefinitionDAO {
     String description;
     @JsonProperty(required = false, value = "version")
     String version;
+    @JsonProperty(required = false, value = "update_date")
+    String updateDate;
+
     @JsonProperty(required = false, value = "parameters")
     Map<String, PipelineParameterDAO> parameters = Collections.emptyMap();
     @JsonProperty(required = false, value = "properties")

@@ -31,6 +31,8 @@ public class PipelineDefinition {
     private String pipelineId;
     @Column(name = "name" )
     private String name;
+//    @Column(name = "update_date" )
+//    private String  updateDate;
 
     @Column( name = "visible")
     private Boolean visible=false;
