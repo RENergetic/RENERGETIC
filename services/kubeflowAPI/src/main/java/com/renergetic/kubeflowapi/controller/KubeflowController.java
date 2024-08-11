@@ -1,8 +1,10 @@
 package com.renergetic.kubeflowapi.controller;
 
 import com.renergetic.common.dao.PipelineDefinitionDAO;
+import com.renergetic.common.dao.PipelineDefinitionPropertyDAO;
 import com.renergetic.common.dao.PipelineParameterDAO;
 import com.renergetic.common.dao.PipelineRunDAO;
+import com.renergetic.common.model.PipelineDefinitionProperty;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.dao.ApiRunPostDAO;
 import com.renergetic.kubeflowapi.model.*;
@@ -38,8 +40,6 @@ public class KubeflowController {
     @Value("${kubeflow.user.password}")
     private String kubeflowPassword;
 
-    //    @Autowired
-//    private ExampleService exampleService;
     @Autowired
     private KubeflowService kubeflowService;
 
@@ -274,7 +274,7 @@ public class KubeflowController {
                      @RequestParam(name = "offset", required = false) Optional<Long> offset,
                      @RequestParam(name = "limit", required = false) Optional<Long> limit) {
         List<PipelineRunDAO> res =
-                kubeflowPipelineService.listRuns(pipelineId, from, to, limit.orElse(100L),offset.orElse(0L));
+                kubeflowPipelineService.listRuns(pipelineId, from, to, limit.orElse(100L), offset.orElse(0L));
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -306,7 +306,6 @@ public class KubeflowController {
         Boolean res = kubeflowPipelineService.setVisibility(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
-
     @Operation(summary = "Remove visibility")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @DeleteMapping(path = "/admin/pipeline/{pipeline_id}/visibility", produces = "application/json")
@@ -315,6 +314,48 @@ public class KubeflowController {
         Boolean res = kubeflowPipelineService.removeVisibility(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
+    @Operation(summary = "Get  pipeline definitions by property ")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/admin/pipeline/property/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<List<PipelineDefinitionDAO>> getByProperty(@PathVariable(name = "key") String propertyKey,
+                                                                     @PathVariable(name = "value") String propertyValue) {
+        //TODO: verify admin roles
+        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Update existing pipeline property ")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "/admin/pipeline/{pipeline_id}/property/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<PipelineDefinitionPropertyDAO> setProperty(
+            @PathVariable(name = "pipeline_id") String pipelineId,
+            @PathVariable(name = "key") String propertyKey,
+            @PathVariable(name = "value") String propertyValue) {
+        //TODO: verify admin roles
+        var res = kubeflowPipelineService.setProperty(pipelineId, propertyKey, propertyValue);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Set pipeline property")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PostMapping (path = "/admin/pipeline/{pipeline_id}/property", produces = "application/json")
+    public ResponseEntity<PipelineDefinitionPropertyDAO> setProperty(@PathVariable(name = "pipeline_id") String pipelineId, @RequestBody PipelineDefinitionPropertyDAO propertyDAO) {
+        //TODO: verify admin roles
+        var res = kubeflowPipelineService.setProperty(pipelineId, propertyDAO);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "delete pipeline property  ")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @DeleteMapping(path = "/admin/pipeline/{pipeline_id}/property/{key}", produces = "application/json")
+    public ResponseEntity<?> deleteProperty(@PathVariable(name = "pipeline_id") String pipelineId,
+                                            @PathVariable(name = "key") String propertyKey) {
+        //TODO: verify admin roles
+        kubeflowPipelineService.deleteProperty(pipelineId, propertyKey);
+        return ResponseEntity.ok().build();
+    }
+
 
 
     @Operation(summary = "Set pipeline parameters metadata")

@@ -1,12 +1,15 @@
 package com.renergetic.kubeflowapi.service;
 
 import com.renergetic.common.dao.PipelineDefinitionDAO;
+import com.renergetic.common.dao.PipelineDefinitionPropertyDAO;
 import com.renergetic.common.dao.PipelineParameterDAO;
 import com.renergetic.common.dao.PipelineRunDAO;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.PipelineDefinition;
+import com.renergetic.common.model.PipelineDefinitionProperty;
 import com.renergetic.common.model.PipelineParameter;
 import com.renergetic.common.model.PipelineRun;
+import com.renergetic.common.repository.PipelineDefinitionPropertyRepository;
 import com.renergetic.common.repository.PipelineParameterRepository;
 import com.renergetic.common.repository.PipelineRepository;
 import com.renergetic.common.repository.PipelineRunRepository;
@@ -30,6 +33,8 @@ public class KubeflowPipelineService {
     private PipelineRepository pipelineRepository;
     @Autowired
     private PipelineParameterRepository pipelineParameterRepository;
+    @Autowired
+    private PipelineDefinitionPropertyRepository pipelinePropertyRepository;
     @Autowired
     private PipelineRunRepository pipelineRunRepository;
     @Autowired
@@ -204,6 +209,13 @@ public class KubeflowPipelineService {
     }
 
     //#region private
+
+    /**
+     *
+     * @param wd
+     * @param kubeFlowParameters parameters from kubeflwo services
+     * @return
+     */
     private List<PipelineParameter> mergeParameters(PipelineDefinition wd,
                                                     Map<String, PipelineParameterDAO> kubeFlowParameters) {
         if (kubeFlowParameters == null) {
@@ -387,6 +399,50 @@ public class KubeflowPipelineService {
 
         }
         return dao;
+    }
+
+    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, PipelineDefinitionPropertyDAO propertyDAO) {
+        Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
+        PipelineDefinition pd;
+        if (byId.isPresent()) {
+            pd = byId.get();
+        } else {
+            pd = initPipelineDefinition(pipelineId);
+            pipelineRepository.save(pd);
+        }
+        var property = propertyDAO.mapToEntity();
+        pipelinePropertyRepository.getPipelineProperty(pipelineId, propertyDAO.getKey())
+                .ifPresent(pipelineDefinitionProperty -> property.setId(pipelineDefinitionProperty.getId()));
+        property.setPipelineDefinition(pd);
+        pipelinePropertyRepository.save(property);
+        return PipelineDefinitionPropertyDAO.create(property);
+    }
+
+    public PipelineDefinitionPropertyDAO setProperty(String pipelineId,String propertyKey,String propertyValue) {
+        Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
+        PipelineDefinition pd;
+        if (byId.isPresent()) {
+            pd = byId.get();
+        } else {
+            pd = initPipelineDefinition(pipelineId);
+            pipelineRepository.save(pd);
+        }
+        PipelineDefinitionProperty property = pipelinePropertyRepository.getPipelineProperty(pipelineId, propertyKey).orElseThrow(() -> new NotFoundException(
+                "Pipeline property (" + pipelineId + "," + propertyKey + ") not exists  "));
+        property.setValue(propertyValue);
+        pipelinePropertyRepository.save(property);
+        return PipelineDefinitionPropertyDAO.create(property);
+    }
+
+    public PipelineDefinitionPropertyDAO deleteProperty(String pipelineId, String propertyKey) {
+        PipelineDefinitionProperty pipelineDefinitionProperty = pipelinePropertyRepository.getPipelineProperty(pipelineId, propertyKey).orElseThrow(() -> new NotFoundException(
+                "Pipeline property (" + pipelineId + "," + propertyKey + ") not exists  "));
+        pipelinePropertyRepository.deletePipelineProperty(pipelineId, propertyKey);
+        return PipelineDefinitionPropertyDAO.create(pipelineDefinitionProperty);
+    }
+    public List< PipelineDefinitionDAO> getByProperty(  String propertyKey,String propertyValue) {
+        return pipelineRepository.findByProperty(propertyKey,propertyValue).stream().map(PipelineDefinitionDAO::create).toList();
+
     }
     //#endregion
 }
