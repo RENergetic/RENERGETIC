@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import com.renergetic.kubeflowapi.service.utils.KubeflowUtils;
 import com.renergetic.common.utilities.Json;
 
+import static io.smallrye.config.ConfigLogging.log;
+
 @Service
 public class KubeflowService {
 
@@ -203,23 +205,24 @@ public class KubeflowService {
         HashMap<String, PipelineParameterDAO> paramsMap = new HashMap<>();
 
         var defaultVersion = obj.getJSONObject("default_version");
-        JSONArray paramArr;
+        JSONArray paramArr = null;
         try {
             paramArr = defaultVersion.getJSONArray("parameters");
         } catch (org.json.JSONException ex) {
-            paramArr = null;
+//            paramArr = null;
         }
         if (paramArr == null)
             try {
                 paramArr = obj.getJSONArray("parameters");
             } catch (org.json.JSONException ex) {
-                paramArr = null;
+//                paramArr = null;
             }
 
         var defaultVersionId = defaultVersion.getString("id");
         var createdAt = defaultVersion.getString("created_at");
         dao.setVersion(defaultVersionId);
-        dao.setUpdateDate(createdAt);
+        if (createdAt != null)
+            dao.setUpdateDate(DateConverter.toEpoch(Date.from(Instant.parse(createdAt))));
         if (paramArr != null) {
             for (int j = 0; j < paramArr.length(); j++) {
                 var param = paramArr.getJSONObject(j);
@@ -241,17 +244,17 @@ public class KubeflowService {
         try {
             dao.setState(runObj.getString("status"));
         } catch (Exception ex) {
-
+//
         }
         try {
-            var init = DateConverter.toEpoch(Date.from(Instant.parse(runObj.getString("created_at"))));
+//            var init = DateConverter.toEpoch(Date.from(Instant.parse(runObj.getString("created_at"))));
             var start = DateConverter.toEpoch(Date.from(Instant.parse(runObj.getString("scheduled_at"))));
             var end = DateConverter.toEpoch(Date.from(Instant.parse(runObj.getString("finished_at"))));
             dao.setStartTime(start);
             if (end > 0)
                 dao.setEndTime(end);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Parse run obj failed: "+ex.getMessage());
         }
 //todo: parse run manifest
 
@@ -267,19 +270,18 @@ public class KubeflowService {
         String urlString = homeUrl;
         String httpsMethod = "GET";
         Object body = null;
-        HashMap<String,String> params = new HashMap<>();
-        HashMap<String,String>  headers = new HashMap<>();
-        String stateValue = "";
+        HashMap<String, String> params = new HashMap<>();
+        HashMap<String, String> headers = new HashMap<>();
+        String stateValue  ;
         String code = "";
         HttpsResponseInfo response;
         String cookie = "";
 //        headers.put("Accept", "*/*");
         // Step 1 Obtain state value WORKING
         response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, Collections.emptyMap());
+        assert response != null;
         stateValue = KubeflowUtils.getState(response.getResponseBody());
-        System.out.println("STEP 1:");
-        System.out.println("Code: " + response.getResponseCode());
-        System.out.println("State value: " + stateValue);
+        System.out.println("1:Code: " + response.getResponseCode()+", state" + stateValue);
 
         // Step 2 Get info from home
         urlString = homeUrl + "dex/auth";

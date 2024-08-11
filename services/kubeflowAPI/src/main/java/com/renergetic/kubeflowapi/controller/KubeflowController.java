@@ -4,10 +4,7 @@ import com.renergetic.common.dao.PipelineDefinitionDAO;
 import com.renergetic.common.dao.PipelineDefinitionPropertyDAO;
 import com.renergetic.common.dao.PipelineParameterDAO;
 import com.renergetic.common.dao.PipelineRunDAO;
-import com.renergetic.common.model.PipelineDefinitionProperty;
 import com.renergetic.common.utilities.Json;
-import com.renergetic.kubeflowapi.dao.ApiRunPostDAO;
-import com.renergetic.kubeflowapi.model.*;
 import com.renergetic.kubeflowapi.service.KubeflowService;
 import com.renergetic.kubeflowapi.service.KubeflowPipelineService;
 import com.renergetic.kubeflowapi.service.utils.KubeflowUtils;
@@ -31,8 +28,6 @@ import java.util.*;
 @RequestMapping("/api/kubeflow")
 public class KubeflowController {
     //#region fields
-    @Value("${api.generate.dummy-data}")
-    private Boolean generateDummy;
 
     @Value("${kubeflow.user.name}")
     private String kubeflowUsername;
@@ -51,7 +46,6 @@ public class KubeflowController {
 
     //#endregion
     private String cookie;
-    //= "authservice_session=MTcxMTM2ODUxOHxOd3dBTkZKT05VMU5XRVpVVjA5TVFWZFBVMUJNVDFGTVVrcE1TMWRDTWtOWVVVa3lVRlZGUmxKTlJrOUhUVEpRVWtsWFZraEZTa0U9fP6c_WZhE0UgbxeoNjBjExcwvdA8rm_Cm7uJc4VrheSg";
 
     //#region kubeflow integration
 
@@ -72,54 +66,6 @@ public class KubeflowController {
         return new ResponseEntity<>(kubeflowService.getListRuns(cookie), HttpStatus.OK);
     }
 
-    @Operation(summary = "Run dummy pipeline")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PostMapping(path = "/pipelines/{id_pipeline}/run", produces = "application/json")
-    public ResponseEntity<?> runDummy(@PathVariable String id_pipeline) { // cambiar PathVariable por requestparam
-        String urlString = homeUrl + "pipeline/apis/v1beta1/runs";
-        String httpsMethod = "POST";
-        HashMap params = new HashMap<>();
-        HashMap headers = new HashMap<>();
-        Json jsonUtil;
-        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
-        List<KeyValue> parameters = new ArrayList<>();
-        parameters.add(new KeyValue("value_1", "1"));
-        parameters.add(new KeyValue("value_2", "b"));
-        parameters.add(new KeyValue("value_3", "8"));
-        //PipelineSpec pipeSpec = new PipelineSpec("5cda125a-2973-467b-b58b-b1c1cab712e6", "DETAULT NAME","WORLKFLOW MANIFEST", "PIPELINE MANIFEST", parameters);
-        PipelineSpec pipeSpec = new PipelineSpec(null, null, null, null, parameters);
-        List<ApiResourceReference> resourceReference = new ArrayList<>();
-        ApiResourceKey key = new ApiResourceKey("a8069584-de7f-4a31-9c1d-6d4a04ce66a8", "EXPERIMENT");
-        resourceReference.add(new ApiResourceReference(null, key, "", "OWNER"));
-        key = new ApiResourceKey("cd6edfd0-ed26-4c15-bb18-bdba5d5c99aa", "PIPELINE_VERSION");
-        resourceReference.add(new ApiResourceReference(null, key, "", "CREATOR"));
-        ApiRunPostDAO body = new ApiRunPostDAO("DummyTest4Description", "DummyTest4Name", pipeSpec, resourceReference,
-                ""); //TODO: RESOURCE_REFERENCES
-        headers.put("Accept", "*/*");
-        headers.put("Accept-Encoding", "gzip, deflat, br");
-        headers.put("Accept-Language", "en-US,en;q=0.9");
-        headers.put("Connection", "keep-alive");
-        headers.put("Cookie", cookie);
-        headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
-        headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
-
-        System.out.println("+++++++++++++++++++++++++++++++++++++");
-        System.out.println("++++++++++++++++++  JSON  ++++++++++++++++++");
-        System.out.println("+++++++++++++++++++++++++++++++++++++");
-        System.out.println(Json.toJson(body));
-        System.out.println("+++++++++++++++++++++++++++++++++++++");
-        System.out.println("++++++++++++++++++  BODY  ++++++++++++++++++");
-        System.out.println("+++++++++++++++++++++++++++++++++++++");
-        System.out.println(body);
-        String response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
-        System.out.println("++++++++++++++++++  REQUEST  +++++++++++++++++++");
-        System.out.println(response);
-        System.out.println("Pipeline ID: " + id_pipeline);
-        System.out.println("+++++++++++++++++++++++++++++++++++++");
-        System.out.println("++++++++++++++++++  RESPONSE  ++++++++++++++++++");
-        System.out.println("+++++++++++++++++++++++++++++++++++++");
-        return new ResponseEntity<>(Json.toJson(body), HttpStatus.OK);
-    }
 
     @Operation(summary = "Last time a pipeline was run")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -200,38 +146,6 @@ public class KubeflowController {
         return new ResponseEntity<>(kubeflowService.getListPipelines(cookie), HttpStatus.OK);
     }
 
-    @Operation(summary = "Get all examples saved on the repository")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/example/user", produces = "application/json")
-    public ResponseEntity<?> getMethodName() {
-        String urlString = homeUrl;
-        String httpsMethod = "GET";
-        Object body = null;
-        HashMap params = new HashMap<>();
-        HashMap headers = new HashMap<>();
-
-        headers.put("Accept", "*/*");
-        headers.put("Accept-Encoding", "gzip, deflat, br");
-        headers.put("Accept-Language", "en-US,en;q=0.9");
-        headers.put("Connection", "keep-alive");
-        headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
-        headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
-
-        String response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
-        String[] lines = response.split("\n");
-        String stateValue = "";
-        for (String line : lines) {
-            if (line.contains("action=\"/dex/auth/local/login?back=&amp;state=")) {
-                int startIndex = line.indexOf("state=") + "state=".length();
-                int endIndex = line.indexOf("\"", startIndex);
-                stateValue = line.substring(startIndex, endIndex);
-                System.out.println("State value: " + stateValue);
-                break;
-            }
-        }
-
-        return new ResponseEntity<>(String.format("%s: %s", kubeflowUsername, kubeflowPassword), HttpStatus.OK);
-    }
 
 //#endregion
 
@@ -415,3 +329,83 @@ public class KubeflowController {
 //TODO: INSERT AUTOMATIC HEADERS
 //TODO: INSERT AUTOMATIC PARAMS
 //TODO: IMPORT MOST OF THE FUCTIONS TO A SERVICE CLASS
+//@Operation(summary = "Run dummy pipeline")
+//@ApiResponse(responseCode = "200", description = "Request executed correctly")
+//@PostMapping(path = "/pipelines/{id_pipeline}/run", produces = "application/json")
+//public ResponseEntity<?> runDummy(@PathVariable String id_pipeline) { // cambiar PathVariable por requestparam
+//    String urlString = homeUrl + "pipeline/apis/v1beta1/runs";
+//    String httpsMethod = "POST";
+//    HashMap params = new HashMap<>();
+//    HashMap headers = new HashMap<>();
+//    Json jsonUtil;
+//    cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
+//    List<KeyValue> parameters = new ArrayList<>();
+//    parameters.add(new KeyValue("value_1", "1"));
+//    parameters.add(new KeyValue("value_2", "b"));
+//    parameters.add(new KeyValue("value_3", "8"));
+//    //PipelineSpec pipeSpec = new PipelineSpec("5cda125a-2973-467b-b58b-b1c1cab712e6", "DETAULT NAME","WORLKFLOW MANIFEST", "PIPELINE MANIFEST", parameters);
+//    PipelineSpec pipeSpec = new PipelineSpec(null, null, null, null, parameters);
+//    List<ApiResourceReference> resourceReference = new ArrayList<>();
+//    ApiResourceKey key = new ApiResourceKey("a8069584-de7f-4a31-9c1d-6d4a04ce66a8", "EXPERIMENT");
+//    resourceReference.add(new ApiResourceReference(null, key, "", "OWNER"));
+//    key = new ApiResourceKey("cd6edfd0-ed26-4c15-bb18-bdba5d5c99aa", "PIPELINE_VERSION");
+//    resourceReference.add(new ApiResourceReference(null, key, "", "CREATOR"));
+//    ApiRunPostDAO body = new ApiRunPostDAO("DummyTest4Description", "DummyTest4Name", pipeSpec, resourceReference,
+//            ""); //TODO: RESOURCE_REFERENCES
+//    headers.put("Accept", "*/*");
+//    headers.put("Accept-Encoding", "gzip, deflat, br");
+//    headers.put("Accept-Language", "en-US,en;q=0.9");
+//    headers.put("Connection", "keep-alive");
+//    headers.put("Cookie", cookie);
+//    headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
+//    headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
+//
+//    System.out.println("+++++++++++++++++++++++++++++++++++++");
+//    System.out.println("++++++++++++++++++  JSON  ++++++++++++++++++");
+//    System.out.println("+++++++++++++++++++++++++++++++++++++");
+//    System.out.println(Json.toJson(body));
+//    System.out.println("+++++++++++++++++++++++++++++++++++++");
+//    System.out.println("++++++++++++++++++  BODY  ++++++++++++++++++");
+//    System.out.println("+++++++++++++++++++++++++++++++++++++");
+//    System.out.println(body);
+//    String response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
+//    System.out.println("++++++++++++++++++  REQUEST  +++++++++++++++++++");
+//    System.out.println(response);
+//    System.out.println("Pipeline ID: " + id_pipeline);
+//    System.out.println("+++++++++++++++++++++++++++++++++++++");
+//    System.out.println("++++++++++++++++++  RESPONSE  ++++++++++++++++++");
+//    System.out.println("+++++++++++++++++++++++++++++++++++++");
+//    return new ResponseEntity<>(Json.toJson(body), HttpStatus.OK);
+//}
+//@Operation(summary = "Get all examples saved on the repository")
+//@ApiResponse(responseCode = "200", description = "Request executed correctly")
+//@GetMapping(path = "/example/user", produces = "application/json")
+//public ResponseEntity<?> getMethodName() {
+//    String urlString = homeUrl;
+//    String httpsMethod = "GET";
+//    Object body = null;
+//    HashMap params = new HashMap<>();
+//    HashMap headers = new HashMap<>();
+//
+//    headers.put("Accept", "*/*");
+//    headers.put("Accept-Encoding", "gzip, deflat, br");
+//    headers.put("Accept-Language", "en-US,en;q=0.9");
+//    headers.put("Connection", "keep-alive");
+//    headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
+//    headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
+//
+//    String response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
+//    String[] lines = response.split("\n");
+//    String stateValue = "";
+//    for (String line : lines) {
+//        if (line.contains("action=\"/dex/auth/local/login?back=&amp;state=")) {
+//            int startIndex = line.indexOf("state=") + "state=".length();
+//            int endIndex = line.indexOf("\"", startIndex);
+//            stateValue = line.substring(startIndex, endIndex);
+//            System.out.println("State value: " + stateValue);
+//            break;
+//        }
+//    }
+//
+//    return new ResponseEntity<>(String.format("%s: %s", kubeflowUsername, kubeflowPassword), HttpStatus.OK);
+//}

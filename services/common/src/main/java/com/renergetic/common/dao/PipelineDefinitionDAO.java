@@ -29,7 +29,7 @@ public class PipelineDefinitionDAO {
     @JsonProperty(required = false, value = "version")
     String version;
     @JsonProperty(required = false, value = "update_date")
-    String updateDate;
+    Long updateDate;
 
     @JsonProperty(required = false, value = "parameters")
     Map<String, PipelineParameterDAO> parameters = Collections.emptyMap();
