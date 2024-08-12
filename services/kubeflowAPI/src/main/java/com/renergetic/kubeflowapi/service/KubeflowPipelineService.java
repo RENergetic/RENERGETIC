@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -211,7 +212,6 @@ public class KubeflowPipelineService {
     //#region private
 
     /**
-     *
      * @param wd
      * @param kubeFlowParameters parameters from kubeflwo services
      * @return
@@ -401,7 +401,11 @@ public class KubeflowPipelineService {
         return dao;
     }
 
-    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, PipelineDefinitionPropertyDAO propertyDAO) {
+    @Transactional
+    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, PipelineDefinitionPropertyDAO propertyDAO, Optional<Boolean> unique) {
+        if (unique.isPresent() && unique.get()) {
+            clearProperty(propertyDAO.getKey());
+        }
         Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
         PipelineDefinition pd;
         if (byId.isPresent()) {
@@ -418,15 +422,18 @@ public class KubeflowPipelineService {
         return PipelineDefinitionPropertyDAO.create(property);
     }
 
-    public PipelineDefinitionPropertyDAO setProperty(String pipelineId,String propertyKey,String propertyValue) {
+    @Transactional
+    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, String propertyKey, String propertyValue, Optional<Boolean> unique) {
+        if (unique.isPresent() && unique.get()) {
+            clearProperty(propertyKey);
+        }
         Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
-        PipelineDefinition pd;
-        if (byId.isPresent()) {
-            pd = byId.get();
-        } else {
-            pd = initPipelineDefinition(pipelineId);
+        if (byId.isEmpty()) {
+            PipelineDefinition pd = initPipelineDefinition(pipelineId);
             pipelineRepository.save(pd);
         }
+//        else   pd = byId.get();
+
         PipelineDefinitionProperty property = pipelinePropertyRepository.getPipelineProperty(pipelineId, propertyKey).orElseThrow(() -> new NotFoundException(
                 "Pipeline property (" + pipelineId + "," + propertyKey + ") not exists  "));
         property.setValue(propertyValue);
@@ -440,8 +447,15 @@ public class KubeflowPipelineService {
         pipelinePropertyRepository.deletePipelineProperty(pipelineId, propertyKey);
         return PipelineDefinitionPropertyDAO.create(pipelineDefinitionProperty);
     }
-    public List< PipelineDefinitionDAO> getByProperty(  String propertyKey,String propertyValue) {
-        return pipelineRepository.findByProperty(propertyKey,propertyValue).stream().map(PipelineDefinitionDAO::create).toList();
+
+    public void clearProperty(String propertyKey) {
+
+        pipelinePropertyRepository.deletePipelineProperty(propertyKey);
+
+    }
+
+    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue) {
+        return pipelineRepository.findByProperty(propertyKey, propertyValue).stream().map(PipelineDefinitionDAO::create).toList();
 
     }
     //#endregion

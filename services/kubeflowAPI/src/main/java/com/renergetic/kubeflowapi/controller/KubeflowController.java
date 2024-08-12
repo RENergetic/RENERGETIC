@@ -220,6 +220,7 @@ public class KubeflowController {
         Boolean res = kubeflowPipelineService.setVisibility(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
     @Operation(summary = "Remove visibility")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @DeleteMapping(path = "/admin/pipeline/{pipeline_id}/visibility", produces = "application/json")
@@ -245,18 +246,21 @@ public class KubeflowController {
     public ResponseEntity<PipelineDefinitionPropertyDAO> setProperty(
             @PathVariable(name = "pipeline_id") String pipelineId,
             @PathVariable(name = "key") String propertyKey,
-            @PathVariable(name = "value") String propertyValue) {
+            @PathVariable(name = "value") String propertyValue,
+            @RequestParam(required = false) Optional<Boolean> unique) {
         //TODO: verify admin roles
-        var res = kubeflowPipelineService.setProperty(pipelineId, propertyKey, propertyValue);
+        var res = kubeflowPipelineService.setProperty(pipelineId, propertyKey, propertyValue, unique);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Set pipeline property")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PostMapping (path = "/admin/pipeline/{pipeline_id}/property", produces = "application/json")
-    public ResponseEntity<PipelineDefinitionPropertyDAO> setProperty(@PathVariable(name = "pipeline_id") String pipelineId, @RequestBody PipelineDefinitionPropertyDAO propertyDAO) {
+    @PostMapping(path = "/admin/pipeline/{pipeline_id}/property", produces = "application/json")
+    public ResponseEntity<PipelineDefinitionPropertyDAO> setProperty(@PathVariable(name = "pipeline_id") String pipelineId,
+                                                                     @RequestParam(required = false) Optional<Boolean> unique,
+                                                                     @RequestBody PipelineDefinitionPropertyDAO propertyDAO) {
         //TODO: verify admin roles
-        var res = kubeflowPipelineService.setProperty(pipelineId, propertyDAO);
+        var res = kubeflowPipelineService.setProperty(pipelineId, propertyDAO, unique);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -269,7 +273,6 @@ public class KubeflowController {
         kubeflowPipelineService.deleteProperty(pipelineId, propertyKey);
         return ResponseEntity.ok().build();
     }
-
 
 
     @Operation(summary = "Set pipeline parameters metadata")
