@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: krakend-config
+data:
+  krakend.json: |
+    {
+      "$schema": "https://www.krakend.io/schema/v3.json",
+      "version": 3,
+      "name": "KrakenD RENergetic",
+      "port": 8080,
+      "cache_ttl": "300s",
+      "timeout": "90s",
+      "output_encoding": "no-op",
+      "endpoints": [
+      ],
+      "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "http://localhost/auth/realms/realm-renergetic/protocol/openid-connect/certs",
+            "disable_jwk_security": true
+        },
+        "security/cors": {
+          "allow_origins": [
+            "*"
+          ],
+          "allow_methods": [
+            "GET",
+            "HEAD",
+            "POST",
+            "PUT",
+            "DELETE"
+          ],
+          "expose_headers": [
+            "*"
+          ],
+          "allow_headers": [
+            "*"
+          ],
+          "max_age": "12h",
+          "allow_credentials": true,
+          "debug": false
+        }
+      }
+    }

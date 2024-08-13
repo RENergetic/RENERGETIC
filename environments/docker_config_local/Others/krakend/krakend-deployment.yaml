@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: krakend
+spec:
+  selector:
+      matchLabels:
+        app: krakend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: krakend
+    spec:
+      containers:
+        - name: krakend
+          image: krakend:latest
+          imagePullPolicy: Never
+          ports:
+          - name: http
+            containerPort: 8080
+          volumeMounts:
+            - mountPath: /etc/krakend
+              name: krakend-disk
+          resources:
+            requests:
+              cpu: 200m
+              memory: 300Mi
+            limits:
+              cpu: 250m
+              memory: 500Mi
+      volumes:
+        - name: krakend-disk
+          configMap:
+            name: krakend-config
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      restartPolicy: Always

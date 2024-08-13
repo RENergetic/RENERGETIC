@@ -28,6 +28,7 @@ keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
 grafana=$(grep -ioP "(grafana\s*=\s*)\K.+" _installers.properties)
 nifi=$(grep -ioP "(nifi\s*=\s*)\K.+" _installers.properties)
 wso2=$(grep -ioP "(wso2\s*=\s*)\K.+" _installers.properties)
+krakend=$(grep -ioP "(krakend\s*=\s*)\K.+" _installers.properties)
 
 # Connect to Minikube
 if ! minikube status &> /dev/null;
@@ -61,6 +62,24 @@ then
             do echo "Waiting to PostgreSQL pod to create databases" && sleep 1; 
         done
         kubectl exec statefulset/postgresql-db --namespace=$project -- bin/bash -c "psql -U postgres < ./scripts/init.sql"
+    fi
+
+    if [[ $krakend = 'true' ]]
+    then
+        cd  "${current}/docker_config_local/Databases/influxdb"
+        # INFLUXDB INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        kubectl delete configmaps/krakend-config --namespace=$project
+        kubectl delete deployments/krakend --namespace=$project
+        kubectl delete services/krakend-sv --namespace=$project
+        
+        docker build --no-cache --force-rm --tag=krakend:latest .
+        
+        kubectl apply -f krakend-config.yaml --namespace=$project
+        kubectl apply -f krakend-deployment.yaml --namespace=$project
+        kubectl apply -f krakend-service.yaml --namespace=$project
     fi
 
     if [[ $influxDB = 'true' ]]

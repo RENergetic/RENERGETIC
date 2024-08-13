@@ -1,0 +1,1 @@
+FROM devopsfaith/krakend:2.6
