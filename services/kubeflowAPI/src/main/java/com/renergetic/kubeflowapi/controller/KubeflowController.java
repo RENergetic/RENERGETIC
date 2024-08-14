@@ -107,49 +107,12 @@ public class KubeflowController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Operation(summary = "List of experiments")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/experiments", produces = "application/json")
-    public ResponseEntity<?> experimentList() {
-        String urlString = homeUrl + "pipeline/apis/v1beta1/experiments";
-        String httpsMethod = "GET";
-        Object body = null;
-        HashMap params = new HashMap<>();
-        HashMap headers = new HashMap<>();
 
-        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
-
-        params.put("page_size", "10");
-        params.put("resource_reference_key.type", "NAMESPACE");
-        params.put("resource_reference_key.id", "kubeflow-renergetic");
-        params.put("filter",
-                "{\"predicates\":[{\"key\":\"storage_state\",\"op\":\"NOT_EQUALS\",\"string_value\":\"STORAGESTATE_ARCHIVED\"}]}");
-
-        headers.put("Accept", "*/*");
-        headers.put("Accept-Encoding", "gzip, deflat, br");
-        headers.put("Accept-Language", "en-US,en;q=0.9");
-        headers.put("Connection", "keep-alive");
-        headers.put("Cookie", cookie);
-        headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
-        headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
-
-        return new ResponseEntity<>(KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody(),
-                HttpStatus.OK);
-    }
-
-    @Operation(summary = "Login user")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/login", produces = "application/json")
-    public ResponseEntity<?> logUser() {
-        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
-        //return new ResponseEntity<>(stateValue + " -> " + body, HttpStatus.OK);
-        return new ResponseEntity<>(kubeflowService.getListPipelines(cookie), HttpStatus.OK);
-    }
-
-
-//#endregion
+    //#endregion
 
     //#region Renergetic API
+
+    //#region non-admin
     @Operation(summary = "Get All pipelines for non-admin users")
     // GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR NON ADMINS)
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -159,15 +122,6 @@ public class KubeflowController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get All pipelines") //GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR ADMINS)
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/admin/pipeline", produces = "application/json")
-    public ResponseEntity<List<PipelineDefinitionDAO>> listAll(
-            @RequestParam(required = false) Optional<Boolean> visible) {
-        //TODO: verify admin roles
-        List<PipelineDefinitionDAO> res = kubeflowPipelineService.getAllAdmin(visible);
-        return new ResponseEntity<>(res, HttpStatus.OK);
-    }
 
     @Operation(summary = "Get pipeline current/recent run") //GET RUN
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -175,20 +129,6 @@ public class KubeflowController {
     public ResponseEntity<PipelineRunDAO> getExperimentRun(
             @PathVariable(name = "pipeline_id") String pipelineId) {
         PipelineRunDAO res = kubeflowPipelineService.getRun(pipelineId);
-        return new ResponseEntity<>(res, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Get pipeline runs") //GET RUN
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/pipeline/{pipeline_id}/runs", produces = "application/json")
-    public ResponseEntity<List<PipelineRunDAO>>
-    getExperimentRun(@PathVariable(name = "pipeline_id") String pipelineId,
-                     @RequestParam(value = "from", required = false) Long from,
-                     @RequestParam(value = "to", required = false) Long to,
-                     @RequestParam(name = "offset", required = false) Optional<Long> offset,
-                     @RequestParam(name = "limit", required = false) Optional<Long> limit) {
-        List<PipelineRunDAO> res =
-                kubeflowPipelineService.listRuns(pipelineId, from, to, limit.orElse(100L), offset.orElse(0L));
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -211,6 +151,32 @@ public class KubeflowController {
         Boolean res = kubeflowPipelineService.stopRun(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+    @Operation(summary = "Get pipeline runs") //GET RUN
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/pipeline/{pipeline_id}/runs", produces = "application/json")
+    public ResponseEntity<List<PipelineRunDAO>>
+    listPipelineRuns(@PathVariable(name = "pipeline_id") String pipelineId,
+                     @RequestParam(value = "from", required = false) Long from,
+                     @RequestParam(value = "to", required = false) Long to,
+                     @RequestParam(name = "offset", required = false) Optional<Long> offset,
+                     @RequestParam(name = "limit", required = false) Optional<Long> limit) {
+        List<PipelineRunDAO> res =
+                kubeflowPipelineService.listRuns(pipelineId, from, to, limit.orElse(100L), offset.orElse(0L));
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    //#endregion
+
+    //#region admin
+    @Operation(summary = "Get All pipelines") //GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR ADMINS)
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/admin/pipeline", produces = "application/json")
+    public ResponseEntity<List<PipelineDefinitionDAO>> listAll(
+            @RequestParam(required = false) Optional<Boolean> visible) {
+        //TODO: verify admin roles
+        List<PipelineDefinitionDAO> res = kubeflowPipelineService.getAllAdmin(visible);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
 
     @Operation(summary = "Set pipeline visibility in the UI")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -229,6 +195,25 @@ public class KubeflowController {
         Boolean res = kubeflowPipelineService.removeVisibility(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
+    @Operation(summary = "Set pipeline parameters metadata")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "/admin/pipeline/{pipeline_id}/parameters", produces = "application/json")
+    public ResponseEntity<Map<String, PipelineParameterDAO>> setParameters(
+            @PathVariable(name = "pipeline_id") String pipelineId, @RequestBody
+    Map<String, PipelineParameterDAO> parameters) {
+        //TODO: verify admin roles
+        Map<String, PipelineParameterDAO> params = null;
+        try {
+            params = kubeflowPipelineService.setParameters(pipelineId, parameters);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return new ResponseEntity<>(params, HttpStatus.OK);
+    }
+    //#endregion
+
+    //#region properties
 
     @Operation(summary = "Get  pipeline definitions by property ")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -273,26 +258,20 @@ public class KubeflowController {
         kubeflowPipelineService.deleteProperty(pipelineId, propertyKey);
         return ResponseEntity.ok().build();
     }
-
-
-    @Operation(summary = "Set pipeline parameters metadata")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PutMapping(path = "/admin/pipeline/{pipeline_id}/parameters", produces = "application/json")
-    public ResponseEntity<Map<String, PipelineParameterDAO>> setParameters(
-            @PathVariable(name = "pipeline_id") String pipelineId, @RequestBody
-    Map<String, PipelineParameterDAO> parameters) {
-        //TODO: verify admin roles
-        Map<String, PipelineParameterDAO> params = null;
-        try {
-            params = kubeflowPipelineService.setParameters(pipelineId, parameters);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-        return new ResponseEntity<>(params, HttpStatus.OK);
-    }
+//#endregion
 
 
 }
+
+//    @Operation(summary = "Login user")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @GetMapping(path = "/login", produces = "application/json")
+//    public ResponseEntity<?> logUser() {
+//        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
+//        //return new ResponseEntity<>(stateValue + " -> " + body, HttpStatus.OK);
+//        return new ResponseEntity<>(kubeflowService.getListPipelines(cookie), HttpStatus.OK);
+//    }
+
 //
 //
 //
@@ -321,13 +300,7 @@ public class KubeflowController {
 //        return ResponseEntity.ok().build();
 //    }
 
-// ********************************************************************************
-// ********************************************************************************
-// ********************************************************************************
-// TOMEK'S TESTS
-// ********************************************************************************
-// ********************************************************************************
-// ********************************************************************************
+// Old test messages
 
 //TODO: INSERT AUTOMATIC HEADERS
 //TODO: INSERT AUTOMATIC PARAMS
@@ -411,4 +384,32 @@ public class KubeflowController {
 //    }
 //
 //    return new ResponseEntity<>(String.format("%s: %s", kubeflowUsername, kubeflowPassword), HttpStatus.OK);
-//}
+//}    @Operation(summary = "List of experiments")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @GetMapping(path = "/experiments", produces = "application/json")
+//    public ResponseEntity<?> experimentList() {
+//        String urlString = homeUrl + "pipeline/apis/v1beta1/experiments";
+//        String httpsMethod = "GET";
+//        Object body = null;
+//        HashMap params = new HashMap<>();
+//        HashMap headers = new HashMap<>();
+//
+//        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
+//
+//        params.put("page_size", "10");
+//        params.put("resource_reference_key.type", "NAMESPACE");
+//        params.put("resource_reference_key.id", "kubeflow-renergetic");
+//        params.put("filter",
+//                "{\"predicates\":[{\"key\":\"storage_state\",\"op\":\"NOT_EQUALS\",\"string_value\":\"STORAGESTATE_ARCHIVED\"}]}");
+//
+//        headers.put("Accept", "*/*");
+//        headers.put("Accept-Encoding", "gzip, deflat, br");
+//        headers.put("Accept-Language", "en-US,en;q=0.9");
+//        headers.put("Connection", "keep-alive");
+//        headers.put("Cookie", cookie);
+//        headers.put("Host", "kubeflow.apps.dcw1-test.paas.psnc.pl");
+//        headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
+//
+//        return new ResponseEntity<>(KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody(),
+//                HttpStatus.OK);
+//    }
