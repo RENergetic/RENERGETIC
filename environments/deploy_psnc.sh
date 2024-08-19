@@ -97,6 +97,13 @@ compileApp() {
         cp "./target/"*.jar "${current}/docker_config/APIs/user-api/api.jar"
     fi
 
+    if [[ $keycloakInitializer = 'true' ]]
+    then
+        cd "${apisPath}/keycloakInit"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/keycloak-init/api.jar"
+    fi
+
     if [[ $wrapperApi = 'true' ]]
     then
         cd "${apisPath}/REN_API/wrapperAPI"
@@ -291,7 +298,7 @@ installPSNC() {
         kubectl apply -f rules-api-service.yaml --namespace=$project
     fi
 
-    if [[ $userApi = 'true' ]]
+    if [[ $keycloakInitializer = 'true' ]]
     then
         cd "${current}/docker_config/APIs/keycloak-init"
     
