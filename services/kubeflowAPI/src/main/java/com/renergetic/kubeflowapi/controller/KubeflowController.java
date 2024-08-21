@@ -7,26 +7,28 @@ import com.renergetic.common.dao.PipelineRunDAO;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.service.KubeflowService;
 import com.renergetic.kubeflowapi.service.KubeflowPipelineService;
-import com.renergetic.kubeflowapi.service.utils.KubeflowUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
 
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @RestController
 @Tag(name = "Kubeflow Controller", description = "Manage the connection to Kubeflow API")
 @RequestMapping("/api/kubeflow")
 public class KubeflowController {
+    private static final Logger log = LoggerFactory.getLogger(KubeflowController.class);
     //#region fields
 
     @Value("${kubeflow.user.name}")
@@ -41,8 +43,10 @@ public class KubeflowController {
     @Autowired
     private KubeflowPipelineService kubeflowPipelineService;
 
+/*
     @Value("${kubeflow.url}")
     String homeUrl = "https://kubeflow.test.pcss.pl/";
+*/
 
     //#endregion
     private String cookie;
@@ -70,7 +74,7 @@ public class KubeflowController {
     @Operation(summary = "Last time a pipeline was run")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/pipeline/{id}/lastrun", produces = "application/json")
-    public ResponseEntity<?> lastRunPipeline(@PathVariable("id") Long id, @PathVariable String cookie) {
+    public ResponseEntity<?> lastRunPipeline(@PathVariable("id") Long id ) {
         //return new ResponseEntity<>(kubeflowService.getListIDPipelines(cookie), HttpStatus.OK);
         cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
         return new ResponseEntity<>(kubeflowService.getListRuns(cookie), HttpStatus.OK);
@@ -101,7 +105,7 @@ public class KubeflowController {
             }
             response = jsonResponse.toString();
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("runStateList",e);
         }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -203,7 +207,7 @@ public class KubeflowController {
             @PathVariable(name = "pipeline_id") String pipelineId, @RequestBody
     Map<String, PipelineParameterDAO> parameters) {
         //TODO: verify admin roles
-        Map<String, PipelineParameterDAO> params = null;
+        Map<String, PipelineParameterDAO> params ;
         try {
             params = kubeflowPipelineService.setParameters(pipelineId, parameters);
         } catch (ParseException e) {

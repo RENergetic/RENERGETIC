@@ -8,8 +8,7 @@ import com.renergetic.common.dao.PipelineDefinitionDAO;
 import com.renergetic.common.dao.PipelineParameterDAO;
 import com.renergetic.common.dao.PipelineRunDAO;
 import com.renergetic.common.utilities.DateConverter;
-import com.renergetic.kubeflowapi.dao.ApiRunPostDAO;
-import com.renergetic.kubeflowapi.model.*;
+import com.renergetic.kubeflowapi.dao.*;
 import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,7 +43,6 @@ public class KubeflowService {
     public String getListPipelines(String cookie) {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines";
         String httpsMethod = "GET";
-        Object body = null;
         HashMap<String, String> params = new HashMap<>();
         HashMap<String, String> headers = new HashMap<>();
 
@@ -60,7 +58,7 @@ public class KubeflowService {
 
         //params.put("filter", "");
 
-        return KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
+        return KubeflowUtils.sendRequest(urlString, httpsMethod, params, null, headers).getResponseBody();
     }
 
     public String getListRuns(String cookie) {
@@ -118,30 +116,28 @@ public class KubeflowService {
     public PipelineDefinitionDAO getPipeline(String id) throws ParseException {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines/" + id;
         String httpsMethod = "GET";
-        Object body = null;
         HashMap<String, String> params = new HashMap<>();
         HashMap<String, String> headers = this.initHeaders();
 
         String pipelinesJSON =
-                KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers).getResponseBody();
+                KubeflowUtils.sendRequest(urlString, httpsMethod, params, null, headers).getResponseBody();
         var pipelineObj = Json.parse(pipelinesJSON);
         return this.parsePipelineObj(pipelineObj);
     }
 
-    public void stopRun(String id) {
+    public boolean stopRun(String id) {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/runs/" + id + "/terminate";
         String httpsMethod = "POST";
         HashMap<String, String> headers = this.initHeaders();
-        KubeflowUtils.sendRequest(urlString, httpsMethod, null, null, headers).getResponseBody();
+        return KubeflowUtils.sendRequest(urlString, httpsMethod, null, null, headers).getResponseCode() == 200;//.getResponseBody();
 
     }
 
     public PipelineRunDAO getRun(String id) {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/runs/" + id;
         String httpsMethod = "GET";
-        HashMap headers = this.initHeaders();
         String pipelinesJSON =
-                KubeflowUtils.sendRequest(urlString, httpsMethod, null, null, headers).getResponseBody();
+                KubeflowUtils.sendRequest(urlString, httpsMethod, null, null, this.initHeaders()).getResponseBody();
 
         PipelineRunDAO runObj = null;
         try {
@@ -160,7 +156,7 @@ public class KubeflowService {
 //        params.put("resource_reference_key.type", "NAMESPACE");
 //        params.put("resource_reference_key.id", kubeflowNamespace);
 
-        HashMap headers = initHeaders();
+
         List<KeyValue> parameters =
                 inputParams.entrySet().stream().filter(it -> it.getValue() != null).map(
                         it -> new KeyValue(it.getKey(), it.getValue().toString())).collect(
@@ -181,12 +177,11 @@ public class KubeflowService {
                 new ApiRunPostDAO(pipeline.getDescription(), pipeline.getName(), pipeSpec, resourceReference,
                         ""); //TODO: RESOURCE_REFERENCES
 //        headers.put("Referer", "https://kubeflow.apps.dcw1-test.paas.psnc.pl/pipeline/");
-
-        var resp = KubeflowUtils.sendRequest(urlString, httpsMethod, null, body, headers);
+//        HashMap headers = initHeaders();
+        var resp = KubeflowUtils.sendRequest(urlString, httpsMethod, null, body, initHeaders());
         try {
             var obj = Json.parse(resp.getResponseBody());
-            var dao = this.parseRunObj(obj);
-            return dao;
+            return this.parseRunObj(obj);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -254,7 +249,7 @@ public class KubeflowService {
             if (end > 0)
                 dao.setEndTime(end);
         } catch (Exception ex) {
-            log.error("Parse run obj failed: "+ex.getMessage());
+            log.error("Parse run obj failed: " + ex.getMessage());
         }
 //todo: parse run manifest
 
@@ -272,16 +267,16 @@ public class KubeflowService {
         Object body = null;
         HashMap<String, String> params = new HashMap<>();
         HashMap<String, String> headers = new HashMap<>();
-        String stateValue  ;
+        String stateValue;
         String code = "";
         HttpsResponseInfo response;
         String cookie = "";
 //        headers.put("Accept", "*/*");
         // Step 1 Obtain state value WORKING
         response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, Collections.emptyMap());
-        assert response != null;
+        assert response.getResponseBody() != null;
         stateValue = KubeflowUtils.getState(response.getResponseBody());
-        System.out.println("1:Code: " + response.getResponseCode()+", state" + stateValue);
+        System.out.println("1:Code: " + response.getResponseCode() + ", state" + stateValue);
 
         // Step 2 Get info from home
         urlString = homeUrl + "dex/auth";
@@ -391,17 +386,17 @@ public class KubeflowService {
         for (Map.Entry<String, List<String>> entry : response.getResponseHeaders().entrySet()) {
             String key = entry.getKey();
             List<String> values = entry.getValue();
-            System.out.println("Key: " + key);
-            System.out.println("Values:");
+//            System.out.println("Key: " + key);
+//            System.out.println("Values:");
             if (key != null && key.equals("set-cookie")) {
                 for (String value : values) {
-                    System.out.println("  - " + value);
+//                    System.out.println("  - " + value);
                     cookie = "authservice_session=" + KubeflowUtils.extractParamValue(value, "authservice_session=",
                             ";");
                     stateValue = KubeflowUtils.extractParamValue(value, "Expires=", ";");
                 }
             }
-            System.out.println();
+//            System.out.println();
         }
         System.out.println("Cookie: " + cookie);
         System.out.println("Expiration: " + stateValue);
@@ -409,7 +404,7 @@ public class KubeflowService {
     }
 
     private HashMap<String, String> initHeaders() {
-        HashMap<String, String> headers = new HashMap<String, String>();
+        HashMap<String, String> headers = new HashMap<>();
         headers.put("Accept", "*/*");
 //        headers.put("Accept-Encoding", "gzip, deflat, br");
 //        headers.put("Accept-Language", "en-US,en;q=0.9");

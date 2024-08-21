@@ -5,7 +5,7 @@ import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.common.model.security.KeycloakUser;
 
 import com.renergetic.common.utilities.Json;
-import lombok.Getter;
+import lombok.Getter; 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String clientId;
 
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(   HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
             String jwtToken = request.getHeader("Authorization");
