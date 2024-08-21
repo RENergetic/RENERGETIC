@@ -8,7 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.renergetic.common.utilities.Json;
-import com.renergetic.kubeflowapi.model.HttpsResponseInfo;
+import com.renergetic.kubeflowapi.dao.HttpsResponseInfo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,68 +28,56 @@ public class KubeflowUtils {
     public static HttpsResponseInfo sendRequest(String urlString, String httpMethod, Map<String, String> params,
                                                 Object body,
                                                 Map<String, String> headers) {
-
-//        String response = new String();
-//        String jsonResponse = "";
-//        String paramsString = "";
         HttpURLConnection connection;
         URL url;
         try {
-//            System.out.println("SEND REQUEST *******************************************");
-            // Specify the URL you want to connect to
             if (params != null) {
                 String parseParams = mapParams(params);
                 parseParams = parseParams.isBlank() ? parseParams : '?' + parseParams;
                 url = new URL(urlString + parseParams);
             } else
-                url = new URL(urlString  );
-
+                url = new URL(urlString);
             System.out.println(url);
-
             connection = (HttpURLConnection) url.openConnection();
             connection.setInstanceFollowRedirects(false);
             HttpURLConnection.setFollowRedirects(false);
             connection.setRequestMethod(httpMethod);
-
             if (headers != null) {
                 for (Entry<String, String> entry : headers.entrySet()) {
                     System.out.println("Feedback headers --> " + entry.getKey() + " : " + entry.getValue());
                     connection.setRequestProperty(entry.getKey(), entry.getValue());
                 }
             }
-
             connection.setDoOutput(true);
-
             if (body != null) {
-                String mBody=null;
-                if(body instanceof String){
-                    mBody=(String)body;
-                }else
-                    mBody=Json.toJson(body);
+                String mBody = body instanceof String ? (String) body : Json.toJson(body);
                 try (OutputStream os = connection.getOutputStream()) {
-                    byte[] input = mBody.getBytes("utf-8");
+                    byte[] input = mBody.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
             }
 
             HttpsResponseInfo info = new HttpsResponseInfo(connection.getResponseCode(), getBody(connection),
                     connection.getHeaderFields());
-
-//            System.out.println(info);
-
             connection.disconnect();
             return info;
         } catch (IllegalArgumentException e) {
-            System.err.println("Check that the URL is valid and  the HTTP Method is allowed");
+            log.error("Check that the URL is valid and  the HTTP Method is allowed");
+            return new HttpsResponseInfo(503, "Check that the URL is valid and  the HTTP Method is allowed", null);
         } catch (JsonProcessingException e) {
-            System.err.println("Can't parse body to a JSON");
+            log.error("Can't parse body to a JSON");
+            return new HttpsResponseInfo(503, "Can't parse body to a JSON", null);
+
         } catch (IOException e) {
-            System.err.println("Can't get connection with the URL");
+            log.error("Can't get connection with the URL");
+            return new HttpsResponseInfo(503, "Can't get connection with the URL", null);
         } catch (Exception e) {
-            System.err.println("Unknow exception");
-            e.printStackTrace();
+
+            log.error("Unknown exception", e);
+            return new HttpsResponseInfo(503, "Unknown exception", null);
+
         }
-        return null;
+
     }
 
     static public String mapParams(Map<String, String> params) {
@@ -120,28 +108,34 @@ public class KubeflowUtils {
             while ((line = reader.readLine()) != null) {
                 response.append(line);
             }
-            System.out.println("");
+//            System.out.println("");
             /*System.out.println("Response body 1: " + response);
             System.out.println("Response body 2: " + response.toString());*/
 
         } catch (IllegalArgumentException e) {
-            System.err.println("Check that the URL is valid and  the HTTP Method is allowed");
+            log.error("Check that the URL is valid and  the HTTP Method is allowed");
         } catch (JsonProcessingException e) {
-            System.err.println("Can't parse body to a JSON");
+            log.error("Can't parse body to a JSON");
         } catch (IOException e) {
-            System.err.println("Can't get connection with the URL");
+            log.error("Can't get connection with the URL");
         } catch (Exception e) {
-            System.err.println("Unknow exception");
-            e.printStackTrace();
+            log.error("Unknown exception", e);
         }
         return response.toString();
     }
 
-    public static String getState(String response) { //MAYBE IT CAN BE DELETED
+    public static String getState(String response) {
+        /**
+         * state prevents an attack where the attacker produces a fake authentication response,
+         * e.g. as part of the Basic Client Profile by sending a code to the Client's redirect URI.
+         * For example: after phishing the user an attacker could inject a stolen code that would be
+         * associated with the current user in this way. The state correlates request and response
+         * so an unsolicited crafted response is not possible without knowing the state parameter
+         * that was used in the request.
+         */
         Pattern pattern = Pattern.compile("state=([^&\"]+)");
         Matcher matcher = pattern.matcher(response);
         String stateValue = "";
-
         // Find the state value if the pattern matches
         if (matcher.find()) {
             stateValue = matcher.group(1);

@@ -221,7 +221,7 @@ public class KubeflowController {
 
     @Operation(summary = "Get  pipeline definitions by property ")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/admin/pipeline/property/{key}/value/{value}", produces = "application/json")
+    @GetMapping(path = "/pipeline/property/{key}/value/{value}", produces = "application/json")
     public ResponseEntity<List<PipelineDefinitionDAO>> getByProperty(@PathVariable(name = "key") String propertyKey,
                                                                      @PathVariable(name = "value") String propertyValue) {
         //TODO: verify admin roles
