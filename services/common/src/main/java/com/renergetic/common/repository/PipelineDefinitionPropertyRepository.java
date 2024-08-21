@@ -18,12 +18,12 @@ public interface PipelineDefinitionPropertyRepository extends JpaRepository<Pipe
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM pipeline_definition_property WHERE " +
-            " pipeline_definition_property.pipeline_id = :pipelineId AND pipeline_definition_property.key=:key ",
+            " pipeline_definition_property.pipeline_id = :pipelineId AND pipeline_definition_property.property_key=:key ",
             nativeQuery = true)
     void deletePipelineProperty(String pipelineId, String key);
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM pipeline_definition_property WHERE  pipeline_definition_property.key=:key ",
+    @Query(value = "DELETE FROM pipeline_definition_property WHERE  pipeline_definition_property.property_key=:key ",
             nativeQuery = true)
     void deletePipelineProperty(  String key);
 
