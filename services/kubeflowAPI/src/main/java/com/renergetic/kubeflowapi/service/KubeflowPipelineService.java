@@ -18,12 +18,18 @@ import com.renergetic.kubeflowapi.service.utils.DummyDataGenerator;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static io.smallrye.config.ConfigLogging.log;
 
 
 @Service
@@ -41,12 +47,14 @@ public class KubeflowPipelineService {
     @Autowired
     private KubeflowService kubeflowService;
 
+    Lock runlock = new ReentrantLock();
+
     public List<PipelineDefinitionDAO> getAll() {
         Map<String, PipelineDefinitionDAO> kubeflowMap = this.getKubeflowMap();
         return pipelineRepository.findByVisible(true).stream()
                 .map((it) -> {
                     //filter also parameters
-                    PipelineDefinitionDAO enrichedPipeline = enrichDAO(kubeflowMap, it, false);
+                    PipelineDefinitionDAO enrichedPipeline = enrichDAO(kubeflowMap.get(it.getPipelineId()), it, false);
                     enrichedPipeline.setParameters(
                             enrichedPipeline.getParameters().entrySet().stream()
                                     .filter(param -> param.getValue().getVisible())
@@ -74,8 +82,16 @@ public class KubeflowPipelineService {
 
         }
         localPipelines.forEach(it -> {
+//            if(kubeflowMap)
+            var kbfPipeline = kubeflowMap.get(it.getPipelineId());
+            if (kbfPipeline != null && !kbfPipeline.getName().equals(it.getName())) {
+                //sync name
+                it.setName(kbfPipeline.getName());
+                pipelineRepository.save(it);
+
+            }
             if (mVisible == null || mVisible == it.getVisible()) {
-                kubeflowMap.put(it.getPipelineId(), enrichDAO(kubeflowMap, it, true));
+                kubeflowMap.put(it.getPipelineId(), enrichDAO(kbfPipeline, it, true));
             } else {
                 kubeflowMap.remove(it.getPipelineId());
             }
@@ -116,20 +132,36 @@ public class KubeflowPipelineService {
         var wd = pipelineRepository.findById(pipelineId)
                 .orElseThrow(() -> new NotFoundException(
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
-        if (wd.getPipelineRun() != null && wd.getPipelineRun().getStartTime() != null && wd.getPipelineRun().getEndTime() == null) {
-            //task hasn't finished
-            PipelineRunDAO run = this.getRun(pipelineId);
-            if (run.getEndTime() == null) ;
-            throw new RuntimeException("Current task is still running");
+
+
+        try {
+            if (runlock.tryLock(30000, TimeUnit.MILLISECONDS)) {
+                try {
+
+                    assertRunningSync(wd);
+
+                    var kfPipeline = kubeflowService.getPipeline(pipelineId);
+                    PipelineRunDAO runDAO = startKubeflowRun(wd, params);
+                    var now = DateConverter.now();
+                    PipelineRun currentRun = runDAO.mapToEntity();
+                    currentRun.setInitTime(now);
+                    pipelineRunRepository.save(currentRun);
+                    wd.setPipelineRun(currentRun);
+                    wd.setName(kfPipeline.getName());
+                    pipelineRepository.save(wd);
+                    return runDAO;
+                } catch (ParseException e) {
+                    throw new RuntimeException("Invalid pipeline: " + pipelineId);
+                } finally {
+                    runlock.unlock();
+                }
+            } else {
+                throw new RuntimeException("Timeout running Pipeline: " + pipelineId);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        PipelineRunDAO runDAO = startKubeflowRun(wd, params);
-        var now = DateConverter.now();
-        PipelineRun currentRun = runDAO.mapToEntity();
-        currentRun.setInitTime(now);
-        pipelineRunRepository.save(currentRun);
-        wd.setPipelineRun(currentRun);
-        pipelineRepository.save(wd);
-        return runDAO;
+
     }
 
     public Boolean stopRun(String pipelineId) {
@@ -172,17 +204,6 @@ public class KubeflowPipelineService {
                                                            Map<String, PipelineParameterDAO> parameters) throws ParseException {
         Map<String, String> kfParameters;
         Map<String, PipelineParameterDAO> kubeflowParameters;
-        if (generateDummy) {
-            kfParameters = DummyDataGenerator.getParameters(pipelineId);
-            kubeflowParameters = mapKubeflowParameters(kfParameters);
-//todo remove
-            PipelineDefinitionDAO pipeline = kubeflowService.getPipeline(pipelineId);
-            kubeflowParameters = pipeline.getParameters();
-        } else {
-            PipelineDefinitionDAO pipeline = kubeflowService.getPipeline(pipelineId);
-            kubeflowParameters = pipeline.getParameters();
-        }
-
         List<PipelineParameter> userParams =
                 parameters.values().stream().map(PipelineParameterDAO::mapToEntity).collect(Collectors.toList());
         Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
@@ -194,6 +215,16 @@ public class KubeflowPipelineService {
             wd = byId.get();
             wd.getParameters().forEach(it -> pipelineParameterRepository.delete(it));
         }
+        PipelineDefinitionDAO kfPipeline;
+        if (generateDummy) {
+            kfParameters = DummyDataGenerator.getParameters(pipelineId);
+            kubeflowParameters = mapKubeflowParameters(kfParameters);
+            kfPipeline = kubeflowService.getPipeline(pipelineId);
+        } else {
+            kfPipeline = kubeflowService.getPipeline(pipelineId);
+            kubeflowParameters = kfPipeline.getParameters();
+        }
+        wd.setName(kfPipeline.getName());
         var mPipeline = pipelineRepository.save(wd);
         mPipeline.setParameters(userParams);
         List<PipelineParameter> pipelineParameters = this.mergeParameters(mPipeline, kubeflowParameters);
@@ -205,7 +236,6 @@ public class KubeflowPipelineService {
                         .collect(Collectors.toMap(PipelineParameterDAO::getKey, Function.identity()));
 
 
-//        pipelineRepository.save(wd);
         return params;
     }
 
@@ -362,21 +392,19 @@ public class KubeflowPipelineService {
     }
 
     /**
-     * @param kubeflowMap kubeflow experiments definitions with input parameters
-     * @param item
+     * @param kbfPipeline kubeflow pipeline definition with input parameters
+     * @param item        local pipeline
      * @param update
      * @return
      */
-    private PipelineDefinitionDAO enrichDAO(Map<String, PipelineDefinitionDAO> kubeflowMap,
+    private PipelineDefinitionDAO enrichDAO(@Nullable PipelineDefinitionDAO kbfPipeline,
                                             PipelineDefinition item, Boolean update) {
         PipelineDefinitionDAO dao = PipelineDefinitionDAO.create(item);
         ;
-        if (kubeflowMap.containsKey(item.getPipelineId())) {
-            var kb = kubeflowMap.get(item.getPipelineId());
-            //            if (  && item.getPipelineRun() != null) {
+        if (kbfPipeline != null) {
+//            var kb = kubeflowMap.get(item.getPipelineId());
             if (item.getPipelineRun() != null && item.getPipelineRun().getEndTime() == null) {
-                if (generateDummy) {
-
+                if (generateDummy) { //
                 } else {
                     var run = item.getPipelineRun();
                     var runId = run.getRunId();
@@ -389,57 +417,130 @@ public class KubeflowPipelineService {
                     pipelineRunRepository.save(run);
                 }
             }
-
-            item.setParameters(this.mergeParameters(item, kb.getParameters()));
+            item.setParameters(this.mergeParameters(item, kbfPipeline.getParameters()));
 
             dao = PipelineDefinitionDAO.create(item);
-            dao.setName(kb.getName());
-            dao.setVersion(kb.getVersion());
-            dao.setDescription(kb.getDescription());
+//            if(kbfPipeline.getName().equals())
+            dao.setName(kbfPipeline.getName());
+            dao.setVersion(kbfPipeline.getVersion());
+            dao.setDescription(kbfPipeline.getDescription());
 
         }
         return dao;
     }
 
+
+    private void assertRunningSync(PipelineDefinition wd) {
+        try {
+            if (runlock.tryLock(15000L, TimeUnit.MILLISECONDS)) {
+                try {
+                    this.assertRunning(wd);
+                } finally {
+                    runlock.unlock();
+                }
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void assertRunning(PipelineDefinition wd) {
+
+
+        if (wd.getPipelineRun() != null && wd.getPipelineRun().getStartTime() != null && wd.getPipelineRun().getEndTime() == null) {
+            //task hasn't finished
+            PipelineRunDAO run = this.getRun(wd.getPipelineId());
+            if (run.getEndTime() == null)
+                throw new RuntimeException("Current task is still running");
+        }
+    }
+
+    //#endregion
+
+    //#region properties
+    @Transactional
+    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, String propertyKey, String propertyValue, Optional<Boolean> unique) {
+//        if (unique.isPresent() && unique.get()) {
+//            clearProperty(propertyKey);
+//        }
+        var propertyDAO = new PipelineDefinitionPropertyDAO();
+        propertyDAO.setValue(propertyValue);
+        propertyDAO.setKey(propertyKey);
+
+        return this.setProperty(pipelineId, propertyDAO, unique.orElse(false), true);
+
+    }
+
     @Transactional
     public PipelineDefinitionPropertyDAO setProperty(String pipelineId, PipelineDefinitionPropertyDAO propertyDAO, Optional<Boolean> unique) {
-        if (unique.isPresent() && unique.get()) {
-            clearProperty(propertyDAO.getKey());
-        }
+//        if (unique.isPresent() && unique.get()) {
+//            clearProperty(propertyDAO.getKey());
+//        }
+        return this.setProperty(pipelineId, propertyDAO, unique.orElse(false), false);
+    }
+
+    @Transactional
+    private PipelineDefinitionPropertyDAO setProperty(String pipelineId, PipelineDefinitionPropertyDAO propertyDAO, Boolean unique, Boolean update) {
         Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
         PipelineDefinition pd;
         if (byId.isPresent()) {
             pd = byId.get();
+            if (unique) {
+                try {
+                    if (runlock.tryLock(15000L, TimeUnit.MILLISECONDS)) {
+                        try {
+                            this.assertRunning(pd);
+                            clearProperty(propertyDAO.getKey());
+                            return this.setProperty(pd, propertyDAO, update);
+                        } finally {
+                            runlock.unlock();
+                        }
+                    } else {
+                        throw new RuntimeException("Pipeline is blocked");
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                return this.setProperty(pd, propertyDAO, update);
+            }
+
         } else {
             pd = initPipelineDefinition(pipelineId);
             pipelineRepository.save(pd);
+            return this.setProperty(pd, propertyDAO, update);
         }
-        var property = propertyDAO.mapToEntity();
-        pipelinePropertyRepository.getPipelineProperty(pipelineId, propertyDAO.getKey())
-                .ifPresent(pipelineDefinitionProperty -> property.setId(pipelineDefinitionProperty.getId()));
-        property.setPipelineDefinition(pd);
-        pipelinePropertyRepository.save(property);
-        return PipelineDefinitionPropertyDAO.create(property);
+
+
     }
+
 
     @Transactional
-    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, String propertyKey, String propertyValue, Optional<Boolean> unique) {
-        if (unique.isPresent() && unique.get()) {
-            clearProperty(propertyKey);
-        }
-        Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
-        if (byId.isEmpty()) {
-            PipelineDefinition pd = initPipelineDefinition(pipelineId);
-            pipelineRepository.save(pd);
-        }
-//        else   pd = byId.get();
+    private PipelineDefinitionPropertyDAO setProperty(PipelineDefinition pipeline, PipelineDefinitionPropertyDAO propertyDAO, Boolean update) {
 
-        PipelineDefinitionProperty property = pipelinePropertyRepository.getPipelineProperty(pipelineId, propertyKey).orElseThrow(() -> new NotFoundException(
-                "Pipeline property (" + pipelineId + "," + propertyKey + ") not exists  "));
-        property.setValue(propertyValue);
+
+        PipelineDefinitionProperty property;
+        var pipelineId = pipeline.getPipelineId();
+        if (!update) {
+            property = propertyDAO.mapToEntity();
+            var p = pipelinePropertyRepository.getPipelineProperty(pipelineId, propertyDAO.getKey());
+            if (p.isPresent()) {
+                property.setId(p.get().getId());
+            } else property.setId(null);
+        } else {
+            property = pipelinePropertyRepository.getPipelineProperty(pipelineId, propertyDAO.getKey())
+                    .orElseThrow(() -> new NotFoundException(
+                            "Pipeline property (" + pipelineId + "," + propertyDAO.getKey() + ") not exists  "));
+            property.setValue(propertyDAO.getValue());
+
+
+        }
+        property.setPipelineDefinition(pipeline);
+
         pipelinePropertyRepository.save(property);
         return PipelineDefinitionPropertyDAO.create(property);
     }
+
 
     public PipelineDefinitionPropertyDAO deleteProperty(String pipelineId, String propertyKey) {
         PipelineDefinitionProperty pipelineDefinitionProperty = pipelinePropertyRepository.getPipelineProperty(pipelineId, propertyKey).orElseThrow(() -> new NotFoundException(
@@ -454,9 +555,25 @@ public class KubeflowPipelineService {
 
     }
 
-    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue) {
-        return pipelineRepository.findByProperty(propertyKey, propertyValue).stream().map(PipelineDefinitionDAO::create).toList();
+    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue,Boolean visible) {
+        var s = pipelineRepository.findByProperty(propertyKey, propertyValue,visible).stream();
+        return s.map((it) -> {
+            try {
+                var kbfPipeline = kubeflowService.getPipeline(it.getPipelineId());
+                if (!kbfPipeline.getName().equals(it.getName())) {
+                    it.setName(kbfPipeline.getName());
+                    pipelineRepository.save(it);
+                }
+                return this.enrichDAO(kbfPipeline, it, true);
+
+            } catch (ParseException e) {
+                log.error(
+                        "Invalid pipeline: " + it.getPipelineId());
+                return null;
+            }
+        }).filter(Objects::nonNull).toList();
 
     }
     //#endregion
+
 }

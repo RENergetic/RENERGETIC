@@ -115,6 +115,7 @@ public class KubeflowService {
 
     public PipelineDefinitionDAO getPipeline(String id) throws ParseException {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines/" + id;
+        //TODO check response if pipeline id is empty
         String httpsMethod = "GET";
         HashMap<String, String> params = new HashMap<>();
         HashMap<String, String> headers = this.initHeaders();

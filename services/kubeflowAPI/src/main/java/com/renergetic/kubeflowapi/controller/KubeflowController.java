@@ -224,8 +224,8 @@ public class KubeflowController {
     @GetMapping(path = "/pipeline/property/{key}/value/{value}", produces = "application/json")
     public ResponseEntity<List<PipelineDefinitionDAO>> getByProperty(@PathVariable(name = "key") String propertyKey,
                                                                      @PathVariable(name = "value") String propertyValue) {
-        //TODO: verify admin roles
-        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue);
+
+        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue,true);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
