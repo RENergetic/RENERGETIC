@@ -79,6 +79,10 @@
             "enabled": true,
             "standardFlowEnabled": true,
             "directAccessGrantsEnabled": true,
+            "implicitFlowEnabled": true,
+            "authorizationServicesEnabled": true,
+            "publicClient": false,
+            "serviceAccountEnabled": true,
             "rootUrl": "http://localhost:8080/",
             "baseUrl": null,
             "adminUrl": "http://localhost:8080/",
@@ -99,7 +103,31 @@
                     "description": "",
                     "composite": false
                 }
-            ]
+            ],
+            "attributes": {
+                "id.token.as.detached.signature": "false",
+                "saml.assertion.signature": "false",
+                "saml.force.post.binding": "false",
+                "saml.multivalued.roles": "false",
+                "saml.encrypt": "false",
+                "oauth2.device.authorization.grant.enabled": "true",
+                "backchannel.logout.revoke.offline.tokens": "false",
+                "saml.server.signature": "false",
+                "saml.server.signature.keyinfo.ext": "false",
+                "use.refresh.tokens": "true",
+                "exclude.session.state.from.auth.response": "false",
+                "oidc.ciba.grant.enabled": "true",
+                "saml.artifact.binding": "false",
+                "backchannel.logout.session.required": "true",
+                "client_credentials.use_refresh_token": "false",
+                "saml_force_name_id_format": "false",
+                "require.pushed.authorization.requests": "false",
+                "saml.client.signature": "false",
+                "tls.client.certificate.bound.access.tokens": "false",
+                "saml.authnstatement": "false",
+                "display.on.consent.screen": "false",
+                "saml.onetimeuse.condition": "false"
+            }
 
         }
     ],

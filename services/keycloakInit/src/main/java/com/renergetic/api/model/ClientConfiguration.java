@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Getter
@@ -23,6 +24,14 @@ public class ClientConfiguration {
     private boolean standardFlowEnabled;
     @JsonProperty(required = true)
     private boolean directAccessGrantsEnabled;
+    @JsonProperty(required = false)
+    private Boolean implicitFlowEnabled;
+    @JsonProperty(required = false)
+    private Boolean authorizationServicesEnabled;
+    @JsonProperty(required = false)
+    private Boolean publicClient;
+    @JsonProperty(required = false)
+    private Boolean serviceAccountEnabled;
     @JsonProperty(required = true)
     private String rootUrl;
     @JsonProperty(required = true)
@@ -33,6 +42,8 @@ public class ClientConfiguration {
     private List<String> validRedirectUris;
     @JsonProperty(required = true)
     private List<String> webOrigins;
+    @JsonProperty(required = false)
+    private Map<String, String> attributes;
 
     @JsonProperty(required = true)
     private List<RoleConfiguration> roles;

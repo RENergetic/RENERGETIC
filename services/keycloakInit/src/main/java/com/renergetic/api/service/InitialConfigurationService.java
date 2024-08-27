@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.core.Response;
+
 @Service
 @Slf4j
 public class InitialConfigurationService {
@@ -131,7 +133,20 @@ public class InitialConfigurationService {
         clientRepresentation.setAdminUrl(clientConfiguration.getAdminUrl());
         clientRepresentation.setRedirectUris(clientConfiguration.getValidRedirectUris());
         clientRepresentation.setWebOrigins(clientConfiguration.getWebOrigins());
+
+        if(clientConfiguration.getImplicitFlowEnabled() != null)
+            clientRepresentation.setImplicitFlowEnabled(clientConfiguration.getImplicitFlowEnabled());
+        if(clientConfiguration.getAuthorizationServicesEnabled() != null)
+            clientRepresentation.setAuthorizationServicesEnabled(clientConfiguration.getAuthorizationServicesEnabled());
+        if(clientConfiguration.getPublicClient() != null)
+            clientRepresentation.setPublicClient(clientConfiguration.getPublicClient());
+        if(clientConfiguration.getServiceAccountEnabled() != null)
+            clientRepresentation.setServiceAccountsEnabled(clientConfiguration.getServiceAccountEnabled());
+        if(clientConfiguration.getAttributes() != null)
+            clientRepresentation.setAttributes(clientConfiguration.getAttributes());
+
         keycloak.realm(realm).clients().create(clientRepresentation);
+
         return keycloak.realm(realm).clients().findByClientId(clientConfiguration.getClientId()).get(0).getId();
     }
 
