@@ -16,7 +16,7 @@ public class AbstractMeterTypeDAO {
 
     public AbstractMeterTypeDAO(AbstractMeter meter) {
         this.name = meter.name();
-        this.meter = meter.meter;
+        this.meter = meter.meterLabel;
         this.description = meter.description;
         this.physicalName = meter.physicalName;
     }
