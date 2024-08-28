@@ -20,8 +20,8 @@ import com.renergetic.ingestionapi.exception.ConnectionException;
 import com.renergetic.ingestionapi.exception.InvalidArgumentException;
 import com.renergetic.ingestionapi.exception.TimeFormatException;
 import com.renergetic.ingestionapi.exception.TooLargeRequestException;
-import com.renergetic.ingestionapi.model.Request;
-import com.renergetic.ingestionapi.model.RequestError;
+import com.renergetic.common.model.Request;
+import com.renergetic.common.model.RequestError;
 import com.renergetic.ingestionapi.service.LogsService;
 
 @RestControllerAdvice

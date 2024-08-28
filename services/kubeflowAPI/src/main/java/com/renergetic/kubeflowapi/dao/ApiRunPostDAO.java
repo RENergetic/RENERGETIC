@@ -4,14 +4,14 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
-import com.renergetic.kubeflowapi.model.ApiResourceReference;
-import com.renergetic.kubeflowapi.model.ApiRun;
-import com.renergetic.kubeflowapi.model.PipelineSpec;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Kubeflow run obj
+ */
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -35,15 +35,15 @@ public class ApiRunPostDAO {
     @SerializedName("service_account")
     private String serviceAccount;
 
-    public static ApiRunPostDAO create(ApiRun run) {
-        ApiRunPostDAO runDAO = new ApiRunPostDAO();
-
-        runDAO.setDescription(run.getDescription());
-        runDAO.setName(run.getName());
-        runDAO.setPipelineSpec(run.getPipeline_spec());
-        runDAO.setResourceReferences(run.getResource_references());
-        runDAO.setServiceAccount(run.getService_account());
-
-        return runDAO;
-    }
+//    public static ApiRunPostDAO create(ApiRun run) {
+//        ApiRunPostDAO runDAO = new ApiRunPostDAO();
+//
+//        runDAO.setDescription(run.getDescription());
+//        runDAO.setName(run.getName());
+//        runDAO.setPipelineSpec(run.getPipeline_spec());
+//        runDAO.setResourceReferences(run.getResource_references());
+//        runDAO.setServiceAccount(run.getService_account());
+//
+//        return runDAO;
+//    }
 }

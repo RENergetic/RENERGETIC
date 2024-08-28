@@ -17,7 +17,6 @@ import javax.persistence.EntityListeners;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 @Entity
 @Table(name = "asset_details")
 @EntityListeners(AssetDetailsListener.class)

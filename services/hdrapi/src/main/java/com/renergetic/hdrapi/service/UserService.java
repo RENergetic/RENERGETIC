@@ -81,7 +81,7 @@ public class UserService {
        Asset asset = Asset.initUserAsset(user.getUsername(), userEntity, assetType, null);
        asset.setUuid(uuidRepository.saveAndFlush(new UUID()));
        assetRepository.save(asset);
-       return UserDAOResponse.create(keycloakUser, null, null);
+       return UserDAOResponse.create(userEntity.getId(),keycloakUser, null, null);
    }
 
     @Transactional
@@ -142,7 +142,7 @@ public class UserService {
         uuidRepository.delete(asset.getUuid());
         userRepository.deleteById(entityUser.getId());
         uuidRepository.delete(entityUser.getUuid());
-        return UserDAOResponse.create(keycloakUser, null, null);
+        return UserDAOResponse.create(entityUser.getId(), keycloakUser, null, null);
     }
 
     public UserSettingsDAO saveSetting(UserSettingsDAO settings) {
@@ -232,7 +232,7 @@ public class UserService {
         } else {
             //else todo:
         }
-        return UserDAOResponse.create(userRepresentation, null, null);
+        return UserDAOResponse.create(user.mapToEntity().getId(), userRepresentation, null, null);
     }
 
 

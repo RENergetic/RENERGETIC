@@ -159,6 +159,7 @@ public class MeasurementController {
         List<String> tags = measurementSv.getTagKeys();
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
+
     @Operation(summary = "Get All Measurements Tags Keys")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/tags/key/{key}/values", produces = "application/json")
@@ -214,7 +215,6 @@ public class MeasurementController {
                 measurementSv.findAssetMeasurements(assetId, offset.orElse(0L), limit.orElse(500));
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
-
 
 
 //=== INFO REQUESTS ===================================================================================
@@ -320,6 +320,7 @@ public class MeasurementController {
         MeasurementDAOResponse measurementResponse = measurementSv.save(measurement);
         return new ResponseEntity<>(measurementResponse, HttpStatus.CREATED);
     }
+
     @Operation(summary = "Create a new Measurements")
     @ApiResponse(responseCode = "201", description = "Measurements saved correctly")
     @ApiResponse(responseCode = "422", description = "Type isn't valid")
@@ -462,6 +463,14 @@ public class MeasurementController {
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get tag")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "tags/key/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<TagDAO> getTag(@PathVariable String key, @PathVariable String value) {
+        var tag = measurementSv.getTag(key, value);
+        return new ResponseEntity<>(tag, HttpStatus.OK);
+    }
+
     @Operation(summary = "Insert Tags for Measurement")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PutMapping(path = {"{id}/tags", "id/{id}/tags"}, produces = "application/json")
@@ -473,7 +482,7 @@ public class MeasurementController {
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
-    
+
     @Operation(summary = "Add tag to the measurement")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PutMapping(path = "/id/{id}/tags/key/{key}/value/{value}", produces = "application/json")
@@ -482,6 +491,7 @@ public class MeasurementController {
         boolean res = measurementSv.setTag(measurementId, key, value);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
 
     @Operation(summary = "Delete tag")
     @ApiResponse(responseCode = "204", description = "Tag deleted")

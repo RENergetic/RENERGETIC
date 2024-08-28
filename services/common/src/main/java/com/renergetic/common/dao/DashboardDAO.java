@@ -24,7 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @ToString
 public class DashboardDAO {
-    @JsonProperty(required = false )
+    @JsonProperty(required = false)
     private Long id;
 
     @JsonProperty(required = false)
@@ -39,6 +39,8 @@ public class DashboardDAO {
 
     @JsonProperty(value = "grafana_id", required = false)
     private String grafanaId;
+    @JsonProperty(value = "visible", required = false)
+    private Boolean visible;
 
     @JsonProperty(required = false)
     private Map<String, ?> ext;
@@ -50,7 +52,7 @@ public class DashboardDAO {
     @JsonInclude(value = Include.NON_NULL)
     @JsonProperty(access = Access.READ_ONLY, required = false)
     private Integer status;
-    
+
     @JsonProperty(value = "measurement_type", required = false)
     private MeasurementType measurementType;
 
@@ -73,7 +75,7 @@ public class DashboardDAO {
             dao.setLabel(dashboard.getLabel());
             dao.setGrafanaId(dashboard.getGrafanaId());
             dao.setMeasurementType(dashboard.getMeasurementType());
-
+            dao.setVisible(dashboard.getVisible());
 
             if (dashboard.getExt() != null) {
                 try {
@@ -98,6 +100,7 @@ public class DashboardDAO {
 
         dashboard.setId(id);
         dashboard.setGrafanaId(grafanaId);
+        dashboard.setVisible(this.visible);
         if (this.ext != null)
             dashboard.setExt(Json.toJson(this.ext));
 
