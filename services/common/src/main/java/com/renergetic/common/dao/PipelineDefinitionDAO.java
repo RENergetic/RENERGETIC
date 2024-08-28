@@ -3,6 +3,7 @@ package com.renergetic.common.dao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.common.model.PipelineDefinition;
 import com.renergetic.common.model.PipelineParameter;
+import com.renergetic.common.model.PipelineDefinitionProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,8 +28,13 @@ public class PipelineDefinitionDAO {
     String description;
     @JsonProperty(required = false, value = "version")
     String version;
+    @JsonProperty(required = false, value = "update_date")
+    Long updateDate;
+
     @JsonProperty(required = false, value = "parameters")
     Map<String, PipelineParameterDAO> parameters = Collections.emptyMap();
+    @JsonProperty(required = false, value = "properties")
+    Map<String, PipelineDefinitionPropertyDAO> properties = Collections.emptyMap();
     @JsonProperty(required = true, value = "visible")
     boolean visible = false;
     @JsonProperty(required = false, value = "current_run")
@@ -54,6 +60,14 @@ public class PipelineDefinitionDAO {
         } else {
             dao.setParameters(Collections.emptyMap());
         }
+        if (wd.getProperties() != null) {
+            Map<String, PipelineDefinitionPropertyDAO> map =
+                    wd.getProperties().stream().map(PipelineDefinitionPropertyDAO::create)
+                            .collect(Collectors.toMap(PipelineDefinitionPropertyDAO::getKey, it -> it));
+            dao.setProperties(map);
+        } else {
+            dao.setProperties(Collections.emptyMap());
+        }
         return dao;
     }
 
@@ -68,6 +82,10 @@ public class PipelineDefinitionDAO {
                 this.getParameters().values().stream().map(PipelineParameterDAO::mapToEntity).collect(
                         Collectors.toList());
         wd.setParameters(params);
+        List<PipelineDefinitionProperty> properties =
+                this.getProperties().values().stream().map(PipelineDefinitionPropertyDAO::mapToEntity).collect(
+                        Collectors.toList());
+        wd.setProperties(properties);
         return wd;
     }
 }

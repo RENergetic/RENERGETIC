@@ -248,9 +248,9 @@ public class AbstractMeterDataService {
                 data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
                 configuredMeters.add(data);
             } else if (response != null)
-                log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meter, meter.getDomain().toString(), response.statusCode()));
+                log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meterLabel, meter.getDomain().toString(), response.statusCode()));
             else
-                log.error(String.format("Error retrieving data from Influx for abstract meter %s with domain %s: NULL response", meter.getName().meter, meter.getDomain().toString()));
+                log.error(String.format("Error retrieving data from Influx for abstract meter %s with domain %s: NULL response", meter.getName().meterLabel, meter.getDomain().toString()));
         }
         return configuredMeters;
     }

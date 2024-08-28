@@ -44,7 +44,7 @@ public class AbstractMeterService {
     public Map<String, String> map() {
         Map<String, String> meters = new TreeMap<>();
         for (AbstractMeter meter : AbstractMeter.values()) {
-            meters.put(meter.meter, meter.description);
+            meters.put(meter.meterLabel, meter.description);
         }
         return meters;
     }

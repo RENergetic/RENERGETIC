@@ -7,7 +7,9 @@ import lombok.Getter;
 @Getter
 public class AbstractMeterTypeDAO {
 
+    @Deprecated
     String meter;
+    String label;
     String description;
     String name;
 
@@ -16,7 +18,8 @@ public class AbstractMeterTypeDAO {
 
     public AbstractMeterTypeDAO(AbstractMeter meter) {
         this.name = meter.name();
-        this.meter = meter.meter;
+        this.meter = meter.meterLabel;
+        this.label = meter.meterLabel;
         this.description = meter.description;
         this.physicalName = meter.physicalName;
     }

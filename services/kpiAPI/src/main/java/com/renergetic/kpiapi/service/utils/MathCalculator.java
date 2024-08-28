@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.renergetic.kpiapi.model.AbstractMeter;
 import com.renergetic.kpiapi.service.utils.calc.MeasurementToken;
 import com.renergetic.kpiapi.service.utils.calc.ShuntingYardParser;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
@@ -348,7 +349,6 @@ public class MathCalculator {
             HttpResponse<String> response =
                     httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + function, "GET", params, null,
                             null);
-
             if (response.statusCode() < 300) {
                 JSONArray array = new JSONArray(response.body());
                 if (!array.isEmpty())

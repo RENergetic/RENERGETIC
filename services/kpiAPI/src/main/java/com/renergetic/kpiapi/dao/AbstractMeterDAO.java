@@ -12,6 +12,8 @@ public class AbstractMeterDAO {
 
     @JsonProperty(required = true)
     String name;
+    @JsonProperty(required = true)
+    String label;
     @JsonProperty(required = false, value = "custom_name")
     String customName;
 
@@ -27,10 +29,12 @@ public class AbstractMeterDAO {
 
     @JsonProperty(required = false)
     MeasurementDAO measurement;
+
     public static AbstractMeterDAO create(AbstractMeterConfig meter) {
-        return create(meter,null);
+        return create(meter, null);
     }
-    public static AbstractMeterDAO create(AbstractMeterConfig meter, Measurement m  ) {
+
+    public static AbstractMeterDAO create(AbstractMeterConfig meter, Measurement m) {
 
         AbstractMeterDAO dao = null;
 
@@ -40,9 +44,10 @@ public class AbstractMeterDAO {
 
             dao.setId(meter.getId());
 
-            if (meter.getName() != null)
-                dao.setName(meter.getName().meter);
-
+            if (meter.getName() != null) {
+                dao.setName(meter.getName().name());
+                dao.setLabel(meter.getName().meterLabel);
+            }
             dao.setFormula(meter.getFormula());
             dao.setCondition(meter.getCondition());
             dao.setDomain(meter.getDomain());
@@ -52,9 +57,11 @@ public class AbstractMeterDAO {
 
         return dao;
     }
-    public AbstractMeterConfig mapToEntity( ){
+
+    public AbstractMeterConfig mapToEntity() {
         return mapToEntity(null);
     }
+
     public AbstractMeterConfig mapToEntity(Measurement m) {
         AbstractMeterConfig entity = new AbstractMeterConfig();
 

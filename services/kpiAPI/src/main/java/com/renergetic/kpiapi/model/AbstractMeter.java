@@ -15,19 +15,20 @@ public enum AbstractMeter {
     NONRES("Storage non RES", "Non renewable energy storage", "energy"),
     CUSTOM("Custom", "Custom abstract meter", null); //Custom type to calculate own abstract meter
 
-    public final String meter;
+    public final String meterLabel;
     public final String description;
     public final String physicalName;
 
-    AbstractMeter(String name, String description, String physicalName) {
-        this.meter = name;
+    AbstractMeter(String name,  String description, String physicalName) {
+
+        this.meterLabel = name;
         this.description = description;
         this.physicalName = physicalName;
     }
 
     public static AbstractMeter obtain(String name) {
         for (AbstractMeter meter : AbstractMeter.values()) {
-            if (meter.name().equalsIgnoreCase(name) || meter.meter.equalsIgnoreCase(name))
+            if (meter.name().equalsIgnoreCase(name) || meter.meterLabel.equalsIgnoreCase(name))
                 return meter;
         }
 

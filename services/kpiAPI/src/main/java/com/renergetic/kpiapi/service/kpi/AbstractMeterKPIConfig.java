@@ -14,7 +14,7 @@ public class AbstractMeterKPIConfig {
     int period = 0; //period (interval offset) `0` STORAGE current, '-1' STORAGE one interval before, '2' -> to ahead
 
     String getKey() {
-        return this.abstractMeter.meter + "_" + function.name() + " " + period;
+        return this.abstractMeter.meterLabel + "_" + function.name() + " " + period;
     }
 
 }
