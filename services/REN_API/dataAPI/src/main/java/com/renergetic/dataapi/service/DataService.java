@@ -233,8 +233,6 @@ public class DataService {
 
     public TimeseriesDAO getTimeseries(Collection<Measurement> measurements, Long from, Optional<Long> to) {
         if (generateDummy) {
-            List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
-
             return dummyDataGenerator.getTimeseries(
                     measurements.stream().map(m -> MeasurementDAOResponse.create(m, null, null)).collect(
                             Collectors.toList()),
