@@ -20,8 +20,8 @@ public interface MeasurementTagsRepository extends JpaRepository<MeasurementTags
     @Query(value = "SELECT t.* " +
             "FROM (tags t " +
             "INNER JOIN measurement_tags connection ON connection.tag_id = t.id) " +
-            "WHERE connection.measurement_id = :measurementId", nativeQuery = true)
-    List<MeasurementTags> findByMeasurementId(Long measurementId);
+            "WHERE connection.measurement_id = :measurement_id", nativeQuery = true)
+    List<MeasurementTags> findByMeasurementId(@Param("measurement_id")  Long measurementId);
 
 
     @Query(value = "SELECT mt.* " +
