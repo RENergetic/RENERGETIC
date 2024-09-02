@@ -28,6 +28,12 @@ public class WrapperResponseDAO {
     private List<DemandScheduleDAO> demands = Collections.emptyList();
 
     @JsonProperty(required = false)
+    private List<DemandScheduleDAO> demandsPast = Collections.emptyList();
+
+    @JsonProperty(required = false)
+    private List<DemandScheduleDAO> demandsFuture = Collections.emptyList();
+
+    @JsonProperty(required = false)
     private List<InformationPanelDAOResponse> panels;
 
     //TODO: dashboards

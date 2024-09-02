@@ -73,17 +73,17 @@ public class InformationPanelController {
         return new ResponseEntity<>(informationPanelService.getByName(name), HttpStatus.OK);
     }
 
-    @Operation(summary = "Create a new Information Panel")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Information Panel saved correctly"),
-            @ApiResponse(responseCode = "500", description = "Error saving Information Panel")
-    })
-    @PostMapping(path = "", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<InformationPanelDAOResponse> createInformationPanel(
-            @RequestBody InformationPanelDAORequest informationPanelDAORequest) {
-        informationPanelDAORequest.setId(null);
-        return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
-    }
+//    @Operation(summary = "Create a new Information Panel")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "201", description = "Information Panel saved correctly"),
+//            @ApiResponse(responseCode = "500", description = "Error saving Information Panel")
+//    })
+//    @PostMapping(path = "", produces = "application/json", consumes = "application/json")
+//    public ResponseEntity<InformationPanelDAOResponse> createInformationPanel(
+//            @RequestBody InformationPanelDAORequest informationPanelDAORequest) {
+//        informationPanelDAORequest.setId(null);
+//        return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
+//    }
 
     @Operation(summary = "Create a new Information Panel")
     @ApiResponses({
@@ -95,6 +95,7 @@ public class InformationPanelController {
                                                                               @RequestBody InformationPanelDAO informationPanelDAORequest) {
         informationPanelDAORequest.setName(name);
         informationPanelDAORequest.setId(null);
+
         informationPanelDAORequest.setFeatured(false);
         return new ResponseEntity<>(informationPanelService.save(informationPanelDAORequest), HttpStatus.CREATED);
     }

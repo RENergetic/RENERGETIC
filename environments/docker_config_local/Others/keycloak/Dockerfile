@@ -1,3 +1,3 @@
-FROM jboss/keycloak
+FROM bitnami/keycloak
 
-COPY ./themes/renergetic/ /opt/jboss/keycloak/themes/renergetic/
+COPY ./themes/renergetic/ /opt/bitnami/keycloak/themes/renergetic/

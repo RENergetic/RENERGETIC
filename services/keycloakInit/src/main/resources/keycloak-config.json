@@ -1,0 +1,178 @@
+{
+    "realm": "realm-renergetic",
+    "registrationAllowed": false,
+    "clients": [
+        {
+            "clientId": "renergetic-app",
+            "protocol": "openid-connect",
+            "enabled": true,
+            "standardFlowEnabled": true,
+            "directAccessGrantsEnabled": true,
+            "rootUrl": "http://localhost:8080/",
+            "baseUrl": "http://localhost:8080/",
+            "adminUrl": "http://localhost:8080/",
+            "validRedirectUris": [
+                "http://localhost:8080/*","http://localhost:8081/*"
+            ],
+            "webOrigins": [
+                "http://localhost:8080","http://localhost:8081"
+            ],
+            "roles": [
+                {
+                    "name": "ren-admin",
+                    "description": "Registered user with skills to admin the Energy Island and the system",
+                    "composite": true,
+                    "clientComposite": {
+                        "realm-management": [
+                            "manage-users","query-groups","query-users","view-users"
+                        ]
+                    }
+                },
+                {
+                    "name": "ren-dev",
+                    "description": "Developer user with all privileges related with the Realm and Application",
+                    "composite": true,
+                    "clientComposite": {
+                        "realm-management": [
+                            "realm-admin"
+                        ],
+                        "renergetic-app": [
+                            "ren-admin"
+                        ]
+                    }
+                },
+                {
+                    "name": "ren-guest",
+                    "description": "",
+                    "composite": false
+                },
+                {
+                    "name": "ren-manager",
+                    "description": "Registered user with access to assets, dashboards and application panels and edit it",
+                    "composite": false
+                },
+                {
+                    "name": "ren-staff",
+                    "description": "",
+                    "composite": false
+                },
+                {
+                    "name": "ren-technical-manager",
+                    "description": "",
+                    "composite": false
+                },
+                {
+                    "name": "ren-user",
+                    "description": "Registered user with a relationship with some asset/s - owners, residents...",
+                    "composite": false
+                },
+                {
+                    "name": "ren-visitor",
+                    "description": "",
+                    "composite": false
+                }
+            ]
+        },
+        {
+            "clientId": "grafana",
+            "protocol": null,
+            "enabled": true,
+            "standardFlowEnabled": true,
+            "directAccessGrantsEnabled": true,
+            "implicitFlowEnabled": true,
+            "authorizationServicesEnabled": true,
+            "publicClient": false,
+            "serviceAccountEnabled": true,
+            "rootUrl": "http://localhost:8080/",
+            "baseUrl": null,
+            "adminUrl": "http://localhost:8080/",
+            "validRedirectUris": [
+                "http://localhost:8080/*"
+            ],
+            "webOrigins": [
+                "http://localhost:8080"
+            ],
+            "roles": [
+                {
+                    "name": "admin",
+                    "description": "",
+                    "composite": false
+                },
+                {
+                    "name": "editor",
+                    "description": "",
+                    "composite": false
+                }
+            ],
+            "attributes": {
+                "id.token.as.detached.signature": "false",
+                "saml.assertion.signature": "false",
+                "saml.force.post.binding": "false",
+                "saml.multivalued.roles": "false",
+                "saml.encrypt": "false",
+                "oauth2.device.authorization.grant.enabled": "true",
+                "backchannel.logout.revoke.offline.tokens": "false",
+                "saml.server.signature": "false",
+                "saml.server.signature.keyinfo.ext": "false",
+                "use.refresh.tokens": "true",
+                "exclude.session.state.from.auth.response": "false",
+                "oidc.ciba.grant.enabled": "true",
+                "saml.artifact.binding": "false",
+                "backchannel.logout.session.required": "true",
+                "client_credentials.use_refresh_token": "false",
+                "saml_force_name_id_format": "false",
+                "require.pushed.authorization.requests": "false",
+                "saml.client.signature": "false",
+                "tls.client.certificate.bound.access.tokens": "false",
+                "saml.authnstatement": "false",
+                "display.on.consent.screen": "false",
+                "saml.onetimeuse.condition": "false"
+            }
+
+        }
+    ],
+    "users": [
+        {
+            "email": "",
+            "username": "admin",
+            "firstname": "",
+            "lastname": "",
+            "enabled": true,
+            "emailVerified": false,
+            "passwordTemporary": false,
+            "passwordType": "password",
+            "passwordValue": "admin",
+            "roles": {
+                "realm": [
+                    "default-roles-realm-renergetic"
+                ],
+                "clients": {
+                    "realm-management": [
+                        "realm-admin"
+                    ]
+                }
+            }
+        },
+        {
+            "email": "",
+            "username": "jeremy",
+            "firstname": "",
+            "lastname": "",
+            "enabled": true,
+            "emailVerified": false,
+            "passwordTemporary": false,
+            "passwordType": "password",
+            "passwordValue": "jeremy",
+            "roles": {
+                "realm": [
+                    "default-roles-realm-renergetic"
+                ],
+                "clients": {
+                    "renergetic-app": [
+                        "ren-admin"
+                    ]
+                }
+            }
+        }
+    ]
+}

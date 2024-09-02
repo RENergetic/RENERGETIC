@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.ingestionapi.dao.MeasurementDAO;
-import com.renergetic.ingestionapi.dao.RequestInfo;
-import com.renergetic.ingestionapi.dao.RestrictionsDAO;
+import com.renergetic.common.dao.MeasurementIngestionDAO;
+import com.renergetic.common.dao.RequestInfo;
+import com.renergetic.common.dao.RestrictionsDAO;
 import com.renergetic.ingestionapi.exception.TooLargeRequestException;
-import com.renergetic.ingestionapi.model.Request;
+import com.renergetic.common.model.Request;
 import com.renergetic.ingestionapi.service.MeasurementService;
 import com.renergetic.ingestionapi.service.RestrictionsService;
 
@@ -48,10 +48,10 @@ public class MeasurementController {
 	
 	@Operation(summary = "Insert entries in InfluxDB")
 	@PostMapping("ingest")
-	public ResponseEntity<RequestInfo<MeasurementDAO>> addMeasurement(
+	public ResponseEntity<RequestInfo<MeasurementIngestionDAO>> addMeasurement(
 			@RequestHeader(name = HttpHeaders.ORIGIN, required = false, defaultValue = "unknown") String origin,
 			@RequestParam(required=false) Optional<String> bucket, 
-			@RequestBody List<MeasurementDAO> measurements){
+			@RequestBody List<MeasurementIngestionDAO> measurements){
 		
 		RestrictionsDAO restrictions = restrictionsSv.get();
 		Request request = new Request("POST", origin, "/api/ingest", measurements.size(), 200);
@@ -59,7 +59,7 @@ public class MeasurementController {
 		if (measurements.size() > restrictions.getRequestSize())
 			throw new TooLargeRequestException("The request is too large, the max request size is %d", restrictions.getRequestSize());
 		
-		RequestInfo<MeasurementDAO> ret = new RequestInfo<>();
+		RequestInfo<MeasurementIngestionDAO> ret = new RequestInfo<>();
 		ret.setInserted(0L);
 		ret.setErrors(new ArrayList<>());
 

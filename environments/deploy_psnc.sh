@@ -29,6 +29,7 @@ userApi=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
 wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
 dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
 kubeflowApi=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _installers.properties)
+keycloakInitializer=$(grep -ioP "(keycloakInitializer\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -50,28 +51,28 @@ compileApp() {
     if [[ $baseApi = 'true' ]]
     then
         cd "${apisPath}/REN_API/baseAPI"
-        mvn clean package -Dmaven.test.skip
+        mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/base-api/api.jar"
     fi
 
     if [[ $hdr = 'true' ]]
     then
         cd "${apisPath}/hdrAPI"
-        mvn clean package -Dmaven.test.skip
+        mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/hdr-api/api.jar"
     fi
 
     if [[ $influx = 'true' ]]
     then
         cd "${apisPath}/measurementapi"
-        mvn clean package -Dmaven.test.skip
+        mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/influx-api/api.jar"
     fi
 
     if [[ $kpi = 'true' ]]
     then
         cd "${apisPath}/kpiAPI"
-        mvn clean package -Dmaven.test.skip
+        mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/kpi-api/api.jar"
     fi
 
@@ -85,35 +86,42 @@ compileApp() {
     if [[ $rules = 'true' ]]
     then
         cd "${apisPath}/ruleEvaluationService"
-        mvn clean package -Dmaven.test.skip
+        mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/rules-api/api.jar"
     fi
 
     if [[ $userApi = 'true' ]]
     then
         cd "${apisPath}/REN_API/userAPI"
-        mvn clean package -Dmaven.test.skip
+        mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/user-api/api.jar"
+    fi
+
+    if [[ $keycloakInitializer = 'true' ]]
+    then
+        cd "${apisPath}/keycloakInit"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/keycloak-init/api.jar"
     fi
 
     if [[ $wrapperApi = 'true' ]]
     then
         cd "${apisPath}/REN_API/wrapperAPI"
-        mvn clean package -Dmaven.test.skip
+        mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/wrapper-api/api.jar"
     fi
 
     if [[ $dataApi = 'true' ]]
     then
         cd "${apisPath}/REN_API/dataAPI"
-        mvn clean package -Dmaven.test.skip
+        mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/data-api/api.jar"
     fi
     
     if [[ $kubeflowApi = 'true' ]]
     then
         cd "${apisPath}/kubeflowAPI"
-        mvn clean package -Dmaven.test.skip
+        mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/kubeflow-api/api.jar"
     fi
 
@@ -288,6 +296,26 @@ installPSNC() {
         # create kubernetes resources
         envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f rules-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $keycloakInitializer = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/keycloak-init"
+    
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/keycloak-init --namespace=$project
+        kubectl delete services/keycloak-init-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/keycloak-init:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/keycloak-init:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < keycloak-init-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f keycloak-init-service.yaml --namespace=$project
     fi
 
     if [[ $userApi = 'true' ]]

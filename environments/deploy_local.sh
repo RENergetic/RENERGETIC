@@ -22,6 +22,7 @@ baseApi=$(grep -ioP "(base\s*=\s*)\K.+" _installers.properties)
 wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
 dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
 kubeflowApi=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _installers.properties)
+keycloakInitializer=$(grep -ioP "(keycloakInitializer\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -233,6 +234,28 @@ then
         kubectl apply -f user-api-service.yaml --namespace=$project
     fi
 
+    if [[ $keycloakInitializer = 'true' ]]
+    then
+        cd "${apisPath}/keycloakInit"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config_local/APIs/keycloak-init/api.jar"
+
+        cd "${current}/docker_config_local/APIs/keycloak-init"
+        # API INSTALLATION
+        # set environment variables
+        eval $(minikube docker-env)
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/keycloak-init --namespace=$project
+        kubectl delete services/keycloak-init-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=keycloak-init:latest .
+
+        # create kubernetes resources
+        kubectl apply -f keycloak-init-deployment.yaml --force=true --namespace=$project
+        kubectl apply -f keycloak-init-service.yaml --namespace=$project
+    fi
+
     if [[ $wrapperApi = 'true' ]]
     then
         cd "${apisPath}/REN_API/wrapperAPI"
@@ -355,7 +378,7 @@ then
         kubectl delete deployments/keycloak --namespace=$project
         kubectl delete services/keycloak-sv --namespace=$project
 
-        docker build --no-cache --force-rm --tag=keycloak:latest .
+        # docker build --no-cache --force-rm --tag=keycloak:latest .
 
         # create kubernetes resources
         kubectl apply -f keycloak-deployment.yaml --force=true --namespace=$project

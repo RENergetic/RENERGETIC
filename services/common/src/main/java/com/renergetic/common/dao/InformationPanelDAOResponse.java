@@ -31,6 +31,8 @@ public class InformationPanelDAOResponse implements ResourceDAO {
     private Boolean isTemplate;
     @JsonProperty(value = "featured")
     private Boolean featured;
+    @JsonProperty(value = "priority")
+    private Integer priority;
 
     @JsonProperty(value = "props")
     private Map<String, ?> props;
@@ -51,6 +53,7 @@ public class InformationPanelDAOResponse implements ResourceDAO {
         dao.setLabel(entity.getLabel());
         dao.setIsTemplate(entity.getIsTemplate());
         dao.setFeatured(entity.getFeatured());
+        dao.setPriority(entity.getPriority());
         if (entity.getProps() != null) {
             try {
                 dao.setProps(Json.parse(entity.getProps()).toMap());

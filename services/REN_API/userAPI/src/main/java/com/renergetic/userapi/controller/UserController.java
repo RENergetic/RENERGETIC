@@ -68,7 +68,7 @@ public class UserController {
         		.collect(Collectors.toList());
         
         String settingsJson = userSv.getSettings(user.getId()).getSettingsJson();
-        UserDAOResponse profile = UserDAOResponse.create(keycloakProfile, roles, settingsJson);
+        UserDAOResponse profile = UserDAOResponse.create(userSv.translateKeycloakIdToDbId(keycloakProfile.getId()), keycloakProfile, roles, settingsJson);
         
         return new ResponseEntity<>(profile, HttpStatus.OK);
     }
@@ -77,6 +77,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/profile/settings", produces = "application/json")
     public ResponseEntity<String> getAllUsersSettings() {
+
         String userId = loggedInSv.getAuthenticationData().getPrincipal().getId();
         return new ResponseEntity<>(userSv.getSettings(userId).getSettingsJson(), HttpStatus.OK);
     }

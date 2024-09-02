@@ -25,45 +25,47 @@ import javax.validation.constraints.Pattern;
 @Getter
 @Setter
 @ToString
-public class Dashboard {	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+public class Dashboard {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-	@Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)
-	private String name;
+    @Column(name = "name", nullable = false, insertable = true, updatable = true, unique = true)
+    private String name;
 
-	@Pattern(regexp = "https?://\\S+([/?].+)?", message = "URL isn't valid format")
-	@Column(name = "url", nullable = false, insertable = true, updatable = true)
-	private String url;
+    @Pattern(regexp = "https?://\\S+([/?].+)?", message = "URL isn't valid format")
+    @Column(name = "url", nullable = false, insertable = true, updatable = true)
+    private String url;
 
-	@Column(name = "label", nullable = true, insertable = true, updatable = true)
-	private String label;
+    @Column(name = "label", nullable = true, insertable = true, updatable = true)
+    private String label;
+    @Column(name = "visible")
+    private Boolean visible;
 
-	@Column(name = "grafana_id", nullable = true, insertable = true, updatable = true)
-	private String grafanaId;
+    @Column(name = "grafana_id", nullable = true, insertable = true, updatable = true)
+    private String grafanaId;
 
-	@Column(name = "ext", nullable = true, insertable = true, updatable = true,columnDefinition="TEXT")
-	private String ext;
+    @Column(name = "ext", nullable = true, insertable = true, updatable = true, columnDefinition = "TEXT")
+    private String ext;
 
-	@ManyToOne(cascade = CascadeType.REFRESH)
-	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "user_id", nullable = true, insertable = true, updatable = true)
-	private User user;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "user_id", nullable = true, insertable = true, updatable = true)
+    private User user;
 
-	@OneToOne(cascade = CascadeType.REFRESH)
-	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
-	private UUID uuid;
-	@OneToOne(cascade = CascadeType.REFRESH)
-	@NotFound(action = NotFoundAction.IGNORE)
-	@JoinColumn(name = "measurement_type_id", nullable = true, insertable = true, updatable = true)
-	private MeasurementType measurementType;
+    @OneToOne(cascade = CascadeType.REFRESH)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "uuid", nullable = false, insertable = true, updatable = false)
+    private UUID uuid;
+    @OneToOne(cascade = CascadeType.REFRESH)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "measurement_type_id", nullable = true, insertable = true, updatable = true)
+    private MeasurementType measurementType;
 
-	public Dashboard(String name, String url, String label) {
-		super();
-		this.name = name;
-		this.url = url;
-		this.label = label;
-	}
+    public Dashboard(String name, String url, String label) {
+        super();
+        this.name = name;
+        this.url = url;
+        this.label = label;
+    }
 }

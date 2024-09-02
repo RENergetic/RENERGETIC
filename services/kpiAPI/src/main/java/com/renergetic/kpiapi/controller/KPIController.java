@@ -1,9 +1,11 @@
 package com.renergetic.kpiapi.controller;
 
+import com.renergetic.kpiapi.service.kpi.KPIFormula;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +33,20 @@ public class KPIController {
 	
     @Operation(summary = "Get an KPI data")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
+	@GetMapping(path = "formula", produces = "application/json")
+	public ResponseEntity<List<KPIFormula>> listKPIFormulas( ) {
+
+		return ResponseEntity.ok(	KPIFormula.listAll());
+	}
+    @Operation(summary = "Get an KPI data")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
 	@GetMapping(path = "{domain}/{meter_name}/data", produces = "application/json")
 	public ResponseEntity<KPIDataDAO> getAbstractMetersData(
 			@PathVariable("domain") Domain domain,
 			@PathVariable("meter_name") String name,
 			@RequestParam(name = "from", required = false) Optional<Long> from,
 			@RequestParam(name = "to", required = false) Optional<Long> to) {
-		
+
 		return ResponseEntity.ok(kpiSv.get(name, domain, from.orElse(null), to.orElse(null)));
 	}
 	

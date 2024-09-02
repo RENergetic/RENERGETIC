@@ -2,6 +2,7 @@ package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.renergetic.common.dao.details.MeasurementTagsDAO;
+import com.renergetic.common.dao.details.TagDAO;
 import com.renergetic.common.model.HDRRecommendation;
 import com.renergetic.common.utilities.DateConverter;
 import lombok.Getter;
@@ -21,7 +22,7 @@ public class HDRRecommendationDAO {
     @JsonProperty(required = true)
     private Long timestamp;
     @JsonProperty(required = true)
-    private MeasurementTagsDAO tag;
+    private TagDAO tag;
     @JsonProperty(required = false)
     private String label;
 
@@ -31,9 +32,9 @@ public class HDRRecommendationDAO {
 
         if (recommendation != null) {
             dao = new HDRRecommendationDAO();
-            dao.setTimestamp(DateConverter.toEpoch(recommendation.getTimestamp()));
+            dao.setTimestamp( recommendation.getTimestamp() );
             dao.setLabel(recommendation.getLabel());
-            dao.setTag(MeasurementTagsDAO.create(recommendation.getTag()));
+            dao.setTag(TagDAO.create(recommendation.getTag()));
             dao.setId(recommendation.getId());
         }
         return dao;
@@ -45,7 +46,7 @@ public class HDRRecommendationDAO {
         recommendation.setLabel(this.getLabel());
         if (this.id != null)
             recommendation.setId(this.id);
-        recommendation.setTimestamp(DateConverter.toLocalDateTime(this.getTimestamp()));
+        recommendation.setTimestamp( this.getTimestamp() );
         return recommendation;
     }
 

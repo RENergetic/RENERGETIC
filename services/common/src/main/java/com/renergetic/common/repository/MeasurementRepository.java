@@ -16,6 +16,8 @@ import java.util.Optional;
 
 @SuppressWarnings("unchecked")
 public interface MeasurementRepository extends JpaRepository<Measurement, Long> {
+    List<Measurement> findByAssetIsNullAndAssetCategoryIsNull();
+
     List<Measurement> findByName(String name);
 
     Measurement save(Measurement measurement);
@@ -56,8 +58,8 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     //            "INNER JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id " +
     @Query(value = "SELECT distinct measurement.* " +
             "FROM (measurement " +
-            "INNER INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
-            "INNER JOIN measurement_type ON measurement_type.id = measurement.measurement_type_id " +
+            " INNER JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
+            " INNER JOIN measurement_type ON measurement_type.id = measurement.measurement_type_id " +
             ")" +
             " WHERE COALESCE(measurement.sensor_name = CAST(:sensorName AS text),TRUE) " +
             " AND COALESCE(measurement.domain = CAST(:domain AS text) ,TRUE) " +
@@ -278,7 +280,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
 
     @Query(value = "SELECT  me.id, me.direction, me.domain, me.label,me.description, me.name, " +
             " me.sensor_name as sensorName,me.sensor_id as sensorId, me.measurement_type_id as typeId, " +
-            " mt.name as typeName, mt.label as typeLabel,mt.unit, mt.physical_name as physicalName," +
+            " mt.name as typeName, mt.label as typeLabel,mt.unit,mt.factor,mt.base_unit, mt.physical_name as physicalName," +
             " me.asset_id as assetId, asset.name as assetName, asset.label as assetLabel," +
             " sum(CASE WHEN it.id is not null THEN 1 ELSE 0 END)  as panelCount" +
             " FROM public.measurement me" +
@@ -287,9 +289,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " LEFT JOIN information_tile it on it.id = itm.information_tile_id" +
             " WHERE  me.id = :id GROUP  by me.id , mt.id,asset.id ", nativeQuery = true
     )
-    Optional<MeasurementDAO> findMeasurement(Long id );
-
-
+    Optional<MeasurementDAO> findMeasurement(Long id);
 
 
     @Query(
@@ -304,6 +304,17 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     List<Measurement> listHDRMeasurement(@Param("timestamp") LocalDateTime timestamp, @Param("tagKey") String tagKey,
                                          @Param("tagValue") String tagValue);
 
+    @Query(
+            value = "SELECT m.*   FROM ( measurement m" +
+                    " JOIN hdr_measurement hdrm ON hdrm.measurement_id = m.id  " +
+                    " JOIN measurement_tags mt ON mt.measurement_id = m.id" +
+                    " JOIN tags   ON tags.id = mt.tag_id  )" +
+                    " WHERE hdrm.timestamp  = :timestamp and " +
+                    " tags.key =  :tagKey   AND COALESCE(tags.value = CAST(:tagValue AS text)  ,TRUE) ",
+            nativeQuery = true
+    )
+    List<Measurement> listHDRMeasurement(@Param("timestamp") Long timestamp, @Param("tagKey") String tagKey,
+                                         @Param("tagValue") String tagValue);
 
     @Query(value = "SELECT " +
             " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
@@ -333,7 +344,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<MeasurementDAO> findMeasurementsByTag(Long assetId, String assetName, String measurementName,
                                                       String sensorName, String domain, String direction, Long type,
-                                                      String physicalName, String tagKey,  String tagValue,  long offset, Integer limit);
+                                                      String physicalName, String tagKey, String tagValue, long offset, Integer limit);
 
     @Query(value = "SELECT distinct " +
             " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
@@ -361,7 +372,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " GROUP by me.id, mt.id,asset.id  " +
             " order by  me.asset_id,me.name, me.sensor_name, me.measurement_type_id, me.direction, me.domain, me.id asc " +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
-    public List<MeasurementDAO> findMeasurementNoTag(Long assetId,   String measurementName,
+    public List<MeasurementDAO> findMeasurementNoTag(Long assetId, String measurementName,
                                                      String sensorName, String domain, String direction, Long type,
                                                      String physicalName, String tagKey, long offset, Integer limit);
 

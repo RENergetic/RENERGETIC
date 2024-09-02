@@ -1,0 +1,12 @@
+# Backdb Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-init-sv
+spec:
+  selector:
+    app: keycloak-init
+  type: NodePort
+  ports:
+    - port: 8082
+      targetPort: 8082

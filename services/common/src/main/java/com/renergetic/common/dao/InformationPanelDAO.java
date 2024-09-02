@@ -25,10 +25,12 @@ public class InformationPanelDAO {
 
     @JsonProperty()
     private String label;
-    @JsonProperty(value = "is_template")
-    private Boolean isTemplate;
+    @JsonProperty(value = "is_template",required = true)
+    private Boolean isTemplate = false;
     @JsonProperty(value = "featured")
     private Boolean featured;
+    @JsonProperty(value = "priority")
+    private Integer priority;
 
     @JsonProperty(value = "props",required = false)
     private Map<String, ?> props;
@@ -72,7 +74,8 @@ public class InformationPanelDAO {
         panel.setIsTemplate(this.isTemplate);
         panel.setFeatured(this.featured);
         panel.setProps(Json.toJson(this.props));
-        if (this.tiles != null && this.tiles.size() > 0) {
+        panel.setPriority(this.priority);
+        if (this.tiles != null && !this.tiles.isEmpty()) {
 //            TODO: map dao tile to sql model
             panel.setTiles(
                     tiles.stream().map(InformationTileDAORequest::mapToEntity).collect(Collectors.toList())

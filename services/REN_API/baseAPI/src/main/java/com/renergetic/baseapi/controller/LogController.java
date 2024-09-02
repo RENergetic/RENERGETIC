@@ -40,7 +40,7 @@ public class LogController {
 
     @Operation(summary = "Create a new log entry")
     @ApiResponse(responseCode = "201", description = "Request executed correctly")
-    @PostMapping(path = "/create", produces = "application/json")
+    @PostMapping(path = "/create", produces = "application/json", consumes = "application/json")
     public ResponseEntity<LogDAO> createLog(@RequestBody LogDAO logDAO,
                                             @RequestParam(name = "notification", required = false) Optional<Boolean> notification){
         return new ResponseEntity<>(loggingService.create(logDAO, notification), HttpStatus.CREATED);

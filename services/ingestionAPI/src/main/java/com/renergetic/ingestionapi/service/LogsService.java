@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.ingestionapi.model.Request;
-import com.renergetic.ingestionapi.model.RequestError;
-import com.renergetic.ingestionapi.repository.RequestErrorRepository;
-import com.renergetic.ingestionapi.repository.RequestRepository;
+import com.renergetic.common.model.Request;
+import com.renergetic.common.model.RequestError;
+import com.renergetic.common.repository.RequestErrorRepository;
+import com.renergetic.common.repository.RequestRepository;
 
 @Service
 public class LogsService {
