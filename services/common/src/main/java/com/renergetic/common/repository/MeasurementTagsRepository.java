@@ -13,7 +13,7 @@ import javax.transaction.Transactional;
 @SuppressWarnings("unchecked")
 public interface MeasurementTagsRepository extends JpaRepository<MeasurementTags, Long> {
 
-//    List<MeasurementTags> findByMeasurementIdIsNull();
+    List<MeasurementTags> findByMeasurementIdIsNull();
 
     MeasurementTags save(MeasurementTags tag);
 
