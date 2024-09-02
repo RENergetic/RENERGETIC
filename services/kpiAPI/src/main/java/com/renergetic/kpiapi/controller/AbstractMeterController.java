@@ -176,7 +176,7 @@ public class AbstractMeterController {
 
     @Operation(summary = " Calculate online the abstract meters ")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PostMapping(path = "/data", produces = "application/json")
+    @PostMapping(path = "/data/calculate", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> calculateAbstractMeters(
             @RequestParam(name = "from", required = false) Optional<Long> from,
             @RequestParam(name = "to", required = false) Optional<Long> to,
