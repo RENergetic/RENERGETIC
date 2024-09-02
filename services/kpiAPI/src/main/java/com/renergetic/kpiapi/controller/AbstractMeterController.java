@@ -1,13 +1,9 @@
 package com.renergetic.kpiapi.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import com.renergetic.kpiapi.dao.AbstractMeterIdentifier;
 import com.renergetic.kpiapi.dao.AbstractMeterTypeDAO;
-import com.renergetic.kpiapi.model.AbstractMeter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -176,5 +172,16 @@ public class AbstractMeterController {
             @RequestParam(name = "time", required = false) Optional<Long> time) {
 
         return ResponseEntity.ok(amDataSv.calculateAndInsertAll(from.orElse(null), to.orElse(null), time.orElse(null)));
+    }
+
+    @Operation(summary = " Calculate online the abstract meters ")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PostMapping(path = "/data", produces = "application/json")
+    public ResponseEntity<HashMap<String, String>> calculateAbstractMeters(
+            @RequestParam(name = "from", required = false) Optional<Long> from,
+            @RequestParam(name = "to", required = false) Optional<Long> to,
+            @RequestParam(name = "time", required = false) Optional<Long> time) {
+
+        return ResponseEntity.ok(amDataSv.calculateAbstractMeters(from.orElse(null), to.orElse(null), time.orElse(null)));
     }
 }
