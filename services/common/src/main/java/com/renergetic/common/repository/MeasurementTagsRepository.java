@@ -13,15 +13,15 @@ import javax.transaction.Transactional;
 @SuppressWarnings("unchecked")
 public interface MeasurementTagsRepository extends JpaRepository<MeasurementTags, Long> {
 
-    List<MeasurementTags> findByMeasurementIdIsNull();
+//    List<MeasurementTags> findByMeasurementIdIsNull();
 
     MeasurementTags save(MeasurementTags tag);
 
     @Query(value = "SELECT t.* " +
             "FROM (tags t " +
             "INNER JOIN measurement_tags connection ON connection.tag_id = t.id) " +
-            "WHERE connection.measurement_id = :measurementId", nativeQuery = true)
-    List<MeasurementTags> findByMeasurementId(Long measurementId);
+            "WHERE connection.measurement_id = :measurement_id", nativeQuery = true)
+    List<MeasurementTags> findByMeasurementId(@Param("measurement_id")  Long measurementId);
 
 
     @Query(value = "SELECT mt.* " +

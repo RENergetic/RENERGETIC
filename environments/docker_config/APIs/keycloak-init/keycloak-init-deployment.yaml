@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-init
+spec:
+  selector:
+      matchLabels:
+        app: keycloak-init
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: keycloak-init
+    spec:
+      containers:
+        - name: keycloak-init
+          image: docker-registry.default.svc:5000/${PROJECT}/keycloak-init:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+          resources:
+            requests:
+              cpu: 50m
+              memory: 275Mi
+            limits:
+              cpu: 100m
+              memory: 525Mi
+          readinessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 8082
+            initialDelaySeconds: 60
+            periodSeconds: 120
+            successThreshold: 1
+            timeoutSeconds: 1
+      restartPolicy: OnFailure

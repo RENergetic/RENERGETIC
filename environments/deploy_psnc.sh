@@ -29,6 +29,7 @@ userApi=$(grep -ioP "(user\s*=\s*)\K.+" _installers.properties)
 wrapperApi=$(grep -ioP "(wrapper\s*=\s*)\K.+" _installers.properties)
 dataApi=$(grep -ioP "(data\s*=\s*)\K.+" _installers.properties)
 kubeflowApi=$(grep -ioP "(kubeflow\s*=\s*)\K.+" _installers.properties)
+keycloakInitializer=$(grep -ioP "(keycloakInitializer\s*=\s*)\K.+" _installers.properties)
 # Others
 ui=$(grep -ioP "(ui\s*=\s*)\K.+" _installers.properties)
 keycloak=$(grep -ioP "(keycloak\s*=\s*)\K.+" _installers.properties)
@@ -94,6 +95,13 @@ compileApp() {
         cd "${apisPath}/REN_API/userAPI"
         mvn clean package -Dmaven.test.skip -Dspring-boot.run.profiles=prod
         cp "./target/"*.jar "${current}/docker_config/APIs/user-api/api.jar"
+    fi
+
+    if [[ $keycloakInitializer = 'true' ]]
+    then
+        cd "${apisPath}/keycloakInit"
+        mvn clean package -Dmaven.test.skip
+        cp "./target/"*.jar "${current}/docker_config/APIs/keycloak-init/api.jar"
     fi
 
     if [[ $wrapperApi = 'true' ]]
@@ -288,6 +296,26 @@ installPSNC() {
         # create kubernetes resources
         envsubst '$PROJECT' < rules-api-deployment.yaml | kubectl apply --namespace=$project -f -
         kubectl apply -f rules-api-service.yaml --namespace=$project
+    fi
+
+    if [[ $keycloakInitializer = 'true' ]]
+    then
+        cd "${current}/docker_config/APIs/keycloak-init"
+    
+        # API INSTALLATION
+        # set environment variables
+
+        # delete kubernetes resources if exists
+        kubectl delete deployments/keycloak-init --namespace=$project
+        kubectl delete services/keycloak-init-sv --namespace=$project
+
+        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/$project/keycloak-init:latest .
+        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        docker push registry.apps.paas-dev.psnc.pl/$project/keycloak-init:latest
+
+        # create kubernetes resources
+        envsubst '$PROJECT' < keycloak-init-deployment.yaml | kubectl apply --namespace=$project -f -
+        kubectl apply -f keycloak-init-service.yaml --namespace=$project
     fi
 
     if [[ $userApi = 'true' ]]
