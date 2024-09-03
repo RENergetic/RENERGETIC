@@ -238,6 +238,8 @@ public class KPIService {
 //kpi. TODO: link KPI with measurements
 //            hotfix
             if (kpi.typeName.equals("energy")) {
+                //TODO:
+                //https://renergetic-renergetic-wp5.apps.paas-dev.psnc.pl/api-base/1.0/api/measurements/report?type_physical_name=energy&domain=heat&sensor_name=kpi&offset=0&limit=25
                 influxRequest.getFields().put("energy_kwh", calculator.bigDecimalToDoubleString(value));
             } else
                 influxRequest.getFields().put(kpi.typeName, calculator.bigDecimalToDoubleString(value));
