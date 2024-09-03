@@ -42,9 +42,6 @@ public class MeasurementTags extends Details{
 	@JsonIgnore()
 	private   List<Measurement> measurements;
 
-//	@Formula("(select m.measurement_id from measurement_tags m where m.tag_id = id limit 1)")
-//	private Long measurementId;
-
 	public MeasurementTags(String key, String value) {
 		super(key, value);
 		this.measurements = new ArrayList<Measurement>();
