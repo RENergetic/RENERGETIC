@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import com.renergetic.ingestionapi.model.Tags;
+import com.renergetic.ingestionapi.repository.TagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +32,6 @@ import com.renergetic.common.model.RequestError;
 import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.common.repository.MeasurementTypeRepository;
-import com.renergetic.common.repository.MeasurementTagsRepository;
 import com.renergetic.ingestionapi.service.utils.Restrictions;
 
 @Service
@@ -45,7 +46,7 @@ public class MeasurementService {
 	private MeasurementTypeRepository typeRepository;
 	
 	@Autowired
-	private MeasurementTagsRepository tagsRepository;
+	private TagsRepository tagsRepository;
 	
 	@Autowired
 	private LogsService logs;
@@ -164,7 +165,7 @@ public class MeasurementService {
 //		tags.put("predictive_model", null);
 //		tags.put("direction", "(?i)((in)|(out)|(none))");
 //		tags.put("domain", "(?i)((heat)|(electricity))");
-		List<MeasurementTags> tags = tagsRepository.findByMeasurementIdIsNull();
+		List<Tags> tags = tagsRepository.findByMeasurementIdIsNull();
 
 		return tags.stream().collect(HashMap<String, String>::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
 	}
