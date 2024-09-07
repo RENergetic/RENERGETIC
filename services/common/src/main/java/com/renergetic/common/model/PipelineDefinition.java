@@ -9,14 +9,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "pipeline_definition" )
@@ -27,10 +20,12 @@ import javax.persistence.Table;
 public class PipelineDefinition {
 
     @Id
-    @Column(name = "id" )
+    @Column(name = "id",unique = true )
     private String pipelineId;
-    @Column(name = "name" )
-    private String name;
+    @Column(name = "name")
+    private String name = "<name>";
+    @Column(name = "label" )
+    private String label;
 //    @Column(name = "update_date" )
 //    private String  updateDate;
 
@@ -46,6 +41,10 @@ public class PipelineDefinition {
     @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "pipelineDefinition")
     @NotFound(action = NotFoundAction.IGNORE)
     private List<PipelineDefinitionProperty> properties;
+
+    @ManyToOne
+    @JoinColumn(name = "information_panel_id",nullable = true)
+    private InformationPanel informationPanel;
 
     //TODO: maximum time for the task to finish?
     public  PipelineDefinition(String pipelineId) {

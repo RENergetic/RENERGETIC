@@ -1,6 +1,7 @@
 package com.renergetic.common.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.common.model.InformationPanel;
 import com.renergetic.common.model.PipelineDefinition;
 import com.renergetic.common.model.PipelineParameter;
 import com.renergetic.common.model.PipelineDefinitionProperty;
@@ -24,6 +25,8 @@ public class PipelineDefinitionDAO {
     String pipelineId;
     @JsonProperty(required = false, value = "name")
     String name;
+    @JsonProperty(required = false, value = "label")
+    String label;
     @JsonProperty(required = false, value = "description")
     String description;
     @JsonProperty(required = false, value = "version")
@@ -40,9 +43,15 @@ public class PipelineDefinitionDAO {
     @JsonProperty(required = false, value = "current_run")
     PipelineRunDAO currentRun;
 
+    @JsonProperty(required = false, value = "information_panel")
+    InformationPanelDAOSimple informationPanel;
+
     public PipelineDefinitionDAO(String pipelineId) {
         this.pipelineId = pipelineId;
     }
+//    public static PipelineDefinitionDAO create(PipelineDefinition wd) {
+//        return PipelineDefinitionDAO.create(wd,null)
+//    }
 
     public static PipelineDefinitionDAO create(PipelineDefinition wd) {
         PipelineDefinitionDAO dao = new PipelineDefinitionDAO();
@@ -68,14 +77,23 @@ public class PipelineDefinitionDAO {
         } else {
             dao.setProperties(Collections.emptyMap());
         }
+        if (wd.getInformationPanel() != null) {
+            dao.setInformationPanel(InformationPanelDAOSimple.create(wd.getInformationPanel()));
+        }
+        dao.setLabel(wd.getLabel());
         return dao;
     }
 
     public PipelineDefinition mapToEntity() {
+        return mapToEntity(null);
+    }
+
+    public PipelineDefinition mapToEntity(InformationPanel panel) {
         PipelineDefinition wd = new PipelineDefinition();
         wd.setPipelineId(this.pipelineId);
         wd.setVisible(this.visible);
         wd.setName(this.name);
+        wd.setLabel(this.label);
         if (this.currentRun != null)
             wd.setPipelineRun(this.currentRun.mapToEntity());
         List<PipelineParameter> params =
@@ -86,6 +104,8 @@ public class PipelineDefinitionDAO {
                 this.getProperties().values().stream().map(PipelineDefinitionPropertyDAO::mapToEntity).collect(
                         Collectors.toList());
         wd.setProperties(properties);
+        if (panel != null)
+            wd.setInformationPanel(panel);
         return wd;
     }
 }
