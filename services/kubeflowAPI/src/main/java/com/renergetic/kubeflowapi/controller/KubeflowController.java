@@ -53,32 +53,32 @@ public class KubeflowController {
 
     //#region kubeflow integration
 
-    @Operation(summary = "Get all pipelines from kubeflow")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping("/pipelines")
-    public ResponseEntity<?> getAllPipelines() throws IllegalAccessException {
-        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
-        return new ResponseEntity<>(kubeflowService.getListPipelines(cookie), HttpStatus.OK);
-    }
+//    @Operation(summary = "Get all pipelines from kubeflow")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @GetMapping("/pipelines")
+//    public ResponseEntity<?> getAllPipelines() throws IllegalAccessException {
+//        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
+//        return new ResponseEntity<>(kubeflowService.getListPipelines(cookie), HttpStatus.OK);
+//    }
 
 
-    @Operation(summary = "Get all runs from kubeflow")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/runs", produces = "application/json")
-    public ResponseEntity<?> getAllRuns() throws IllegalAccessException{
-        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
-        return new ResponseEntity<>(kubeflowService.getListRuns(cookie), HttpStatus.OK);
-    }
+//    @Operation(summary = "Get all runs from kubeflow")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @GetMapping(path = "/runs", produces = "application/json")
+//    public ResponseEntity<?> getAllRuns() throws IllegalAccessException{
+//        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
+//        return new ResponseEntity<>(kubeflowService.getListRuns(cookie), HttpStatus.OK);
+//    }
+//
 
-
-    @Operation(summary = "Last time a pipeline was run")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @GetMapping(path = "/pipeline/{id}/lastrun", produces = "application/json")
-    public ResponseEntity<?> lastRunPipeline(@PathVariable("id") Long id )throws IllegalAccessException {
-        //return new ResponseEntity<>(kubeflowService.getListIDPipelines(cookie), HttpStatus.OK);
-        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
-        return new ResponseEntity<>(kubeflowService.getListRuns(cookie), HttpStatus.OK);
-    }
+//    @Operation(summary = "Last time a pipeline was run")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @GetMapping(path = "/pipeline/{id}/lastrun", produces = "application/json")
+//    public ResponseEntity<?> lastRunPipeline(@PathVariable("id") Long id )throws IllegalAccessException {
+//        //return new ResponseEntity<>(kubeflowService.getListIDPipelines(cookie), HttpStatus.OK);
+//        cookie = kubeflowService.getCookie(kubeflowUsername, kubeflowPassword);
+//        return new ResponseEntity<>(kubeflowService.getListRuns(cookie), HttpStatus.OK);
+//    }
 
     @Operation(summary = "List of runs with state of the runs")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -188,6 +188,23 @@ public class KubeflowController {
     public ResponseEntity<Boolean> setVisibility(@PathVariable(name = "pipeline_id") String pipelineId) {
         //TODO: verify admin roles
         Boolean res = kubeflowPipelineService.setVisibility(pipelineId);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+    @Operation(summary = "Set pipeline informationpanel  ")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "/admin/pipeline/{pipeline_id}/panel/{panel_id}", produces = "application/json")
+    public ResponseEntity<PipelineDefinitionDAO> setPanel(@PathVariable(name = "pipeline_id") String pipelineId,@PathVariable(name = "pipeline_id") Long panelId) {
+        //TODO: verify admin roles
+        var res = kubeflowPipelineService.setPanel(pipelineId,panelId);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Set pipeline informationpanel  ")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @DeleteMapping(path = "/admin/pipeline/{pipeline_id}/panel", produces = "application/json")
+    public ResponseEntity<PipelineDefinitionDAO> removePanel(@PathVariable(name = "pipeline_id") String pipelineId ) {
+        //TODO: verify admin roles
+        var res = kubeflowPipelineService.removePanel(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 

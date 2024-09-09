@@ -9,10 +9,7 @@ import com.renergetic.common.model.PipelineDefinition;
 import com.renergetic.common.model.PipelineDefinitionProperty;
 import com.renergetic.common.model.PipelineParameter;
 import com.renergetic.common.model.PipelineRun;
-import com.renergetic.common.repository.PipelineDefinitionPropertyRepository;
-import com.renergetic.common.repository.PipelineParameterRepository;
-import com.renergetic.common.repository.PipelineRepository;
-import com.renergetic.common.repository.PipelineRunRepository;
+import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.kubeflowapi.service.utils.DummyDataGenerator;
 import org.apache.tomcat.util.json.ParseException;
@@ -42,6 +39,8 @@ public class KubeflowPipelineService {
     private PipelineParameterRepository pipelineParameterRepository;
     @Autowired
     private PipelineDefinitionPropertyRepository pipelinePropertyRepository;
+    @Autowired
+    private InformationPanelRepository informationPanelRepository;
     @Autowired
     private PipelineRunRepository pipelineRunRepository;
     @Autowired
@@ -137,7 +136,7 @@ public class KubeflowPipelineService {
 
     }
 
-    public PipelineRunDAO startRun(String pipelineId, Map<String, Object> params){
+    public PipelineRunDAO startRun(String pipelineId, Map<String, Object> params) {
         var wd = pipelineRepository.findById(pipelineId)
                 .orElseThrow(() -> new NotFoundException(
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
@@ -210,6 +209,25 @@ public class KubeflowPipelineService {
         return wd.getVisible();
     }
 
+
+    public PipelineDefinitionDAO setPanel(String pipelineId, Long panelId) {
+        Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
+        PipelineDefinition wd;
+        wd = byId.orElseGet(() -> initPipelineDefinition(pipelineId));
+        var panel = informationPanelRepository.findById(panelId).orElseThrow(() -> new NotFoundException("Panel not found " + panelId));
+        wd.setInformationPanel(panel);
+        pipelineRepository.save(wd);
+        return PipelineDefinitionDAO.create(wd);
+    }
+
+    public PipelineDefinitionDAO removePanel(String pipelineId) {
+        Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
+        PipelineDefinition wd;
+        wd = byId.orElseGet(() -> initPipelineDefinition(pipelineId));
+        wd.setInformationPanel(null);
+        pipelineRepository.save(wd);
+        return PipelineDefinitionDAO.create(wd);
+    }
 
     public Map<String, PipelineParameterDAO> setParameters(String pipelineId,
                                                            Map<String, PipelineParameterDAO> parameters) throws ParseException, IllegalAccessException {
@@ -566,8 +584,8 @@ public class KubeflowPipelineService {
 
     }
 
-    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue,Boolean visible) {
-        var s = pipelineRepository.findByProperty(propertyKey, propertyValue,visible).stream();
+    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue, Boolean visible) {
+        var s = pipelineRepository.findByProperty(propertyKey, propertyValue, visible).stream();
         return s.map((it) -> {
             try {
                 var kbfPipeline = kubeflowService.getPipeline(it.getPipelineId());
@@ -587,6 +605,7 @@ public class KubeflowPipelineService {
         }).filter(Objects::nonNull).toList();
 
     }
+
     //#endregion
 
 }
