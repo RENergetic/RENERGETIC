@@ -67,7 +67,7 @@ then
 
     if [[ $krakend = 'true' ]]
     then
-        cd  "${current}/docker_config_local/Databases/influxdb"
+        cd  "${current}/docker_config_local/Others/krakend"
         # INFLUXDB INSTALLATION
         # set environment variables
         eval $(minikube docker-env)
