@@ -193,7 +193,8 @@ public class KubeflowController {
     @Operation(summary = "Set pipeline informationpanel  ")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PutMapping(path = "/admin/pipeline/{pipeline_id}/panel/{panel_id}", produces = "application/json")
-    public ResponseEntity<PipelineDefinitionDAO> setPanel(@PathVariable(name = "pipeline_id") String pipelineId,@PathVariable(name = "pipeline_id") Long panelId) {
+    public ResponseEntity<PipelineDefinitionDAO> setPanel(@PathVariable(name = "pipeline_id") String pipelineId,
+                                                          @PathVariable(name = "panel_id") Long panelId) {
         //TODO: verify admin roles
         var res = kubeflowPipelineService.setPanel(pipelineId,panelId);
         return new ResponseEntity<>(res, HttpStatus.OK);
