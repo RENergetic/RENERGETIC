@@ -118,6 +118,12 @@ public class DataService {
         }
 
     }
+    //TODO: get data for chosen measurements
+//    public DataWrapperDAO getMeasurementData(List<Long> measurementIds, Long from, Optional<Long> to) {
+//        List<Measurement> measurements = measurementRepository.findByIds(measurementIds);
+//        DataDAO res = this.getData(measurements, from, to);
+//        return new DataWrapperDAO(res);
+//    }
 
     public TimeseriesDAO getTileTimeseries(Long tileId, Long assetId, Long from, Optional<Long> to) {
         List<Measurement> measurements = informationPanelService.getTileMeasurements(tileId, assetId, null);

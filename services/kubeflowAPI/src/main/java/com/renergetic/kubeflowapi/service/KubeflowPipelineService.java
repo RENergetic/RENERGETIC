@@ -200,6 +200,16 @@ public class KubeflowPipelineService {
         return wd.getVisible();
     }
 
+    public String setLabel(String pipelineId, String label) {
+        Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
+        PipelineDefinition wd;
+        wd = byId.orElseGet(() -> initPipelineDefinition(pipelineId));
+//        wd.setVisible(true);
+        wd.setLabel(label);
+        wd = pipelineRepository.save(wd);
+        return wd.getLabel();
+    }
+
     public boolean removeVisibility(String pipelineId) {
         Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
         PipelineDefinition wd;
