@@ -73,7 +73,7 @@ public class WebSecurityConfig {
 
         // getUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
         
-        // postUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        postUrls.put("/api/ui/wrapper/{userId}", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name});
         
         // putUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
         
@@ -97,8 +97,8 @@ public class WebSecurityConfig {
         deleteUrls.forEach((urlPattern, roles) -> {
             registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
         });
-        //registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        registry.anyRequest().permitAll();
+        registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        // registry.anyRequest().permitAll();
 
         return http.build();
     }
