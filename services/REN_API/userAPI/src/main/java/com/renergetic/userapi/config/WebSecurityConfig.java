@@ -6,7 +6,6 @@ import com.renergetic.common.config.CustomAccessDeniedHandler;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,18 +65,53 @@ public class WebSecurityConfig {
         http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(filter, FilterSecurityInterceptor.class);
         
+        final String profileUrl = "/api/user/profile/**";        
+        final String assetUrl = "/api/user/assets/**";
+        final String notificationsUrl = "/api/user/notifications/**";
+        final String adminUrl = "/api/manage/user/**";
+
+        final String[] profileRoles = new String[]{
+            KeycloakRole.REN_DEV.name, 
+            KeycloakRole.REN_ADMIN.name, 
+            KeycloakRole.REN_TECHNICAL_MANAGER.name, 
+            KeycloakRole.REN_MANAGER.name, 
+            KeycloakRole.REN_USER.name,
+            KeycloakRole.REN_VISITOR.name,
+            KeycloakRole.REN_GUEST.name,
+            KeycloakRole.REN_STAFF.name};
+
+        final String[] assetRoles = new String[]{
+            KeycloakRole.REN_DEV.name, 
+            KeycloakRole.REN_ADMIN.name, 
+            KeycloakRole.REN_TECHNICAL_MANAGER.name, 
+            KeycloakRole.REN_MANAGER.name, 
+            KeycloakRole.REN_USER.name,
+            KeycloakRole.REN_VISITOR.name,
+            KeycloakRole.REN_GUEST.name,
+            KeycloakRole.REN_STAFF.name};
+
+        final String[] notificationsRoles = new String[]{
+            KeycloakRole.REN_DEV.name, 
+            KeycloakRole.REN_ADMIN.name, 
+            KeycloakRole.REN_TECHNICAL_MANAGER.name, 
+            KeycloakRole.REN_MANAGER.name, 
+            KeycloakRole.REN_USER.name,
+            KeycloakRole.REN_STAFF.name};
+
+        final String[] adminRoles = new String[]{
+            KeycloakRole.REN_DEV.name, 
+            KeycloakRole.REN_ADMIN.name, 
+            KeycloakRole.REN_TECHNICAL_MANAGER.name};
+
         Map<String, String[]> getUrls = new HashMap<>();
         Map<String, String[]> postUrls = new HashMap<>();
         Map<String, String[]> putUrls = new HashMap<>();
         Map<String, String[]> deleteUrls = new HashMap<>();
 
-        // getUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // postUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // putUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // deleteUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        configureRoles(profileUrl, profileRoles, getUrls, postUrls, putUrls, deleteUrls);
+        configureRoles(assetUrl, assetRoles, getUrls, postUrls, putUrls, deleteUrls);
+        configureRoles(notificationsUrl, notificationsRoles, getUrls, postUrls, putUrls, deleteUrls);
+        configureRoles(adminUrl, adminRoles, getUrls, postUrls, putUrls, deleteUrls);
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>
                 .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
@@ -97,8 +131,8 @@ public class WebSecurityConfig {
         deleteUrls.forEach((urlPattern, roles) -> {
             registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
         });
-        //registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        registry.anyRequest().permitAll();
+        registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        // registry.anyRequest().permitAll();
 
         return http.build();
     }
@@ -127,31 +161,16 @@ public class WebSecurityConfig {
         return source;
     }
 
-    public class RoleFilter implements Filter {
-        private final int expectedMask;
-
-        public RoleFilter(int expectedMask) {
-            this.expectedMask = expectedMask;
-        }
-
-        @Override
-        public void destroy() {
-        }
-
-        @Override
-        public void doFilter(ServletRequest req, ServletResponse res,
-                             FilterChain chain) throws IOException, ServletException {
-
-
-            KeycloakAuthenticationToken authentication =
-                    (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            if (authentication.hasRole(expectedMask)) {
-                chain.doFilter(req, res);
-            } else {
-                //TODO:
-            }
-
-        }
-
+    private void configureRoles(
+        String url,
+        String[] roles,
+        Map<String, String[]> getUrls, 
+        Map<String, String[]> postUrls, 
+        Map<String, String[]> putUrls, 
+        Map<String, String[]> deleteUrls) {
+        getUrls.put(url, roles);
+        postUrls.put(url, roles);
+        putUrls.put(url, roles);
+        deleteUrls.put(url, roles);
     }
 }
