@@ -594,7 +594,7 @@ public class KubeflowPipelineService {
 
     }
 
-    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue, Boolean visible) {
+    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue, Boolean visible, Boolean admin) {
         var s = pipelineRepository.findByProperty(propertyKey, propertyValue, visible).stream();
         return s.map((it) -> {
             try {
@@ -603,7 +603,15 @@ public class KubeflowPipelineService {
                     it.setName(kbfPipeline.getName());
                     pipelineRepository.save(it);
                 }
-                return this.enrichDAO(kbfPipeline, it, true);
+                var enrichedPipeline = this.enrichDAO(kbfPipeline, it, true);
+                if (!admin && enrichedPipeline != null)
+                    enrichedPipeline.setParameters(
+                            enrichedPipeline.getParameters().entrySet().stream()
+                                    .filter(param -> param.getValue().getVisible())
+                                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                    );
+                return enrichedPipeline;
+
 
             } catch (ParseException e) {
                 log.error(

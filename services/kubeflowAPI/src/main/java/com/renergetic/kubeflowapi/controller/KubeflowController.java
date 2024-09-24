@@ -246,6 +246,15 @@ public class KubeflowController {
         }
         return new ResponseEntity<>(params, HttpStatus.OK);
     }
+    @Operation(summary = "Get pipeline definitions by property ")
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/admin/pipeline/property/{key}/value/{value}", produces = "application/json")
+    public ResponseEntity<List<PipelineDefinitionDAO>> getByPropertyAdmin(@PathVariable(name = "key") String propertyKey,
+                                                                     @PathVariable(name = "value") String propertyValue) {
+
+        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue, true,true);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
     //#endregion
 
     //#region properties
@@ -256,9 +265,10 @@ public class KubeflowController {
     public ResponseEntity<List<PipelineDefinitionDAO>> getByProperty(@PathVariable(name = "key") String propertyKey,
                                                                      @PathVariable(name = "value") String propertyValue) {
 
-        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue, true);
+        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue, true,false);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
 
     @Operation(summary = "Update existing pipeline property ")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
