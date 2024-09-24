@@ -240,11 +240,11 @@ public class AbstractMeterDataService {
 //                    convert to user defined scale
                     var type = meter.getMeasurement().getType();
                     var value2 = value.multiply(BigDecimal.valueOf(1 / type.getFactor()));
-                    log.info("Abstract meter: " + meter.getName().name() + " = " + calculator.bigDecimalToDoubleString(value2) + ";" + calculator.bigDecimalToDoubleString(value) + " * " + meter.getMeasurement().getType().getFactor());
+                    log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value2) + ";" + calculator.bigDecimalToDoubleString(value) + " * " + meter.getMeasurement().getType().getFactor());
                     value = value2;
                 } else {
-                    log.info("Abstract meter: " + meter.getName().name() + " = " + calculator.bigDecimalToDoubleString(value) + "  - no defined measurement");
-               }
+                    log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value) + "  - no defined measurement");
+                }
             }
 
             var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";

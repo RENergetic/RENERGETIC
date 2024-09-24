@@ -89,7 +89,7 @@ public class KubeflowService {
     //#endregion
 
     //#region renergetic kubeflow methods
-    public HashMap<String, PipelineDefinitionDAO> getPipelines() throws ParseException {
+    public HashMap<String, PipelineDefinitionDAO> getPipelines() throws ParseException, IllegalAccessException {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines";
         String httpsMethod = "GET";
         HashMap<String, String> params = new HashMap<>();
@@ -113,7 +113,7 @@ public class KubeflowService {
         return pipelineMap;
     }
 
-    public PipelineDefinitionDAO getPipeline(String id) throws ParseException {
+    public PipelineDefinitionDAO getPipeline(String id) throws ParseException , IllegalAccessException{
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines/" + id;
         //TODO check response if pipeline id is empty
         String httpsMethod = "GET";
@@ -126,7 +126,7 @@ public class KubeflowService {
         return this.parsePipelineObj(pipelineObj);
     }
 
-    public boolean stopRun(String id) {
+    public boolean stopRun(String id) throws IllegalAccessException {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/runs/" + id + "/terminate";
         String httpsMethod = "POST";
         HashMap<String, String> headers = this.initHeaders();
@@ -134,7 +134,7 @@ public class KubeflowService {
 
     }
 
-    public PipelineRunDAO getRun(String id) {
+    public PipelineRunDAO getRun(String id) throws IllegalAccessException {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/runs/" + id;
         String httpsMethod = "GET";
         String pipelinesJSON =
@@ -150,7 +150,7 @@ public class KubeflowService {
         return runObj;
     }
 
-    public PipelineRunDAO runPipeline(String id, Map<String, Object> inputParams) {
+    public PipelineRunDAO runPipeline(String id, Map<String, Object> inputParams) throws IllegalAccessException {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/runs";
         String httpsMethod = "POST";
 //        HashMap params = new HashMap<>();
@@ -260,7 +260,7 @@ public class KubeflowService {
     //#endregion
 
     //#region initialization of the kubeflow metadata
-    public String getCookie(String user, String password) {
+    public String getCookie(String user, String password) throws IllegalAccessException {
 
         String homeUrl = kubeflowUrl.endsWith("/") ? kubeflowUrl : kubeflowUrl + "/";// "https://kubeflow.test.pcss.pl/";
         String urlString = homeUrl;
@@ -314,7 +314,7 @@ public class KubeflowService {
         // Step 4
         urlString = homeUrl + "dex/auth/ldap/login";
         httpsMethod = "POST";
-        body = "login=" + user + "&password=" + password;
+        body = "login=" + user + "&password=" + password ;
 
         headers.clear();
         headers.put("Accept", "*/*");
@@ -326,11 +326,21 @@ public class KubeflowService {
         response = KubeflowUtils.sendRequest(urlString, httpsMethod, params, body, headers);
         System.out.println("STEP 4:");
         System.out.println("Code: " + response.getResponseCode());
+        if (response.getResponseCode() != 302) {
+            if (response.getResponseBody() != null && (
+                    response.getResponseBody().contains("Invalid LDAP Username and password.")
+                    ||  response.getResponseBody().contains("login-error")
+            )) {
+                throw new java.lang.IllegalAccessException("invalid credentials");
+            }
+
+        }
         String reqValue = "";
         for (Map.Entry<String, List<String>> entry : response.getResponseHeaders().entrySet()) {
             String key = entry.getKey();
             List<String> values = entry.getValue();
             if (key != null && key.equals("location")) {
+//            if (key != null && key.equalsIgnoreCase("location")) {
                 for (String value : values) {
                     System.out.println("  - " + value);
                     int reqIndex = value.indexOf("req=");
@@ -404,7 +414,7 @@ public class KubeflowService {
         return cookie;
     }
 
-    private HashMap<String, String> initHeaders() {
+    private HashMap<String, String> initHeaders() throws IllegalAccessException {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Accept", "*/*");
 //        headers.put("Accept-Encoding", "gzip, deflat, br");

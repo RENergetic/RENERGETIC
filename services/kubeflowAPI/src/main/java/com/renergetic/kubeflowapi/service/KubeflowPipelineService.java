@@ -9,10 +9,7 @@ import com.renergetic.common.model.PipelineDefinition;
 import com.renergetic.common.model.PipelineDefinitionProperty;
 import com.renergetic.common.model.PipelineParameter;
 import com.renergetic.common.model.PipelineRun;
-import com.renergetic.common.repository.PipelineDefinitionPropertyRepository;
-import com.renergetic.common.repository.PipelineParameterRepository;
-import com.renergetic.common.repository.PipelineRepository;
-import com.renergetic.common.repository.PipelineRunRepository;
+import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.kubeflowapi.service.utils.DummyDataGenerator;
 import org.apache.tomcat.util.json.ParseException;
@@ -43,18 +40,25 @@ public class KubeflowPipelineService {
     @Autowired
     private PipelineDefinitionPropertyRepository pipelinePropertyRepository;
     @Autowired
+    private InformationPanelRepository informationPanelRepository;
+    @Autowired
     private PipelineRunRepository pipelineRunRepository;
     @Autowired
     private KubeflowService kubeflowService;
 
     Lock runlock = new ReentrantLock();
 
-    public List<PipelineDefinitionDAO> getAll() {
+    public List<PipelineDefinitionDAO> getAll() throws IllegalAccessException {
         Map<String, PipelineDefinitionDAO> kubeflowMap = this.getKubeflowMap();
         return pipelineRepository.findByVisible(true).stream()
                 .map((it) -> {
                     //filter also parameters
-                    PipelineDefinitionDAO enrichedPipeline = enrichDAO(kubeflowMap.get(it.getPipelineId()), it, false);
+                    PipelineDefinitionDAO enrichedPipeline = null;
+                    try {
+                        enrichedPipeline = enrichDAO(kubeflowMap.get(it.getPipelineId()), it, false);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
                     enrichedPipeline.setParameters(
                             enrichedPipeline.getParameters().entrySet().stream()
                                     .filter(param -> param.getValue().getVisible())
@@ -66,7 +70,7 @@ public class KubeflowPipelineService {
 
     }
 
-    public List<PipelineDefinitionDAO> getAllAdmin(Optional<Boolean> visible) {
+    public List<PipelineDefinitionDAO> getAllAdmin(Optional<Boolean> visible) throws IllegalAccessException {
 
         HashMap<String, PipelineDefinitionDAO> kubeflowMap = this.getKubeflowMap();
         List<PipelineDefinition> localPipelines;
@@ -91,7 +95,11 @@ public class KubeflowPipelineService {
 
             }
             if (mVisible == null || mVisible == it.getVisible()) {
-                kubeflowMap.put(it.getPipelineId(), enrichDAO(kbfPipeline, it, true));
+                try {
+                    kubeflowMap.put(it.getPipelineId(), enrichDAO(kbfPipeline, it, true));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 kubeflowMap.remove(it.getPipelineId());
             }
@@ -102,7 +110,7 @@ public class KubeflowPipelineService {
 
     }
 
-    public PipelineRunDAO getRun(String pipelineId) {
+    public PipelineRunDAO getRun(String pipelineId) throws IllegalAccessException {
         var wd = pipelineRepository.findById(pipelineId)
                 .orElseThrow(() -> new NotFoundException(
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
@@ -152,6 +160,8 @@ public class KubeflowPipelineService {
                     return runDAO;
                 } catch (ParseException e) {
                     throw new RuntimeException("Invalid pipeline: " + pipelineId);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
                 } finally {
                     runlock.unlock();
                 }
@@ -164,7 +174,7 @@ public class KubeflowPipelineService {
 
     }
 
-    public Boolean stopRun(String pipelineId) {
+    public Boolean stopRun(String pipelineId) throws IllegalAccessException {
         var wd = pipelineRepository.findById(pipelineId)
                 .orElseThrow(() -> new NotFoundException(
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
@@ -190,6 +200,16 @@ public class KubeflowPipelineService {
         return wd.getVisible();
     }
 
+    public String setLabel(String pipelineId, String label) {
+        Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
+        PipelineDefinition wd;
+        wd = byId.orElseGet(() -> initPipelineDefinition(pipelineId));
+//        wd.setVisible(true);
+        wd.setLabel(label);
+        wd = pipelineRepository.save(wd);
+        return wd.getLabel();
+    }
+
     public boolean removeVisibility(String pipelineId) {
         Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
         PipelineDefinition wd;
@@ -200,8 +220,27 @@ public class KubeflowPipelineService {
     }
 
 
+    public PipelineDefinitionDAO setPanel(String pipelineId, Long panelId) {
+        Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
+        PipelineDefinition wd;
+        wd = byId.orElseGet(() -> initPipelineDefinition(pipelineId));
+        var panel = informationPanelRepository.findById(panelId).orElseThrow(() -> new NotFoundException("Panel not found " + panelId));
+        wd.setInformationPanel(panel);
+        pipelineRepository.save(wd);
+        return PipelineDefinitionDAO.create(wd);
+    }
+
+    public PipelineDefinitionDAO removePanel(String pipelineId) {
+        Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
+        PipelineDefinition wd;
+        wd = byId.orElseGet(() -> initPipelineDefinition(pipelineId));
+        wd.setInformationPanel(null);
+        pipelineRepository.save(wd);
+        return PipelineDefinitionDAO.create(wd);
+    }
+
     public Map<String, PipelineParameterDAO> setParameters(String pipelineId,
-                                                           Map<String, PipelineParameterDAO> parameters) throws ParseException {
+                                                           Map<String, PipelineParameterDAO> parameters) throws ParseException, IllegalAccessException {
         Map<String, String> kfParameters;
         Map<String, PipelineParameterDAO> kubeflowParameters;
         List<PipelineParameter> userParams =
@@ -311,7 +350,7 @@ public class KubeflowPipelineService {
     }
 
 
-    private PipelineRunDAO startKubeflowRun(PipelineDefinition wd, Map<String, Object> params) {
+    private PipelineRunDAO startKubeflowRun(PipelineDefinition wd, Map<String, Object> params) throws IllegalAccessException {
 
         PipelineDefinitionDAO definitionDAO = PipelineDefinitionDAO.create(wd);
         PipelineRunDAO runDAO;
@@ -330,7 +369,7 @@ public class KubeflowPipelineService {
         return runDAO;
     }
 
-    private PipelineRunDAO stopKubeflowRun(PipelineDefinition wd) {
+    private PipelineRunDAO stopKubeflowRun(PipelineDefinition wd) throws IllegalAccessException {
         PipelineRun workflowRun = wd.getPipelineRun();
         if (generateDummy) {
             workflowRun.setEndTime(DateConverter.now());
@@ -364,7 +403,7 @@ public class KubeflowPipelineService {
      *
      * @return indexed by pipelineid pipelines
      */
-    private HashMap<String, PipelineDefinitionDAO> getKubeflowMap() {
+    private HashMap<String, PipelineDefinitionDAO> getKubeflowMap() throws IllegalAccessException {
 
         HashMap<String, PipelineDefinitionDAO> kubeflowMap;
         if (generateDummy) {
@@ -398,7 +437,7 @@ public class KubeflowPipelineService {
      * @return
      */
     private PipelineDefinitionDAO enrichDAO(@Nullable PipelineDefinitionDAO kbfPipeline,
-                                            PipelineDefinition item, Boolean update) {
+                                            PipelineDefinition item, Boolean update) throws IllegalAccessException {
         PipelineDefinitionDAO dao = PipelineDefinitionDAO.create(item);
         ;
         if (kbfPipeline != null) {
@@ -439,12 +478,12 @@ public class KubeflowPipelineService {
                     runlock.unlock();
                 }
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void assertRunning(PipelineDefinition wd) {
+    private void assertRunning(PipelineDefinition wd) throws IllegalAccessException {
 
 
         if (wd.getPipelineRun() != null && wd.getPipelineRun().getStartTime() != null && wd.getPipelineRun().getEndTime() == null) {
@@ -498,7 +537,7 @@ public class KubeflowPipelineService {
                     } else {
                         throw new RuntimeException("Pipeline is blocked");
                     }
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -555,8 +594,8 @@ public class KubeflowPipelineService {
 
     }
 
-    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue,Boolean visible) {
-        var s = pipelineRepository.findByProperty(propertyKey, propertyValue,visible).stream();
+    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue, Boolean visible, Boolean admin) {
+        var s = pipelineRepository.findByProperty(propertyKey, propertyValue, visible).stream();
         return s.map((it) -> {
             try {
                 var kbfPipeline = kubeflowService.getPipeline(it.getPipelineId());
@@ -564,16 +603,27 @@ public class KubeflowPipelineService {
                     it.setName(kbfPipeline.getName());
                     pipelineRepository.save(it);
                 }
-                return this.enrichDAO(kbfPipeline, it, true);
+                var enrichedPipeline = this.enrichDAO(kbfPipeline, it, true);
+                if (!admin && enrichedPipeline != null)
+                    enrichedPipeline.setParameters(
+                            enrichedPipeline.getParameters().entrySet().stream()
+                                    .filter(param -> param.getValue().getVisible())
+                                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                    );
+                return enrichedPipeline;
+
 
             } catch (ParseException e) {
                 log.error(
                         "Invalid pipeline: " + it.getPipelineId());
                 return null;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
         }).filter(Objects::nonNull).toList();
 
     }
+
     //#endregion
 
 }

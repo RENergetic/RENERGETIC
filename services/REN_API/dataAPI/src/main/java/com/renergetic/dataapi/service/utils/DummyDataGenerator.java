@@ -65,9 +65,9 @@ public class DummyDataGenerator {
 
     private static Double getMeasurementValue(MeasurementDAOResponse m, Double previousValue) {
         //TODO: consider measurement type and domains
-        Double max = 300.0 /Math.pow(m.getType().getFactor(),0.6);
+        Double max = 2000.0 /Math.pow(m.getType().getFactor(),0.6);
         if (m.getDomain() == Domain.heat) {
-            max = 5000.0/Math.pow(m.getType().getFactor(),0.6);
+            max = 6000.0/Math.pow(m.getType().getFactor(),0.6);
         }
 
         if (Objects.equals(m.getType().getPhysicalName(), "percentage")) {
