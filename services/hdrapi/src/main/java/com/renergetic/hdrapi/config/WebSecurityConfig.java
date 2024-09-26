@@ -5,7 +5,6 @@ import com.renergetic.common.model.security.KeycloakRole;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +17,6 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -69,8 +67,22 @@ public class WebSecurityConfig {
         Map<String, String[]> postUrls = new HashMap<>();
         Map<String, String[]> putUrls = new HashMap<>();
         Map<String, String[]> deleteUrls = new HashMap<>();
-        
-//    ### GET METHODS ###
+
+        String hdrUrl = "/api/hdr/**";
+
+        String[] hdrRoles = new String[]{
+                KeycloakRole.REN_DEV.name, 
+                KeycloakRole.REN_ADMIN.name,
+                KeycloakRole.REN_TECHNICAL_MANAGER.name,
+                KeycloakRole.REN_MANAGER.name};
+
+        // HDR REQUEST
+        getUrls.put(hdrUrl, hdrRoles);
+        postUrls.put(hdrUrl, hdrRoles);
+        putUrls.put(hdrUrl, hdrRoles);
+        deleteUrls.put(hdrUrl, hdrRoles);
+
+//    ### GET METHODS ### /* deprecated */
         getUrls.put("/api/users/**", new String[]{KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
                 KeycloakRole.REN_TECHNICAL_MANAGER.name});
         getUrls.put("/api/users/**",
@@ -90,7 +102,7 @@ public class WebSecurityConfig {
         getUrls.put("/api/dashboard/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
                 KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
                 KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
-//    ### POST METHODS ###
+//    ### POST METHODS ### /* deprecated */
         postUrls.put("/api/users/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
                 KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
                 KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
@@ -100,7 +112,7 @@ public class WebSecurityConfig {
         postUrls.put("/api/users/profile/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
                 KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
                 KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
-//    ### PUT METHODS ###
+//    ### PUT METHODS ###  /* deprecated */
         putUrls.put("/api/users/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
                 KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
                 KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
@@ -110,7 +122,7 @@ public class WebSecurityConfig {
         putUrls.put("/api/users/profile/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
                 KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
                 KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
-//    ### DELETE METHODS ###
+//    ### DELETE METHODS ###  /* deprecated */
         deleteUrls.put("/api/users/**", new String[]{KeycloakRole.REN_USER.name, KeycloakRole.REN_STAFF.name, KeycloakRole.REN_MANAGER.name,
                 KeycloakRole.REN_VISITOR.name,KeycloakRole.REN_DEV.name, KeycloakRole.REN_ADMIN.name,
                 KeycloakRole.REN_TECHNICAL_MANAGER.name, KeycloakRole.REN_MANAGER.name});
@@ -136,8 +148,8 @@ public class WebSecurityConfig {
         deleteUrls.forEach((urlPattern, roles) -> {
             registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
         });
-        //registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        registry.anyRequest().permitAll();
+        registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        //registry.anyRequest().permitAll();
 
         return http.build();
     }
