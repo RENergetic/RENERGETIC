@@ -47,7 +47,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 
-
 @Service
 public class DataService {
     @Value("${influx.api.url}")
@@ -91,32 +90,43 @@ public class DataService {
      * @return
      */
     public DataWrapperDAO getPanelData(Long panelId, Long assetId, Long from, Optional<Long> to) {
-        if (assetId != null) {
-            InformationPanelDAOResponse assetTemplate =
-                    informationPanelService.getAssetTemplate(panelId, assetId);
+//        if (assetId != null) {
+//            InformationPanelDAOResponse assetTemplate =
+//                    informationPanelService.getAssetTemplate(panelId, assetId);
+//
+//            Stream<MeasurementDAOResponse> measurementDAOResponseStream = assetTemplate.getTiles().stream().map(
+//                    InformationTileDAOResponse::getMeasurements
+//            ).flatMap(List::stream);
+//            Collection<MeasurementDAOResponse> values =
+//                    measurementDAOResponseStream.collect(
+//                            Collectors.toMap(m -> m.getFunction() + "_" + m.getId(), Function.identity(),
+//                                    (m1, m2) -> m1)).values();
+//            DataDAO res = this.getData(values, from, to);
+//
+//            return new DataWrapperDAO(res, assetTemplate);
+//        } else {
+//            List<InformationTileMeasurement> measurements =
+//                    informationPanelService.getPanelMeasurements(panelId);
+//            List<MeasurementDAOResponse> measurementDAOResponseList = measurements.stream()
+//                .filter(it->it.getMeasurement()!=null)
+//                .map(it ->
+//                    MeasurementDAOResponse.create(it.getMeasurement(), it.getMeasurement().getDetails(),
+//                            it.getFunction())).collect(Collectors.toList());
+//            DataDAO res = this.getData(measurementDAOResponseList, from, to);
+//            return new DataWrapperDAO(res);
+//        }
+        InformationPanelDAOResponse assetTemplate =
+                informationPanelService.inferMeasurements(panelId, assetId);
 
-            Stream<MeasurementDAOResponse> measurementDAOResponseStream = assetTemplate.getTiles().stream().map(
-                    InformationTileDAOResponse::getMeasurements
-            ).flatMap(List::stream);
-            Collection<MeasurementDAOResponse> values =
-                    measurementDAOResponseStream.collect(
-                            Collectors.toMap(m -> m.getFunction() + "_" + m.getId(), Function.identity(),
-                                    (m1, m2) -> m1)).values();
-            DataDAO res = this.getData(values, from, to);
-
-            return new DataWrapperDAO(res, assetTemplate);
-        } else {
-            List<InformationTileMeasurement> measurements =
-                    informationPanelService.getPanelMeasurements(panelId);
-            List<MeasurementDAOResponse> measurementDAOResponseList = measurements.stream()
-                .filter(it->it.getMeasurement()!=null)
-                .map(it ->
-                    MeasurementDAOResponse.create(it.getMeasurement(), it.getMeasurement().getDetails(),
-                            it.getFunction())).collect(Collectors.toList());
-            DataDAO res = this.getData(measurementDAOResponseList, from, to);
-            return new DataWrapperDAO(res);
-        }
-
+        Stream<MeasurementDAOResponse> measurementDAOResponseStream = assetTemplate.getTiles().stream().map(
+                InformationTileDAOResponse::getMeasurements
+        ).flatMap(List::stream);
+        Collection<MeasurementDAOResponse> values =
+                measurementDAOResponseStream.collect(
+                        Collectors.toMap(m -> m.getFunction() + "_" + m.getId(), Function.identity(),
+                                (m1, m2) -> m1)).values();
+        DataDAO res = this.getData(values, from, to);
+        return new DataWrapperDAO(res);
     }
     //TODO: get data for chosen measurements
 //    public DataWrapperDAO getMeasurementData(List<Long> measurementIds, Long from, Optional<Long> to) {

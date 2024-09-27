@@ -8,6 +8,7 @@ import com.renergetic.common.mapper.InformationPanelMapper;
 import com.renergetic.common.model.*;
 import com.renergetic.common.model.UUID;
 import com.renergetic.common.model.details.MeasurementDetails;
+import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.repository.information.MeasurementDetailsRepository;
 import com.renergetic.common.mapper.InformationTilePanelMapper;
@@ -141,8 +142,25 @@ public class InformationPanelService {
 
     public InformationPanelDAO inferMeasurements(InformationPanelDAO informationPanel) {
         var tiles = informationPanel.getTiles();
-
+        MeasurementTags panelTag;
+        if (informationPanel.getProps().containsKey("tag_key")) {
+            panelTag = new MeasurementTags();
+            panelTag.setKey(informationPanel.getProps().get("tag_key").toString());
+            if (informationPanel.getProps().containsKey("tag_value"))
+                panelTag.setValue(informationPanel.getProps().get("tag_value").toString());
+        } else {
+            panelTag = new MeasurementTags();
+        }
         tiles.forEach(tile -> {
+            MeasurementTags mtag;
+            if (tile.getProps().containsKey("tag_key")) {
+                mtag = new MeasurementTags();
+                mtag.setKey(tile.getProps().get("tag_key").toString());
+                if (tile.getProps().containsKey("tag_value"))
+                    mtag.setValue(tile.getProps().get("tag_value").toString());
+            } else
+                mtag = new MeasurementTags();
+
             List<MeasurementTileDAORequest> collect = tile.getMeasurements()
                     .stream().map(
                             tileM -> {
@@ -161,7 +179,9 @@ public class InformationPanelService {
                                             assetId = byName.get().getId();
                                         }
                                     }
-                                    var l = getInferredMeasurements(tileM,assetId);
+
+
+                                    var l = getInferredMeasurements(tileM, assetId, panelTag, mtag);
                                     if (l.isEmpty()) {
                                         //return non inferred measurements so the client can see what's missing
                                         return List.of(tileM);
@@ -178,6 +198,8 @@ public class InformationPanelService {
                     )
                     .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList());
             if (!collect.isEmpty())
+
+
                 tile.setMeasurements(collect);
         });
         return informationPanel;
@@ -260,112 +282,113 @@ public class InformationPanelService {
     }
 
 
-    public InformationPanelDAOResponse connect(Long id, Long assetId) {
-        InformationPanel panel = informationPanelRepository.findById(id)
-                .orElseThrow(() -> new InvalidNonExistingIdException("The panel to connect doesn't exists"));
+//    public InformationPanelDAOResponse connect(Long id, Long assetId) {
+//        InformationPanel panel = informationPanelRepository.findById(id)
+//                .orElseThrow(() -> new InvalidNonExistingIdException("The panel to connect doesn't exists"));
+//
+//        panel.getAssets().add(
+//                assetRepository.findById(assetId)
+//                        .orElseThrow(() -> new InvalidNonExistingIdException("The asset to connect doesn't exists")));
+//        return InformationPanelDAOResponse.create(informationPanelRepository.save(panel));
+//    }
 
-        panel.getAssets().add(
-                assetRepository.findById(assetId)
-                        .orElseThrow(() -> new InvalidNonExistingIdException("The asset to connect doesn't exists")));
-        return InformationPanelDAOResponse.create(informationPanelRepository.save(panel));
-    }
+//    /**
+//     * find panels available definition by panelId
+//     *
+//     * @param userId panel Id
+//     * @param offset rows offset
+//     * @param limit  result length limit
+//     */
+//    public List<InformationPanelDAOResponse> findByUserId(Long userId, long offset, int limit) {
+//        // TODO: Improve request efficiency
+//        List<InformationPanel> informationPanels = informationPanelRepository.findByUserId(userId, offset, limit);
+//        List<InformationPanelDAOResponse> list =
+//                informationPanels.stream()
+//                        .map(panel -> InformationPanelDAOResponse.create(panel, null))
+//                        .collect(Collectors.toList());
+//
+//        if (!list.isEmpty())
+//            return list;
+//        else throw new NotFoundException("No information panels related with userId " + userId + " found");
+//    }
+//
+//    /**
+//     * @param isTemplate
+//     * @param limit      result length limit
+//     */
+//    public List<InformationPanelDAOResponse> findFeatured(boolean isTemplate, int limit) {
+//        // TODO: Improve request efficiency
+//        List<InformationPanel> informationPanels = informationPanelRepository.findFeatured(isTemplate, 0, limit);
+//        return informationPanels.stream()
+//                .map(panel -> InformationPanelDAOResponse.create(panel, null))
+//                .collect(Collectors.toList());
+//    }
 
-    /**
-     * find panels available definition by panelId
-     *
-     * @param userId panel Id
-     * @param offset rows offset
-     * @param limit  result length limit
-     */
-    public List<InformationPanelDAOResponse> findByUserId(Long userId, long offset, int limit) {
-        // TODO: Improve request efficiency
-        List<InformationPanel> informationPanels = informationPanelRepository.findByUserId(userId, offset, limit);
-        List<InformationPanelDAOResponse> list =
-                informationPanels.stream()
-                        .map(panel -> InformationPanelDAOResponse.create(panel, null))
-                        .collect(Collectors.toList());
-
-        if (!list.isEmpty())
-            return list;
-        else throw new NotFoundException("No information panels related with userId " + userId + " found");
-    }
-
-    /**
-     * @param isTemplate
-     * @param limit      result length limit
-     */
-    public List<InformationPanelDAOResponse> findFeatured(boolean isTemplate, int limit) {
-        // TODO: Improve request efficiency
-        List<InformationPanel> informationPanels = informationPanelRepository.findFeatured(isTemplate, 0, limit);
-        return informationPanels.stream()
-                .map(panel -> InformationPanelDAOResponse.create(panel, null))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * get panel template by panelId and infer measurements by assetId
-     *
-     * @param panelId
-     * @param assetId
-     * @return
-     */
-    public InformationPanelDAOResponse getAssetTemplate(Long panelId, Long assetId) {
-
-        // TODO: Improve request efficiency
-        Optional<InformationPanel> panel = informationPanelRepository.findById(panelId);
-        if (panel.isPresent()) {
-            return InformationPanelDAOResponse.create(panel.get(),
-                    panel.get().getTiles().stream().map(tile -> InformationTileDAOResponse.create(tile,
-                            tile.getInformationTileMeasurements().stream().map(
-                                            tileM -> tileM.getMeasurement() == null
-                                                    && panel.get().getIsTemplate() && assetId != null
-                                                    && tileM.getAssetCategory() == null ?
-                                                    getInferredMeasurements(tileM, assetId, tileM.getFunction())
-                                                    : Collections.singletonList(getMeasurementFromTileMeasurement(tileM)))
-                                    .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList())
-                    )).collect(Collectors.toList())
-            );
-        } else throw new NotFoundException("No information panel  " + panelId + " not found");
-    }
+//    /**
+//     * get panel template by panelId and infer measurements by assetId
+//     *
+//     * @param panelId
+//     * @param assetId
+//     * @return
+//     */
+//    public InformationPanelDAOResponse getAssetTemplate(Long panelId, Long assetId) {
+//
+//        // TODO: Improve request efficiency
+//        Optional<InformationPanel> panel = informationPanelRepository.findById(panelId);
+//        if (panel.isPresent()) {
+//            return InformationPanelDAOResponse.create(panel.get(),
+//                    panel.get().getTiles().stream().map(tile -> InformationTileDAOResponse.create(tile,
+//                            tile.getInformationTileMeasurements().stream().map(
+//                                            tileM -> tileM.getMeasurement() == null
+//                                                    && panel.get().getIsTemplate() && assetId != null
+//                                                    && tileM.getAssetCategory() == null ?
+//                                                    getInferredMeasurements(tileM, assetId, tileM.getFunction())
+//                                                    : Collections.singletonList(getMeasurementFromTileMeasurement(tileM)))
+//                                    .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList())
+//                    )).collect(Collectors.toList())
+//            );
+//        } else throw new NotFoundException("No information panel  " + panelId + " not found");
+//    }
 
 
-    public List<InformationTileMeasurement> getPanelMeasurements(long id) {
-        InformationPanel panel = informationPanelRepository.findById(id).orElse(null);
+//    public List<InformationTileMeasurement> getPanelMeasurements(long id) {
+//        InformationPanel panel = informationPanelRepository.findById(id).orElse(null);
+//
+//        if (panel != null) {
+//            return panel.getTiles().stream().map(tile -> tile.getInformationTileMeasurements()
+//                    .stream().filter(Objects::nonNull)
+//                    .collect(Collectors.toList())
+//            ).flatMap(List::stream).collect(Collectors.toList());
+//        }
+//        throw new NotFoundException("No panel found related with id " + id);
+//    }
 
-        if (panel != null) {
-            return panel.getTiles().stream().map(tile -> tile.getInformationTileMeasurements()
-                    .stream().filter(Objects::nonNull)
-                    .collect(Collectors.toList())
-            ).flatMap(List::stream).collect(Collectors.toList());
-        }
-        throw new NotFoundException("No panel found related with id " + id);
-    }
+//    public List<Measurement> getTileMeasurements(long tileId, Long assetId, Long userId) {
+//
+//        InformationTile tile = informationTileRepository.findById(tileId).orElse(null);
+//        if (tile != null) {
+//            if (assetId != null) {
+//                Boolean isTemplate = tile.getInformationPanel().getIsTemplate();
+//                //TODO: simplify it
+//                return tile.getInformationTileMeasurements().stream().map(
+//                                tileM -> tileM.getMeasurement() == null
+//                                        && isTemplate
+//                                        && tileM.getAssetCategory() == null ?
+//                                        getInferredMeasurements(tileM, assetId, tileM.getFunction()).stream().map(
+//                                                MeasurementDAOResponse::mapToEntity).collect(Collectors.toList())
+//                                        : Collections.singletonList(tileM.getMeasurement()))
+//                        .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList());
+//            } else {
+//                return tile.getInformationTileMeasurements().stream().map(
+//                        InformationTileMeasurement::getMeasurement).filter(Objects::nonNull).collect(
+//                        Collectors.toList());
+//            }
+//        }
+//        throw new NotFoundException("No tile found related with tile id: " + tileId);
+//    }
 
-    public List<Measurement> getTileMeasurements(long tileId, Long assetId, Long userId) {
-
-        InformationTile tile = informationTileRepository.findById(tileId).orElse(null);
-        if (tile != null) {
-            if (assetId != null) {
-                Boolean isTemplate = tile.getInformationPanel().getIsTemplate();
-                //TODO: simplify it
-                return tile.getInformationTileMeasurements().stream().map(
-                                tileM -> tileM.getMeasurement() == null
-                                        && isTemplate
-                                        && tileM.getAssetCategory() == null ?
-                                        getInferredMeasurements(tileM, assetId, tileM.getFunction()).stream().map(
-                                                MeasurementDAOResponse::mapToEntity).collect(Collectors.toList())
-                                        : Collections.singletonList(tileM.getMeasurement()))
-                        .flatMap(List::stream).filter(Objects::nonNull).collect(Collectors.toList());
-            } else {
-                return tile.getInformationTileMeasurements().stream().map(
-                        InformationTileMeasurement::getMeasurement).filter(Objects::nonNull).collect(
-                        Collectors.toList());
-            }
-        }
-        throw new NotFoundException("No tile found related with tile id: " + tileId);
-    }
-
-    private List<MeasurementTileDAORequest> getInferredMeasurements(MeasurementTileDAORequest tileM,Long assetId) {
+    private List<MeasurementTileDAORequest> getInferredMeasurements(MeasurementTileDAORequest tileM, Long assetId,
+                                                                    MeasurementTags panelTag, MeasurementTags mTag) {
         return measurementRepository
                 .inferMeasurement(assetId,
                         tileM.getName(),
@@ -373,32 +396,33 @@ public class InformationPanelService {
                         tileM.getDomain() != null ? tileM.getDomain().name() : null,
                         tileM.getDirection() != null ? tileM.getDirection().name() : null,
                         tileM.getType() != null ? tileM.getType().getId() : null,
-                        tileM.getType() != null ? tileM.getType().getPhysicalName() : null)
+                        tileM.getType() != null ? tileM.getType().getPhysicalName() : null
+                        , mTag.getKey(), mTag.getValue(), panelTag.getKey(), panelTag.getValue())
                 .stream().map((m) -> MeasurementTileDAORequest.create(m, tileM.getFunction(), tileM.getProps()))
                 .collect(Collectors.toList());
     }
 
-    private List<MeasurementDAOResponse> getInferredMeasurements(InformationTileMeasurement tileM,
-                                                                 Long assetId, String func) {
-        return measurementRepository
-                .inferMeasurement(assetId,
-                        tileM.getMeasurementName(),
-                        tileM.getSensorName(),
-                        tileM.getDomain() != null ? tileM.getDomain().name() : null,
-                        tileM.getDirection() != null ? tileM.getDirection().name() : null,
-                        tileM.getType() != null ? tileM.getType().getId() : null,
-                        tileM.getPhysicalName())
-                .stream().map(x -> MeasurementDAOResponse.create(x,
-                        measurementDetailsRepository.findByMeasurementId(x.getId()), func))
-                .collect(Collectors.toList());
-    }
+//    private List<MeasurementDAOResponse> getInferredMeasurements(InformationTileMeasurement tileM,
+//                                                                 Long assetId, String func) {
+//        return measurementRepository
+//                .inferMeasurement(assetId,
+//                        tileM.getMeasurementName(),
+//                        tileM.getSensorName(),
+//                        tileM.getDomain() != null ? tileM.getDomain().name() : null,
+//                        tileM.getDirection() != null ? tileM.getDirection().name() : null,
+//                        tileM.getType() != null ? tileM.getType().getId() : null,
+//                        tileM.getPhysicalName())
+//                .stream().map(x -> MeasurementDAOResponse.create(x,
+//                        measurementDetailsRepository.findByMeasurementId(x.getId()), func))
+//                .collect(Collectors.toList());
+//    }
 
-    private MeasurementDAOResponse getMeasurementFromTileMeasurement(InformationTileMeasurement tileM) {
-        if (tileM.getMeasurement() == null) {
-            return null;
-        }
-        List<MeasurementDetails> details =
-                measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId());
-        return MeasurementDAOResponse.create(tileM.getMeasurement(), details, tileM.getFunction());
-    }
+//    private MeasurementDAOResponse getMeasurementFromTileMeasurement(InformationTileMeasurement tileM) {
+//        if (tileM.getMeasurement() == null) {
+//            return null;
+//        }
+//        List<MeasurementDetails> details =
+//                measurementDetailsRepository.findByMeasurementId(tileM.getMeasurement().getId());
+//        return MeasurementDAOResponse.create(tileM.getMeasurement(), details, tileM.getFunction());
+//    }
 }
