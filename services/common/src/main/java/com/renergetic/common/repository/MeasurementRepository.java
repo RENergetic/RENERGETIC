@@ -168,9 +168,9 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             "FROM (measurement " +
             " LEFT JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
             "INNER JOIN measurement_type ON measurement_type.id = measurement.measurement_type_id " +
-            " LEFT JOIN measurement_tags mt ON mt.measurement_id = m.id " +
+            " LEFT JOIN measurement_tags mt ON mt.measurement_id = measurement.id " +
             " LEFT JOIN tags   ON tags.id = mt.tag_id " +
-            " LEFT JOIN measurement_tags mtPanel ON mtPanel.measurement_id = m.id " +
+            " LEFT JOIN measurement_tags mtPanel ON mtPanel.measurement_id = measurement.id " +
             " LEFT JOIN tags tagsPanel  ON tagsPanel.id = mtPanel.tag_id " +
             ")" +
             " WHERE COALESCE(measurement.sensor_name = CAST(:sensorName AS text),TRUE) " +

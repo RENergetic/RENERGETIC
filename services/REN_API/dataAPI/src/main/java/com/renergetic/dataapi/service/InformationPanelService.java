@@ -296,7 +296,7 @@ public class InformationPanelService {
         List<MeasurementDAOResponse> collect = tile.getInformationTileMeasurements()
                 .stream().map(
                         tileM -> {
-                            if (tileM.getId() == null) {
+                            if (tileM.getMeasurement() == null) {
                                 //infer type
                                 if (tileM.getType() != null
                                         && (tileM.getType().getId() != null
@@ -319,9 +319,9 @@ public class InformationPanelService {
                                 return l;
                             } else {
                                 // FIXME: here a measurement is retrieved from the database but it isn't used
-                                var m = measurementRepository.findById(tileM.getId()).orElseThrow(
-                                        () -> new NotFoundException("Measurement not found " + tileM.getId()));
-                                return List.of(MeasurementDAOResponse.create(m, measurementDetailsRepository.findByMeasurementId(tileM.getId()), tileM.getFunction()));
+//                                var m = measurementRepository.findById(tileM.getId()).orElseThrow(
+//                                        () -> new NotFoundException("Measurement not found " + tileM.getId()));
+                                return List.of(MeasurementDAOResponse.create(tileM.getMeasurement(), measurementDetailsRepository.findByMeasurementId(tileM.getId()), tileM.getFunction()));
 
                             }
 
