@@ -126,7 +126,7 @@ public class DataService {
                         Collectors.toMap(m -> m.getFunction() + "_" + m.getId(), Function.identity(),
                                 (m1, m2) -> m1)).values();
         DataDAO res = this.getData(values, from, to);
-        return new DataWrapperDAO(res);
+        return new DataWrapperDAO(res,assetTemplate);
     }
     //TODO: get data for chosen measurements
 //    public DataWrapperDAO getMeasurementData(List<Long> measurementIds, Long from, Optional<Long> to) {
