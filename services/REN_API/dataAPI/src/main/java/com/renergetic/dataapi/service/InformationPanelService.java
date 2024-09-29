@@ -264,7 +264,7 @@ public class InformationPanelService {
                         tileM.getDomain() != null ? tileM.getDomain().name() : null,
                         tileM.getDirection() != null ? tileM.getDirection().name() : null,
                         tileM.getType() != null ? tileM.getType().getId() : null,
-                        tileM.getType() != null ? tileM.getType().getPhysicalName() : null
+                        tileM.getType() != null ? tileM.getType().getPhysicalName() : tileM.getPhysicalName()
                         , mTag.getKey(), mTag.getValue(), panelTag.getKey(), panelTag.getValue())
                 .stream().filter(Objects::nonNull)
                 .map((m) -> MeasurementDAOResponse.create(m,
