@@ -10,17 +10,20 @@ import java.util.Map;
 public class ESC implements KPIFormula {
 
     public final static ESC Instance = new ESC();
+
     @Override
     public KPI getKPI() {
         return KPI.ESC;
     }
 
     private static AbstractMeterKPIConfig[] requiredMeters = {
-            new AbstractMeterKPIConfig( AbstractMeter.LOAD, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.LOSSES, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.STORAGE, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.LRS, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.LNS, InfluxFunction.SUM,0)
+            new AbstractMeterKPIConfig(AbstractMeter.LOAD, InfluxFunction.SUM, 0),
+//            new AbstractMeterKPIConfig(AbstractMeter.LOSSES, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.ENS, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.ERS, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.STORAGE, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.LRS, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.LNS, InfluxFunction.SUM, 0)
 
     };
 
@@ -28,10 +31,14 @@ public class ESC implements KPIFormula {
     public BigDecimal calculate(Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previous) {
         return this.calculate(values);
     }
+
     @Override
     public BigDecimal calculate(Map<AbstractMeter, Double> values) {
-        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)) /
-                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS) );
+//        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)) /
+//                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS) );
+
+        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.STORAGE) - values.get(AbstractMeter.ERS) - values.get(AbstractMeter.ENS)) /
+                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS));
 
         if (!Double.isNaN(result) && !Double.isInfinite(result))
             return BigDecimal.valueOf(result);
@@ -42,8 +49,6 @@ public class ESC implements KPIFormula {
     public AbstractMeterKPIConfig[] getRequiredAbstractMeters() {
         return requiredMeters;
     }
-
-
 
 
 }
