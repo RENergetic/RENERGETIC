@@ -144,7 +144,7 @@ public class MeasurementService {
 		return typeRepository
 			.findAll()
 			.stream()
-			.map(type -> new FieldRestrictionsDAO(type.getName(), PrimitiveType.DOUBLE, null, type.getUnit()))
+			.map(type -> new FieldRestrictionsDAO(type.getName(), PrimitiveType.DOUBLE, type.getUnit(), null))
 			.collect(Collectors.toList());
 	}
 	
