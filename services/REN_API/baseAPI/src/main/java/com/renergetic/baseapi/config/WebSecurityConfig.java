@@ -1,12 +1,10 @@
 package com.renergetic.baseapi.config;
 
-import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.common.config.CustomAccessDeniedHandler;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
@@ -25,8 +22,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.servlet.*;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -71,13 +66,167 @@ public class WebSecurityConfig {
         Map<String, String[]> putUrls = new HashMap<>();
         Map<String, String[]> deleteUrls = new HashMap<>();
 
-        // getUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // postUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // putUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // deleteUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        String alertThresholdUrl = "/api/threshold/**";
+        String areaUrl = "/api/area/**";
+        String assetCategoryUrl = "/api/assetCategories/**";
+        String assetUrl = "/api/assets/**";
+        String dashboardUrl = "/api/dashboard/**";
+        String demandRequestUrl = "/api/demandRequests/**";
+        String informationPanelUrl = "/api/informationPanel/**";
+        String informationTileUrl = "/api/informationTile/**";
+        String logUrl = "/api/log/**";
+        String measurementUrl = "/api/measurements/**";
+        String notificationUrl = "/api/notification/**";
+        String ruleController = "/api/rules/**";
+
+        String[] alertThresholdRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name,
+            KeycloakRole.REN_MANAGER.name
+        };
+
+        String[] areaRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name
+        };
+
+        String[] assetCategoryRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name
+        };
+
+        String[] assetRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name
+        };
+
+        String[] dashboardRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name,
+            KeycloakRole.REN_MANAGER.name
+        };
+
+        String[] demandRequestRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name,
+            KeycloakRole.REN_MANAGER.name
+        };
+
+        String[] getInformationPanelRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name,
+            KeycloakRole.REN_MANAGER.name,
+            KeycloakRole.REN_USER.name,
+            KeycloakRole.REN_VISITOR.name,
+            KeycloakRole.REN_STAFF.name
+        };
+
+        String[] informationPanelRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name
+        };
+
+        String[] getInformationTileRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name,
+            KeycloakRole.REN_MANAGER.name,
+            KeycloakRole.REN_USER.name,
+            KeycloakRole.REN_VISITOR.name,
+            KeycloakRole.REN_STAFF.name
+        };
+
+        String[] informationTileRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name,
+            KeycloakRole.REN_MANAGER.name
+        };
+
+        String[] logRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name,
+            KeycloakRole.REN_MANAGER.name
+        };
+
+        String[] measurementRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name
+        };
+
+        String[] notificationRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name
+        };
+
+        String[] ruleRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name
+        };
+
+        getUrls.put(alertThresholdUrl, alertThresholdRoles);
+        getUrls.put(areaUrl, areaRoles);
+        getUrls.put(assetCategoryUrl, assetCategoryRoles);
+        getUrls.put(assetUrl, assetRoles);
+        getUrls.put(dashboardUrl, dashboardRoles);
+        getUrls.put(demandRequestUrl, demandRequestRoles);
+        getUrls.put(informationPanelUrl, getInformationPanelRoles);
+        getUrls.put(informationTileUrl, getInformationTileRoles);
+        getUrls.put(logUrl, logRoles);
+        getUrls.put(measurementUrl, measurementRoles);
+        getUrls.put(notificationUrl, notificationRoles);
+        getUrls.put(ruleController, ruleRoles);
+
+        postUrls.put(alertThresholdUrl, alertThresholdRoles);
+        postUrls.put(areaUrl, areaRoles);
+        postUrls.put(assetCategoryUrl, assetCategoryRoles);
+        postUrls.put(assetUrl, assetRoles);
+        postUrls.put(dashboardUrl, dashboardRoles);
+        postUrls.put(demandRequestUrl, demandRequestRoles);
+        postUrls.put(informationPanelUrl, informationPanelRoles);
+        postUrls.put(informationTileUrl, informationTileRoles);
+        postUrls.put(logUrl, logRoles);
+        postUrls.put(measurementUrl, measurementRoles);
+        postUrls.put(notificationUrl, notificationRoles);
+        postUrls.put(ruleController, ruleRoles);
+
+        putUrls.put(alertThresholdUrl, alertThresholdRoles);
+        putUrls.put(areaUrl, areaRoles);
+        putUrls.put(assetCategoryUrl, assetCategoryRoles);
+        putUrls.put(assetUrl, assetRoles);
+        putUrls.put(dashboardUrl, dashboardRoles);
+        putUrls.put(demandRequestUrl, demandRequestRoles);
+        putUrls.put(informationPanelUrl, informationPanelRoles);
+        putUrls.put(informationTileUrl, informationTileRoles);
+        putUrls.put(logUrl, logRoles);
+        putUrls.put(measurementUrl, measurementRoles);
+        putUrls.put(notificationUrl, notificationRoles);
+        putUrls.put(ruleController, ruleRoles);
+
+        deleteUrls.put(alertThresholdUrl, alertThresholdRoles);
+        deleteUrls.put(areaUrl, areaRoles);
+        deleteUrls.put(assetCategoryUrl, assetCategoryRoles);
+        deleteUrls.put(assetUrl, assetRoles);
+        deleteUrls.put(dashboardUrl, dashboardRoles);
+        deleteUrls.put(demandRequestUrl, demandRequestRoles);
+        deleteUrls.put(informationPanelUrl, informationPanelRoles);
+        deleteUrls.put(informationTileUrl, informationTileRoles);
+        deleteUrls.put(logUrl, logRoles);
+        deleteUrls.put(measurementUrl, measurementRoles);
+        deleteUrls.put(notificationUrl, notificationRoles);
+        deleteUrls.put(ruleController, ruleRoles);
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>
                 .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
@@ -97,8 +246,8 @@ public class WebSecurityConfig {
         deleteUrls.forEach((urlPattern, roles) -> {
             registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
         });
-        //registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        registry.anyRequest().permitAll();
+        registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        //registry.anyRequest().permitAll();
 
         return http.build();
     }
@@ -127,31 +276,4 @@ public class WebSecurityConfig {
         return source;
     }
 
-    public class RoleFilter implements Filter {
-        private final int expectedMask;
-
-        public RoleFilter(int expectedMask) {
-            this.expectedMask = expectedMask;
-        }
-
-        @Override
-        public void destroy() {
-        }
-
-        @Override
-        public void doFilter(ServletRequest req, ServletResponse res,
-                             FilterChain chain) throws IOException, ServletException {
-
-
-            KeycloakAuthenticationToken authentication =
-                    (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            if (authentication.hasRole(expectedMask)) {
-                chain.doFilter(req, res);
-            } else {
-                //TODO:
-            }
-
-        }
-
-    }
 }
