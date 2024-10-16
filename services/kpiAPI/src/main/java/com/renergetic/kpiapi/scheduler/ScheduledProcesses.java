@@ -27,17 +27,25 @@ public class ScheduledProcesses {
 
     private static final String LOG_FORMAT = " - %s for domain %s: %.2f at %d";
 
+    private static Integer nextKpiCalculation = 0;
+
     @Autowired
     private AbstractMeterDataService meterService;
 
     @Autowired
     private KPIService kpiService;
 
-    @Value("${scheduled.kpi.period}")
+    @Value("${scheduled.calculation.period}")
     private Integer meterPeriod;
 
-    @Scheduled(fixedDelayString = "${scheduled.kpi.period}", timeUnit = TimeUnit.MINUTES)
+    @Value("${scheduled.kpi.frecuency}")
+    private Integer kpiFrecuency;
+
+    @Scheduled(fixedDelayString = "${scheduled.calculation.period}", timeUnit = TimeUnit.MINUTES)
     public void calculateKpisAndAbstractMeters() {
+
+        // ABSTRACT METERS CALCULATION
+
         long tsNow = Instant.now().toEpochMilli();
         // var tsNow = ( (int)(Instant.now().toEpochMilli()/60000)*60000); round to minutes ? TODO:
         long tsFrom = tsNow - 60000 * meterPeriod;
@@ -51,29 +59,35 @@ public class ScheduledProcesses {
                 )
         );
 
-        List<KPIDataDAO> electricityData = kpiService
-                .calculateAndInsertAll(Domain.electricity, tsFrom, tsNow, tsNow);
-        log.info("Start Calculate KPIs ");
-        List<KPIDataDAO> heatData = kpiService
-                .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, tsNow);
-        //TODO: comments if its not calculating properly the following KPIS
-        List<KPIDataDAO> allDomain = kpiService
-                .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance, EP.Instance), tsFrom, tsNow, tsNow);
+        // KPIs CALCULATION
+        if (nextKpiCalculation.equals(kpiFrecuency - 1)) {
+            List<KPIDataDAO> electricityData = kpiService
+                    .calculateAndInsertAll(Domain.electricity, tsFrom, tsNow, tsNow);
+            log.info("Start Calculate KPIs ");
+            List<KPIDataDAO> heatData = kpiService
+                    .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, tsNow);
+            //TODO: comments if its not calculating properly the following KPIS
+            List<KPIDataDAO> allDomain = kpiService
+                    .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance, EP.Instance), tsFrom, tsNow, tsNow);
 
-        log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", meterPeriod));
-        electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
-                        log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
-                )
-        );
-        log.info("Heat KPIs calculated");
-        heatData.forEach(obj -> obj.getData().forEach((time, value) ->
-                        log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
-                )
-        );
-        log.info("All domain KPIs calculated");
-        allDomain.forEach(obj -> obj.getData().forEach((time, value) ->
-                        log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
-                )
-        );
+            log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", meterPeriod));
+            electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
+                            log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
+                    )
+            );
+            log.info("Heat KPIs calculated");
+            heatData.forEach(obj -> obj.getData().forEach((time, value) ->
+                            log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
+                    )
+            );
+            log.info("All domain KPIs calculated");
+            allDomain.forEach(obj -> obj.getData().forEach((time, value) ->
+                            log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
+                    )
+            );
+            nextKpiCalculation = 0;
+        } else {
+            nextKpiCalculation++;
+        }
     }
 }
