@@ -228,32 +228,36 @@ public class KPIService {
 
         // Calculate and save each KPI
         for (KPI kpi : KPI.values()) {
-            log.info("Start Calculate: " + kpi.kpi + " for: " + domain.name());
-            MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
+            try {
+                log.info("Start Calculate: " + kpi.kpi + " for: " + domain.name());
+                MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
 
-            if (time != null)
-                influxRequest.getFields().put("time", DateConverter.toString(time));
+                if (time != null)
+                    influxRequest.getFields().put("time", DateConverter.toString(time));
 
-            BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
-//kpi. TODO: link KPI with measurements
-//            hotfix
-            if (kpi.typeName.equals("energy")) {
-                //TODO:
-                //https://renergetic-renergetic-wp5.apps.paas-dev.psnc.pl/api-base/1.0/api/measurements/report?type_physical_name=energy&domain=heat&sensor_name=kpi&offset=0&limit=25
-                influxRequest.getFields().put("energy_kwh", calculator.bigDecimalToDoubleString(value));
-            } else
-                influxRequest.getFields().put(kpi.typeName, calculator.bigDecimalToDoubleString(value));
+                BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
+                //kpi. TODO: link KPI with measurements
+                //            hotfix
+                if (kpi.typeName.equals("energy")) {
+                    //TODO:
+                    //https://renergetic-renergetic-wp5.apps.paas-dev.psnc.pl/api-base/1.0/api/measurements/report?type_physical_name=energy&domain=heat&sensor_name=kpi&offset=0&limit=25
+                    influxRequest.getFields().put("energy_kwh", calculator.bigDecimalToDoubleString(value));
+                } else
+                    influxRequest.getFields().put(kpi.typeName, calculator.bigDecimalToDoubleString(value));
 
-            HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
+                HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 
-            if (response != null && response.statusCode() < 300) {
-                KPIDataDAO data = KPIDataDAO.create(kpi, domain);
-                data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
-                configuredMeters.add(data);
-            } else if (response != null)
-                log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.kpi, domain.toString(), response.statusCode()));
-            else
-                log.error(String.format("Error retrieving data from Influx for KPI %s with domain %s: NULL response", kpi.kpi, domain.toString()));
+                if (response != null && response.statusCode() < 300) {
+                    KPIDataDAO data = KPIDataDAO.create(kpi, domain);
+                    data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+                    configuredMeters.add(data);
+                } else if (response != null)
+                    log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.kpi, domain.toString(), response.statusCode()));
+                else
+                    log.error(String.format("Error retrieving data from Influx for KPI %s with domain %s: NULL response", kpi.kpi, domain.toString()));
+            } catch (Exception e) {
+                log.error("Error calculating KPI: " + kpi.kpi + " for domain: " + domain.name(), e);
+            }
         }
         return configuredMeters;
     }

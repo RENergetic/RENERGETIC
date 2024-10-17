@@ -224,42 +224,46 @@ public class AbstractMeterDataService {
                                 0 : Integer.compare(m1.getDomain().value, m2.getDomain().value));
 
         for (AbstractMeterConfig meter : meters) {
+            try {
+                MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
 
-            MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
+                if (time != null)
+                    influxRequest.getFields().put("time", DateConverter.toString(time));
 
-            if (time != null)
-                influxRequest.getFields().put("time", DateConverter.toString(time));
+                BigDecimal value = new BigDecimal(0);
+                if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to)) {
 
-            BigDecimal value = new BigDecimal(0);
-            if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to)) {
+    //                value = calculator.calculateFormula(meter.getFormula(), from, to);
+                    value = calculator.calcFormula(meter.getFormula(), from, to);
 
-//                value = calculator.calculateFormula(meter.getFormula(), from, to);
-                value = calculator.calcFormula(meter.getFormula(), from, to);
-
-                if (meter.getMeasurement() != null) {
-//                    convert to user defined scale
-                    var type = meter.getMeasurement().getType();
-                    var value2 = value.multiply(BigDecimal.valueOf(1 / type.getFactor()));
-                    log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value2) + ";" + calculator.bigDecimalToDoubleString(value) + " * " + meter.getMeasurement().getType().getFactor());
-                    value = value2;
-                } else {
-                    log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value) + "  - no defined measurement");
+                    if (meter.getMeasurement() != null) {
+    //                    convert to user defined scale
+                        var type = meter.getMeasurement().getType();
+                        var value2 = value.multiply(BigDecimal.valueOf(1 / type.getFactor()));
+                        log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value2) + ";" + calculator.bigDecimalToDoubleString(value) + " * " + meter.getMeasurement().getType().getFactor());
+                        value = value2;
+                    } else {
+                        log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value) + "  - no defined measurement");
+                    }
                 }
+
+                var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
+                influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
+
+                HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
+
+                if (response != null && response.statusCode() < 300) {
+                    AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
+                    data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+                    configuredMeters.add(data);
+                } else if (response != null)
+                    log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meterLabel, meter.getDomain().toString(), response.statusCode()));
+                else
+                    log.error(String.format("Error retrieving data from Influx for abstract meter %s with domain %s: NULL response", meter.getName().meterLabel, meter.getDomain().toString()));
+            
+            } catch (Exception e) {
+                log.error("Error calculating abstract meter: " + meter.getName().name() + " for: " + meter.getDomain().name(), e);
             }
-
-            var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
-            influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
-
-            HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
-
-            if (response != null && response.statusCode() < 300) {
-                AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
-                data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
-                configuredMeters.add(data);
-            } else if (response != null)
-                log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meterLabel, meter.getDomain().toString(), response.statusCode()));
-            else
-                log.error(String.format("Error retrieving data from Influx for abstract meter %s with domain %s: NULL response", meter.getName().meterLabel, meter.getDomain().toString()));
         }
         return configuredMeters;
     }
