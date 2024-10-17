@@ -25,8 +25,8 @@
 	<dependencies>
         <dependency>
             <groupId>com.renergetic</groupId>
-            <artifactId>common</artifactId>
-			<version>2.3.32</version>
+            <artifactId>common</artifactId> 
+			<version>2.3.34</version> 
         </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

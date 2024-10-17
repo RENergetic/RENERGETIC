@@ -20,11 +20,11 @@ spec:
             - containerPort: 8082
           resources:
             requests:
-              cpu: 200m
-              memory: 500Mi
+              cpu: 400m
+              memory: 825Mi
             limits:
-              cpu: 300m
-              memory: 1100Mi
+              cpu: 525m
+              memory: 1000Mi
           readinessProbe:
             failureThreshold: 3
             httpGet:
