@@ -343,11 +343,11 @@ public class KPIService {
             case ESS -> ESS.Instance.calculate(values);//this.calculateESS(values);
             case EP -> EP.Instance.calculate(values);//this.calculateEP(values);
             case EE -> EE.Instance.calculate(values);//this.calculateEE(values);
-            case ES -> ES.Instance.calculate(values);//this.calculateES(values, previousValues);
+            case ES -> ES.Instance.calculate(values, previousValues);//this.calculateES(values, previousValues);
             case SRES -> SRES.Instance.calculate(values); //this.calculateSRES(values);
             case SNES -> SNES.Instance.calculate(values);//this.calculateSNES(values);
             case CO2 -> CO2.Instance.calculate(values); //this.calculateCO2(values);
-            case PEAK -> PEAK.Instance.calculate(values);// this.calculatePEAK(maxValues);
+            case PEAK -> PEAK.Instance.calculate(maxValues);// this.calculatePEAK(maxValues);
             case ESC -> ESC.Instance.calculate(values); // this.calculateESC(values);
         };
     }
