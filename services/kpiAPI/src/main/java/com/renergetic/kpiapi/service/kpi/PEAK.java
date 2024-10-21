@@ -31,8 +31,8 @@ public class PEAK implements KPIFormula {
     @Override
     public BigDecimal calculate(Map<AbstractMeter, Double> values) {
         //in the original equation storage was subtracted in the nominator , in order to preserve the renewables values between 0-1 we need to add all storage in the denominator
-        Double result = values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE);
-
+        double result = values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES)
+                + values.get(AbstractMeter.STORAGE);
         if (!Double.isNaN(result) && !Double.isInfinite(result))
             return BigDecimal.valueOf(result);
         else return new BigDecimal(0);

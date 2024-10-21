@@ -1,11 +1,9 @@
 package com.renergetic.kpiapi.repository;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import com.renergetic.kpiapi.dao.AbstractMeterIdentifier;
-import com.renergetic.kpiapi.model.Measurement;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.renergetic.kpiapi.model.AbstractMeter;

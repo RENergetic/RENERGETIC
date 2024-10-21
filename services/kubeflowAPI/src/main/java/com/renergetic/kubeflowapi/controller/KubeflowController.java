@@ -146,6 +146,15 @@ public class KubeflowController {
         PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId, params);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+    @Operation(summary = "Start pipeline with name") //RUN PIPELINE
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PostMapping(path = "/pipeline/{pipeline_id}/run/{name}", produces = "application/json")
+    public ResponseEntity<PipelineRunDAO> startPipeline(
+            @PathVariable(name = "pipeline_id") String pipelineId, @PathVariable(name = "name") String name, @RequestBody Map<String, Object> params) {
+
+        PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId, params);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
 
     @Operation(summary = "Stop run") //STOP PIPELINE
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
