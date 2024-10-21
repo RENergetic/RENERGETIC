@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.renergetic.common.utilities.HttpAPIs;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,6 @@ import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.model.InfluxFunction;
 import com.renergetic.kpiapi.repository.AbstractMeterRepository;
 import com.renergetic.kpiapi.service.utils.DateConverter;
-import com.renergetic.kpiapi.service.utils.HttpAPIs;
 import com.renergetic.kpiapi.service.utils.MathCalculator;
 
 import lombok.extern.slf4j.Slf4j;

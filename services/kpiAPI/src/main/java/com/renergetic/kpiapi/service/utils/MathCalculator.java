@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.renergetic.common.utilities.HttpAPIs;
 import com.renergetic.kpiapi.service.utils.calc.MeasurementToken;
 import com.renergetic.kpiapi.service.utils.calc.ShuntingYardParser;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
