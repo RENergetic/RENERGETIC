@@ -12,11 +12,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.renergetic.common.model.Measurement;
+import com.renergetic.common.model.details.MeasurementDetails;
+import com.renergetic.common.model.details.MeasurementTags;
+import com.renergetic.common.repository.AssetRepository;
+import com.renergetic.common.repository.MeasurementRepository;
+import com.renergetic.common.repository.MeasurementTagsRepository;
 import com.renergetic.common.utilities.HttpAPIs;
+import com.renergetic.common.model.Asset ;
 import com.renergetic.kpiapi.service.utils.calc.MeasurementToken;
 import com.renergetic.kpiapi.service.utils.calc.ShuntingYardParser;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
-import com.renergetic.kpiapi.model.Asset;
 import com.renergetic.kpiapi.service.utils.calc.Token;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,13 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.renergetic.kpiapi.model.Details;
-import com.renergetic.kpiapi.model.Measurement;
-import com.renergetic.kpiapi.model.details.MeasurementDetails;
-import com.renergetic.kpiapi.model.details.MeasurementTags;
-import com.renergetic.kpiapi.repository.AssetRepository;
-import com.renergetic.kpiapi.repository.MeasurementRepository;
-import com.renergetic.kpiapi.repository.MeasurementTagsRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -333,7 +332,7 @@ public class MathCalculator {
             if (tags != null && !tags.isEmpty())
                 params.putAll(tags.stream()
                         .filter(tag -> !params.containsKey(tag.getValue()))
-                        .collect(Collectors.toMap(Details::getKey, Details::getValue)));
+                        .collect(Collectors.toMap(MeasurementTags::getKey, MeasurementTags::getValue)));
 
             // PARSE TO NON CUMULATIVE DATA IF THE MEASUREMENT IS CUMULATIVE
             MeasurementDetails cumulative = null;

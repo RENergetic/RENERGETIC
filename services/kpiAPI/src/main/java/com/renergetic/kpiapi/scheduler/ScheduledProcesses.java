@@ -1,8 +1,8 @@
 package com.renergetic.kpiapi.scheduler;
 
+import com.renergetic.common.model.Domain;
 import com.renergetic.kpiapi.dao.AbstractMeterDataDAO;
 import com.renergetic.kpiapi.dao.KPIDataDAO;
-import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.service.AbstractMeterDataService;
 import com.renergetic.kpiapi.service.KPIService;
 

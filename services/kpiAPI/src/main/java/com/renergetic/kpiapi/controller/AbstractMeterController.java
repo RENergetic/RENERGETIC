@@ -2,6 +2,7 @@ package com.renergetic.kpiapi.controller;
 
 import java.util.*;
 
+import com.renergetic.common.model.Domain;
 import com.renergetic.kpiapi.dao.AbstractMeterIdentifier;
 import com.renergetic.kpiapi.dao.AbstractMeterTypeDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.kpiapi.dao.AbstractMeterDAO;
 import com.renergetic.kpiapi.dao.AbstractMeterDataDAO;
-import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.model.InfluxFunction;
 import com.renergetic.kpiapi.service.AbstractMeterDataService;
 import com.renergetic.kpiapi.service.AbstractMeterService;

@@ -8,12 +8,16 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.renergetic.common.dao.MeasurementDAO;
+import com.renergetic.common.model.Domain;
+import com.renergetic.common.model.Measurement;
+import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.kpiapi.dao.AbstractMeterIdentifier;
 import com.renergetic.kpiapi.dao.AbstractMeterTypeDAO;
-import com.renergetic.kpiapi.dao.MeasurementDAO;
-import com.renergetic.kpiapi.model.Measurement;
-import com.renergetic.kpiapi.repository.MeasurementRepository;
 
+
+import com.renergetic.kpiapi.dao.MeasurementKPIDAO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -26,9 +30,9 @@ import com.renergetic.kpiapi.exception.InvalidArgumentException;
 import com.renergetic.kpiapi.exception.NotFoundException;
 import com.renergetic.kpiapi.model.AbstractMeter;
 import com.renergetic.kpiapi.model.AbstractMeterConfig;
-import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.repository.AbstractMeterRepository;
 
+@Slf4j
 @Service
 public class AbstractMeterService {
 
@@ -101,7 +105,7 @@ public class AbstractMeterService {
     public AbstractMeterDAO get(String name, Domain domain) {
         AbstractMeterConfig byNameAndDomain = amRepo.findByNameAndDomain(AbstractMeter.obtain(name), domain)
                 .orElseThrow(() -> new NotFoundException("The abstract meter with name %s and domain %s isn't configured", name, domain));
-        return AbstractMeterDAO.create(byNameAndDomain,byNameAndDomain.getMeasurement()                );
+        return AbstractMeterDAO.create(byNameAndDomain, byNameAndDomain.getMeasurement());
     }
 
     /**
@@ -123,17 +127,17 @@ public class AbstractMeterService {
 
         if (!amRepo.existsByNameAndDomain(AbstractMeter.obtain(meter.getName()), meter.getDomain())) {
             meter.setId(null);
-            var entity= meter.mapToEntity();
+            var entity = meter.mapToEntity();
             if (meter.getMeasurement() != null) {
 //check if exists
-               entity.setMeasurement(measurementRepository.findById(meter.getMeasurement().getId()).orElseThrow());
+                entity.setMeasurement(measurementRepository.findById(meter.getMeasurement().getId()).orElseThrow());
             } else {
 //             infer measurement
                 var m = this.findMeasurement(meter);
                 entity.setMeasurement(m);
             }
 
-            var newMeter = AbstractMeterDAO.create(amRepo.save(entity),entity.getMeasurement());
+            var newMeter = AbstractMeterDAO.create(amRepo.save(entity), entity.getMeasurement());
             if (newMeter.getDomain() != Domain.none)
                 this.updateAllDomainMeter(newMeter, false);
             return newMeter;
@@ -142,10 +146,19 @@ public class AbstractMeterService {
     }
 
     private Measurement findMeasurement(AbstractMeterDAO meter) {
-        var m = measurementRepository.inferMeasurement(meter.getName().toLowerCase(),
-                "abstract_meter", meter.getDomain().name(), null, null, null);
-        if (m.size() == 1) {
-            return m.get(0);
+        MeasurementDAO m = null;
+//        var m = measurementRepository.inferMeasurement(null,meter.getName().toLowerCase(),
+//                "abstract_meter", meter.getDomain().name(), null, null, null);
+        try {
+            m = measurementRepository.findMeasurements(null, null, meter.getName().toLowerCase(),
+                    "abstract_meter", meter.getDomain().name(), null, null, null,
+                    0, 1).get(0);
+
+        } catch (Exception ex) {
+            log.error("Error calculating KPI: " + meter.getName().toLowerCase() + " for domain: " + meter.getDomain().name() + " measurement not found");
+        }
+        if (m != null) {
+            return measurementRepository.findById(m.getId()).get();
         }
         return null;
     }
@@ -176,7 +189,7 @@ public class AbstractMeterService {
             } else
                 config.setMeasurement(null);
             config.setId(previousConfig.get().getId());
-            AbstractMeterDAO updatedMeter = AbstractMeterDAO.create(amRepo.save(config),config.getMeasurement());
+            AbstractMeterDAO updatedMeter = AbstractMeterDAO.create(amRepo.save(config), config.getMeasurement());
             if (meter.getDomain() != Domain.none) {
                 this.updateAllDomainMeter(updatedMeter, false);
             }
@@ -199,9 +212,9 @@ public class AbstractMeterService {
         Optional<AbstractMeterConfig> previousConfig = amRepo.findByNameAndDomain(meter, domain);
         if (previousConfig.isPresent()) {
             if (domain != Domain.none)
-                updateAllDomainMeter(AbstractMeterDAO.create(previousConfig.get(),null), true);
+                updateAllDomainMeter(AbstractMeterDAO.create(previousConfig.get(), null), true);
             amRepo.deleteByNameAndDomain(meter, domain);
-            return AbstractMeterDAO.create(previousConfig.get(),null);
+            return AbstractMeterDAO.create(previousConfig.get(), null);
         } else
             throw new IdNoDefinedException("The abstract meter with name %s and domain %s isn't configured", meter, domain);
     }
@@ -218,9 +231,9 @@ public class AbstractMeterService {
         if (previousConfig.isPresent()) {
             var prev = previousConfig.get();
             if (prev.getDomain() != Domain.none)
-                updateAllDomainMeter(AbstractMeterDAO.create(prev,null), true);
+                updateAllDomainMeter(AbstractMeterDAO.create(prev, null), true);
             amRepo.delete(prev);
-            return AbstractMeterDAO.create(previousConfig.get(),null);
+            return AbstractMeterDAO.create(previousConfig.get(), null);
         } else
             throw new IdNoDefinedException("The abstract meter with name %s and domain %s isn't configured", meter.getName(), meter.getDomain());
     }
@@ -249,7 +262,7 @@ public class AbstractMeterService {
             allDomainMeter.setDomain(Domain.none);
             var measurement = this.findMeasurement(meter);
             if (measurement != null)
-                meter.setMeasurement(MeasurementDAO.create(measurement));
+                meter.setMeasurement(MeasurementKPIDAO.create(measurement));
 
             if (meter.getCondition() != null && !meter.getCondition().isEmpty())
                 allDomainMeter.setCondition(meter.getCondition());
@@ -259,7 +272,7 @@ public class AbstractMeterService {
             allDomainMeter.setName(AbstractMeter.obtain(meter.getName()));
         }
         allDomainMeter.setFormula(formula);
-        AbstractMeterDAO.create(amRepo.save(allDomainMeter),allDomainMeter.getMeasurement());
+        AbstractMeterDAO.create(amRepo.save(allDomainMeter), allDomainMeter.getMeasurement());
     }
 
     private void checkDomain(AbstractMeterDAO meter) {

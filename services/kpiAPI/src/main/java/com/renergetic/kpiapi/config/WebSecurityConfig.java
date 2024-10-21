@@ -1,7 +1,7 @@
 package com.renergetic.kpiapi.config;
 
-import com.renergetic.kpiapi.model.security.KeycloakAuthenticationToken;
 
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;

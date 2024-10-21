@@ -1,6 +1,7 @@
 package com.renergetic.kpiapi.service;
 
 import com.renergetic.common.dao.MeasurementDAO;
+import com.renergetic.common.model.Domain;
 import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.common.utilities.HttpAPIs;
 import com.renergetic.kpiapi.dao.KPIDataDAO;
