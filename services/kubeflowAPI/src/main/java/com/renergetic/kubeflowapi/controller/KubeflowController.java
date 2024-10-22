@@ -143,7 +143,7 @@ public class KubeflowController {
     public ResponseEntity<PipelineRunDAO> startPipeline(
             @PathVariable(name = "pipeline_id") String pipelineId, @RequestBody Map<String, Object> params) {
 
-        PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId, params);
+        PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId,null, params);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
     @Operation(summary = "Start pipeline with name") //RUN PIPELINE
@@ -152,7 +152,7 @@ public class KubeflowController {
     public ResponseEntity<PipelineRunDAO> startPipeline(
             @PathVariable(name = "pipeline_id") String pipelineId, @PathVariable(name = "name") String name, @RequestBody Map<String, Object> params) {
 
-        PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId, params);
+        PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId,name, params);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
