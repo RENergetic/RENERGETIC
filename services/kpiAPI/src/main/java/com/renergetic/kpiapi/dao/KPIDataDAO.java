@@ -1,6 +1,6 @@
 package com.renergetic.kpiapi.dao;
 
-import com.renergetic.kpiapi.model.Domain;
+import com.renergetic.common.model.Domain;
 import com.renergetic.kpiapi.model.KPI;
 
 import java.util.TreeMap;

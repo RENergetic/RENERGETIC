@@ -3,9 +3,9 @@ package com.renergetic.kpiapi.dao;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.renergetic.common.model.Domain;
 import com.renergetic.kpiapi.model.AbstractMeterConfig;
 
-import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.model.KPI;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

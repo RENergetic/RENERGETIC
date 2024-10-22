@@ -1,6 +1,6 @@
 package com.renergetic.kpiapi.config;
 
-import com.renergetic.kpiapi.model.security.KeycloakAuthenticationToken;
+import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;

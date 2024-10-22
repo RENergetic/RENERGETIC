@@ -3,11 +3,10 @@ package com.renergetic.kpiapi.service;
 import java.math.BigDecimal;
 import java.net.http.HttpResponse;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.renergetic.common.model.Domain;
+import com.renergetic.common.utilities.HttpAPIs;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +20,9 @@ import com.renergetic.kpiapi.exception.InvalidArgumentException;
 import com.renergetic.kpiapi.exception.NotFoundException;
 import com.renergetic.kpiapi.model.AbstractMeter;
 import com.renergetic.kpiapi.model.AbstractMeterConfig;
-import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.model.InfluxFunction;
 import com.renergetic.kpiapi.repository.AbstractMeterRepository;
 import com.renergetic.kpiapi.service.utils.DateConverter;
-import com.renergetic.kpiapi.service.utils.HttpAPIs;
 import com.renergetic.kpiapi.service.utils.MathCalculator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -117,7 +114,8 @@ public class AbstractMeterDataService {
      * @param group     the group parameter to be sent to Influx API (optional)
      * @return an AbstractMeterDataDAO object containing the retrieved data
      */
-    public AbstractMeterDataDAO getAggregated(String name, Domain domain, InfluxFunction operation, Long from, Long to, String group) {
+    public AbstractMeterDataDAO getAggregated(String name, Domain domain, InfluxFunction operation, Long from, Long to,
+                                              String group) {
 
         AbstractMeterDataDAO ret = new AbstractMeterDataDAO();
 
@@ -219,9 +217,9 @@ public class AbstractMeterDataService {
             throw new NotFoundException("There aren't abstract meters configured");
 
         meters.sort(
-                (m1, m2) ->
-                        m1.getDomain().equals(m2.getDomain()) ?
-                                0 : Integer.compare(m1.getDomain().value, m2.getDomain().value));
+                Comparator.comparing(AbstractMeterConfig::getDomain));
+//                        m1.getDomain().equals(m2.getDomain()) ?
+//                                0 : Integer.compare(m1.getDomain().name(), m2.getDomain().name()));
 
         for (AbstractMeterConfig meter : meters) {
             try {
@@ -233,11 +231,11 @@ public class AbstractMeterDataService {
                 BigDecimal value = new BigDecimal(0);
                 if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to)) {
 
-    //                value = calculator.calculateFormula(meter.getFormula(), from, to);
+                    //                value = calculator.calculateFormula(meter.getFormula(), from, to);
                     value = calculator.calcFormula(meter.getFormula(), from, to);
 
                     if (meter.getMeasurement() != null) {
-    //                    convert to user defined scale
+                        //                    convert to user defined scale
                         var type = meter.getMeasurement().getType();
                         var value2 = value.multiply(BigDecimal.valueOf(1 / type.getFactor()));
                         log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value2) + ";" + calculator.bigDecimalToDoubleString(value) + " * " + meter.getMeasurement().getType().getFactor());
@@ -260,7 +258,7 @@ public class AbstractMeterDataService {
                     log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meterLabel, meter.getDomain().toString(), response.statusCode()));
                 else
                     log.error(String.format("Error retrieving data from Influx for abstract meter %s with domain %s: NULL response", meter.getName().meterLabel, meter.getDomain().toString()));
-            
+
             } catch (Exception e) {
                 log.error("Error calculating abstract meter: " + meter.getName().name() + " for: " + meter.getDomain().name(), e);
             }
@@ -276,10 +274,12 @@ public class AbstractMeterDataService {
         if (meters.isEmpty())
             throw new NotFoundException("There aren't abstract meters configured");
 
+//        meters.sort(
+//                (m1, m2) ->
+//                        m1.getDomain().equals(m2.getDomain()) ?
+//                                0 : Integer.compare(m1.getDomain().value, m2.getDomain().value));
         meters.sort(
-                (m1, m2) ->
-                        m1.getDomain().equals(m2.getDomain()) ?
-                                0 : Integer.compare(m1.getDomain().value, m2.getDomain().value));
+                Comparator.comparing(AbstractMeterConfig::getDomain));
 
         for (AbstractMeterConfig meter : meters) {
 

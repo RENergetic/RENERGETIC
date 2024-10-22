@@ -1,6 +1,8 @@
 package com.renergetic.kpiapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.renergetic.common.model.Domain;
+import com.renergetic.common.model.Measurement;
 import com.renergetic.kpiapi.model.*;
 
 import lombok.Data;
@@ -28,7 +30,7 @@ public class AbstractMeterDAO {
 
 
     @JsonProperty(required = false)
-    MeasurementDAO measurement;
+    MeasurementKPIDAO measurement;
 
     public static AbstractMeterDAO create(AbstractMeterConfig meter) {
         return create(meter, null);
@@ -52,7 +54,7 @@ public class AbstractMeterDAO {
             dao.setCondition(meter.getCondition());
             dao.setDomain(meter.getDomain());
             if (m != null)
-                dao.setMeasurement(MeasurementDAO.create(m));
+                dao.setMeasurement(MeasurementKPIDAO.create(m));
         }
 
         return dao;

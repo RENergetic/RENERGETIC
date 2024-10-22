@@ -30,6 +30,8 @@ public class PipelineRun {
     //Run paramaters
     @Column(name = "params", columnDefinition = "TEXT")
     private String params;
+    @Column(name = "name")
+    private String name;
     @Column(nullable = false, name = "init_time")
     private Long initTime;
     @Column(nullable = true, name = "start_time")

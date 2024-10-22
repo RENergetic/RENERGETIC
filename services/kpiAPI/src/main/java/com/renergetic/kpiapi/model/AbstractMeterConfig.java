@@ -2,6 +2,8 @@ package com.renergetic.kpiapi.model;
 
 import javax.persistence.*;
 
+import com.renergetic.common.model.Domain;
+import com.renergetic.common.model.Measurement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
