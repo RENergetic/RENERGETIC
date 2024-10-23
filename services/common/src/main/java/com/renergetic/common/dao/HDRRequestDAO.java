@@ -32,7 +32,7 @@ public class HDRRequestDAO {
     @JsonProperty(value = "value_change")
     private Double valueChange;
     @JsonProperty(value = "value_type", required = false)
-    private MeasurementTypeDAORequest valueType;
+    private MeasurementTypeDAO valueType;
     @JsonProperty(value = "asset", required = false)
     private SimpleAssetDAO asset;
     @JsonProperty(value = "config")
@@ -52,7 +52,7 @@ public class HDRRequestDAO {
             dao.setId(request.getId());
             dao.setMaxValue(request.getMaxValue());
             dao.setValueChange(request.getValueChange());
-            dao.setValueType(MeasurementTypeDAORequest.create(request.getValueType()));
+            dao.setValueType(MeasurementTypeDAO.create(request.getValueType()));
             if (request.getAsset() != null) {
                 dao.setAsset(SimpleAssetDAO.create(request.getAsset()));
             }
