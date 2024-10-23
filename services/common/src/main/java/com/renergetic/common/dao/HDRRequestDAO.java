@@ -32,7 +32,7 @@ public class HDRRequestDAO {
     @JsonProperty(value = "value_change")
     private Double valueChange;
     @JsonProperty(value = "value_type", required = false)
-    private MeasurementType valueType;
+    private MeasurementTypeDAORequest valueType;
     @JsonProperty(value = "asset", required = false)
     private SimpleAssetDAO asset;
     @JsonProperty(value = "config")
@@ -52,7 +52,7 @@ public class HDRRequestDAO {
             dao.setId(request.getId());
             dao.setMaxValue(request.getMaxValue());
             dao.setValueChange(request.getValueChange());
-            dao.setValueType(request.getValueType());
+            dao.setValueType(MeasurementTypeDAORequest.create(request.getValueType()));
             if (request.getAsset() != null) {
                 dao.setAsset(SimpleAssetDAO.create(request.getAsset()));
             }
@@ -71,13 +71,13 @@ public class HDRRequestDAO {
     public HDRRequest mapToEntity() {
         HDRRequest request = new HDRRequest();
         request.setId(this.getId());
-        request.setTimestamp( this.getTimestamp() );
-        request.setDateFrom( this.getDateFrom() );
-        request.setDateTo( this.getDateTo()) ;
+        request.setTimestamp(this.getTimestamp());
+        request.setDateFrom(this.getDateFrom());
+        request.setDateTo(this.getDateTo());
         request.setId(this.getId());
         request.setMaxValue(this.getMaxValue());
         request.setValueChange(this.getValueChange());
-        request.setValueType(this.getValueType());
+        request.setValueType(this.getValueType().mapToEntity());
         request.setJsonConfig(Json.toJson(this.config));
         if (this.getAsset() != null) {
             request.setAsset(this.getAsset().mapToEntity());
