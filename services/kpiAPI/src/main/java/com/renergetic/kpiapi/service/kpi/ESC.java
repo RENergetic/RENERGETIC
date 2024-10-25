@@ -16,11 +16,9 @@ public class ESC implements KPIFormula {
         return KPI.ESC;
     }
 
-    private static AbstractMeterKPIConfig[] requiredMeters = {
+    private static final AbstractMeterKPIConfig[] requiredMeters = {
             new AbstractMeterKPIConfig(AbstractMeter.LOAD, InfluxFunction.SUM, 0),
-//            new AbstractMeterKPIConfig(AbstractMeter.LOSSES, InfluxFunction.SUM, 0),
-            new AbstractMeterKPIConfig(AbstractMeter.ENS, InfluxFunction.SUM, 0),
-            new AbstractMeterKPIConfig(AbstractMeter.ERS, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.LOSSES, InfluxFunction.SUM, 0),
             new AbstractMeterKPIConfig(AbstractMeter.STORAGE, InfluxFunction.SUM, 0),
             new AbstractMeterKPIConfig(AbstractMeter.LRS, InfluxFunction.SUM, 0),
             new AbstractMeterKPIConfig(AbstractMeter.LNS, InfluxFunction.SUM, 0)
@@ -36,9 +34,15 @@ public class ESC implements KPIFormula {
     public BigDecimal calculate(Map<AbstractMeter, Double> values) {
 //        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)) /
 //                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS) );
+        double result = (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS))
+                /
+                ((values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+        ;
+//        double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.STORAGE)-  values.get(AbstractMeter.LOSSES)
+//                - values.get(AbstractMeter.ERS) - values.get(AbstractMeter.ENS)) /
+//                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS));
 
-        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.STORAGE) - values.get(AbstractMeter.ERS) - values.get(AbstractMeter.ENS)) /
-                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS));
+
 //        from(bucket: "renergetic")
 //  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
 //  |> filter(fn: (r) => r["_measurement"] == "abstract_meter")
