@@ -1,4 +1,4 @@
-package com.renergetic.common.dao;
+package com.renergetic.ingestionapi.dao;
 
 import com.renergetic.common.model.PrimitiveType;
 import lombok.AllArgsConstructor;
@@ -13,5 +13,6 @@ import lombok.ToString;
 public class FieldRestrictionsDAO {
 	String name;
 	PrimitiveType type;
+	String unit;
 	String format;
 }

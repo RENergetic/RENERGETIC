@@ -1,8 +1,8 @@
 package com.renergetic.kpiapi.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.renergetic.kpiapi.model.Domain;
-import com.renergetic.kpiapi.model.MeasurementType;
+import com.renergetic.common.model.Domain;
+import com.renergetic.common.model.MeasurementType;
 import lombok.Data;
 
 import java.util.Map;

@@ -32,20 +32,20 @@ public class InformationPanelController {
             @RequestParam(required = false) Optional<Integer> limit) {
         return new ResponseEntity<>(informationPanelService.getAll(offset.orElse(0L), limit.orElse(20)), HttpStatus.OK);
     }
-
-    @Operation(summary = "Infer a measurements for Information Panel")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Panel with filled measurements"),
-            @ApiResponse(responseCode = "500", description = "Error getting measurements")
-    })
-    @PostMapping(path = "/infermeasurements", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<InformationPanelDAO> inferMeasurementsForPanel(
-            @RequestBody InformationPanelDAO informationPanelDAORequest) {
-
-
-        return new ResponseEntity<>(informationPanelService.inferMeasurements(informationPanelDAORequest),
-                HttpStatus.OK);
-    }
+//
+//    @Operation(summary = "Infer a measurements for Information Panel")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "Panel with filled measurements"),
+//            @ApiResponse(responseCode = "500", description = "Error getting measurements")
+//    })
+//    @PostMapping(path = "/infermeasurements", produces = "application/json", consumes = "application/json")
+//    public ResponseEntity<InformationPanelDAO> inferMeasurementsForPanel(
+//            @RequestBody InformationPanelDAO informationPanelDAORequest) {
+//
+//
+//        return new ResponseEntity<>(informationPanelService.inferMeasurements(informationPanelDAORequest),
+//                HttpStatus.OK);
+//    }
 
     @Operation(summary = "Get All Panels by owner id")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.renergetic.common.exception.NotFoundException;
+import com.renergetic.common.mapper.InformationTilePanelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -59,6 +61,8 @@ public class WrapperService {
     DataService dataSv;
 
     @Autowired
+    private InformationTilePanelMapper informationTilePanelMapper;
+    @Autowired
     DummyDataGenerator dummyDataGenerator;
 
     public WrapperResponseDAO createWrapperResponse(Long userId, WrapperRequestDAO body) {
@@ -68,20 +72,20 @@ public class WrapperService {
         if (body.getCalls().getAssets() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getAssets();
             wrapperResponseDAO.setAssets(
-                getOwnerAssets(userId, Optional.ofNullable(data.getOffset()),
-                Optional.ofNullable(data.getLimit()))
+                    getOwnerAssets(userId, Optional.ofNullable(data.getOffset()),
+                            Optional.ofNullable(data.getLimit()))
             );
         }
         if (body.getCalls().getAssetPanels() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getAssetPanels();
             wrapperResponseDAO.setAssetPanels(
-                getPrivateAssetPanels(userId, Optional.ofNullable(data.getOffset()),
-                Optional.ofNullable(data.getLimit()))
+                    getPrivateAssetPanels(userId, Optional.ofNullable(data.getOffset()),
+                            Optional.ofNullable(data.getLimit()))
             );
         }
         if (body.getCalls().getMeasurementTypes() != null) {
             wrapperResponseDAO.setMeasurementTypes(
-                measurementTypeRepo.findAll()
+                    measurementTypeRepo.findAll()
             );
         }
         if (body.getCalls().getData() != null) {
@@ -100,9 +104,9 @@ public class WrapperService {
         if (body.getCalls().getDashboards() != null) {
             WrapperRequestDAO.PaginationArgsWrapperRequestDAO data = body.getCalls().getDashboards();
             wrapperResponseDAO.setDashboards(
-                getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit()))
+                    getDashboards(userId, Optional.ofNullable(data.getOffset()), Optional.ofNullable(data.getLimit()))
             );
-            
+
             DashboardMetaKeys meta = new DashboardMetaKeys(measurementTypeRepo.findByDashboardVisibility());
             wrapperResponseDAO.setDashboardMetaKeys(meta);
         }
@@ -123,10 +127,10 @@ public class WrapperService {
 
     private List<SimpleAssetDAO> getOwnerAssets(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         return assetRepo.findByUserIdConnectionTypes(
-            userId, 
-            List.of(ConnectionType.owner.toString()), 
-            offset.orElse(0L),
-            limit.orElse(20)
+                userId,
+                List.of(ConnectionType.owner.toString()),
+                offset.orElse(0L),
+                limit.orElse(20)
         ).stream().map(SimpleAssetDAO::create).collect(Collectors.toList());
     }
 
@@ -134,21 +138,21 @@ public class WrapperService {
         List<String> connectionTypes = List.of(ConnectionType.owner.toString(), ConnectionType.resident.toString());
 
         return assetRepo.findByUserIdConnectionTypes(userId,
-                            connectionTypes,
-                            offset.orElse(0L),
-                            limit.orElse(20))
-                    .stream()
-                    .map(x -> x.getInformationPanels()
+                        connectionTypes,
+                        offset.orElse(0L),
+                        limit.orElse(20))
+                .stream()
+                .map(x -> x.getInformationPanels()
                         .stream()
                         .filter(InformationPanel::getFeatured)
                         .map(y -> AssetPanelDAO.fromEntities(x, y))
                         .collect(Collectors.toList()))
-                    .flatMap(List::stream).collect(Collectors.toList());
+                .flatMap(List::stream).collect(Collectors.toList());
     }
 
     private AssetMetaKeys getAssetMetaKeys() {
         List<AssetTypeDAO> types = assetTypeRepo.findAll().stream().map(
-            AssetTypeDAO::create
+                AssetTypeDAO::create
         ).collect(Collectors.toList());
 
         List<AssetCategoryDAO> categories = assetCategoryRepo.findAll().stream().map(
@@ -158,20 +162,30 @@ public class WrapperService {
         return new AssetMetaKeys(types, categories);
     }
 
+    //
+//    private List<InformationPanelDAOResponse> getPublicPanels(Optional<Integer> limit) {
+//        // TODO: check the data for do it more efficent
+//        return informationPanelRepo.findFeatured(false, 0, Math.min(50, limit.orElse(20)))
+//            .stream()
+//            .map(panel -> InformationPanelDAOResponse.create(panel, null))
+//            .collect(Collectors.toList());
+//    }
     private List<InformationPanelDAOResponse> getPublicPanels(Optional<Integer> limit) {
         // TODO: check the data for do it more efficent
         return informationPanelRepo.findFeatured(false, 0, Math.min(50, limit.orElse(20)))
-            .stream()
-            .map(panel -> InformationPanelDAOResponse.create(panel, null))
-            .collect(Collectors.toList());
+                .stream()
+                .map(panel ->
+                        informationTilePanelMapper.toDTO(panel, true))
+                .collect(Collectors.toList());
     }
+
 
     private List<DashboardDAO> getDashboards(Long userId, Optional<Long> offset, Optional<Integer> limit) {
         List<DashboardDAO> dashboards = dashboardRepo.findAvailableForUserId(userId, offset.orElse(0L), limit.orElse(20))
-            .stream()
-            .map(DashboardDAO::create)
-            .collect(Collectors.toList());
-        
+                .stream()
+                .map(DashboardDAO::create)
+                .collect(Collectors.toList());
+
         if (dashboards.isEmpty() && generateDummy) {
             dashboards = dummyDataGenerator.getDashboards(5);
         }
@@ -231,13 +245,13 @@ public class WrapperService {
     }
 
     private DataDAO getDemandData(List<DemandScheduleDAO> demands) {
-        
+
         List<MeasurementDAOResponse> measurements =
                 demands.stream().filter(
                                 it -> it.getDemandDefinition().getTile() != null
                         ).flatMap(demand -> demand.getDemandDefinition().getTile().getMeasurements().stream())
                         .collect(Collectors.toList());
-                        
+
         return dataSv.getData(measurements, null, Optional.empty());
         //TODO: here there might be issue with presenting the data and choosing appropriate time interval - this should be discused
         //probably data required for the demand demand should be stored as static  DataDAO JSON in RDBMS
