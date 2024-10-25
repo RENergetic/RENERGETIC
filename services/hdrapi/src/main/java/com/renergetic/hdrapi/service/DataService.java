@@ -54,59 +54,59 @@ public class DataService {
     @Autowired
     private MeasurementDetailsRepository measurementDetailsRepository;
 
-    public DataWrapperDAO getPanelData(Long panelId, Long from, Optional<Long> to) {
-        return this.getPanelData(panelId, null, from, to);
-    }
+//    public DataWrapperDAO getPanelData(Long panelId, Long from, Optional<Long> to) {
+//        return this.getPanelData(panelId, null, from, to);
+//    }
 
-    /**
-     * get data for the panel template
-     *
-     * @param panelId
-     * @param assetId
-     * @param from
-     * @param to
-     * @return
-     */
-    public DataWrapperDAO getPanelData(Long panelId, Long assetId, Long from, Optional<Long> to) {
-        if (assetId != null) {
-            InformationPanelDAOResponse assetTemplate =
-                    informationPanelService.getAssetTemplate(panelId, assetId);
-
-            Stream<MeasurementDAOResponse> measurementDAOResponseStream = assetTemplate.getTiles().stream().map(
-                    InformationTileDAOResponse::getMeasurements
-            ).flatMap(List::stream);
-            Collection<MeasurementDAOResponse> values =
-                    measurementDAOResponseStream.collect(
-                            Collectors.toMap(m -> m.getFunction() + "_" + m.getId(), Function.identity(),
-                                    (m1, m2) -> m1)).values();
+//    /**
+//     * get data for the panel template
+//     *
+//     * @param panelId
+//     * @param assetId
+//     * @param from
+//     * @param to
+//     * @return
+//     */
+//    public DataWrapperDAO getPanelData(Long panelId, Long assetId, Long from, Optional<Long> to) {
+//        if (assetId != null) {
+//            InformationPanelDAOResponse assetTemplate =
+//                    informationPanelService.getAssetTemplate(panelId, assetId);
+//
+//            Stream<MeasurementDAOResponse> measurementDAOResponseStream = assetTemplate.getTiles().stream().map(
+//                    InformationTileDAOResponse::getMeasurements
+//            ).flatMap(List::stream);
+//            Collection<MeasurementDAOResponse> values =
+//                    measurementDAOResponseStream.collect(
+//                            Collectors.toMap(m -> m.getFunction() + "_" + m.getId(), Function.identity(),
+//                                    (m1, m2) -> m1)).values();
+////            DataDAO res =
+////                    this.getData(values.stream().map(v -> v.mapToEntity(measurementDetailsRepository.findByMeasurementId(v.getId()))).collect(Collectors.toList()), from, to);
 //            DataDAO res =
-//                    this.getData(values.stream().map(v -> v.mapToEntity(measurementDetailsRepository.findByMeasurementId(v.getId()))).collect(Collectors.toList()), from, to);
-            DataDAO res =
-                    this.getData(values, from, to);
+//                    this.getData(values, from, to);
+//
+//            //we need to return template with filled measurements for the given assetId
+//            return new DataWrapperDAO(res, assetTemplate);
+//        } else {
+//            //TODO: TOMEK/or someone else - check : if asset is null and panel is an template - raise exception  - bad request
+//            List<InformationTileMeasurement> measurements =
+//                    informationPanelService.getPanelMeasurements(panelId);
+//            List<MeasurementDAOResponse> measurementDAOResponseList = measurements.stream()
+//                    .filter(it->it.getMeasurement()!=null).map(it ->
+//                    MeasurementDAOResponse.create(it.getMeasurement(), it.getMeasurement().getDetails(),
+//                            it.getFunction())).collect(Collectors.toList());
+//            DataDAO res = this.getData(measurementDAOResponseList, from, to);
+//            return new DataWrapperDAO(res);
+//        }
+//
+//    }
 
-            //we need to return template with filled measurements for the given assetId
-            return new DataWrapperDAO(res, assetTemplate);
-        } else {
-            //TODO: TOMEK/or someone else - check : if asset is null and panel is an template - raise exception  - bad request
-            List<InformationTileMeasurement> measurements =
-                    informationPanelService.getPanelMeasurements(panelId);
-            List<MeasurementDAOResponse> measurementDAOResponseList = measurements.stream()
-                    .filter(it->it.getMeasurement()!=null).map(it ->
-                    MeasurementDAOResponse.create(it.getMeasurement(), it.getMeasurement().getDetails(),
-                            it.getFunction())).collect(Collectors.toList());
-            DataDAO res = this.getData(measurementDAOResponseList, from, to);
-            return new DataWrapperDAO(res);
-        }
-
-    }
-
-    public TimeseriesDAO getTileTimeseries(Long tileId, Long assetId, Long from, Optional<Long> to) {
-        List<Measurement> measurements = informationPanelService.getTileMeasurements(tileId, assetId, null);
-        TimeseriesDAO res = this.getTimeseries(measurements, from, to);
-        return res;
-
-
-    }
+//    public TimeseriesDAO getTileTimeseries(Long tileId, Long assetId, Long from, Optional<Long> to) {
+//        List<Measurement> measurements = informationPanelService.getTileMeasurements(tileId, assetId, null);
+//        TimeseriesDAO res = this.getTimeseries(measurements, from, to);
+//        return res;
+//
+//
+//    }
 
     public TimeseriesDAO getMeasurementTimeseries(List<Long> measurementIds, Long from, Optional<Long> to) {
         List<Measurement> measurements = measurementRepository.findByIds(measurementIds);

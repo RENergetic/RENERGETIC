@@ -2,9 +2,9 @@ package com.renergetic.common.model;
 
 public enum PrimitiveType {
 	INTEGER ("^-?\\d+$"),
-	DOUBLE ("^-?\\d+(.\\d+)?$"),
+	DOUBLE ("^-?\\d+(\\.\\d+)?$"),
 	UNSIGNED_INTEGER ("^\\d+$"),
-	UNSIGNED_DOUBLE ("^\\d+(.\\d+)?$"),
+	UNSIGNED_DOUBLE ("^\\d+(\\.\\d+)?$"),
 	BOOLEAN ("(true) | (false)"),
 	STRING (".*");
 	

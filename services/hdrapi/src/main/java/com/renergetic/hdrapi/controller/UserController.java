@@ -108,7 +108,7 @@ public class UserController {
                 Collectors.toList());
         Long userId = loggedInService.getLoggedInUser().getId();
         String settingsJson = userSv.getSettings(userId);
-        UserDAOResponse profile = UserDAOResponse.create(keycloakProfile, roles, settingsJson);
+        UserDAOResponse profile = UserDAOResponse.create(userId,keycloakProfile, roles, settingsJson);
         return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 

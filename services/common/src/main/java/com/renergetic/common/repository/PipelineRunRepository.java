@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PipelineRunRepository extends JpaRepository<PipelineRun, String> {
+
     PipelineRun save(PipelineRun pipelineRun);
 
     @Query(value = "SELECT pipeline_run.* FROM pipeline_run pipeline_run" +
@@ -20,4 +21,13 @@ public interface PipelineRunRepository extends JpaRepository<PipelineRun, String
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
 
     public List<PipelineRun> getPipelineRuns(String pipelineId, Long from, Long to, Long offset, Long limit);
+    @Query(value = "SELECT pipeline_run.* FROM pipeline_run pipeline_run" +
+            " WHERE pipeline_run.pipeline_id = :pipelineId and " +
+            " AND COALESCE(pipeline_run.name ilike CONCAT('%', :name, '%'),:name is null ) " +
+            " AND COALESCE(pipeline_run.start_time > :from,TRUE) " +
+            " AND COALESCE(pipeline_run.start_time < :to,TRUE) " +
+            " order by pipeline_run.init_time DESC " +
+            " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
+
+    public List<PipelineRun> getPipelineRuns(String pipelineId,String name, Long from, Long to, Long offset, Long limit);
 }

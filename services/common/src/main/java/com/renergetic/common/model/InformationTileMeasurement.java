@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.AccessLevel;
@@ -94,14 +95,20 @@ public class InformationTileMeasurement {
         }
         var dao = new MeasurementDAOResponse();
         dao.setId(null);
-        if(this.asset!=null){
+        if (this.asset != null) {
             dao.setAsset(SimpleAssetDAO.create(asset));
         }
         dao.setDirection(direction);
         dao.setDomain(domain);
         dao.setName(measurementName);
         dao.setSensorName(sensorName);
-        dao.setType(type);
+        if (type != null && type.getId() != null)
+            dao.setType(type);
+        else if (physicalName != null) {
+            var t = new MeasurementType();
+            t.setPhysicalName(physicalName);
+            dao.setType(t);
+        }
         dao.setCategory(assetCategory != null ? assetCategory.getName() : null);
         if (this.function != null)
             dao.setFunction(InfluxFunction.obtain(this.function));

@@ -1,4 +1,4 @@
-package com.renergetic.common.dao;
+package com.renergetic.ingestionapi.dao;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.common.dao.MeasurementIngestionDAO;
 import com.renergetic.common.dao.RequestInfo;
-import com.renergetic.common.dao.RestrictionsDAO;
+import com.renergetic.ingestionapi.dao.RestrictionsDAO;
 import com.renergetic.ingestionapi.exception.TooLargeRequestException;
 import com.renergetic.common.model.Request;
 import com.renergetic.ingestionapi.service.MeasurementService;
