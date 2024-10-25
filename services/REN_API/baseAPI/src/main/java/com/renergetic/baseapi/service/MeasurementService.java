@@ -226,7 +226,7 @@ public class MeasurementService {
 
     public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
                                                      String sensorName,
-                                                     String assetName, Long typeId, String physicalTypeName,
+                                                    Long assetId, String assetName, Long typeId, String physicalTypeName,
                                                      String tagKey,
                                                      String tagValue,
                                                      Long offset,
@@ -234,11 +234,11 @@ public class MeasurementService {
         Stream<MeasurementDAO> measurements;
         if (tagKey == null) {
             measurements = measurementRepository.findMeasurements(
-                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
                     limit).stream();
         } else {
             measurements = measurementRepository.findMeasurementsByTag(
-                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,
                     tagValue, offset, limit).stream();
         }
 
