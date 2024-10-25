@@ -245,6 +245,7 @@ public class MeasurementAggregationService {
                 measurement.setSensorId(ref.getSensorId());
                 measurement.setIsland(ref.getIsland());
                 measurement.setAsset(asset);
+                //measurement.setDetails(ref.getDetails());
                 //TODO: This remains in details !!
                 if(measurement.getDetails() == null)
                     measurement.setDetails(new ArrayList<>());
@@ -319,8 +320,8 @@ public class MeasurementAggregationService {
         measurementAggregationRepository.deleteAllInBatch(toDelete);
         measurementAggregationRepository.saveAll(measurementAggregations);
         for(int i = 0; i < measurementAggregations.size(); i++){
-            Set<Measurement> measurements = measurementAggregations.get(0).getOutputMeasurements();
-            List<MeasurementTags> tags = measurementTags.get(0);
+            Set<Measurement> measurements = measurementAggregations.get(i).getOutputMeasurements();
+            List<MeasurementTags> tags = measurementTags.get(i);
             tags.forEach(x -> x.getMeasurements().addAll(measurements));
             measurementTagsRepository.saveAll(tags);
         }
@@ -380,8 +381,8 @@ public class MeasurementAggregationService {
                                     && Objects.equals(x.getSensorId(), refMeasurement.getSensorId())){
                                         List<String> remainingKeys = new ArrayList<>(tags.keySet());
                                         for(Details detail : measurementTagsRepository.findByMeasurementId(x.getId())){
-                                            if((!tags.containsKey(detail.getKey()) || !remainingKeys.remove(detail.getKey()))
-                                                    && Objects.equals(detail.getValue(),  tags.get(detail.getKey()))){
+                                            if(!tags.containsKey(detail.getKey()) || !remainingKeys.remove(detail.getKey())
+                                                    || !Objects.equals(detail.getValue(),  tags.get(detail.getKey()))){
                                                 return false;
                                             }
                                         }
