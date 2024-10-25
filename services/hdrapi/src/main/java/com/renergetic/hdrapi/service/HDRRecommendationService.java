@@ -11,6 +11,7 @@ import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.hdrapi.config.MeasurementRepository2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -32,7 +33,9 @@ public class HDRRecommendationService {
     @Autowired
     HDRMeasurementRepository hdrMeasurementRepository;
     @Autowired
-    private MeasurementTagsRepository measurementTagsRepository;
+    MeasurementTagsRepository measurementTagsRepository;
+    @Autowired
+    MeasurementTypeRepository measurementTypeRepository;
     @Autowired
     HDRRequestRepository hdrRequestRepository;
     @Autowired
@@ -63,6 +66,10 @@ public class HDRRecommendationService {
                 requestDAO.getTimestamp() < recentRequestTimestamp.get()) {
             throw new InvalidArgumentException("Request is outdated");
         } else {
+            var mType = requestDAO.getValueType();
+            measurementTypeRepository.findById(requestDAO.getValueType().getId()).orElseThrow(() -> new NotFoundException(
+                    "Measurement type : " + mType.getId() + "not exists"));
+
             var request = hdrRequestRepository.save(requestDAO.mapToEntity());
             return HDRRequestDAO.create(request);
         }
@@ -73,7 +80,7 @@ public class HDRRecommendationService {
         if (recommendationRepository.timestampExists(t).isPresent())
             return this.save(t, recommendations);
         else
-            throw  new InvalidArgumentException("Timestamp does not exist");
+            throw new InvalidArgumentException("Timestamp does not exist");
     }
 
     public Boolean save(long t, List<HDRRecommendationDAO> recommendations) {

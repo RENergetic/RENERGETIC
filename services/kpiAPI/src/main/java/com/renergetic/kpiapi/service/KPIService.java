@@ -1,15 +1,18 @@
 package com.renergetic.kpiapi.service;
 
+import com.renergetic.common.dao.MeasurementDAO;
+import com.renergetic.common.model.Domain;
+import com.renergetic.common.repository.MeasurementRepository;
+import com.renergetic.common.utilities.HttpAPIs;
 import com.renergetic.kpiapi.dao.KPIDataDAO;
 import com.renergetic.kpiapi.dao.MeasurementDAORequest;
 import com.renergetic.kpiapi.exception.HttpRuntimeException;
 import com.renergetic.kpiapi.exception.InvalidArgumentException;
 import com.renergetic.kpiapi.model.*;
 import com.renergetic.kpiapi.repository.KPIConstantRepository;
-import com.renergetic.kpiapi.service.kpi.AbstractMeterKPIConfig;
-import com.renergetic.kpiapi.service.kpi.KPIFormula;
+
+import com.renergetic.kpiapi.service.kpi.*;
 import com.renergetic.kpiapi.service.utils.DateConverter;
-import com.renergetic.kpiapi.service.utils.HttpAPIs;
 import com.renergetic.kpiapi.service.utils.MathCalculator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,6 +28,7 @@ import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -40,6 +45,8 @@ public class KPIService {
 
     @Autowired
     private MathCalculator calculator;
+    @Autowired
+    MeasurementRepository measurementRepository;
 
     /**
      * Retrieves the kpi data DAO for the given name, domain, and time range.
@@ -63,14 +70,11 @@ public class KPIService {
         params.put("measurements", "kpi");
         params.put("measurement_type", ret.getName().name().toLowerCase());
         params.put("domain", domain.name());
-        if (from != null)
-            params.put("from", from.toString());
-        if (to != null)
-            params.put("to", to.toString());
+        if (from != null) params.put("from", from.toString());
+        if (to != null) params.put("to", to.toString());
 
         // Send request to Influx API
-        HttpResponse<String> response =
-                httpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
+        HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
 
         // Parse response with status code smaller than 300
         if (response != null && response.statusCode() < 300) {
@@ -112,7 +116,8 @@ public class KPIService {
      * @param group     the group parameter to be sent to Influx API (optional)
      * @return an KPIDataDAO object containing the retrieved data
      */
-    public KPIDataDAO getAggregated(String name, Domain domain, InfluxFunction operation, Long from, Long to, String group) {
+    public KPIDataDAO getAggregated(String name, Domain domain, InfluxFunction operation, Long from, Long to,
+                                    String group) {
 
         KPIDataDAO ret = new KPIDataDAO();
 
@@ -125,16 +130,12 @@ public class KPIService {
         params.put("measurements", "kpi");
         params.put("measurement_type", ret.getName().name().toLowerCase());
         params.put("domain", domain.name());
-        if (from != null)
-            params.put("from", from.toString());
-        if (to != null)
-            params.put("to", to.toString());
-        if (group != null)
-            params.put("group", group);
+        if (from != null) params.put("from", from.toString());
+        if (to != null) params.put("to", to.toString());
+        if (group != null) params.put("group", group);
 
         // Send request to Influx API
-        HttpResponse<String> response =
-                httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
+        HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
 
         // Parse response with status code smaller than 300
         if (response != null && response.statusCode() < 300) {
@@ -198,17 +199,11 @@ public class KPIService {
         maxValues.put(AbstractMeter.LOSSES, 0.);
         maxValues.put(AbstractMeter.STORAGE, 0.);
 
-        values.forEach((key, value) ->
-                threads.add(new Thread(() -> values.put(key, this.getAbstractMeterData(key, domain, from, to, InfluxFunction.SUM))))
-        );
+        values.forEach((key, value) -> threads.add(new Thread(() -> values.put(key, this.getAbstractMeterData(key, domain, from, to, InfluxFunction.SUM)))));
 
-        previousValues.forEach((key, value) ->
-                threads.add(new Thread(() -> previousValues.put(key, this.getAbstractMeterData(key, domain, from - (to - from), from, InfluxFunction.SUM))))
-        );
+        previousValues.forEach((key, value) -> threads.add(new Thread(() -> previousValues.put(key, this.getAbstractMeterData(key, domain, from - (to - from), from, InfluxFunction.SUM)))));
 
-        maxValues.forEach((key, value) ->
-                threads.add(new Thread(() -> maxValues.put(key, this.getAbstractMeterData(key, domain, from, to, InfluxFunction.MAX))))
-        );
+        maxValues.forEach((key, value) -> threads.add(new Thread(() -> maxValues.put(key, this.getAbstractMeterData(key, domain, from, to, InfluxFunction.MAX)))));
 
         threads.forEach(Thread::start);
 
@@ -232,18 +227,36 @@ public class KPIService {
                 log.info("Start Calculate: " + kpi.kpi + " for: " + domain.name());
                 MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
 
-                if (time != null)
-                    influxRequest.getFields().put("time", DateConverter.toString(time));
+                if (time != null) influxRequest.getFields().put("time", DateConverter.toString(time));
 
                 BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
+
+                //some fields aren't optional because there would be no sense to mix them -> can be discussed
+                //TODO: not sure if user id and connection is required here - unless we want to check here if the user can view the data/strcuture of the panel
+
+
+//                          String domain, String direction, Long type,
+//                        String physicalName, String tagKey, long offset, Integer limit);
+                MeasurementDAO m = null;
+                try {
+                    m = measurementRepository.findMeasurements(null, null, kpi.name().toLowerCase(), "kpi", domain.name(), null, null, null, 0, 1).get(0);
+
+                } catch (Exception ex) {
+                    log.error("Error calculating KPI: " + kpi.kpi + " for domain: " + domain.name() + " measurement not found");
+                }
                 //kpi. TODO: link KPI with measurements
-                //            hotfix
-                if (kpi.typeName.equals("energy")) {
-                    //TODO:
-                    //https://renergetic-renergetic-wp5.apps.paas-dev.psnc.pl/api-base/1.0/api/measurements/report?type_physical_name=energy&domain=heat&sensor_name=kpi&offset=0&limit=25
-                    influxRequest.getFields().put("energy_kwh", calculator.bigDecimalToDoubleString(value));
-                } else
-                    influxRequest.getFields().put(kpi.typeName, calculator.bigDecimalToDoubleString(value));
+
+                if (m != null) {
+                    influxRequest.getFields().put(m.getTypeName(), calculator.bigDecimalToDoubleString(value));
+                } else {
+                    //            hotfix
+                    if (kpi.typeName.equals("energy")) {
+                        //TODO: horfix
+                        //https://renergetic-renergetic-wp5.apps.paas-dev.psnc.pl/api-base/1.0/api/measurements/report?type_physical_name=energy&domain=heat&sensor_name=kpi&offset=0&limit=25
+                        influxRequest.getFields().put("energy_kwh", calculator.bigDecimalToDoubleString(value));
+                    } else influxRequest.getFields().put(kpi.typeName, calculator.bigDecimalToDoubleString(value));
+
+                }
 
                 HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 
@@ -268,28 +281,16 @@ public class KPIService {
         // Prepare Abstract meter needed values
         Set<Thread> threads = new HashSet<>();
 
-        Map<AbstractMeter, Double> values = Arrays.stream(meters)
-                .filter(it -> it.getPeriod() == 0 && it.getFunction() == InfluxFunction.SUM)
-                .collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
-        Map<AbstractMeter, Double> previousValues = Arrays.stream(meters)
-                .filter(it -> it.getPeriod() == -1 && it.getFunction() == InfluxFunction.SUM)
-                .collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
-        Map<AbstractMeter, Double> maxValues = Arrays.stream(meters)
-                .filter(it -> it.getPeriod() == 0 && it.getFunction() == InfluxFunction.MAX)
-                .collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
+        Map<AbstractMeter, Double> values = Arrays.stream(meters).filter(it -> it.getPeriod() == 0 && it.getFunction() == InfluxFunction.SUM).collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
+        Map<AbstractMeter, Double> previousValues = Arrays.stream(meters).filter(it -> it.getPeriod() == -1 && it.getFunction() == InfluxFunction.SUM).collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
+        Map<AbstractMeter, Double> maxValues = Arrays.stream(meters).filter(it -> it.getPeriod() == 0 && it.getFunction() == InfluxFunction.MAX).collect(Collectors.toMap(AbstractMeterKPIConfig::getAbstractMeter, it -> 0.0));// new EnumMap<>(AbstractMeter.class);
 
 
-        values.forEach((key, value) ->
-                threads.add(new Thread(() -> values.put(key, this.getAbstractMeterData(key, domain, from, to, InfluxFunction.SUM))))
-        );
+        values.forEach((key, value) -> threads.add(new Thread(() -> values.put(key, this.getAbstractMeterData(key, domain, from, to, InfluxFunction.SUM)))));
 
-        previousValues.forEach((key, value) ->
-                threads.add(new Thread(() -> previousValues.put(key, this.getAbstractMeterData(key, domain, from - (to - from), from, InfluxFunction.SUM))))
-        );
+        previousValues.forEach((key, value) -> threads.add(new Thread(() -> previousValues.put(key, this.getAbstractMeterData(key, domain, from - (to - from), from, InfluxFunction.SUM)))));
 
-        maxValues.forEach((key, value) ->
-                threads.add(new Thread(() -> maxValues.put(key, this.getAbstractMeterData(key, domain, from, to, InfluxFunction.MAX))))
-        );
+        maxValues.forEach((key, value) -> threads.add(new Thread(() -> maxValues.put(key, this.getAbstractMeterData(key, domain, from, to, InfluxFunction.MAX)))));
 
         threads.forEach(Thread::start);
 
@@ -314,8 +315,7 @@ public class KPIService {
             log.info("Start Calculate: " + kpi.kpi + " for: " + domain.name());
             MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
 
-            if (time != null)
-                influxRequest.getFields().put("time", DateConverter.toString(time));
+            if (time != null) influxRequest.getFields().put("time", DateConverter.toString(time));
 
             BigDecimal value = calculateKPI(kpi, domain, from, to, values, previousValues, maxValues);
 
@@ -335,133 +335,111 @@ public class KPIService {
         return configuredMeters;
     }
 
-    public BigDecimal calculateKPI(KPI kpi, Domain domain, Long from, Long to, Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previousValues, Map<AbstractMeter, Double> maxValues) {
+    public BigDecimal calculateKPI(KPI kpi, Domain domain, Long from, Long to, Map<AbstractMeter, Double> values,
+                                   Map<AbstractMeter, Double> previousValues, Map<AbstractMeter, Double> maxValues) {
 
         // Calculate each KPI with the values retrieved before
         return switch (kpi) {
-            case ESS -> this.calculateESS(values);
-            case EP -> this.calculateEP(values);
-            case EE -> this.calculateEE(values);
-            case ES -> this.calculateES(values, previousValues);
-            case SRES -> this.calculateSRES(values);
-            case SNES -> this.calculateSNES(values);
-            case CO2 -> this.calculateCO2(values);
-            case PEAK -> this.calculatePEAK(maxValues);
-            case ESC -> this.calculateESC(values);
+            case ESS -> ESS.Instance.calculate(values);//this.calculateESS(values);
+            case EP -> EP.Instance.calculate(values);//this.calculateEP(values);
+            case EE -> EE.Instance.calculate(values);//this.calculateEE(values);
+            case ES -> ES.Instance.calculate(values, previousValues);//this.calculateES(values, previousValues);
+            case SRES -> SRES.Instance.calculate(values); //this.calculateSRES(values);
+            case SNES -> SNES.Instance.calculate(values);//this.calculateSNES(values);
+            case CO2 -> CO2.Instance.calculate(values); //this.calculateCO2(values);
+            case PEAK -> PEAK.Instance.calculate(maxValues);// this.calculatePEAK(maxValues);
+            case ESC -> ESC.Instance.calculate(values); // this.calculateESC(values);
         };
     }
 
-    public BigDecimal calculateESS(Map<AbstractMeter, Double> values) {
+//    public BigDecimal calculateESS(Map<AbstractMeter, Double> values) {
+//
+//        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) - (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+//
+//        if (!Double.isNaN(result) && !Double.isInfinite(result)) return BigDecimal.valueOf(result);
+//        else return new BigDecimal(0);
+//    }
+//
+//    public BigDecimal calculateESC(Map<AbstractMeter, Double> values) {
+//
+//        double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)) / (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS));
+//
+//        if (!Double.isNaN(result) && !Double.isInfinite(result)) return BigDecimal.valueOf(result);
+//        else return new BigDecimal(0);
+//    }
+//
+//    public BigDecimal calculateEP(Map<AbstractMeter, Double> values) {
+//
+//        double result = (values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) + (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) / (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+//
+//        if (!Double.isNaN(result) && !Double.isInfinite(result)) return BigDecimal.valueOf(result);
+//        else return new BigDecimal(0);
+//    }
+//
+//    public BigDecimal calculateEE(Map<AbstractMeter, Double> values) {
+//
+//        double result = 1 - (values.get(AbstractMeter.LOSSES) / (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+//
+//        if (!Double.isNaN(result) && !Double.isInfinite(result)) return BigDecimal.valueOf(result);
+//        else return new BigDecimal(0);
+//    }
 
-        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE) -
-                (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+//    public BigDecimal calculateES(Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previousValues) {
+//
+//        double result = ((previousValues.get(AbstractMeter.LOAD) + previousValues.get(AbstractMeter.LOSSES) + previousValues.get(AbstractMeter.STORAGE)) - (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))) / (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+//
+//        if (!Double.isNaN(result) && !Double.isInfinite(result)) return BigDecimal.valueOf(result);
+//        else return new BigDecimal(0);
+//    }
 
-        if (!Double.isNaN(result) && !Double.isInfinite(result))
-            return BigDecimal.valueOf(result);
-        else return new BigDecimal(0);
-    }
+//    public BigDecimal calculateSRES(Map<AbstractMeter, Double> values) {
+//        //in the original equation storage was subtracted in the nominator , in order to preserve the renewables values between 0-1 we need to add all storage in the denominator
+//        double result = (values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+//
+//        if (!Double.isNaN(result) && !Double.isInfinite(result)) return BigDecimal.valueOf(result);
+//        else return new BigDecimal(0);
+//    }
 
-    public BigDecimal calculateESC(Map<AbstractMeter, Double> values) {
+//    public BigDecimal calculateSNES(Map<AbstractMeter, Double> values) {
+//        double result = 1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) / (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
+//
+//        if (!Double.isNaN(result) && !Double.isInfinite(result)) return BigDecimal.valueOf(result);
+//        else return new BigDecimal(0);
+//    }
+//
+//    public BigDecimal calculateCO2(Map<AbstractMeter, Double> values) {
+////        todo review this kpi
+//        KPIConstant c = constantRepository.findAll().stream().findFirst().orElse(new KPIConstant(1L, 1., 1., 1., 1.));
+//
+//        log.debug(String.format("Constants: a -> %.2f | b -> %.2f | g -> %.2f | d -> %.2f", c.getAlpha(), c.getBeta(), c.getGamma(), c.getDelta()));
+//
+//        Double result = ((c.getAlpha() * values.get(AbstractMeter.LRS) + c.getBeta() * values.get(AbstractMeter.ERS) + c.getGamma() * values.get(AbstractMeter.ENS) + c.getDelta() * values.get(AbstractMeter.LNS))) / (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
+//
+//        if (!Double.isNaN(result) && !Double.isInfinite(result)) return BigDecimal.valueOf(result);
+//        else return new BigDecimal(0);
+//    }
+//
+//    public BigDecimal calculatePEAK(Map<AbstractMeter, Double> values) {
+//
+//        Double result = values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE);
+//
+//        if (!Double.isNaN(result) && !Double.isInfinite(result)) return BigDecimal.valueOf(result);
+//        else return new BigDecimal(0);
+//    }
 
-        Double result = (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)) /
-                (values.get(AbstractMeter.LNS) + values.get(AbstractMeter.LRS));
-
-        if (!Double.isNaN(result) && !Double.isInfinite(result))
-            return BigDecimal.valueOf(result);
-        else return new BigDecimal(0);
-    }
-
-    public BigDecimal calculateEP(Map<AbstractMeter, Double> values) {
-
-        Double result = (values.get(AbstractMeter.EXCESS) + values.get(AbstractMeter.LOSSES) +
-                (values.get(AbstractMeter.ENS) + values.get(AbstractMeter.ERS))) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
-
-        if (!Double.isNaN(result) && !Double.isInfinite(result))
-            return BigDecimal.valueOf(result);
-        else return new BigDecimal(0);
-    }
-
-    public BigDecimal calculateEE(Map<AbstractMeter, Double> values) {
-
-        Double result = 1 - (values.get(AbstractMeter.LOSSES) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
-
-        if (!Double.isNaN(result) && !Double.isInfinite(result))
-            return BigDecimal.valueOf(result);
-        else return new BigDecimal(0);
-    }
-
-    public BigDecimal calculateES(Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previousValues) {
-
-        Double result = ((previousValues.get(AbstractMeter.LOAD) + previousValues.get(AbstractMeter.LOSSES) + previousValues.get(AbstractMeter.STORAGE)) -
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE))) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
-
-        if (!Double.isNaN(result) && !Double.isInfinite(result))
-            return BigDecimal.valueOf(result);
-        else return new BigDecimal(0);
-    }
-
-    public BigDecimal calculateSRES(Map<AbstractMeter, Double> values) {
-        //in the original equation storage was subtracted in the nominator , in order to preserve the renewables values between 0-1 we need to add all storage in the denominator
-        Double result = (values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
-
-        if (!Double.isNaN(result) && !Double.isInfinite(result))
-            return BigDecimal.valueOf(result);
-        else return new BigDecimal(0);
-    }
-
-    public BigDecimal calculateSNES(Map<AbstractMeter, Double> values) {
-        Double result = 1 - ((values.get(AbstractMeter.LRS) + values.get(AbstractMeter.ERS) + values.get(AbstractMeter.RES)) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE)));
-
-        if (!Double.isNaN(result) && !Double.isInfinite(result))
-            return BigDecimal.valueOf(result);
-        else return new BigDecimal(0);
-    }
-
-    public BigDecimal calculateCO2(Map<AbstractMeter, Double> values) {
-//        todo review this kpi
-        KPIConstant c = constantRepository.findAll().stream().findFirst().orElse(new KPIConstant(1L, 1., 1., 1., 1.));
-
-        log.debug(String.format("Constants: a -> %.2f | b -> %.2f | g -> %.2f | d -> %.2f", c.getAlpha(), c.getBeta(), c.getGamma(), c.getDelta()));
-
-        Double result = ((c.getAlpha() * values.get(AbstractMeter.LRS) + c.getBeta() * values.get(AbstractMeter.ERS) +
-                c.getGamma() * values.get(AbstractMeter.ENS) + c.getDelta() * values.get(AbstractMeter.LNS))) /
-                (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
-
-        if (!Double.isNaN(result) && !Double.isInfinite(result))
-            return BigDecimal.valueOf(result);
-        else return new BigDecimal(0);
-    }
-
-    public BigDecimal calculatePEAK(Map<AbstractMeter, Double> values) {
-
-        Double result = values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE);
-
-        if (!Double.isNaN(result) && !Double.isInfinite(result))
-            return BigDecimal.valueOf(result);
-        else return new BigDecimal(0);
-    }
-
-    private Double getAbstractMeterData(AbstractMeter meter, Domain domain, Long from, Long to, InfluxFunction operation) {
+    private Double getAbstractMeterData(AbstractMeter meter, Domain domain, Long from, Long to,
+                                        InfluxFunction operation) {
         Map<String, String> params = new HashMap<>();
 
         // Set parameters to Influx API request
         params.put("measurements", "abstract_meter");
         params.put("measurement_type", meter.name().toLowerCase());
         params.put("domain", domain.name());
-        if (from != null)
-            params.put("from", from.toString());
-        if (to != null)
-            params.put("to", to.toString());
+        if (from != null) params.put("from", from.toString());
+        if (to != null) params.put("to", to.toString());
 
         // Send request to Influx API
-        HttpResponse<String> response =
-                httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
+        HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement/data/" + operation.name().toLowerCase(), "GET", params, null, null);
 
         // Parse response with status code smaller than 300
         if (response != null && response.statusCode() < 300) {

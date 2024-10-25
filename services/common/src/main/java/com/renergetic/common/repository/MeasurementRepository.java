@@ -223,6 +223,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
                                                  String sensorName, String domain, String direction, Long type,
                                                  String physicalName, long offset, Integer limit);
 
+
 //    @Query(value = "SELECT " +
 //            " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
 //            " me.measurement_type_id as typeId," +
