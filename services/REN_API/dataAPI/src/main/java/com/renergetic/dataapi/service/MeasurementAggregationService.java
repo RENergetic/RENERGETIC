@@ -381,8 +381,8 @@ public class MeasurementAggregationService {
                                     && Objects.equals(x.getSensorId(), refMeasurement.getSensorId())){
                                         List<String> remainingKeys = new ArrayList<>(tags.keySet());
                                         for(Details detail : measurementTagsRepository.findByMeasurementId(x.getId())){
-                                            if((!tags.containsKey(detail.getKey()) || !remainingKeys.remove(detail.getKey()))
-                                                    && Objects.equals(detail.getValue(),  tags.get(detail.getKey()))){
+                                            if(!tags.containsKey(detail.getKey()) || !remainingKeys.remove(detail.getKey())
+                                                    || !Objects.equals(detail.getValue(),  tags.get(detail.getKey()))){
                                                 return false;
                                             }
                                         }
