@@ -1,6 +1,6 @@
 package com.renergetic.kpiapi.config;
 
-import com.renergetic.kpiapi.model.security.KeycloakRole;
+import com.renergetic.common.model.security.KeycloakRole;
 
 import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import lombok.RequiredArgsConstructor;
