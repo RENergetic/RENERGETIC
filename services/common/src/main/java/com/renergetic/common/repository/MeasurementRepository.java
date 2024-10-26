@@ -337,6 +337,15 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     List<Measurement> listHDRMeasurement(@Param("timestamp") Long timestamp, @Param("tagKey") String tagKey,
                                          @Param("tagValue") String tagValue);
 
+    @Query(
+            value = "SELECT m.*   FROM ( measurement m" +
+                    " JOIN measurement_tags mt ON mt.measurement_id = m.id" +
+                    " JOIN tags   ON tags.id = mt.tag_id  )" +
+                    " WHERE  tags.key =  :tagKey   AND COALESCE(tags.value = CAST(:tagValue AS text)  ,TRUE) ",
+            nativeQuery = true
+    )
+    List<Measurement> listHDRRecommendationMeasurement( @Param("tagKey") String tagKey,
+                                         @Param("tagValue") String tagValue);
     @Query(value = "SELECT " +
             " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
             " me.measurement_type_id as typeId," +

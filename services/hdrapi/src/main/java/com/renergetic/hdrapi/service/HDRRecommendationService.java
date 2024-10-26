@@ -4,9 +4,11 @@ import com.renergetic.common.dao.HDRMeasurementDAO;
 import com.renergetic.common.dao.HDRRecommendationDAO;
 import com.renergetic.common.dao.HDRRequestDAO;
 import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.exception.InvalidArgumentException;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.*;
+import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.hdrapi.config.MeasurementRepository2;
@@ -168,6 +170,7 @@ public class HDRRecommendationService {
                 .collect(Collectors.toList());
     }
 
+
     public List<MeasurementDAOResponse> getMeasurements(Long timestamp, String key, String value) {
         if (timestamp == null) {
             throw new InvalidArgumentException("Empty timestamp");
@@ -176,6 +179,23 @@ public class HDRRecommendationService {
 //        var t = DateConverter.toLocalDateTime(timestamp);
         return measurementRepository.listHDRMeasurement(timestamp, key, value).stream()
                 .map(it -> MeasurementDAOResponse.create(it, null, null))
+                .collect(Collectors.toList());
+    }
+
+    public List<MeasurementDAOResponse> getRecommendationMeasurements(String key, String value) {
+        if (key == null) {
+            throw new InvalidArgumentException("Empty timestamp");
+        }
+
+//        var t = DateConverter.toLocalDateTime(timestamp);
+        return measurementRepository.listHDRRecommendationMeasurement(key, value).stream()
+                .map(it -> {
+                    var m = MeasurementDAOResponse.create(it, null, null);
+                    var tags = measurementRepository.getTags(m.getId())
+                            .stream().map(MeasurementTagsDAO::create).toList();
+                    m.setTags(tags);
+                    return m;
+                })
                 .collect(Collectors.toList());
     }
 
