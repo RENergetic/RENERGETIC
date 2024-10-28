@@ -51,7 +51,7 @@ public class KPIService {
     MeasurementRepository measurementRepository;
 
     @PostConstruct
-    private void setDaoValue() {
+    private void setRepositories() {
         CO2.Instance.setConstantRepository(this.constantRepository);
     }
 
