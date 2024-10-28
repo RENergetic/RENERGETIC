@@ -107,13 +107,15 @@ public class MeasurementController {
             @RequestParam(required = false, name = "tag_key") String tagKey,
             @RequestParam(required = false, name = "tag_value") String tagValue,
             @RequestParam(required = false, name = "type_id") Long typeId,
-            @RequestParam(required = false, name = "type_physical_name") String physicalTypeName) {
+            @RequestParam(required = false, name = "type_physical_name") String physicalTypeName,
+            @RequestParam(required = false, name = "tags")  Boolean tags
+            ) {
 
 
         List<MeasurementDAOImpl> measurements;
 
         measurements = measurementSv.findMeasurements(name, domain, direction, sensorName,
-                assetId, assetName, typeId, physicalTypeName, tagKey, tagValue, offset.orElse(0L), limit.orElse(1000));
+                assetId, assetName, typeId, physicalTypeName, tagKey, tagValue, offset.orElse(0L), limit.orElse(1000),tags);
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
