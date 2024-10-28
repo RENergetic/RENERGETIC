@@ -3,18 +3,12 @@ package com.renergetic.kpiapi.service.kpi;
 import com.renergetic.kpiapi.model.AbstractMeter;
 import com.renergetic.kpiapi.model.InfluxFunction;
 import com.renergetic.kpiapi.model.KPI;
-import com.renergetic.kpiapi.model.KPIConstant;
-import com.renergetic.kpiapi.repository.KPIConstantRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
-@Service
+
 public class SRES implements KPIFormula {
-    @Autowired
-    private KPIConstantRepository constantRepository;
     public final static SRES Instance = new SRES();
 
     @Override
@@ -22,7 +16,7 @@ public class SRES implements KPIFormula {
         return KPI.SRES;
     }
 
-    private static AbstractMeterKPIConfig[] requiredMeters = {
+    private static final AbstractMeterKPIConfig[] requiredMeters = {
             new AbstractMeterKPIConfig(AbstractMeter.LRS, InfluxFunction.SUM, 0),
             new AbstractMeterKPIConfig(AbstractMeter.ERS, InfluxFunction.SUM, 0),
             new AbstractMeterKPIConfig(AbstractMeter.LOAD, InfluxFunction.SUM, 0),

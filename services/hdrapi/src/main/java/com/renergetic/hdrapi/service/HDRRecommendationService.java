@@ -11,6 +11,7 @@ import com.renergetic.common.model.*;
 import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
+import com.renergetic.common.utilities.Json;
 import com.renergetic.hdrapi.config.MeasurementRepository2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -51,6 +52,7 @@ public class HDRRecommendationService {
         if (r.isPresent()) {
             var recommendation = r.get();
             recommendation.setLabel(recommendationDAO.getLabel());
+            recommendation.setProperties(Json.toJson(recommendationDAO.getProperties()));
             return HDRRecommendationDAO.create(recommendationRepository.save(recommendation));
         } else {
             return HDRRecommendationDAO.create(recommendationRepository.save(recommendationDAO.mapToEntity()));

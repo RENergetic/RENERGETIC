@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.net.http.HttpResponse;
 import java.time.Instant;
@@ -43,10 +44,16 @@ public class KPIService {
     @Autowired
     private KPIConstantRepository constantRepository;
 
+
     @Autowired
     private MathCalculator calculator;
     @Autowired
     MeasurementRepository measurementRepository;
+
+    @PostConstruct
+    private void setDaoValue() {
+        CO2.Instance.setConstantRepository(this.constantRepository);
+    }
 
     /**
      * Retrieves the kpi data DAO for the given name, domain, and time range.
