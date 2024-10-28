@@ -226,7 +226,8 @@ public class MeasurementService {
 
     public List<MeasurementDAOImpl> findMeasurements(String measurementName, String domain, String direction,
                                                      String sensorName,
-                                                     String assetName, Long typeId, String physicalTypeName,
+                                                     Long assetId, String assetName, Long typeId,
+                                                     String physicalTypeName,
                                                      String tagKey,
                                                      String tagValue,
                                                      Long offset,
@@ -234,11 +235,11 @@ public class MeasurementService {
         Stream<MeasurementDAO> measurements;
         if (tagKey == null) {
             measurements = measurementRepository.findMeasurements(
-                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, offset,
                     limit).stream();
         } else {
             measurements = measurementRepository.findMeasurementsByTag(
-                    null, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,
+                    assetId, assetName, measurementName, sensorName, domain, direction, typeId, physicalTypeName, tagKey,
                     tagValue, offset, limit).stream();
         }
 
@@ -253,14 +254,15 @@ public class MeasurementService {
     }
 
     public List<MeasurementDAOImpl> findAssetMeasurements(
-            Long assetId,
-            Long offset,
+            Long assetId, String tagKey, String tagValue, Long offset,
             Integer limit) {
-        Stream<MeasurementDAO> measurements;
-
-        measurements = measurementRepository.findMeasurements(
-                assetId, null, null, null, null, null, null, null, offset, limit).stream();
-        List<MeasurementDAOImpl> collect = measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
+        List<MeasurementDAOImpl> collect = this.findMeasurements(null, null, null,
+                null, assetId, null, null, null, tagKey, tagValue, offset, limit);
+//        Stream<MeasurementDAO> measurements;
+//
+//        measurements = measurementRepository.findMeasurements(
+//                assetId, null, null, null, null, null, null, null, offset, limit).stream();
+//        List<MeasurementDAOImpl> collect = measurements.map(MeasurementDAOImpl::create).collect(Collectors.toList());
         collect.forEach(it ->
         {
             List<MeasurementTagsDAO> tags = measurementTagsRepository.findByMeasurementId(it.getId())
