@@ -13,6 +13,6 @@ import java.util.Map;
 public class RestrictionsDAO {
 	Integer requestSize;
 	List<String> measurements;
-	Map<String, String> tags;
+	Map<String, List<String>> tags;
 	List<FieldRestrictionsDAO> fields;
 }
