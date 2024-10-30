@@ -25,7 +25,8 @@ public interface InformationPanelRepository extends JpaRepository<InformationPan
             " LEFT JOIN asset_connection ON asset_connection.connected_asset_id = asset_conn.id" +
             " LEFT JOIN asset asset_user ON asset_user.id = asset_connection.asset_id AND asset_user.user_id = :userId" +
             " ) " +
-            " WHERE asset_user.user_id = :userId or featured" +
+            " WHERE asset_user.user_id = :userId or featured " +
+            " ORDER BY information_panel.priority DESC  " +
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<InformationPanel> findByUserId(Long userId, long offset, int limit);
 
