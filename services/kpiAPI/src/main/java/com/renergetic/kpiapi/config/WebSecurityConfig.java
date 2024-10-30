@@ -1,7 +1,7 @@
 package com.renergetic.kpiapi.config;
 
+import com.renergetic.common.model.security.KeycloakRole;
 
-import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
@@ -22,8 +21,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.servlet.*;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -68,16 +65,32 @@ public class WebSecurityConfig {
         Map<String, String[]> putUrls = new HashMap<>();
         Map<String, String[]> deleteUrls = new HashMap<>();
 
-        // getUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // postUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // putUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
-        
-        // deleteUrls.put("/api/example/**", new KeycloakRole[]{KeycloakRole.REN_DEV, KeycloakRole.REN_ADMIN});
+        String url = "/api/**";
+
+        String[] kpiRoles = new String[] {
+            KeycloakRole.REN_DEV.name,
+            KeycloakRole.REN_ADMIN.name,
+            KeycloakRole.REN_TECHNICAL_MANAGER.name,
+            KeycloakRole.REN_MANAGER.name
+        };
+
+        getUrls.put(url, kpiRoles);
+    
+        postUrls.put(url, kpiRoles);
+    
+        putUrls.put(url, kpiRoles);
+    
+        deleteUrls.put(url, kpiRoles);
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>
-                .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
+                .ExpressionInterceptUrlRegistry registrySwagger = http.csrf().disable().authorizeRequests();
+                
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>
+                .ExpressionInterceptUrlRegistry registry = registrySwagger
+                .antMatchers(HttpMethod.GET, "/api/docs/**", "/api/docs-ui/**", "/api/swagger-ui/**")
+                .permitAll()
+                .and()
+                .authorizeRequests();
 
         getUrls.forEach((urlPattern, roles) -> {
             registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);
@@ -124,31 +137,4 @@ public class WebSecurityConfig {
         return source;
     }
 
-    public class RoleFilter implements Filter {
-        private final int expectedMask;
-
-        public RoleFilter(int expectedMask) {
-            this.expectedMask = expectedMask;
-        }
-
-        @Override
-        public void destroy() {
-        }
-
-        @Override
-        public void doFilter(ServletRequest req, ServletResponse res,
-                             FilterChain chain) throws IOException, ServletException {
-
-
-            KeycloakAuthenticationToken authentication =
-                    (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            if (authentication.hasRole(expectedMask)) {
-                chain.doFilter(req, res);
-            } else {
-                //TODO:
-            }
-
-        }
-
-    }
 }
