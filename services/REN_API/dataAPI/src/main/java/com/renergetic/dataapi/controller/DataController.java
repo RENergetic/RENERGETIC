@@ -50,8 +50,8 @@ public class DataController {
             calendar.set(Calendar.MONTH, 0);
             fromInstant = calendar.toInstant().toEpochMilli();
         }
-        return new ResponseEntity<>(dataSv.getPanelData(panelId, from.orElse(fromInstant), to),
-                HttpStatus.OK);
+        var resp = dataSv.getPanelData(panelId, from.orElse(fromInstant), to);
+        return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
     @Operation(summary = "Get Data related with a panel id and asset")
@@ -84,7 +84,7 @@ public class DataController {
             @RequestParam("from") Optional<Long> from,
             @RequestParam("to") Optional<Long> to) {
         List<Long> m = measurements.stream().map(Long::valueOf).collect(Collectors.toList());
-        TimeseriesDAO timeseries =                dataSv.getMeasurementTimeseries(m, from.orElse((new Date()).getTime() - 3600000), to);
+        TimeseriesDAO timeseries = dataSv.getMeasurementTimeseries(m, from.orElse((new Date()).getTime() - 3600000), to);
         return new ResponseEntity<>(timeseries, HttpStatus.OK);
     }
 

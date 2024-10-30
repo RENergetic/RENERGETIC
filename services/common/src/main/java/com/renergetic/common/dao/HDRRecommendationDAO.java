@@ -5,10 +5,15 @@ import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.dao.details.TagDAO;
 import com.renergetic.common.model.HDRRecommendation;
 import com.renergetic.common.utilities.DateConverter;
+import com.renergetic.common.utilities.Json;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.tomcat.util.json.ParseException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -25,6 +30,8 @@ public class HDRRecommendationDAO {
     private TagDAO tag;
     @JsonProperty(required = false)
     private String label;
+    @JsonProperty(required = false)
+    private Map<String, ?> properties;
 
     public static HDRRecommendationDAO create(HDRRecommendation recommendation) {
 
@@ -32,10 +39,18 @@ public class HDRRecommendationDAO {
 
         if (recommendation != null) {
             dao = new HDRRecommendationDAO();
-            dao.setTimestamp( recommendation.getTimestamp() );
+            dao.setTimestamp(recommendation.getTimestamp());
             dao.setLabel(recommendation.getLabel());
             dao.setTag(TagDAO.create(recommendation.getTag()));
             dao.setId(recommendation.getId());
+            if (recommendation.getProperties() != null && !recommendation.getProperties().isEmpty()) {
+                try {
+                    dao.setProperties(Json.parse(recommendation.getProperties()).toMap());
+                } catch (ParseException e) {
+                    //TODO: log error
+                }
+            }
+
         }
         return dao;
     }
@@ -46,7 +61,10 @@ public class HDRRecommendationDAO {
         recommendation.setLabel(this.getLabel());
         if (this.id != null)
             recommendation.setId(this.id);
-        recommendation.setTimestamp( this.getTimestamp() );
+        recommendation.setTimestamp(this.getTimestamp());
+        if (this.properties != null && !this.properties.isEmpty()) {
+            recommendation.setProperties(Json.toJson(this.properties));
+        }
         return recommendation;
     }
 

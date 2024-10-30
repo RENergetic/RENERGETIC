@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import com.renergetic.common.dao.FieldRestrictionsDAO;
+import com.renergetic.ingestionapi.dao.RestrictionsDAO;
+import com.renergetic.ingestionapi.dao.FieldRestrictionsDAO;
 import com.renergetic.common.dao.MeasurementIngestionDAO;
-import com.renergetic.common.dao.RestrictionsDAO;
 import com.renergetic.common.model.PrimitiveType;
 
 public class Restrictions {
@@ -87,15 +87,15 @@ public class Restrictions {
 			field = new AbstractMap.SimpleEntry<>(key, false);
 		// CHECK IF IS A INTEGER
 		else if (fieldRestrictions.get(key) == PrimitiveType.INTEGER && value.matches("^-?\\d+$"))
-			field = new AbstractMap.SimpleEntry<>(key, Long.parseLong(value));
-		else if (fieldRestrictions.get(key) == PrimitiveType.DOUBLE && value.matches("^-?\\d+(.\\d+)?$"))
+			field = new AbstractMap.SimpleEntry<>(key, Double.parseDouble(value));
+		else if (fieldRestrictions.get(key) == PrimitiveType.DOUBLE && value.matches("^-?\\d+(\\.\\d+)?$"))
 			field = new AbstractMap.SimpleEntry<>(key, Double.parseDouble(value));
 		else if (fieldRestrictions.get(key) == PrimitiveType.UNSIGNED_INTEGER && value.matches("^-?\\d+$"))
-			field = new AbstractMap.SimpleEntry<>(key, Math.abs(Long.parseLong(value)));
-		else if (fieldRestrictions.get(key) == PrimitiveType.UNSIGNED_DOUBLE && value.matches("^-?\\d+(.\\d+)?$"))
+			field = new AbstractMap.SimpleEntry<>(key, Math.abs(Double.parseDouble(value)));
+		else if (fieldRestrictions.get(key) == PrimitiveType.UNSIGNED_DOUBLE && value.matches("^-?\\d+(\\.\\d+)?$"))
 			field = new AbstractMap.SimpleEntry<>(key, Math.abs(Double.parseDouble(value)));
 		// IF IS A STRING
-		else field = new AbstractMap.SimpleEntry<>(key, value);;
+		else field = new AbstractMap.SimpleEntry<>(key, value);
 		
 		return field;
 	}

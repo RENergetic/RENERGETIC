@@ -103,16 +103,19 @@ public class MeasurementController {
             @RequestParam(required = false) String direction,
             @RequestParam(required = false, name = "sensor_name") String sensorName,
             @RequestParam(required = false, name = "asset_name") String assetName,
+            @RequestParam(required = false, name = "asset_id") Long assetId,
             @RequestParam(required = false, name = "tag_key") String tagKey,
             @RequestParam(required = false, name = "tag_value") String tagValue,
             @RequestParam(required = false, name = "type_id") Long typeId,
-            @RequestParam(required = false, name = "type_physical_name") String physicalTypeName) {
+            @RequestParam(required = false, name = "type_physical_name") String physicalTypeName,
+            @RequestParam(required = false, name = "tags")  Boolean tags
+            ) {
 
 
         List<MeasurementDAOImpl> measurements;
 
         measurements = measurementSv.findMeasurements(name, domain, direction, sensorName,
-                assetName, typeId, physicalTypeName, tagKey, tagValue, offset.orElse(0L), limit.orElse(1000));
+                assetId, assetName, typeId, physicalTypeName, tagKey, tagValue, offset.orElse(0L), limit.orElse(1000),tags);
 
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
@@ -208,11 +211,13 @@ public class MeasurementController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/report/asset/{id}", produces = "application/json")
     public ResponseEntity<List<MeasurementDAOImpl>> listAssetDetailedMeasurements(
+            @RequestParam(required = false, name = "tag_key") String tagKey,
+            @RequestParam(required = false, name = "tag_value") String tagValue,
             @RequestParam(required = false) Optional<Long> offset,
             @RequestParam(required = false) Optional<Integer> limit,
             @PathVariable(required = true, name = "id") Long assetId) {
         List<MeasurementDAOImpl> measurements =
-                measurementSv.findAssetMeasurements(assetId, offset.orElse(0L), limit.orElse(500));
+                measurementSv.findAssetMeasurements(assetId, tagKey, tagValue, offset.orElse(0L), limit.orElse(500));
         return new ResponseEntity<>(measurements, HttpStatus.OK);
     }
 
@@ -326,7 +331,8 @@ public class MeasurementController {
     @ApiResponse(responseCode = "422", description = "Type isn't valid")
     @ApiResponse(responseCode = "500", description = "Error saving measurement")
     @PostMapping(path = "/batch", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<List<MeasurementDAOResponse>> createMeasurements(@RequestBody List<MeasurementDAORequest> measurements) {
+    public ResponseEntity<List<MeasurementDAOResponse>> createMeasurements(
+            @RequestBody List<MeasurementDAORequest> measurements) {
         List<MeasurementDAOResponse> measurementResponses = measurementSv.save(measurements);
         return new ResponseEntity<>(measurementResponses, HttpStatus.CREATED);
     }
@@ -509,7 +515,8 @@ public class MeasurementController {
     @ApiResponse(responseCode = "404", description = "Tag not exist")
     @ApiResponse(responseCode = "500", description = "Error saving information")
     @PutMapping(path = "tags/{tag_id}", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<MeasurementTags> updateTag(@RequestBody MeasurementTags tag, @PathVariable("tag_id") Long tagId) {
+    public ResponseEntity<MeasurementTags> updateTag(@RequestBody MeasurementTags tag,
+                                                     @PathVariable("tag_id") Long tagId) {
         tag = measurementSv.updateTag(tag, tagId);
         return new ResponseEntity<>(tag, tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }

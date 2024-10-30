@@ -1,5 +1,6 @@
 package com.renergetic.kpiapi.controller;
 
+import com.renergetic.common.model.Domain;
 import com.renergetic.kpiapi.service.kpi.KPIFormula;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.renergetic.kpiapi.dao.KPIDataDAO;
-import com.renergetic.kpiapi.model.Domain;
 import com.renergetic.kpiapi.model.InfluxFunction;
 import com.renergetic.kpiapi.service.KPIService;
 

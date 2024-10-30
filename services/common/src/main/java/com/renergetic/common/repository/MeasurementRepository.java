@@ -158,10 +158,21 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     List<Measurement> filterMeasurement(@Param("name") String name, @Param("label") String label,
                                         @Param("offset") long offset, @Param("limit") int limit);
 
+    //    @Query(value = "SELECT m.* " +
+//            " FROM (measurement m " +
+//            " JOIN measurement_tags mt ON mt.measurement_id = m.id   " +
+//            " JOIN tags   ON tags.id = mt.tag_id  )" +
+//            " WHERE tags.key =  :tagKey  " +
+//            " AND COALESCE(tags.value = CAST(:tagValue AS text)  ,TRUE) " +
+//            " LIMIT :limit OFFSET :offset  ", nativeQuery = true)
     @Query(value = "SELECT distinct measurement.* " +
             "FROM (measurement " +
             " LEFT JOIN asset asset_conn ON  measurement.asset_id = asset_conn.id " +
             "INNER JOIN measurement_type ON measurement_type.id = measurement.measurement_type_id " +
+            " LEFT JOIN measurement_tags mt ON mt.measurement_id = measurement.id " +
+            " LEFT JOIN tags   ON tags.id = mt.tag_id " +
+            " LEFT JOIN measurement_tags mtPanel ON mtPanel.measurement_id = measurement.id " +
+            " LEFT JOIN tags tagsPanel  ON tagsPanel.id = mtPanel.tag_id " +
             ")" +
             " WHERE COALESCE(measurement.sensor_name = CAST(:sensorName AS text),TRUE) " +
             " AND COALESCE(measurement.domain = CAST(:domain AS text) ,TRUE) " +
@@ -169,12 +180,21 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " AND COALESCE(measurement.asset_id  = CAST ( CAST(:assetId AS text ) as bigint ) ,TRUE) " +
             " AND COALESCE(measurement.direction = CAST(:direction AS text)  ,TRUE) " +
             " AND COALESCE(measurement_type.physical_name = CAST(:physicalName AS text) ,TRUE) " +
+
+            " AND    ( CAST(:tagKey  AS text) is null or  tags.key = CAST(:tagKey  AS text)   ) " +
+            " AND    ( CAST(:tagValue  AS text) is null or  tags.value = CAST(:tagValue  AS text)   ) " +
+            " AND    ( CAST(:tagPanelKey  AS text) is null or  tagsPanel.key = CAST(:tagPanelKey  AS text)   ) " +
+            " AND    ( CAST(:tagPanelValue  AS text) is null or  tagsPanel.value = CAST(:tagPanelValue  AS text)   ) " +
+//            " AND COALESCE(tags.key = CAST(:tagKey AS text)  ,TRUE) "+
+//            " AND COALESCE(tags.value = CAST(:tagValue AS text)  ,TRUE) "+
+//            " AND COALESCE(tagsPanel.key = CAST(:tagPanelKey AS text)  ,TRUE) "+
+//            " AND COALESCE(tagsPanel.value = CAST(:tagPanelValue AS text)  ,TRUE) "+
             " AND COALESCE(measurement.measurement_type_id  = CAST ( CAST(:type AS text ) as bigint ) ,TRUE) " +
             " LIMIT 50 ", nativeQuery = true)
     //some fields aren't optional because there would be no sense to mix them -> can be discussed
     public List<Measurement> inferMeasurement(
             Long assetId, String measurementName, String sensorName, String domain, String direction, Long type,
-            String physicalName);
+            String physicalName, String tagKey, String tagValue, String tagPanelKey, String tagPanelValue);
 
     @Query(value = "SELECT " +
             " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
@@ -202,6 +222,7 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     public List<MeasurementDAO> findMeasurements(Long assetId, String assetName, String measurementName,
                                                  String sensorName, String domain, String direction, Long type,
                                                  String physicalName, long offset, Integer limit);
+
 
 //    @Query(value = "SELECT " +
 //            " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
@@ -316,6 +337,15 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
     List<Measurement> listHDRMeasurement(@Param("timestamp") Long timestamp, @Param("tagKey") String tagKey,
                                          @Param("tagValue") String tagValue);
 
+    @Query(
+            value = "SELECT m.*   FROM ( measurement m" +
+                    " JOIN measurement_tags mt ON mt.measurement_id = m.id" +
+                    " JOIN tags   ON tags.id = mt.tag_id  )" +
+                    " WHERE  tags.key =  :tagKey   AND COALESCE(tags.value = CAST(:tagValue AS text)  ,TRUE) ",
+            nativeQuery = true
+    )
+    List<Measurement> listHDRRecommendationMeasurement( @Param("tagKey") String tagKey,
+                                         @Param("tagValue") String tagValue);
     @Query(value = "SELECT " +
             " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +
             " me.measurement_type_id as typeId," +
@@ -344,7 +374,8 @@ public interface MeasurementRepository extends JpaRepository<Measurement, Long> 
             " LIMIT :limit OFFSET :offset ;", nativeQuery = true)
     public List<MeasurementDAO> findMeasurementsByTag(Long assetId, String assetName, String measurementName,
                                                       String sensorName, String domain, String direction, Long type,
-                                                      String physicalName, String tagKey, String tagValue, long offset, Integer limit);
+                                                      String physicalName, String tagKey, String tagValue, long offset,
+                                                      Integer limit);
 
     @Query(value = "SELECT distinct " +
             " me.id, me.direction, me.domain, me.label,me.description, me.name, me.sensor_name as sensorName,me.sensor_id as sensorId," +

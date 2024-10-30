@@ -4,13 +4,17 @@ import com.renergetic.common.dao.HDRMeasurementDAO;
 import com.renergetic.common.dao.HDRRecommendationDAO;
 import com.renergetic.common.dao.HDRRequestDAO;
 import com.renergetic.common.dao.MeasurementDAOResponse;
+import com.renergetic.common.dao.details.MeasurementTagsDAO;
 import com.renergetic.common.exception.InvalidArgumentException;
 import com.renergetic.common.exception.NotFoundException;
 import com.renergetic.common.model.*;
+import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
+import com.renergetic.common.utilities.Json;
 import com.renergetic.hdrapi.config.MeasurementRepository2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -32,7 +36,9 @@ public class HDRRecommendationService {
     @Autowired
     HDRMeasurementRepository hdrMeasurementRepository;
     @Autowired
-    private MeasurementTagsRepository measurementTagsRepository;
+    MeasurementTagsRepository measurementTagsRepository;
+    @Autowired
+    MeasurementTypeRepository measurementTypeRepository;
     @Autowired
     HDRRequestRepository hdrRequestRepository;
     @Autowired
@@ -46,6 +52,7 @@ public class HDRRecommendationService {
         if (r.isPresent()) {
             var recommendation = r.get();
             recommendation.setLabel(recommendationDAO.getLabel());
+            recommendation.setProperties(Json.toJson(recommendationDAO.getProperties()));
             return HDRRecommendationDAO.create(recommendationRepository.save(recommendation));
         } else {
             return HDRRecommendationDAO.create(recommendationRepository.save(recommendationDAO.mapToEntity()));
@@ -63,6 +70,10 @@ public class HDRRecommendationService {
                 requestDAO.getTimestamp() < recentRequestTimestamp.get()) {
             throw new InvalidArgumentException("Request is outdated");
         } else {
+            var mType = requestDAO.getValueType();
+            measurementTypeRepository.findById(requestDAO.getValueType().getId()).orElseThrow(() -> new NotFoundException(
+                    "Measurement type : " + mType.getId() + "not exists"));
+
             var request = hdrRequestRepository.save(requestDAO.mapToEntity());
             return HDRRequestDAO.create(request);
         }
@@ -73,7 +84,7 @@ public class HDRRecommendationService {
         if (recommendationRepository.timestampExists(t).isPresent())
             return this.save(t, recommendations);
         else
-            throw  new InvalidArgumentException("Timestamp does not exist");
+            throw new InvalidArgumentException("Timestamp does not exist");
     }
 
     public Boolean save(long t, List<HDRRecommendationDAO> recommendations) {
@@ -161,6 +172,7 @@ public class HDRRecommendationService {
                 .collect(Collectors.toList());
     }
 
+
     public List<MeasurementDAOResponse> getMeasurements(Long timestamp, String key, String value) {
         if (timestamp == null) {
             throw new InvalidArgumentException("Empty timestamp");
@@ -169,6 +181,23 @@ public class HDRRecommendationService {
 //        var t = DateConverter.toLocalDateTime(timestamp);
         return measurementRepository.listHDRMeasurement(timestamp, key, value).stream()
                 .map(it -> MeasurementDAOResponse.create(it, null, null))
+                .collect(Collectors.toList());
+    }
+
+    public List<MeasurementDAOResponse> getRecommendationMeasurements(String key, String value) {
+        if (key == null) {
+            throw new InvalidArgumentException("Empty timestamp");
+        }
+
+//        var t = DateConverter.toLocalDateTime(timestamp);
+        return measurementRepository.listHDRRecommendationMeasurement(key, value).stream()
+                .map(it -> {
+                    var m = MeasurementDAOResponse.create(it, null, null);
+                    var tags = measurementRepository.getTags(m.getId())
+                            .stream().map(MeasurementTagsDAO::create).toList();
+                    m.setTags(tags);
+                    return m;
+                })
                 .collect(Collectors.toList());
     }
 

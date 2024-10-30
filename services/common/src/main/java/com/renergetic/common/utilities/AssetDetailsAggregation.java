@@ -2,6 +2,7 @@ package com.renergetic.common.utilities;
 
 import com.renergetic.common.model.details.AssetDetails;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class AssetDetailsAggregation {
         if(split.length > 2 || split.length == 0)
             return false;
 
-        if(StringUtils.isNumeric(split[0])) {
+        if(NumberUtils.isCreatable(split[0])) {
             if(split.length == 2 && suffix.isEmpty())
                 suffix.append(split[1]);
             return true;
@@ -59,7 +60,7 @@ public class AssetDetailsAggregation {
         if(split.length > 2 || split.length == 0)
             return Double.NaN;
 
-        if(StringUtils.isNumeric(split[0]))
+        if(NumberUtils.isCreatable(split[0]))
             return Double.parseDouble(split[0]);
         return Double.NaN;
     }

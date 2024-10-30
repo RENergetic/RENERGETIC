@@ -136,7 +136,7 @@ public class KubeflowPipelineService {
 
     }
 
-    public PipelineRunDAO startRun(String pipelineId, Map<String, Object> params) {
+    public PipelineRunDAO startRun(String pipelineId, String name, Map<String, Object> params) {
         var wd = pipelineRepository.findById(pipelineId)
                 .orElseThrow(() -> new NotFoundException(
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
@@ -150,6 +150,7 @@ public class KubeflowPipelineService {
 
                     var kfPipeline = kubeflowService.getPipeline(pipelineId);
                     PipelineRunDAO runDAO = startKubeflowRun(wd, params);
+                    runDAO.setName(name);
                     var now = DateConverter.now();
                     PipelineRun currentRun = runDAO.mapToEntity();
                     currentRun.setInitTime(now);
@@ -350,7 +351,8 @@ public class KubeflowPipelineService {
     }
 
 
-    private PipelineRunDAO startKubeflowRun(PipelineDefinition wd, Map<String, Object> params) throws IllegalAccessException {
+    private PipelineRunDAO startKubeflowRun(PipelineDefinition wd,
+                                            Map<String, Object> params) throws IllegalAccessException {
 
         PipelineDefinitionDAO definitionDAO = PipelineDefinitionDAO.create(wd);
         PipelineRunDAO runDAO;
@@ -498,7 +500,8 @@ public class KubeflowPipelineService {
 
     //#region properties
     @Transactional
-    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, String propertyKey, String propertyValue, Optional<Boolean> unique) {
+    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, String propertyKey, String propertyValue,
+                                                     Optional<Boolean> unique) {
 //        if (unique.isPresent() && unique.get()) {
 //            clearProperty(propertyKey);
 //        }
@@ -511,7 +514,8 @@ public class KubeflowPipelineService {
     }
 
     @Transactional
-    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, PipelineDefinitionPropertyDAO propertyDAO, Optional<Boolean> unique) {
+    public PipelineDefinitionPropertyDAO setProperty(String pipelineId, PipelineDefinitionPropertyDAO propertyDAO,
+                                                     Optional<Boolean> unique) {
 //        if (unique.isPresent() && unique.get()) {
 //            clearProperty(propertyDAO.getKey());
 //        }
@@ -519,7 +523,8 @@ public class KubeflowPipelineService {
     }
 
     @Transactional
-    private PipelineDefinitionPropertyDAO setProperty(String pipelineId, PipelineDefinitionPropertyDAO propertyDAO, Boolean unique, Boolean update) {
+    private PipelineDefinitionPropertyDAO setProperty(String pipelineId, PipelineDefinitionPropertyDAO propertyDAO,
+                                                      Boolean unique, Boolean update) {
         Optional<PipelineDefinition> byId = pipelineRepository.findById(pipelineId);
         PipelineDefinition pd;
         if (byId.isPresent()) {
@@ -555,7 +560,8 @@ public class KubeflowPipelineService {
 
 
     @Transactional
-    private PipelineDefinitionPropertyDAO setProperty(PipelineDefinition pipeline, PipelineDefinitionPropertyDAO propertyDAO, Boolean update) {
+    private PipelineDefinitionPropertyDAO setProperty(PipelineDefinition pipeline,
+                                                      PipelineDefinitionPropertyDAO propertyDAO, Boolean update) {
 
 
         PipelineDefinitionProperty property;
@@ -594,7 +600,8 @@ public class KubeflowPipelineService {
 
     }
 
-    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue, Boolean visible, Boolean admin) {
+    public List<PipelineDefinitionDAO> getByProperty(String propertyKey, String propertyValue, Boolean visible,
+                                                     Boolean admin) {
         var s = pipelineRepository.findByProperty(propertyKey, propertyValue, visible).stream();
         return s.map((it) -> {
             try {

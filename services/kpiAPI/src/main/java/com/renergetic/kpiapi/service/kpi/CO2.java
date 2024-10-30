@@ -5,15 +5,17 @@ import com.renergetic.kpiapi.model.InfluxFunction;
 import com.renergetic.kpiapi.model.KPI;
 import com.renergetic.kpiapi.model.KPIConstant;
 import com.renergetic.kpiapi.repository.KPIConstantRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Map;
-@Service
+
+@Setter
 public class CO2 implements KPIFormula {
-    @Autowired
+
+
     private KPIConstantRepository constantRepository;
+
     public final static CO2 Instance = new CO2();
 
     @Override
@@ -21,14 +23,14 @@ public class CO2 implements KPIFormula {
         return KPI.CO2;
     }
 
-    private static AbstractMeterKPIConfig[] requiredMeters = {
-            new AbstractMeterKPIConfig( AbstractMeter.LRS, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.ENS, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.ERS, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.LNS, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.LOAD, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.LOSSES, InfluxFunction.SUM,0),
-            new AbstractMeterKPIConfig( AbstractMeter.STORAGE, InfluxFunction.SUM,0)
+    private static final AbstractMeterKPIConfig[] requiredMeters = {
+            new AbstractMeterKPIConfig(AbstractMeter.LRS, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.ENS, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.ERS, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.LNS, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.LOAD, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.LOSSES, InfluxFunction.SUM, 0),
+            new AbstractMeterKPIConfig(AbstractMeter.STORAGE, InfluxFunction.SUM, 0)
 
     };
 
@@ -37,6 +39,7 @@ public class CO2 implements KPIFormula {
     public BigDecimal calculate(Map<AbstractMeter, Double> values, Map<AbstractMeter, Double> previous) {
         return this.calculate(values);
     }
+
     @Override
     public BigDecimal calculate(Map<AbstractMeter, Double> values) {
 ////        todo review this kpi
@@ -44,7 +47,7 @@ public class CO2 implements KPIFormula {
 
 //        log.debug(String.format("Constants: a -> %.2f | b -> %.2f | g -> %.2f | d -> %.2f", c.getAlpha(), c.getBeta(), c.getGamma(), c.getDelta()));
 
-        Double result = ((c.getAlpha() * values.get(AbstractMeter.LRS) + c.getBeta() * values.get(AbstractMeter.ERS) +
+        double result = ((c.getAlpha() * values.get(AbstractMeter.LRS) + c.getBeta() * values.get(AbstractMeter.ERS) +
                 c.getGamma() * values.get(AbstractMeter.ENS) + c.getDelta() * values.get(AbstractMeter.LNS))) /
                 (values.get(AbstractMeter.LOAD) + values.get(AbstractMeter.LOSSES) + values.get(AbstractMeter.STORAGE));
 
