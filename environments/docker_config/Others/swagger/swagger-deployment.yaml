@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: swagger-ui
-          image: docker-registry.default.svc:5000/ren-prototype-devops/swagger-ui:latest
-          imagePullPolicy: Never
+          image: docker-registry.default.svc:5000/ren-prototype-devops/swaggerui:latest
+          imagePullPolicy: Always
           ports:
             - name: api-http
               containerPort: 8080

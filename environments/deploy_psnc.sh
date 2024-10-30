@@ -446,11 +446,12 @@ installPSNC() {
         kubectl delete deployments/swagger-ui  --namespace=ren-prototype-devops
         kubectl delete services/swagger-ui-sv  --namespace=ren-prototype-devops
 
-        docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype-devops/swagger-ui:latest .
-        docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
-        docker push registry.apps.paas-dev.psnc.pl/ren-prototype-devops/swagger-ui:latest
+        # docker build --no-cache --force-rm --tag=registry.apps.paas-dev.psnc.pl/ren-prototype-devops/swaggerui:latest .
+        # docker login -u $user -p $token https://registry.apps.paas-dev.psnc.pl/
+        # docker push registry.apps.paas-dev.psnc.pl/ren-prototype-devops/swaggerui:latest
 
         # create kubernetes resources
+        kubectl apply -f swagger-deployment.yaml  --namespace=ren-prototype-devops
         kubectl apply -f swagger-config.yaml  --namespace=ren-prototype-devops
         kubectl apply -f swagger-service.yaml  --namespace=ren-prototype-devops
     fi
@@ -512,7 +513,7 @@ rm -rf ~/.kube
 # Connect to PSNC server and log in at Docker
 if oc login $serverUrl --token=$token;
 then
-    compileApp
+    # compileApp
 
     if [[ $_project = 'all' ]]
     then 
