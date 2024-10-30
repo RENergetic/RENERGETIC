@@ -111,7 +111,14 @@ public class WebSecurityConfig {
         configureRoles(adminUrl, adminRoles, getUrls, postUrls, putUrls, deleteUrls);
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>
-                .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
+                .ExpressionInterceptUrlRegistry registrySwagger = http.csrf().disable().authorizeRequests();
+                
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>
+                .ExpressionInterceptUrlRegistry registry = registrySwagger
+                .antMatchers(HttpMethod.GET, "/api/docs/**", "/api/docs-ui/**", "/api/swagger-ui/**")
+                .permitAll()
+                .and()
+                .authorizeRequests();
 
         getUrls.forEach((urlPattern, roles) -> {
             registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);

@@ -2,7 +2,6 @@ package com.renergetic.kpiapi.config;
 
 import com.renergetic.common.model.security.KeycloakRole;
 
-import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -84,7 +83,14 @@ public class WebSecurityConfig {
         deleteUrls.put(url, kpiRoles);
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>
-                .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
+                .ExpressionInterceptUrlRegistry registrySwagger = http.csrf().disable().authorizeRequests();
+                
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>
+                .ExpressionInterceptUrlRegistry registry = registrySwagger
+                .antMatchers(HttpMethod.GET, "/api/docs/**", "/api/docs-ui/**", "/api/swagger-ui/**")
+                .permitAll()
+                .and()
+                .authorizeRequests();
 
         getUrls.forEach((urlPattern, roles) -> {
             registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);

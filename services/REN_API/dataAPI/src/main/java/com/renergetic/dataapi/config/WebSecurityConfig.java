@@ -87,7 +87,14 @@ public class WebSecurityConfig {
             KeycloakRole.REN_TECHNICAL_MANAGER.name});
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>
-                .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
+                .ExpressionInterceptUrlRegistry registrySwagger = http.csrf().disable().authorizeRequests();
+                
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>
+                .ExpressionInterceptUrlRegistry registry = registrySwagger
+                .antMatchers(HttpMethod.GET, "/api/docs/**", "/api/docs-ui/**", "/api/swagger-ui/**")
+                .permitAll()
+                .and()
+                .authorizeRequests();
 
         getUrls.forEach((urlPattern, roles) -> {
             registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);

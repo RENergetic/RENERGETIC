@@ -39,10 +39,11 @@ public class InformationPanelController {
     })
     @PostMapping(path = "/infermeasurements", produces = "application/json", consumes = "application/json")
     public ResponseEntity<InformationPanelDAO> inferMeasurementsForPanel(
+            @RequestParam(required = false,name = "infer")Boolean infer,
              @RequestBody InformationPanelDAO informationPanelDAORequest) {
 
 
-        return new ResponseEntity<>(informationPanelService.inferMeasurements(informationPanelDAORequest ),
+        return new ResponseEntity<>(informationPanelService.inferMeasurements(informationPanelDAORequest,infer ),
                 HttpStatus.OK);
     }
 

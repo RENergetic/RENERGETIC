@@ -39,6 +39,8 @@ public class WebSecurityConfig {
 
     @Value(value = "${keycloak.client-id}")
     private String clientId;
+    @Value(value = "${enable.security}")
+    private boolean enableSecurity;
 
     @Bean
     protected JwtAuthenticationProvider authenticationProvider() throws Exception {
@@ -59,6 +61,10 @@ public class WebSecurityConfig {
         http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(filter, FilterSecurityInterceptor.class);
         
+        if (!enableSecurity) {
+            http.authorizeRequests().anyRequest().permitAll();
+            return http.build();
+        }
         Map<String, String[]> getUrls = new HashMap<>();
         Map<String, String[]> postUrls = new HashMap<>();
         Map<String, String[]> putUrls = new HashMap<>();
@@ -77,7 +83,14 @@ public class WebSecurityConfig {
         deleteUrls.put(url, apiRoles);
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>
-                .ExpressionInterceptUrlRegistry registry = http.csrf().disable().authorizeRequests();
+                .ExpressionInterceptUrlRegistry registrySwagger = http.csrf().disable().authorizeRequests();
+                
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>
+                .ExpressionInterceptUrlRegistry registry = registrySwagger
+                .antMatchers(HttpMethod.GET, "/api/docs/**", "/api/docs-ui/**", "/api/swagger-ui/**")
+                .permitAll()
+                .and()
+                .authorizeRequests();
 
         getUrls.forEach((urlPattern, roles) -> {
             registry.antMatchers(HttpMethod.GET, urlPattern).hasAnyRole(roles);
@@ -95,7 +108,6 @@ public class WebSecurityConfig {
             registry.antMatchers(HttpMethod.DELETE, urlPattern).hasAnyRole(roles);
         });
         registry.anyRequest().authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        //registry.anyRequest().permitAll();
 
         return http.build();
     }

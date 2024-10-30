@@ -140,7 +140,8 @@ public class InformationPanelService {
         return informationTilePanelMapper.toDTO(infoPanelEntity, false);
     }
 
-    public InformationPanelDAO inferMeasurements(InformationPanelDAO informationPanel) {
+    public InformationPanelDAO inferMeasurements(InformationPanelDAO informationPanel, Boolean infer) {
+        final boolean inferMeasurements = infer == null || infer;
         var tiles = informationPanel.getTiles();
         MeasurementTags panelTag;
         if (informationPanel.getProps().containsKey("tag_key")) {
@@ -151,6 +152,7 @@ public class InformationPanelService {
         } else {
             panelTag = new MeasurementTags();
         }
+
         tiles.forEach(tile -> {
             MeasurementTags mtag;
             if (tile.getProps().containsKey("tag_key")) {
@@ -164,7 +166,14 @@ public class InformationPanelService {
             List<MeasurementTileDAORequest> collect = tile.getMeasurements()
                     .stream().map(
                             tileM -> {
-                                if (tileM.getId() == null) {
+                                if (tileM.getId() == null && !inferMeasurements) {
+                                    if (tileM.getAsset() != null) {
+                                        Asset byName = assetRepository.findByName(tileM.getAsset().getName()).orElseThrow(NotFoundException::new);
+                                        tileM.setAsset(SimpleAssetDAO.create(byName));
+                                    }
+                                    return List.of(tileM);
+                                } else if (tileM.getId() == null) {
+
                                     //infer type
                                     if (tileM.getType() != null
                                             && (tileM.getType().getId() != null
@@ -180,7 +189,6 @@ public class InformationPanelService {
                                         }
                                     }
 
-
                                     var l = getInferredMeasurements(tileM, assetId, panelTag, mtag);
                                     if (l.isEmpty()) {
                                         //return non inferred measurements so the client can see what's missing
@@ -188,9 +196,10 @@ public class InformationPanelService {
                                     }
                                     return l;
                                 } else {
-                                    // FIXME: here a measurement is retrieved from the database but it isn't used
-                                    measurementRepository.findById(tileM.getId()).orElseThrow(
-                                            () -> new NotFoundException("Measurement not found " + tileM.getId()));
+                                    if (!measurementRepository.existsById(tileM.getId())) {
+                                        throw new NotFoundException("Measurement not found " + tileM.getId());
+                                    }
+
                                     return List.of(tileM);
                                 }
 
