@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: swagger-config
+data:
+  SUPPORTED_SUBMIT_METHODS: '[]'
+  URLS: |
+    [
+      {
+        "name": "Base API", 
+        "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-base/1.0/api/docs"
+      },
+      {
+        "name": "Data API", 
+        "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-data/1.0/api/docs"
+      },
+      {
+        "name": "User API", 
+        "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-user/1.0/api/docs"
+      },
+      {
+        "name": "Wrapper API", 
+        "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-wrapper/1.0/api/docs"
+      },
+      {
+        "name": "HDR API", 
+        "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-hdr/1.0/api/docs"
+      },
+      {
+        "name": "KPI API", 
+        "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-kpi/1.0/api/docs"
+      },
+      {
+        "name": "Kubeflow API", 
+        "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-kubeflow/1.0/api/docs"
+      },
+      {
+        "name": "Ingestion API", 
+        "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-ingestion/1.0/api/docs"
+      },
+    ]
