@@ -38,4 +38,8 @@ data:
         "name": "Ingestion API", 
         "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-ingestion/1.0/api/docs"
       },
+      {
+        "name": "Influx API", 
+        "url": "https://front-ren-prototype.apps.paas-dev.psnc.pl/api-measurement/1.0/api/docs"
+      },
     ]
