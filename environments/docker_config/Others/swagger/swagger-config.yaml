@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: swagger-config
 data:
+  SUPPORTED_SUBMIT_METHODS: '[]'
   URLS: |
     [
       {
