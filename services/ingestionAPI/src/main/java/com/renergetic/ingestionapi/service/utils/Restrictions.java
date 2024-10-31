@@ -35,8 +35,9 @@ public class Restrictions {
 			if (isValid) {
 				measurement.getTags().forEach((key, value) -> {
 					if (key != null && restrictions.getTags().containsKey(key)) {
-						String valueFilter = restrictions.getTags().get(key);
-						if (valueFilter != null && !value.matches(valueFilter))
+						List<String> valueFilter = restrictions.getTags().get(key);
+						if (valueFilter != null && !valueFilter.isEmpty() && 
+							!valueFilter.contains(null) && !valueFilter.contains(value))
 							errors.add(String.format("'%s' isn't a valid value to the tag '%s'", value, key));
 					} else {
 						errors.add(String.format("'%s' isn't a valid tag name", key));
