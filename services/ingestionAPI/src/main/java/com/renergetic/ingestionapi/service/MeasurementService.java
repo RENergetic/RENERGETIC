@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import com.renergetic.ingestionapi.model.Tags;
+import com.renergetic.ingestionapi.model.TagsData;
 import com.renergetic.ingestionapi.repository.TagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -137,7 +137,11 @@ public class MeasurementService {
 	}
 	
 	public List<String> getMeasurementNames(){
-		return repository.findByAssetIsNullAndAssetCategoryIsNull().stream().map(Measurement::getSensorName).collect(Collectors.toList());
+		return new ArrayList<>(repository
+			.findByAssetIsNullAndAssetCategoryIsNull()
+			.stream()
+			.map(Measurement::getSensorName)
+			.collect(Collectors.toSet()));
 	}
 	
 	public List<FieldRestrictionsDAO> getFieldRestrictions(){
@@ -148,10 +152,21 @@ public class MeasurementService {
 			.collect(Collectors.toList());
 	}
 	
-	public Map<String, String> getTagsRestrictions(){
-		List<Tags> tags = tagsRepository.findByMeasurementIdIsNull();
+	public Map<String, List<String>> getTagsRestrictions(){
+		List<TagsData> tags = tagsRepository.findDistinct();
 
-		return tags.stream().collect(HashMap<String, String>::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
+		Map<String, List<String>> ret = new HashMap<>();
+		tags.forEach(tag -> {
+			if (ret.containsKey(tag.getKey()))
+				ret.get(tag.getKey()).add(tag.getValue());
+			else {
+				List<String> values = new ArrayList<>();
+				values.add(tag.getValue());
+				ret.put(tag.getKey(), values);
+			}
+		});
+
+		return ret;
 	}
 
 	public void addDefaultTags(MeasurementIngestionDAO measurement) {
