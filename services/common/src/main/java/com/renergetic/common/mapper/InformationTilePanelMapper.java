@@ -54,8 +54,8 @@ public class InformationTilePanelMapper {
     public InformationPanelDAOResponse toDTO(InformationPanel entity, Boolean detailed) {
         if (entity == null)
             return null;
-
         InformationPanelDAOResponse dao = new InformationPanelDAOResponse();
+        dao.setPriority(entity.getPriority());
         dao.setId(entity.getId());
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());

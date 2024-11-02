@@ -72,6 +72,10 @@ public class InformationPanel {
     @NotFound(action = NotFoundAction.IGNORE)
     private List<InformationTile> tiles;
 
+    @ManyToOne
+    @JoinColumn(name = "base_information_panel_id",nullable = true)
+    private InformationPanel informationPanel;
+
 
     @Column(name = "props", nullable = true, insertable = true, updatable = true, unique = false,columnDefinition="TEXT")
     private String props;

@@ -19,8 +19,8 @@ public class InformationPanelMapper {
     public InformationPanel toEntity(InformationPanelDAORequest dto) {
         if (dto == null)
             return null;
-        
-        InformationPanel entity =  new InformationPanel();
+
+        InformationPanel entity = new InformationPanel();
         entity.setId(dto.getId());
 
         entity.setLabel(dto.getLabel());
@@ -65,6 +65,7 @@ public class InformationPanelMapper {
         if (entity == null)
             return null;
         InformationPanelDAOResponse dao = new InformationPanelDAOResponse();
+        dao.setPriority(entity.getPriority());
         dao.setId(entity.getId());
         dao.setName(entity.getName());
         dao.setLabel(entity.getLabel());
