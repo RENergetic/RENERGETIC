@@ -41,4 +41,7 @@ public class PipelineRun {
 
     @Column(nullable = true, name = "state")
     private String state;
+
+    @Column(name = "results", columnDefinition = "TEXT")
+    private String results;
 }
