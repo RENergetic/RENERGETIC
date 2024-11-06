@@ -5095,6 +5095,236 @@ data:
               ]
             }
           ]
+        },
+        {
+          "endpoint": "/api-base/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://base-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-data/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://data-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-user/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://user-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-wrapper/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://wrapper-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kpi/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kubeflow/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kubeflow-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-measurement/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://influx-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-ingestion/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://ingestion-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-rules/1.0/api/docs",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/docs",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://rules-api-sv:8082"
+              ]
+            }
+          ]
         }
       ],
       "extra_config": {
