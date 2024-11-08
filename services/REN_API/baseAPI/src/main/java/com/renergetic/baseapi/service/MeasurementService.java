@@ -144,8 +144,21 @@ public class MeasurementService {
                     typeId = t.get().getId();
                 }
             }
-            return !measurementRepository.findMeasurements(
-                    null, null, it.getName(), it.getSensorName(),
+            Long assetId = null;
+            if (it.getAsset()!=null ) {
+                Asset asset = assetRepository.findById(it.getAsset().getId()).orElse(null);
+                if (asset == null || !asset.getName().equals(it.getAsset().getName())) {
+                    it.setAsset(SimpleAssetDAO.create(
+                            assetRepository.findByName(it.getAsset().getName()).orElseThrow(() ->
+                                    new NotFoundException("Asset does not exist " + it.getAsset().getName() + " found"))));
+
+                }
+                assetId = it.getAsset().getId();
+
+
+            }
+            return measurementRepository.findMeasurements(
+                    assetId, null, it.getName(), it.getSensorName(),
                     it.getDomain() != null ? it.getDomain().name() : null, it.getDirection() != null ? it.getDirection().name() : null,
                     typeId, null, 0, 1).isEmpty();
 
