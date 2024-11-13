@@ -44,4 +44,6 @@ public class PipelineRun {
 
     @Column(name = "results", columnDefinition = "TEXT")
     private String results;
+    @Column(name = "ext", columnDefinition = "TEXT")
+    private String ext ;
 }
