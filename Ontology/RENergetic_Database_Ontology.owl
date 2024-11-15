@@ -1,0 +1,3185 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.semanticweb.org/elias/ontologies/2023/1/RENergetic-Ontology"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     ontologyIRI="http://www.semanticweb.org/elias/ontologies/2023/1/RENergetic-Ontology">
+    <Prefix name="" IRI="http://www.semanticweb.org/elias/ontologies/2023/1/RENergetic-Ontology"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Declaration>
+        <Class IRI="#Action"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Action_Type"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Aggregation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Alert_Threshold"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CO2eq_unit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Degree_celcius"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Degree_fahrenheit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Direction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Domain"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Electricity"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Energy_unit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Fixed_Consumption"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Fixed_Generation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Flexible_Consumption"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Flexible_Generation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Flow_unit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Gas"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Heat"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Heat_Pump"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Interconnector"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Kilowatt"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Kilowatt_hours"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Notification"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Optimizer_Component"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Optimizer_Domain"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Percentage"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Power_unit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Prediction_Window"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Asset"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Building"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_BuildingComponents"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Co-generationUnit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_CoalPlant"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Device"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_DistrictCooling"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_DistrictHeating"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_EVChargingStation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Electricity"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_EnergyIsland"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_ExternalElectricityGrid"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_ExternalHeatGrid"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Flat"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_GasBoiler"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Generation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_GenerationPlant"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_HeatPump"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Measurement"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Measurement_Type"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_PVPlant"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Room"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_SolarThermalCollector"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_Steam"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#REN_User"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Storage"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Tag"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Temperature_unit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#UI_Component"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Unit_of_measure"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Unknown"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#User_Demand_Definition"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#User_Demand_Schedule"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#User_Notification"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#User_roles"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#User_settings"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Voltage"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Watt"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Watt_hours"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#m3_per_h"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#aggregates_measurements"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#alert_for_measurement"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#asset_detail"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#connects_from"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#connects_to"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#consumes_from"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#domain_connection"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#for_user"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#generates_to"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#generation"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_action"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_action_type"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_aggregation"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_asset_connection"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_base_unit"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_demand_definition"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_direction"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_domain"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_energy_island"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_measurement_type"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_notification"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_parent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_role"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_sensor"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_tag"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_unit"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#has_user"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#load"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#measurement_for_asset"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#notification_for_asset"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#represents"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#schedule_for_asset"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#settings_of"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_cost"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_external"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_load"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_max"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_max_capacity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_max_charge"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_max_discharge"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_max_generation"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_max_in"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_max_load"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_max_out"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_mu"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_time_from"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregates_parameter_time_to"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregation_interval"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#aggregation_type"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#asset_detail"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#date_from"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#date_to"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_action_type"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_description"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_factor"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_geo_location"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_label"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_message"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_name"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_sensor_name"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_timestamp"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_uuid"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#has_value"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_cost"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_external"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_load"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_max"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_max_capacity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_max_charge"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_max_discharge"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_max_generation"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_max_in"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_max_load"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_max_out"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_mu"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_time_from"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#parameter_time_to"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#starts_at"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#stops_at"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#stores_settings_as_JSON"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#threshold_constraint"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#threshold_type"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#threshold_update"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#update_at"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Administrator"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Developer"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Electricity"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Energy_Island_Manager"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Guest"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Heat"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Max"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Mean"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Min"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Staff"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Sum"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Technical_Manager"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#User"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Visitor"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#charge_battery"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#decrease"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#decrease_temperature"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#default"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#in"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#increase"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#increase_temperature"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#none"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#out"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#start"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#stop"/>
+    </Declaration>
+    <SubClassOf>
+        <Class IRI="#Action"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#has_name"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Action_Type"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#has_action_type"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Alert_Threshold"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#alert_for_measurement"/>
+            <Class IRI="#REN_Measurement"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Alert_Threshold"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#aggregation_interval"/>
+            <Datatype abbreviatedIRI="xsd:int"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Alert_Threshold"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#aggregation_type"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Alert_Threshold"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#threshold_constraint"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Alert_Threshold"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#threshold_type"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Alert_Threshold"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#threshold_update"/>
+            <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CO2eq_unit"/>
+        <Class IRI="#Unit_of_measure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Degree_celcius"/>
+        <Class IRI="#Temperature_unit"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Degree_fahrenheit"/>
+        <Class IRI="#Temperature_unit"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Direction"/>
+        <Class IRI="#Tag"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Domain"/>
+        <Class IRI="#Tag"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Electricity"/>
+        <Class IRI="#Optimizer_Domain"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Energy_unit"/>
+        <Class IRI="#Unit_of_measure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Fixed_Consumption"/>
+        <Class IRI="#Optimizer_Component"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Fixed_Consumption"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#consumes_from"/>
+            <Class IRI="#Optimizer_Domain"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Fixed_Consumption"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#load"/>
+            <Class IRI="#REN_Measurement"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Fixed_Generation"/>
+        <Class IRI="#Optimizer_Component"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Fixed_Generation"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="#represents"/>
+            <Class IRI="#REN_Generation"/>
+        </ObjectAllValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Fixed_Generation"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#generates_to"/>
+            <Class IRI="#Optimizer_Domain"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Fixed_Generation"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#generation"/>
+            <Class IRI="#REN_Measurement"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Consumption"/>
+        <Class IRI="#Optimizer_Component"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Consumption"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_cost"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Consumption"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_external"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Consumption"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_max_load"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Consumption"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#parameter_cost"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Generation"/>
+        <Class IRI="#Optimizer_Component"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Generation"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="#represents"/>
+            <Class IRI="#REN_Generation"/>
+        </ObjectAllValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Generation"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#generates_to"/>
+            <Class IRI="#Optimizer_Domain"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Generation"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_cost"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Generation"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_external"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flexible_Generation"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_max_generation"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Flow_unit"/>
+        <Class IRI="#Unit_of_measure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Gas"/>
+        <Class IRI="#Optimizer_Domain"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Heat"/>
+        <Class IRI="#Optimizer_Domain"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Heat_Pump"/>
+        <Class IRI="#Interconnector"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Heat_Pump"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="#connects_from"/>
+            <Class IRI="#Electricity"/>
+        </ObjectAllValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Heat_Pump"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="#connects_to"/>
+            <Class IRI="#Heat"/>
+        </ObjectAllValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Heat_Pump"/>
+        <ObjectAllValuesFrom>
+            <ObjectProperty IRI="#represents"/>
+            <Class IRI="#REN_HeatPump"/>
+        </ObjectAllValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Interconnector"/>
+        <Class IRI="#Optimizer_Component"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Interconnector"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#connects_from"/>
+            <Class IRI="#Optimizer_Domain"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Interconnector"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#connects_to"/>
+            <Class IRI="#Optimizer_Domain"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Interconnector"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_max_in"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Interconnector"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_max_out"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Interconnector"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_mu"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Kilowatt"/>
+        <Class IRI="#Power_unit"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Kilowatt_hours"/>
+        <Class IRI="#Energy_unit"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Notification"/>
+        <Class IRI="#UI_Component"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Notification"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#notification_for_asset"/>
+            <Class IRI="#REN_Asset"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Notification"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#date_from"/>
+            <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Notification"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#date_to"/>
+            <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Notification"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_message"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Optimizer_Component"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="#represents"/>
+            <Class IRI="#REN_Asset"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Percentage"/>
+        <Class IRI="#Unit_of_measure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Power_unit"/>
+        <Class IRI="#Unit_of_measure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Prediction_Window"/>
+        <Class IRI="#Tag"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Asset"/>
+        <ObjectMinCardinality cardinality="0">
+            <ObjectProperty IRI="#has_asset_connection"/>
+            <Class IRI="#REN_Asset"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Asset"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_parent"/>
+            <Class IRI="#REN_Asset"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Asset"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_user"/>
+            <Class IRI="#REN_User"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Asset"/>
+        <DataMinCardinality cardinality="0">
+            <DataProperty IRI="#asset_detail"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Asset"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_geo_location"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Asset"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_name"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Asset"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_uuid"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Building"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_BuildingComponents"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Co-generationUnit"/>
+        <Class IRI="#REN_Generation"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_CoalPlant"/>
+        <Class IRI="#REN_Generation"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Device"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_DistrictCooling"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_DistrictHeating"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_EVChargingStation"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Electricity"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_EnergyIsland"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_ExternalElectricityGrid"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_ExternalHeatGrid"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Flat"/>
+        <Class IRI="#REN_BuildingComponents"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_GasBoiler"/>
+        <Class IRI="#REN_Device"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Generation"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_GenerationPlant"/>
+        <Class IRI="#REN_Generation"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_HeatPump"/>
+        <Class IRI="#REN_Device"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement"/>
+        <ObjectMinCardinality cardinality="0">
+            <ObjectProperty IRI="#has_tag"/>
+            <Class IRI="#Tag"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_aggregation"/>
+            <Class IRI="#Aggregation"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_direction"/>
+            <Class IRI="#Direction"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_domain"/>
+            <Class IRI="#Domain"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_energy_island"/>
+            <Class IRI="#REN_EnergyIsland"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_measurement_type"/>
+            <Class IRI="#REN_Measurement_Type"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#measurement_for_asset"/>
+            <Class IRI="#REN_Asset"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_label"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_sensor_name"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement_Type"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_base_unit"/>
+            <Class IRI="#Unit_of_measure"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement_Type"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_unit"/>
+            <Class IRI="#Unit_of_measure"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement_Type"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_description"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement_Type"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_factor"/>
+            <Datatype abbreviatedIRI="xsd:double"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Measurement_Type"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_label"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_PVPlant"/>
+        <Class IRI="#REN_Generation"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Room"/>
+        <Class IRI="#REN_BuildingComponents"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_SolarThermalCollector"/>
+        <Class IRI="#REN_Device"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_Steam"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_User"/>
+        <Class IRI="#REN_Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_User"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_role"/>
+            <Class IRI="#User_roles"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#REN_User"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_uuid"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Storage"/>
+        <Class IRI="#Optimizer_Component"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Storage"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#consumes_from"/>
+            <Class IRI="#Optimizer_Domain"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Storage"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#domain_connection"/>
+            <Class IRI="#Optimizer_Domain"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Storage"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_max_capacity"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Storage"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_max_charge"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Storage"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_max_discharge"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Storage"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_mu"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Tag"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#has_value"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Temperature_unit"/>
+        <Class IRI="#Unit_of_measure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+        <Class IRI="#Optimizer_Component"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#consumes_from"/>
+            <Class IRI="#Optimizer_Domain"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_load"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_max"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_time_from"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#aggregates_parameter_time_to"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Unknown"/>
+        <Class IRI="#Optimizer_Domain"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Demand_Definition"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_action"/>
+            <Class IRI="#Action"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Demand_Definition"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_action_type"/>
+            <Class IRI="#Action_Type"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Demand_Definition"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#has_message"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Demand_Schedule"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_demand_definition"/>
+            <Class IRI="#User_Demand_Definition"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Demand_Schedule"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#schedule_for_asset"/>
+            <Class IRI="#REN_Asset"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Demand_Schedule"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#starts_at"/>
+            <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Demand_Schedule"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#stops_at"/>
+            <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Demand_Schedule"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#update_at"/>
+            <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Notification"/>
+        <Class IRI="#UI_Component"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Notification"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#for_user"/>
+            <Class IRI="#REN_User"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_Notification"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#has_notification"/>
+            <Class IRI="#Notification"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_settings"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#settings_of"/>
+            <Class IRI="#REN_User"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#User_settings"/>
+        <DataMaxCardinality cardinality="1">
+            <DataProperty IRI="#stores_settings_as_JSON"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Voltage"/>
+        <Class IRI="#Unit_of_measure"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Watt"/>
+        <Class IRI="#Power_unit"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Watt_hours"/>
+        <Class IRI="#Energy_unit"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#m3_per_h"/>
+        <Class IRI="#Flow_unit"/>
+    </SubClassOf>
+    <ClassAssertion>
+        <Class IRI="#User_roles"/>
+        <NamedIndividual IRI="#Administrator"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#User_roles"/>
+        <NamedIndividual IRI="#Developer"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Domain"/>
+        <NamedIndividual IRI="#Electricity"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#User_roles"/>
+        <NamedIndividual IRI="#Energy_Island_Manager"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#User_roles"/>
+        <NamedIndividual IRI="#Guest"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Domain"/>
+        <NamedIndividual IRI="#Heat"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Aggregation"/>
+        <NamedIndividual IRI="#Max"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Aggregation"/>
+        <NamedIndividual IRI="#Mean"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Aggregation"/>
+        <NamedIndividual IRI="#Min"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#User_roles"/>
+        <NamedIndividual IRI="#Staff"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Aggregation"/>
+        <NamedIndividual IRI="#Sum"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#User_roles"/>
+        <NamedIndividual IRI="#Technical_Manager"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#User_roles"/>
+        <NamedIndividual IRI="#User"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#User_roles"/>
+        <NamedIndividual IRI="#Visitor"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Action"/>
+        <NamedIndividual IRI="#charge_battery"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Action_Type"/>
+        <NamedIndividual IRI="#decrease"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Action"/>
+        <NamedIndividual IRI="#decrease_temperature"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Action_Type"/>
+        <NamedIndividual IRI="#default"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Direction"/>
+        <NamedIndividual IRI="#in"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Action_Type"/>
+        <NamedIndividual IRI="#increase"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Action"/>
+        <NamedIndividual IRI="#increase_temperature"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Direction"/>
+        <NamedIndividual IRI="#none"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Direction"/>
+        <NamedIndividual IRI="#out"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Action_Type"/>
+        <NamedIndividual IRI="#start"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Action_Type"/>
+        <NamedIndividual IRI="#stop"/>
+    </ClassAssertion>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Administrator"/>
+        <NamedIndividual IRI="#Developer"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Administrator"/>
+        <NamedIndividual IRI="#Energy_Island_Manager"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Administrator"/>
+        <NamedIndividual IRI="#Guest"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Administrator"/>
+        <NamedIndividual IRI="#Staff"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Administrator"/>
+        <NamedIndividual IRI="#Technical_Manager"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Administrator"/>
+        <NamedIndividual IRI="#User"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Administrator"/>
+        <NamedIndividual IRI="#Visitor"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Developer"/>
+        <NamedIndividual IRI="#Energy_Island_Manager"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Developer"/>
+        <NamedIndividual IRI="#Guest"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Developer"/>
+        <NamedIndividual IRI="#Staff"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Developer"/>
+        <NamedIndividual IRI="#Technical_Manager"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Developer"/>
+        <NamedIndividual IRI="#User"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Developer"/>
+        <NamedIndividual IRI="#Visitor"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Energy_Island_Manager"/>
+        <NamedIndividual IRI="#Guest"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Energy_Island_Manager"/>
+        <NamedIndividual IRI="#Staff"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Energy_Island_Manager"/>
+        <NamedIndividual IRI="#Technical_Manager"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Energy_Island_Manager"/>
+        <NamedIndividual IRI="#User"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Energy_Island_Manager"/>
+        <NamedIndividual IRI="#Visitor"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Guest"/>
+        <NamedIndividual IRI="#Staff"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Guest"/>
+        <NamedIndividual IRI="#Technical_Manager"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Guest"/>
+        <NamedIndividual IRI="#User"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Guest"/>
+        <NamedIndividual IRI="#Visitor"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Staff"/>
+        <NamedIndividual IRI="#Technical_Manager"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Staff"/>
+        <NamedIndividual IRI="#User"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Staff"/>
+        <NamedIndividual IRI="#Visitor"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Technical_Manager"/>
+        <NamedIndividual IRI="#User"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#Technical_Manager"/>
+        <NamedIndividual IRI="#Visitor"/>
+    </DifferentIndividuals>
+    <DifferentIndividuals>
+        <NamedIndividual IRI="#User"/>
+        <NamedIndividual IRI="#Visitor"/>
+    </DifferentIndividuals>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_value"/>
+        <NamedIndividual IRI="#Electricity"/>
+        <Literal>Electricity</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_value"/>
+        <NamedIndividual IRI="#Heat"/>
+        <Literal>Heat</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_name"/>
+        <NamedIndividual IRI="#charge_battery"/>
+        <Literal>charge_battery</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_action_type"/>
+        <NamedIndividual IRI="#decrease"/>
+        <Literal>decrease</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_name"/>
+        <NamedIndividual IRI="#decrease_temperature"/>
+        <Literal>decrease_temperature</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_action_type"/>
+        <NamedIndividual IRI="#default"/>
+        <Literal>default</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_value"/>
+        <NamedIndividual IRI="#in"/>
+        <Literal>in</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_action_type"/>
+        <NamedIndividual IRI="#increase"/>
+        <Literal>increase</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_name"/>
+        <NamedIndividual IRI="#increase_temperature"/>
+        <Literal>increase_temperature</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_value"/>
+        <NamedIndividual IRI="#none"/>
+        <Literal>none</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_value"/>
+        <NamedIndividual IRI="#out"/>
+        <Literal>out</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_action_type"/>
+        <NamedIndividual IRI="#start"/>
+        <Literal>start</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#has_action_type"/>
+        <NamedIndividual IRI="#stop"/>
+        <Literal>stop</Literal>
+    </DataPropertyAssertion>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#connects_from"/>
+        <ObjectProperty IRI="#domain_connection"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#connects_to"/>
+        <ObjectProperty IRI="#domain_connection"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#consumes_from"/>
+        <ObjectProperty IRI="#domain_connection"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#generates_to"/>
+        <ObjectProperty IRI="#domain_connection"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#generation"/>
+        <ObjectProperty IRI="#asset_detail"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#load"/>
+        <ObjectProperty IRI="#asset_detail"/>
+    </SubObjectPropertyOf>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#aggregates_measurements"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#alert_for_measurement"/>
+        <Class IRI="#Alert_Threshold"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#asset_detail"/>
+        <ObjectUnionOf>
+            <Class IRI="#Optimizer_Component"/>
+            <Class IRI="#REN_Asset"/>
+        </ObjectUnionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#connects_from"/>
+        <Class IRI="#Interconnector"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#connects_to"/>
+        <Class IRI="#Interconnector"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#consumes_from"/>
+        <ObjectUnionOf>
+            <Class IRI="#Fixed_Generation"/>
+            <Class IRI="#Flexible_Consumption"/>
+        </ObjectUnionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#domain_connection"/>
+        <Class IRI="#Optimizer_Component"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#generates_to"/>
+        <ObjectUnionOf>
+            <Class IRI="#Fixed_Generation"/>
+            <Class IRI="#Flexible_Generation"/>
+        </ObjectUnionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#generation"/>
+        <Class IRI="#Fixed_Generation"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_action"/>
+        <Class IRI="#User_Demand_Definition"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_action_type"/>
+        <Class IRI="#Action_Type"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_action_type"/>
+        <Class IRI="#User_Demand_Definition"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_aggregation"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_asset_connection"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_base_unit"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_demand_definition"/>
+        <Class IRI="#User_Demand_Schedule"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_direction"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_domain"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_energy_island"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_measurement_type"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_notification"/>
+        <Class IRI="#User_Notification"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_parent"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_role"/>
+        <Class IRI="#REN_User"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_sensor"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_tag"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_unit"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#has_user"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#REN_Asset"/>
+            <ObjectComplementOf>
+                <Class IRI="#REN_User"/>
+            </ObjectComplementOf>
+        </ObjectIntersectionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#load"/>
+        <Class IRI="#Fixed_Generation"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#measurement_for_asset"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#notification_for_asset"/>
+        <Class IRI="#Notification"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#represents"/>
+        <Class IRI="#Optimizer_Component"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#schedule_for_asset"/>
+        <Class IRI="#User_Demand_Schedule"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#settings_of"/>
+        <Class IRI="#User_settings"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#aggregates_measurements"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#alert_for_measurement"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#domain_connection"/>
+        <Class IRI="#Optimizer_Domain"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#for_user"/>
+        <Class IRI="#REN_User"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#generation"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_action"/>
+        <Class IRI="#Action"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_action_type"/>
+        <Class IRI="#Action_Type"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_aggregation"/>
+        <Class IRI="#Aggregation"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_asset_connection"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_base_unit"/>
+        <Class IRI="#Unit_of_measure"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_demand_definition"/>
+        <Class IRI="#User_Demand_Definition"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_direction"/>
+        <Class IRI="#Direction"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_domain"/>
+        <Class IRI="#Domain"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_energy_island"/>
+        <Class IRI="#REN_EnergyIsland"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_measurement_type"/>
+        <Class IRI="#REN_Measurement_Type"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_notification"/>
+        <Class IRI="#Notification"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_parent"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_role"/>
+        <Class IRI="#User_roles"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_sensor"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_tag"/>
+        <Class IRI="#Tag"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_unit"/>
+        <Class IRI="#Unit_of_measure"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#has_user"/>
+        <Class IRI="#REN_User"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#load"/>
+        <Class IRI="#REN_Measurement"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#measurement_for_asset"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#notification_for_asset"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#represents"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#schedule_for_asset"/>
+        <Class IRI="#REN_Asset"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#settings_of"/>
+        <Class IRI="#REN_User"/>
+    </ObjectPropertyRange>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_cost"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_external"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_load"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_max"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_max_capacity"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_max_charge"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_max_discharge"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_max_generation"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_max_in"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_max_load"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_max_out"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_mu"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_time_from"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#aggregates_parameter_time_to"/>
+        <DataProperty IRI="#parameter_aggregation"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#date_from"/>
+        <DataProperty IRI="#has_timestamp"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#date_to"/>
+        <DataProperty IRI="#has_timestamp"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_cost"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_external"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_load"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_max"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_max_capacity"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_max_charge"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_max_discharge"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_max_generation"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_max_in"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_max_load"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_max_out"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_mu"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_time_from"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#parameter_time_to"/>
+        <DataProperty IRI="#asset_detail"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#starts_at"/>
+        <DataProperty IRI="#has_timestamp"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#stops_at"/>
+        <DataProperty IRI="#has_timestamp"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#update_at"/>
+        <DataProperty IRI="#has_timestamp"/>
+    </SubDataPropertyOf>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_cost"/>
+        <ObjectUnionOf>
+            <Class IRI="#Flexible_Consumption"/>
+            <Class IRI="#Flexible_Generation"/>
+        </ObjectUnionOf>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_external"/>
+        <ObjectUnionOf>
+            <Class IRI="#Flexible_Consumption"/>
+            <Class IRI="#Flexible_Generation"/>
+        </ObjectUnionOf>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_load"/>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_max"/>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_max_capacity"/>
+        <Class IRI="#Storage"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_max_charge"/>
+        <Class IRI="#Storage"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_max_discharge"/>
+        <Class IRI="#Storage"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_max_generation"/>
+        <Class IRI="#Flexible_Generation"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_max_in"/>
+        <Class IRI="#Interconnector"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_max_load"/>
+        <Class IRI="#Flexible_Consumption"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_max_out"/>
+        <Class IRI="#Interconnector"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_mu"/>
+        <ObjectUnionOf>
+            <Class IRI="#Interconnector"/>
+            <Class IRI="#Storage"/>
+        </ObjectUnionOf>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_time_from"/>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregates_parameter_time_to"/>
+        <Class IRI="#Time-shiftable_Load_Component"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregation_interval"/>
+        <Class IRI="#Alert_Threshold"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#aggregation_type"/>
+        <Class IRI="#Alert_Threshold"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#asset_detail"/>
+        <Class IRI="#REN_Asset"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#date_from"/>
+        <Class IRI="#Notification"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#date_to"/>
+        <Class IRI="#Notification"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#has_action_type"/>
+        <ObjectUnionOf>
+            <Class IRI="#Action_Type"/>
+            <Class IRI="#User_Demand_Definition"/>
+        </ObjectUnionOf>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#has_factor"/>
+        <Class IRI="#REN_Measurement_Type"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#has_geo_location"/>
+        <Class IRI="#REN_Asset"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#has_message"/>
+        <ObjectUnionOf>
+            <Class IRI="#Notification"/>
+            <Class IRI="#User_Demand_Definition"/>
+        </ObjectUnionOf>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#has_sensor_name"/>
+        <Class IRI="#REN_Measurement"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#has_uuid"/>
+        <ObjectUnionOf>
+            <Class IRI="#REN_Asset"/>
+            <Class IRI="#REN_User"/>
+        </ObjectUnionOf>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#has_value"/>
+        <Class IRI="#Tag"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#parameter_aggregation"/>
+        <Class IRI="#Optimizer_Component"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#stores_settings_as_JSON"/>
+        <Class IRI="#User_settings"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#threshold_constraint"/>
+        <Class IRI="#Alert_Threshold"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#threshold_type"/>
+        <Class IRI="#Alert_Threshold"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#threshold_update"/>
+        <Class IRI="#Notification"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#aggregation_interval"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#aggregation_type"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#asset_detail"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#date_from"/>
+        <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#date_to"/>
+        <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_action_type"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_description"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_factor"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_geo_location"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_label"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_message"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_name"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_sensor_name"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_timestamp"/>
+        <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_uuid"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#has_value"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#parameter_aggregation"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#stores_settings_as_JSON"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#threshold_constraint"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#threshold_type"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#threshold_update"/>
+        <Datatype abbreviatedIRI="xsd:dateTimeStamp"/>
+    </DataPropertyRange>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Action</IRI>
+        <Literal>Defines the concrete action such as &quot;charge battery&quot;.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Action</IRI>
+        <Literal>Action</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Action_Type</IRI>
+        <Literal>Defines a type of action such as &quot;increase&quot; or &quot;start&quot;.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Action_Type</IRI>
+        <Literal>Action Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Alert_Threshold</IRI>
+        <Literal>Currently unused.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Alert_Threshold</IRI>
+        <Literal>Alert Threshold</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#CO2eq_unit</IRI>
+        <Literal>CO2eq Unit</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Degree_celcius</IRI>
+        <Literal>Degre Celcius</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Degree_fahrenheit</IRI>
+        <Literal>Degree Fahrenheit</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Direction</IRI>
+        <Literal>Describes the direction ascribed to a Measurement.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Direction</IRI>
+        <Literal>Direction</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Domain</IRI>
+        <Literal></Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Electricity</IRI>
+        <Literal>Electricity Domain</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Energy_unit</IRI>
+        <Literal>Energy Unit</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Fixed_Consumption</IRI>
+        <Literal>Fixed Consumption Component represents uncontrollable consumption of energy from the connected domain.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Fixed_Consumption</IRI>
+        <Literal>Fixed Consumption</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Fixed_Generation</IRI>
+        <Literal>Fixed Generation Component represents uncontrollable generation of energy in the connected domain.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Fixed_Generation</IRI>
+        <Literal>Fixed Generation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Flexible_Consumption</IRI>
+        <Literal>A Flexible Consumption Component allows the optimizer to define the energy consumption in the connected domain at each time step. The consumption can take the values from 0 to the value provided by max load parameter.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Flexible_Consumption</IRI>
+        <Literal>Flexible Consumption</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Flexible_Generation</IRI>
+        <Literal>Flexible generation component allows the optimizer to defines the energy generation in the connected domain at each time step. Generation can take the values from 0 to the value provided by max generation parameter. Cost of one unit of energy generation is provided by cost parameter.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Flexible_Generation</IRI>
+        <Literal>Flexible Generation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Flow_unit</IRI>
+        <Literal>Flow</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Gas</IRI>
+        <Literal>Gas Domain</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Heat</IRI>
+        <Literal>Heat Domain</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Heat_Pump</IRI>
+        <Literal>A Heat Pump Component is a special case of an Interconnector Component that connects a heat and electricity domain. It uses the same parameters as an Interconnector Component.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Heat_Pump</IRI>
+        <Literal>Heat Pump</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Interconnector</IRI>
+        <Literal>An Interconnector Component is connected to two domains. It consumes energy from one domain (specified by parameter domain from) and generates energy for another domain (specified by parameter domain to). The transformation is done with efficiency provided by parameter mu. It is the ratio of the energy generated in domain to to energy consumed in domain from. The consumption from the domain from can take the values from 0 to the value provided by max in parameter. The generation to the domain to can take the values from 0 to the value provided by max out parameter.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Interconnector</IRI>
+        <Literal>Interconnector</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Kilowatt</IRI>
+        <Literal>Kilowatt</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Kilowatt_hours</IRI>
+        <Literal>Kilowatt Hours</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Notification</IRI>
+        <Literal>Notification</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Optimizer_Component</IRI>
+        <Literal>Optimization Components represent one or more Assets, aggregate their parameters and measurements and are consumed by an optimizer.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Optimizer_Component</IRI>
+        <Literal>Optimizer Component</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Optimizer_Domain</IRI>
+        <Literal>Each Optimizer Component either belongs to one Optimizer Domain or connects multiple.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Optimizer_Domain</IRI>
+        <Literal>Optimizer Domain</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Percentage</IRI>
+        <Literal>Percentage</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Power_unit</IRI>
+        <Literal>Power Unit</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Prediction_Window</IRI>
+        <Literal>Prediction Window</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#REN_Asset</IRI>
+        <Literal>Assets in the RENergetic assets may be everything from energy islands, buildings, devices to the users of the system. They may be connected using asset connections. The asset type, which is its own table in the database, is implicitely modelled via the different classes. Similarly, the asset connection is handled via relations.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Asset</IRI>
+        <Literal>Asset</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Building</IRI>
+        <Literal>Building</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_BuildingComponents</IRI>
+        <Literal>Building Components</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Co-generationUnit</IRI>
+        <Literal>Co-generation Unit</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_CoalPlant</IRI>
+        <Literal>Coal Plant</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Device</IRI>
+        <Literal>Device</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_DistrictCooling</IRI>
+        <Literal>District Cooling</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_DistrictHeating</IRI>
+        <Literal>District Heating</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_EVChargingStation</IRI>
+        <Literal>EV Charging Station</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Electricity</IRI>
+        <Literal>Electricity</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_EnergyIsland</IRI>
+        <Literal>Energy Island</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_ExternalElectricityGrid</IRI>
+        <Literal>External Electricity Grid</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_ExternalHeatGrid</IRI>
+        <Literal>External Heat Grid</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Flat</IRI>
+        <Literal>Flat</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_GasBoiler</IRI>
+        <Literal>Gas Boiler</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Generation</IRI>
+        <Literal>Generation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_GenerationPlant</IRI>
+        <Literal>Generation Plant</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_HeatPump</IRI>
+        <Literal>Heat Pump</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#REN_Measurement</IRI>
+        <Literal>A measurement made by an asset, which is typically stored as a time-series instance in InfluxDB.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Measurement</IRI>
+        <Literal>Measurement</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#REN_Measurement_Type</IRI>
+        <Literal>Contains information regarding the base unit, the actual unit, a (scale) factor and a few more details regarding a measurement.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Measurement_Type</IRI>
+        <Literal>Measurement Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_PVPlant</IRI>
+        <Literal>PV Plant</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Room</IRI>
+        <Literal>Room</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_SolarThermalCollector</IRI>
+        <Literal>Solar Thermal Collector</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_Steam</IRI>
+        <Literal>Steam</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#REN_User</IRI>
+        <Literal>User</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Storage</IRI>
+        <Literal>A Storage Component allows the optimizer to define the energy generation and consumption in the connected domain at each time step. The storage component is capable of storing energy over multiple time steps. The maximum energy that can be stored in the component is defined by parameter max capacity. A capacity before first time step is provided by component initial capacity. The consumption (charge process) from the connected domain can take the values from 0 to the value provided by max charge parameter. The generation (discharge process) to the connected domain can take the values from 0 to the value provided by max discharge parameter. The efficiency of energy conversion is determined by parameter mu - the ratio between energy added to the storage of the component as a result of charging to the energy consumed from domain (or the ratio between energy that consumed from the storage to the energy generated in domain).</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Storage</IRI>
+        <Literal>Storage</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Tag</IRI>
+        <Literal>Tags are key-value pairs with the key being &quot;Direction&quot;, &quot;Domain&quot; or &quot;Prediction Window&quot;. Each key may only have a value from a set of values that are specific to the key. For example, &quot;Domain&quot; only allows for the values of &quot;Electricity&quot; and &quot;Heat&quot;. A key-value pair such as &quot;Domain&quot; - &quot;Electricity&quot; is modelled as an instance of &quot;Domain&quot; with the value, which is of type string, being set to &quot;Electricity&quot;.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Tag</IRI>
+        <Literal>Tag</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Temperature_unit</IRI>
+        <Literal>Temperature Unit</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Time-shiftable_Load_Component</IRI>
+        <Literal>A Time-shiftable Load Component allows the optimizer to define the energy consumption in the connected domain at time steps (inclusive) between parameters time from and time to. Note that time from and time to are the time steps in the interval, not timestamps. For example, if the optimization is performed for 15 minute intervals over the course of a day, there are 96 time steps, which the parameters refer to. During these time steps total consumption is equal to the parameter load. The consumption can take the values from 0 to the value provided by max parameter.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Time-shiftable_Load_Component</IRI>
+        <Literal>Time-shiftable Load Component</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#UI_Component</IRI>
+        <Literal>UI components in information regarding the API is not extensively modeled in this ontology. Thus, they are summed up as UI_Component.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#UI_Component</IRI>
+        <Literal>UI Component</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Unit_of_measure</IRI>
+        <Literal>Units of measure are used for measurements. Different units that are found in the data stored in the database are modeled here.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Unit_of_measure</IRI>
+        <Literal>Unit of Measure</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Unknown</IRI>
+        <Literal>Unknown Domain</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#User_Demand_Definition</IRI>
+        <Literal>Defines the demand by choosing an action, an action type and a message. In the  User_Demand_Schedule, the demand defined here is linked to a user and a time when the demand is active.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#User_Demand_Definition</IRI>
+        <Literal>User Demand Definition</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#User_Demand_Schedule</IRI>
+        <Literal>Defines the time when the demand as defined in a user demand schedule is valid. The timestamps determine from when on up to which point the demand is valid. The schedule also references the applicable asset and the demand definition.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#User_Demand_Schedule</IRI>
+        <Literal>User Demand Schedule</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#User_Notification</IRI>
+        <Literal>User Notification</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#User_roles</IRI>
+        <Literal>The roles a user of the RENergetic system may have.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#User_roles</IRI>
+        <Literal>User Roles</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#User_settings</IRI>
+        <Literal>A user&apos;s settings for the RENergetic system. The actual settings are stored as a JSON-File.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#User_settings</IRI>
+        <Literal>User Settings</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Voltage</IRI>
+        <Literal>Voltage</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Watt</IRI>
+        <Literal>Watt</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Watt_hours</IRI>
+        <Literal>Watt Hours</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_measurements</IRI>
+        <Literal>aggregates measurements</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_cost</IRI>
+        <Literal>aggregates parameter cost</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_external</IRI>
+        <Literal>aggregates parameter external</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_load</IRI>
+        <Literal>aggregates parameter load</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_max</IRI>
+        <Literal>aggregates parameter max</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_max_capacity</IRI>
+        <Literal>aggregates parameter max capactiy</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_max_charge</IRI>
+        <Literal>aggregates parameter max charge</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_max_discharge</IRI>
+        <Literal>aggregates parameter max discharge</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_max_generation</IRI>
+        <Literal>aggregates parameter max generation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_max_in</IRI>
+        <Literal>aggregates parameter max in</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_max_load</IRI>
+        <Literal>aggregates parameter max load</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_max_out</IRI>
+        <Literal>aggregates parameter max out</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_mu</IRI>
+        <Literal>aggregates parameter mu</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_time_from</IRI>
+        <Literal>aggregates parameter time from</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregates_parameter_time_to</IRI>
+        <Literal>aggregates parameter time to</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregation_interval</IRI>
+        <Literal>aggregation interval</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#aggregation_type</IRI>
+        <Literal>aggregation type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#alert_for_measurement</IRI>
+        <Literal>alert for measurement</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#asset_detail</IRI>
+        <Literal>Asset details store values for Assets or Optimizer Components, for example parameters.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#asset_detail</IRI>
+        <Literal>asset detail</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#connects_from</IRI>
+        <Literal>Used for Optimizer Components that connect from one to another Domain.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#connects_from</IRI>
+        <Literal>connects from</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#connects_to</IRI>
+        <Literal>Used for Optimizer Components that connect from one to another Domain.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#connects_to</IRI>
+        <Literal>connects to</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#consumes_from</IRI>
+        <Literal>Used for Components that consume energy from a Domain.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#consumes_from</IRI>
+        <Literal>consumes from</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#date_from</IRI>
+        <Literal>Notification is valid from this timestamp on.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#date_from</IRI>
+        <Literal>date from</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#date_to</IRI>
+        <Literal>Notification is valid until this timestamp is exceeded.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#date_to</IRI>
+        <Literal>date to</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#domain_connection</IRI>
+        <Literal>Connects an Optimizer Component to a specific Domain. The type of connection can be different, which is modeled using sub-properties.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#domain_connection</IRI>
+        <Literal>domain connection</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#for_user</IRI>
+        <Literal>for user</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#generates_to</IRI>
+        <Literal>Used for Components that generate energy to a Domain.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#generates_to</IRI>
+        <Literal>generates to</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#generation</IRI>
+        <Literal>generation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_action</IRI>
+        <Literal>has action</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_action_type</IRI>
+        <Literal>has action type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_aggregation</IRI>
+        <Literal>has aggregation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_asset_connection</IRI>
+        <Literal>has asset connection</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_base_unit</IRI>
+        <Literal>has base unit</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_demand_definition</IRI>
+        <Literal>has demand definition</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_description</IRI>
+        <Literal>has description</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_direction</IRI>
+        <Literal>has direction</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_domain</IRI>
+        <Literal>has domain</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_energy_island</IRI>
+        <Literal>has energy island</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_factor</IRI>
+        <Literal>has factor</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_geo_location</IRI>
+        <Literal>has geo location</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_label</IRI>
+        <Literal>has label</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_measurement_type</IRI>
+        <Literal>has measurement type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_message</IRI>
+        <Literal>has message</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_name</IRI>
+        <Literal>has name</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_notification</IRI>
+        <Literal>has notification</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_parent</IRI>
+        <Literal>has parent</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_role</IRI>
+        <Literal>has role</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_sensor</IRI>
+        <Literal>has sensor</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_sensor_name</IRI>
+        <Literal>has sensor name</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_tag</IRI>
+        <Literal>has tag</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_timestamp</IRI>
+        <Literal>has timestamp</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_unit</IRI>
+        <Literal>has unit</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_user</IRI>
+        <Literal>has user</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_uuid</IRI>
+        <Literal>has uuid</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#has_value</IRI>
+        <Literal>has value</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#load</IRI>
+        <Literal>load</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#m3_per_h</IRI>
+        <Literal>m3 per h</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#measurement_for_asset</IRI>
+        <Literal>measurement for asset</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#notification_for_asset</IRI>
+        <Literal>notification for asset</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#parameter_aggregation</IRI>
+        <Literal>Aggregates the specific parameter as modeled by the sub-classes that correspond to the sub-classes of asset detail.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_aggregation</IRI>
+        <Literal>parameter aggregation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_cost</IRI>
+        <Literal>parameter cost</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_external</IRI>
+        <Literal>parameter external</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_load</IRI>
+        <Literal>parameter load</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_max</IRI>
+        <Literal>parameter max</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_max_capacity</IRI>
+        <Literal>parameter max capacity</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_max_charge</IRI>
+        <Literal>parameter max charge</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_max_discharge</IRI>
+        <Literal>parameter max discharge</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_max_generation</IRI>
+        <Literal>parameter max generation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_max_in</IRI>
+        <Literal>parameter max in</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_max_load</IRI>
+        <Literal>parameter max load</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_max_out</IRI>
+        <Literal>parameter max out</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_mu</IRI>
+        <Literal>parameter mu</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_time_from</IRI>
+        <Literal>parameter time from</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#parameter_time_to</IRI>
+        <Literal>parameter time to</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#represents</IRI>
+        <Literal>Assets can be represented using Optimizer Components, which aggregate measurements and parameters if multiple Assets are represented. The Optimizer Components serve as an abstraction for Assets to represent them in an optimizer.</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#represents</IRI>
+        <Literal>represents</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#schedule_for_asset</IRI>
+        <Literal>schedule for asset</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#settings_of</IRI>
+        <Literal>settings of</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#starts_at</IRI>
+        <Literal>start at</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#stops_at</IRI>
+        <Literal>stops at</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#stores_settings_as_JSON</IRI>
+        <Literal>stores settings as JSON</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#threshold_constraint</IRI>
+        <Literal>threshold constraint</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#threshold_type</IRI>
+        <Literal>threshold type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#threshold_update</IRI>
+        <Literal>threshold update</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#update_at</IRI>
+        <Literal>update at</Literal>
+    </AnnotationAssertion>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
