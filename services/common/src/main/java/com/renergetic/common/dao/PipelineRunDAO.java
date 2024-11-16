@@ -31,7 +31,7 @@ public class PipelineRunDAO {
     Map<String, Object> parameters = Collections.emptyMap();
     @JsonProperty(required = false, value = "results")
     Map<String, Object> results = null;
-    @JsonProperty(required = false, value = "results")
+    @JsonProperty(required = false, value = "ext")
     Map<String, Object> ext = null;
 
     @JsonProperty(required = false, value = "init_time")

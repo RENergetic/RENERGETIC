@@ -5,6 +5,7 @@ import com.renergetic.common.dao.PipelineDefinitionPropertyDAO;
 import com.renergetic.common.dao.PipelineParameterDAO;
 import com.renergetic.common.dao.PipelineRunDAO;
 import com.renergetic.common.utilities.Json;
+import com.renergetic.kubeflowapi.dao.RunRequestDAO;
 import com.renergetic.kubeflowapi.service.KubeflowService;
 import com.renergetic.kubeflowapi.service.KubeflowPipelineService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -137,22 +138,43 @@ public class KubeflowController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get pipeline run") //GET RUN
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/run/{run_id}", produces = "application/json")
+    public ResponseEntity<PipelineRunDAO> getExperimentRunById(
+            @PathVariable(name = "run_id") String runId) throws IllegalAccessException {
+        PipelineRunDAO res = kubeflowPipelineService.getRunById(runId);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Set run result") //GET RUN
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @PutMapping(path = "/run/{run_id}", produces = "application/json")
+    public ResponseEntity<PipelineRunDAO> getExperimentRunById(
+            @PathVariable(name = "run_id") String runId,
+            @RequestBody Map<String, Object> results) throws IllegalAccessException {
+        PipelineRunDAO res = kubeflowPipelineService.setRunResult(runId, results);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
     @Operation(summary = "Start pipeline") //RUN PIPELINE
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = "/pipeline/{pipeline_id}/run", produces = "application/json")
     public ResponseEntity<PipelineRunDAO> startPipeline(
-            @PathVariable(name = "pipeline_id") String pipelineId, @RequestBody Map<String, Object> params) {
+            @PathVariable(name = "pipeline_id") String pipelineId, @RequestBody RunRequestDAO runRequest) {
 
-        PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId,null, params);
+        PipelineRunDAO res = kubeflowPipelineService.startRun(runRequest);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
     @Operation(summary = "Start pipeline with name") //RUN PIPELINE
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = "/pipeline/{pipeline_id}/run/{name}", produces = "application/json")
     public ResponseEntity<PipelineRunDAO> startPipeline(
-            @PathVariable(name = "pipeline_id") String pipelineId, @PathVariable(name = "name") String name, @RequestBody Map<String, Object> params) {
+            @PathVariable(name = "pipeline_id") String pipelineId, @PathVariable(name = "name") String name,
+            @RequestBody Map<String, Object> params) {
 
-        PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId,name, params);
+        PipelineRunDAO res = kubeflowPipelineService.startRun(pipelineId, name, params, new HashMap<>());
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -199,7 +221,7 @@ public class KubeflowController {
     public ResponseEntity<String> setLabel(@PathVariable(name = "pipeline_id") String pipelineId,
                                            @PathVariable(name = "label") String label) {
         //TODO: verify admin roles
-        String mLabel = kubeflowPipelineService.setLabel(pipelineId,label);
+        String mLabel = kubeflowPipelineService.setLabel(pipelineId, label);
         return new ResponseEntity<>(mLabel, HttpStatus.OK);
     }
 
@@ -255,13 +277,15 @@ public class KubeflowController {
         }
         return new ResponseEntity<>(params, HttpStatus.OK);
     }
+
     @Operation(summary = "Get pipeline definitions by property ")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/admin/pipeline/property/{key}/value/{value}", produces = "application/json")
-    public ResponseEntity<List<PipelineDefinitionDAO>> getByPropertyAdmin(@PathVariable(name = "key") String propertyKey,
-                                                                     @PathVariable(name = "value") String propertyValue) {
+    public ResponseEntity<List<PipelineDefinitionDAO>> getByPropertyAdmin(
+            @PathVariable(name = "key") String propertyKey,
+            @PathVariable(name = "value") String propertyValue) {
 
-        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue, true,true);
+        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue, true, true);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
     //#endregion
@@ -274,7 +298,7 @@ public class KubeflowController {
     public ResponseEntity<List<PipelineDefinitionDAO>> getByProperty(@PathVariable(name = "key") String propertyKey,
                                                                      @PathVariable(name = "value") String propertyValue) {
 
-        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue, true,false);
+        var res = kubeflowPipelineService.getByProperty(propertyKey, propertyValue, true, false);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -295,9 +319,10 @@ public class KubeflowController {
     @Operation(summary = "Set pipeline property")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = "/admin/pipeline/{pipeline_id}/property", produces = "application/json")
-    public ResponseEntity<PipelineDefinitionPropertyDAO> setProperty(@PathVariable(name = "pipeline_id") String pipelineId,
-                                                                     @RequestParam(required = false) Optional<Boolean> unique,
-                                                                     @RequestBody PipelineDefinitionPropertyDAO propertyDAO) {
+    public ResponseEntity<PipelineDefinitionPropertyDAO> setProperty(
+            @PathVariable(name = "pipeline_id") String pipelineId,
+            @RequestParam(required = false) Optional<Boolean> unique,
+            @RequestBody PipelineDefinitionPropertyDAO propertyDAO) {
         //TODO: verify admin roles
         var res = kubeflowPipelineService.setProperty(pipelineId, propertyDAO, unique);
         return new ResponseEntity<>(res, HttpStatus.OK);

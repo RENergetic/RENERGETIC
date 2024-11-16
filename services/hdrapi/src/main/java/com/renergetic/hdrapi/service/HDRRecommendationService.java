@@ -186,7 +186,7 @@ public class HDRRecommendationService {
 
     public List<MeasurementDAOResponse> getRecommendationMeasurements(String key, String value) {
         if (key == null) {
-            throw new InvalidArgumentException("Empty timestamp");
+            throw new InvalidArgumentException("Empty key");
         }
 
 //        var t = DateConverter.toLocalDateTime(timestamp);
