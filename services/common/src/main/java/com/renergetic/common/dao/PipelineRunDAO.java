@@ -31,6 +31,8 @@ public class PipelineRunDAO {
     Map<String, Object> parameters = Collections.emptyMap();
     @JsonProperty(required = false, value = "results")
     Map<String, Object> results = null;
+    @JsonProperty(required = false, value = "ext")
+    Map<String, Object> ext = null;
 
     @JsonProperty(required = false, value = "init_time")
     private Long initTime;
@@ -74,6 +76,15 @@ public class PipelineRunDAO {
                 throw new RuntimeException(e);
             }
         }
+        if (wd.getExt() != null && !wd.getExt().isEmpty()) {
+            try {
+                Map<String, Object> map = Json.toMap(wd.getExt());
+                dao.setExt(map);
+            } catch (ParseException e) {
+                //TODO: throw some usable exception
+                throw new RuntimeException(e);
+            }
+        }
         if (wd.getStartTime() != null)
             dao.setStartTime(wd.getStartTime());
         if (wd.getEndTime() != null)
@@ -93,6 +104,9 @@ public class PipelineRunDAO {
         wd.setState(this.state);
         if (this.results != null) {
             wd.setResults(Json.toJson(this.results));
+        }
+        if (this.ext != null) {
+            wd.setExt(Json.toJson(this.ext));
         }
         wd.setParams(Json.toJson(this.parameters));
         wd.setPipelineDefinition(this.pipelineDefinitionDAO.mapToEntity());

@@ -87,16 +87,17 @@ public class MeasurementTileDAORequest {
             entity.setMeasurement(measurement);
         } else {
             if (type != null) {
+
+                MeasurementType entityType = new MeasurementType();
+                entityType.setId(type.getId());
+                entityType.setName(type.getName());
+                entityType.setPhysicalName(type.getPhysicalName());
+                entityType.setUnit(type.getUnit());
                 if (type.getId() != null) {
-                    MeasurementType entityType = new MeasurementType();
                     entityType.setId(type.getId());
-                    entityType.setName(type.getName());
-                    entityType.setPhysicalName(type.getPhysicalName());
-                    entityType.setUnit(type.getUnit());
-                    entity.setType(entityType);
-                } else {
-                    entity.setPhysicalName(type.getPhysicalName());
                 }
+                entity.setPhysicalName(type.getPhysicalName());
+                entity.setType(entityType);
             }
             if (asset != null) {
                 entity.setAsset(this.asset.mapToEntity());

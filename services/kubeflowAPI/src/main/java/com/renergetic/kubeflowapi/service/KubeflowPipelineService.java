@@ -11,6 +11,8 @@ import com.renergetic.common.model.PipelineParameter;
 import com.renergetic.common.model.PipelineRun;
 import com.renergetic.common.repository.*;
 import com.renergetic.common.utilities.DateConverter;
+import com.renergetic.common.utilities.Json;
+import com.renergetic.kubeflowapi.dao.RunRequestDAO;
 import com.renergetic.kubeflowapi.service.utils.DummyDataGenerator;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,16 +116,41 @@ public class KubeflowPipelineService {
         var wd = pipelineRepository.findById(pipelineId)
                 .orElseThrow(() -> new NotFoundException(
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
-        if (wd.getPipelineRun() != null) {
-            if (wd.getPipelineRun().getEndTime() == null && !generateDummy) {
-                var run = wd.getPipelineRun();
-                PipelineRunDAO kubeflowRun = kubeflowService.getRun(run.getRunId());
-                run.setState(kubeflowRun.getState());
+        return processRun(wd.getPipelineRun());
+
+    }
+
+
+    public PipelineRunDAO getRunById(String runId) throws IllegalAccessException {
+        var pipelineRun = pipelineRunRepository.findById(runId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Run: " + runId + " not available outside kubeflow or not exists"));
+        return processRun(pipelineRun);
+
+    }
+
+    public PipelineRunDAO setRunResult(String runId, Map<String, Object> results) throws IllegalAccessException {
+        var pipelineRun = pipelineRunRepository.findById(runId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Run: " + runId + " not available outside kubeflow or not exists"));
+        pipelineRun.setResults(Json.toJson(results));
+        return PipelineRunDAO.create(pipelineRunRepository.save(pipelineRun));
+
+    }
+
+
+    private PipelineRunDAO processRun(PipelineRun pipelineRun) throws IllegalAccessException {
+
+        if (pipelineRun != null) {
+            if (pipelineRun.getEndTime() == null && !generateDummy) {
+
+                PipelineRunDAO kubeflowRun = kubeflowService.getRun(pipelineRun.getRunId());
+                pipelineRun.setState(kubeflowRun.getState());
                 if (kubeflowRun.getEndTime() != null)
-                    run.setEndTime(kubeflowRun.getEndTime());
-                pipelineRunRepository.save(run); //update the db state
+                    pipelineRun.setEndTime(kubeflowRun.getEndTime());
+                pipelineRunRepository.save(pipelineRun); //update the db state
             }
-            return PipelineRunDAO.create(wd.getPipelineRun());
+            return PipelineRunDAO.create(pipelineRun);
         }
         return null;
 
@@ -136,7 +163,12 @@ public class KubeflowPipelineService {
 
     }
 
-    public PipelineRunDAO startRun(String pipelineId, String name, Map<String, Object> params) {
+    public PipelineRunDAO startRun(RunRequestDAO runRequest) {
+        return this.startRun(runRequest.getPipelineId(), runRequest.getSimulationName(), runRequest.getParams(), runRequest.getExt());
+    }
+
+    public PipelineRunDAO startRun(String pipelineId, String name, Map<String, Object> params,
+                                   Map<String, Object> ext) {
         var wd = pipelineRepository.findById(pipelineId)
                 .orElseThrow(() -> new NotFoundException(
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
@@ -151,6 +183,7 @@ public class KubeflowPipelineService {
                     var kfPipeline = kubeflowService.getPipeline(pipelineId);
                     PipelineRunDAO runDAO = startKubeflowRun(wd, params);
                     runDAO.setName(name);
+                    runDAO.setExt(ext);
                     var now = DateConverter.now();
                     PipelineRun currentRun = runDAO.mapToEntity();
                     currentRun.setInitTime(now);
@@ -630,6 +663,7 @@ public class KubeflowPipelineService {
         }).filter(Objects::nonNull).toList();
 
     }
+
 
     //#endregion
 

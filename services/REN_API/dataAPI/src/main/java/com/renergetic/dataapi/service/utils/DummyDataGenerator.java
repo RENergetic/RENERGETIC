@@ -104,11 +104,12 @@ public class DummyDataGenerator {
         long interval = (dateTo - dateFrom) / 500;
         Long[] timestamps = new Long[points];
         for (int i = 0; i < timestamps.length; i++) {
-            if (i > points * 0.6)
-                timestamps[i] = dateFrom + interval * i;
-            else {
-                timestamps[i] = dateFrom + interval / 10 * i;
-            }
+            timestamps[i] = dateFrom + interval * i;
+//            if (i > points * 0.6)
+//                timestamps[i] = dateFrom + interval * i;
+//            else {
+//                timestamps[i] = dateFrom + interval / 10 * i;
+//            }
         }
         data.setTimestamps(Arrays.asList(timestamps));
         Map<String, List<Double>> map = new HashMap<>();

@@ -51,8 +51,6 @@ public class DataService {
     private InformationPanelService informationPanelService;
     @Autowired
     private MeasurementTypeRepository measurementTypeRepository;
-    @Autowired
-    private MeasurementDetailsRepository measurementDetailsRepository;
 
 //    public DataWrapperDAO getPanelData(Long panelId, Long from, Optional<Long> to) {
 //        return this.getPanelData(panelId, null, from, to);

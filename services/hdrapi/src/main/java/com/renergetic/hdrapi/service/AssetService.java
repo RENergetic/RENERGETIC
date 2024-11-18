@@ -28,8 +28,6 @@ import java.util.stream.Stream;
 @Service
 @Slf4j
 public class AssetService {
-    @PersistenceContext
-    EntityManager entityManager;
 
     @Autowired
     AssetRepository assetRepository;
