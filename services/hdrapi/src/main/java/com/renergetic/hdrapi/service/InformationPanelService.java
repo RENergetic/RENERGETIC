@@ -25,8 +25,6 @@ public class InformationPanelService {
     @Autowired
     private MeasurementService measurementService;
     @Autowired
-    private AssetService assetService;
-    @Autowired
     private InformationPanelRepository informationPanelRepository;
     @Autowired
     private InformationTileRepository informationTileRepository;

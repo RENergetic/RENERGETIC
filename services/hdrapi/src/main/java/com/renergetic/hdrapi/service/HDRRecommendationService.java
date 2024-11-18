@@ -28,9 +28,6 @@ import java.util.stream.Collectors;
 public class HDRRecommendationService {
     @Autowired
     MeasurementRepository measurementRepository;
-//    @Autowired
-//    MeasurementRepository2 measurementRepository2;
-
     @Autowired
     HDRRecommendationRepository recommendationRepository;
     @Autowired
@@ -128,17 +125,16 @@ public class HDRRecommendationService {
 
     public Optional<List<HDRRecommendationDAO>> getRecent() {
         var t = recommendationRepository.getRecentRecommendation();
-
         List<HDRRecommendationDAO> r = null;
         if (t.isPresent()) {
             var requestTimestamp = hdrRequestRepository.getRecentRequestTimestamp();
             if (requestTimestamp.isPresent() && requestTimestamp.get() > t.get()) {
-//                throw new InvalidArgumentException("recommendations are out outdated");
-                return Optional.ofNullable(r);
+//              recommendations are out outdated
+                return Optional.empty();
             }
             r = this.getRecommendations(t.get());
         }
-        return Optional.ofNullable(r);
+        return Optional.ofNullable(r);//   no recommendations
     }
 
     public List<HDRRequestDAO> getRecentRequest() {
@@ -163,8 +159,12 @@ public class HDRRecommendationService {
     }
 
     public List<MeasurementDAOResponse> getMeasurements(Long timestamp) {
+
         if (timestamp == null) {
-            throw new InvalidArgumentException("Empty timestamp");
+            Optional<Long> t = hdrRequestRepository.getRecentRequestTimestamp();
+            timestamp = t.orElseThrow(() -> new NotFoundException("There are no requests"));
+//            this.getRequests(t.get()).isEmpty();
+//            throw new InvalidArgumentException("Empty timestamp");
         }
 //        var t = DateConverter.toLocalDateTime(timestamp);
         return hdrMeasurementRepository.listMeasurement(timestamp).stream()
@@ -174,8 +174,13 @@ public class HDRRecommendationService {
 
 
     public List<MeasurementDAOResponse> getMeasurements(Long timestamp, String key, String value) {
+
+
         if (timestamp == null) {
-            throw new InvalidArgumentException("Empty timestamp");
+            Optional<Long> t = hdrRequestRepository.getRecentRequestTimestamp();
+            timestamp = t.orElseThrow(() -> new NotFoundException("There are no requests"));
+//            this.getRequests(t.get()).isEmpty();
+//            throw new InvalidArgumentException("Empty timestamp");
         }
 
 //        var t = DateConverter.toLocalDateTime(timestamp);
@@ -189,7 +194,6 @@ public class HDRRecommendationService {
             throw new InvalidArgumentException("Empty key");
         }
 
-//        var t = DateConverter.toLocalDateTime(timestamp);
         return measurementRepository.listHDRRecommendationMeasurement(key, value).stream()
                 .map(it -> {
                     var m = MeasurementDAOResponse.create(it, null, null);
@@ -205,8 +209,6 @@ public class HDRRecommendationService {
         if (timestamp == null) {
             throw new InvalidArgumentException("Empty timestamp");
         }
-//        var t = DateConverter.toLocalDateTime(timestamp);
-//        hdrRequestRepository.findRequestByTimestamp(t);
         HDRMeasurement hdrMeasurement = hdrMeasurementRepository.findByIdAndTimestamp(measurementId,
                 timestamp).orElse(null);
 

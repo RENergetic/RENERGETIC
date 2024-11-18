@@ -149,7 +149,7 @@ public class KubeflowController {
 
     @Operation(summary = "Set run result") //GET RUN
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PutMapping(path = "/run/{run_id}", produces = "application/json")
+    @PutMapping(path = "/run/{run_id}/result", produces = "application/json")
     public ResponseEntity<PipelineRunDAO> getExperimentRunById(
             @PathVariable(name = "run_id") String runId,
             @RequestBody Map<String, Object> results) throws IllegalAccessException {

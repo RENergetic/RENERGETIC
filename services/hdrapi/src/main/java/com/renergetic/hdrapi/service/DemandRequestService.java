@@ -28,9 +28,6 @@ public class DemandRequestService {
     @Autowired
     DemandDefinitionRepository demandDefinitionRepository;
 
-    @Autowired
-    UserService userService;
-
     public List<DemandScheduleDAO> save(List<DemandScheduleDAO> demandScheduleDAOS) throws InvalidCreationIdAlreadyDefinedException{
         LocalDateTime currentDateTime = LocalDateTime.now();
 
