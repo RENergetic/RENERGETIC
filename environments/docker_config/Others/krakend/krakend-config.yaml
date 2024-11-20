@@ -4489,7 +4489,7 @@ data:
           ],
           "backend": [
             {
-              "url_pattern": "/api/meter/list/{domain}/{meter_name}",
+              "url_pattern": "/api/meter/{domain}/{meter_name}",
               "encoding": "no-op",
               "method": "GET",
               "host": [
