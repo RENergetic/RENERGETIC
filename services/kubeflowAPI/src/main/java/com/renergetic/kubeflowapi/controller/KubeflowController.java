@@ -128,6 +128,16 @@ public class KubeflowController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get pipeline by id for non-admin users")
+    // GET ALL PIPELINES/RUNS IT ALREADY EXISTS (ONLY FOR NON ADMINS)
+    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+    @GetMapping(path = "/pipeline/{pipeline_id}", produces = "application/json")
+    public ResponseEntity<PipelineDefinitionDAO> listAll(
+            @PathVariable(name = "pipeline_id") String pipelineId) throws IllegalAccessException {
+
+        return new ResponseEntity<>(kubeflowPipelineService.getById(pipelineId, false), HttpStatus.OK);
+    }
+
 
     @Operation(summary = "Get pipeline current/recent run") //GET RUN
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
