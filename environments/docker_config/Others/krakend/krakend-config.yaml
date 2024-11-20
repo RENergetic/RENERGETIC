@@ -5304,6 +5304,29 @@ data:
           ]
         },
         {
+          "endpoint": "/api-kubeflow/1.0/api/kubeflow/pipeline/{pipeline_id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/kubeflow/pipeline/{pipeline_id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kubeflow-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
           "endpoint": "/api-kubeflow/1.0/api/kubeflow/pipeline/{pipeline_id}/run",
           "method": "POST",
           "output_encoding": "no-op",
