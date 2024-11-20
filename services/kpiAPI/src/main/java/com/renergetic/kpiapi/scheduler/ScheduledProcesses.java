@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +54,7 @@ public class ScheduledProcesses {
         List<AbstractMeterDataDAO> data = meterService
                 .calculateAndInsertAll(tsFrom, tsNow, tsNow);
 
-        log.info(String.format("Abtract meters calculated (Period: %d minutes)", meterPeriod));
+        log.info(String.format("Abstract meters calculated (Period: %d minutes)", meterPeriod));
         data.forEach(obj -> obj.getData().forEach((time, value) ->
                         log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
                 )
@@ -67,9 +68,6 @@ public class ScheduledProcesses {
             List<KPIDataDAO> heatData = kpiService
                     .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, tsNow);
             //TODO: comments if its not calculating properly the following KPIS
-            List<KPIDataDAO> allDomain = kpiService
-                    .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance, EP.Instance), tsFrom, tsNow, tsNow);
-
             log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", meterPeriod));
             electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
                             log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
@@ -80,11 +78,20 @@ public class ScheduledProcesses {
                             log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
                     )
             );
-            log.info("All domain KPIs calculated");
-            allDomain.forEach(obj -> obj.getData().forEach((time, value) ->
-                            log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
-                    )
-            );
+ 
+            try {
+                List<KPIDataDAO> allDomain = kpiService
+                        .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance, EP.Instance), tsFrom, tsNow, tsNow);
+                log.info("All domain KPIs calculated");
+                allDomain.forEach(obj -> obj.getData().forEach((time, value) ->
+                                log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
+                        )
+                );
+            } catch (Exception ex) {
+                log.error("Error while calculating all domain KPI" + ex.getMessage());
+
+            }
+
             nextKpiCalculation = 0;
         } else {
             nextKpiCalculation++;

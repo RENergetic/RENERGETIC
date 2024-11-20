@@ -317,8 +317,8 @@ public class KPIService {
         List<KPIDataDAO> configuredMeters = new LinkedList<>();
 
         // Calculate and save each KPI
-        for (KPI kpi : KPI.values()) {
-
+        for (var kpiFormula : kpis) {
+            var kpi = kpiFormula.getKPI();
             log.info("Start Calculate: " + kpi.kpi + " for: " + domain.name());
             MeasurementDAORequest influxRequest = MeasurementDAORequest.create(kpi, domain);
 
