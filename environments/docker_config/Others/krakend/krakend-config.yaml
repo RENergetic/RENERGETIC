@@ -3993,6 +3993,98 @@ data:
           ]
         },
         {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations/key/{key}/value/{value}/measurement",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations/key/{key}/value/{value}/measurement",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations/key/{key}/measurement",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations/key/{key}/measurement",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations/key/{key}/value/{value}/measurement/id",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations/key/{key}/value/{value}/measurement/id",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-hdr/1.0/api/hdr/recommendations/key/{key}/measurement/id",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/hdr/recommendations/key/{key}/measurement/id",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://hdr-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
           "endpoint": "/api-hdr/1.0/api/hdr/measurement",
           "method": "GET",
           "output_encoding": "no-op",
@@ -4397,7 +4489,7 @@ data:
           ],
           "backend": [
             {
-              "url_pattern": "/api/meter/list/{domain}/{meter_name}",
+              "url_pattern": "/api/meter/{domain}/{meter_name}",
               "encoding": "no-op",
               "method": "GET",
               "host": [
@@ -5203,6 +5295,29 @@ data:
           "backend": [
             {
               "url_pattern": "/api/kubeflow/pipeline/{pipeline_id}/run",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kubeflow-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kubeflow/1.0/api/kubeflow/pipeline/{pipeline_id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/kubeflow/pipeline/{pipeline_id}",
               "encoding": "no-op",
               "method": "GET",
               "host": [

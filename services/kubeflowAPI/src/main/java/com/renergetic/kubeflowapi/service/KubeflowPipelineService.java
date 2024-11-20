@@ -72,6 +72,32 @@ public class KubeflowPipelineService {
 
     }
 
+    public PipelineDefinitionDAO getById(String pipelineId, Boolean admin)
+            throws IllegalAccessException {
+        Map<String, PipelineDefinitionDAO> kubeflowMap = this.getKubeflowMap();
+        PipelineDefinitionDAO pipelineDefinitionDAO = pipelineRepository.findById(pipelineId)
+                .map((it) -> {
+                    if (!it.getVisible() && !admin)
+                        throw new RuntimeException("Pipeline: " + pipelineId + " not available");
+                    //filter also parameters
+                    PipelineDefinitionDAO enrichedPipeline = null;
+                    try {
+                        enrichedPipeline = enrichDAO(kubeflowMap.get(it.getPipelineId()), it, false);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                    enrichedPipeline.setParameters(
+                            enrichedPipeline.getParameters().entrySet().stream()
+                                    .filter(param -> param.getValue().getVisible())
+                                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                    );
+                    return enrichedPipeline;
+
+                }).orElseThrow(() -> new NotFoundException("Pipeline: " + pipelineId + " not found"));
+        return pipelineDefinitionDAO;
+
+    }
+
     public List<PipelineDefinitionDAO> getAllAdmin(Optional<Boolean> visible) throws IllegalAccessException {
 
         HashMap<String, PipelineDefinitionDAO> kubeflowMap = this.getKubeflowMap();
