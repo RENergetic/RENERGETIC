@@ -53,7 +53,7 @@ public class ScheduledProcesses {
         List<AbstractMeterDataDAO> data = meterService
                 .calculateAndInsertAll(tsFrom, tsNow, tsNow);
 
-        log.info(String.format("Abtract meters calculated (Period: %d minutes)", meterPeriod));
+        log.info(String.format("Abstract meters calculated (Period: %d minutes)", meterPeriod));
         data.forEach(obj -> obj.getData().forEach((time, value) ->
                         log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
                 )
