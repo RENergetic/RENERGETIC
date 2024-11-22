@@ -4545,6 +4545,29 @@ data:
           ]
         },
         {
+          "endpoint": "/api-kpi/1.0/api/meter/data/calculate",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter/data/calculate",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
           "endpoint": "/api-kpi/1.0/api/meter",
           "method": "POST",
           "output_encoding": "no-op",
@@ -5297,6 +5320,44 @@ data:
               "url_pattern": "/api/kubeflow/pipeline/{pipeline_id}/run",
               "encoding": "no-op",
               "method": "GET",
+              "host": [
+                "http://kubeflow-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kubeflow/1.0/api/kubeflow/run/{run_id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/kubeflow/run/{run_id}",
+              "encoding": "no-op",
+              "method": "GET",
+              "host": [
+                "http://kubeflow-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
+          "endpoint": "/api-kubeflow/1.0/api/kubeflow/run/{run_id}/result",
+          "method": "PUT","output_encoding": "no-op","input_headers": ["authorization","accept","content-type"],
+          "input_query_strings": ["*"],
+          "backend": [
+            {
+              "url_pattern": "/api/kubeflow/run/{run_id}/result",
+              "encoding": "no-op",
+              "method": "PUT",
               "host": [
                 "http://kubeflow-api-sv:8082"
               ]

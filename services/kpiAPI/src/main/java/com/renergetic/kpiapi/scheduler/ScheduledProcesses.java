@@ -51,28 +51,21 @@ public class ScheduledProcesses {
         // var tsNow = ( (int)(Instant.now().toEpochMilli()/60000)*60000); round to minutes ? TODO:
         long tsFrom = tsNow - 60000 * meterPeriod;
 
-        List<AbstractMeterDataDAO> data = meterService
-                .calculateAndInsertAll(tsFrom, tsNow, tsNow);
-
-        log.info(String.format("Abstract meters calculated (Period: %d minutes)", meterPeriod));
-        data.forEach(obj -> obj.getData().forEach((time, value) ->
-                        log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
-                )
-        );
+        calcAbstractMeter(tsFrom, tsNow);
 
         // KPIs CALCULATION
         if (nextKpiCalculation.equals(kpiFrecuency - 1)) {
+            log.info("Start Calculate KPIs ");
             List<KPIDataDAO> electricityData = kpiService
                     .calculateAndInsertAll(Domain.electricity, tsFrom, tsNow, tsNow);
-            log.info("Start Calculate KPIs ");
             List<KPIDataDAO> heatData = kpiService
                     .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, tsNow);
             //TODO: comments if its not calculating properly the following KPIS
-            log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", meterPeriod));
             electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
                             log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
                     )
             );
+            log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", meterPeriod));
             log.info("Heat KPIs calculated");
             heatData.forEach(obj -> obj.getData().forEach((time, value) ->
                             log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
@@ -96,5 +89,16 @@ public class ScheduledProcesses {
         } else {
             nextKpiCalculation++;
         }
+    }
+
+    private void calcAbstractMeter(long tsFrom, long tsNow) {
+        List<AbstractMeterDataDAO> data = meterService
+                .calculateAndInsertAll(tsFrom, tsNow, tsNow);
+
+        log.info(String.format("Abstract meters calculated (Period: %d minutes)", meterPeriod));
+        data.forEach(obj -> obj.getData().forEach((time, value) ->
+                        log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
+                )
+        );
     }
 }
