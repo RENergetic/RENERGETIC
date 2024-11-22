@@ -2,12 +2,12 @@ package com.renergetic.kpiapi.service;
 
 import java.math.BigDecimal;
 import java.net.http.HttpResponse;
-import java.time.Instant;
 import java.util.*;
 
 import com.renergetic.common.model.Domain;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.HttpAPIs;
+import com.renergetic.kpiapi.dao.DataWrapperDAO;
 import com.renergetic.kpiapi.service.utils.MeterTimespan;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -177,123 +177,60 @@ public class AbstractMeterDataService {
         return ret;
     }
 
-    public AbstractMeterDataDAO calculateAndInsert(String name, Domain domain, Long from, Long to, Long time) {
-        Map<String, String> headers = Map.of("Content-Type", "application/json");
-
-        AbstractMeterConfig meter = abstractMeterRepository.findByNameAndDomain(AbstractMeter.obtain(name), domain)
-                .orElseThrow(() -> new NotFoundException("The abstract meter with name %s and domain %s isn't configured", name, domain));
-
-        AbstractMeterDataDAO ret = AbstractMeterDataDAO.create(meter);
-        MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
-
-        if (time != null)
-            influxRequest.getFields().put("time", DateConverter.toString(time));
-
-//        BigDecimal value = calculator.calcFormula(meter.getFormula(), from, to);
-        BigDecimal value = calculator.calcFormula(meter.getFormula(), from, to);
-//          value = calculator.calculateFormula(meter.getFormula(), from, to);
-
-        var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
-        var multiplier = meter.getMeasurement() != null ? meter.getMeasurement().getType().getFactor() : 1.0;
-        value = value.divide(BigDecimal.valueOf(multiplier));
-
-        influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
-
-
-        HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
-
-        if (response != null && response.statusCode() < 300) {
-            ret.getData().put(time, value.doubleValue());
-        } else if (response != null)
-            throw new HttpRuntimeException("Influx request failed with status code %d", response.statusCode());
-        else throw new HttpRuntimeException("Influx request failed with NULL response");
-
-        return ret;
+    public List<AbstractMeterDataDAO> calculateAndInsertAll(Long ts) {
+        var span = MeterTimespan.init(meterPeriod, ts);
+        return this.calculateAndInsertAll(span);
     }
 
-    public List<AbstractMeterDataDAO> calculateAndInsertAll(Long from, Long to, Long time) {
-        if (time == null) {
-            time = Instant.now().getEpochSecond() * 1000;
-        }
-        log.info("Calc Abstract meter, from: " + from + " to: " + to + "(" + time + ")");
-
+    public List<AbstractMeterDataDAO> calculateAndInsertAll(MeterTimespan ts) {
+        log.info("Calc Abstract meter, from: " + ts.getTsFrom() + " to: " + ts.getTsTo());
         Map<String, String> headers = Map.of("Content-Type", "application/json");
-
         List<AbstractMeterDataDAO> configuredMeters = new LinkedList<>();
         List<AbstractMeterConfig> meters = abstractMeterRepository.findAll();
-        if (meters.isEmpty())
-            throw new NotFoundException("There aren't abstract meters configured");
+        for (var domain : Domain.values()) {
 
-        meters.sort(
-                Comparator.comparing(AbstractMeterConfig::getDomain));
+            var filtered = meters.stream().filter(it -> it.getDomain() == domain).toList();
+            var data = this.calculateAbstractMeters(filtered, ts);
+            for (AbstractMeterConfig meter : filtered) {
+                var meterName = meter.getName().name();
+                try {
+                    var value = data.get(meterName);
+                    MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
+                    var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
+                    influxRequest.getFields().put(fieldName, value);
+                    HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
+                    if (response != null && response.statusCode() < 300) {
+                        AbstractMeterDataDAO meterDataDAO = AbstractMeterDataDAO.create(meter);
+                        meterDataDAO.getData().put(ts.getTsTo(), Double.parseDouble(value));
+                        configuredMeters.add(meterDataDAO);
+                    } else if (response != null)
+                        log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meterLabel, meter.getDomain().toString(), response.statusCode()));
+                    else
+                        log.error(String.format("Error retrieving data from Influx for abstract meter %s with domain %s: NULL response", meter.getName().meterLabel, meter.getDomain().toString()));
 
-        for (AbstractMeterConfig meter : meters) {
-            try {
-                MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
-
-                if (time != null)
-                    influxRequest.getFields().put("time", DateConverter.toString(time));
-
-                BigDecimal value = new BigDecimal(0);
-                if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to)) {
-
-                    //                value = calculator.calculateFormula(meter.getFormula(), from, to);
-                    value = calculator.calcFormula(meter.getFormula(), from, to);
-
-                    if (meter.getMeasurement() != null) {
-                        //                    convert to user defined scale
-                        var type = meter.getMeasurement().getType();
-                        var value2 = value.multiply(BigDecimal.valueOf(1 / type.getFactor()));
-                        log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value2) + ";" + calculator.bigDecimalToDoubleString(value) + " * " + meter.getMeasurement().getType().getFactor());
-                        value = value2;
-                    } else {
-                        log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value) + "  - no defined measurement");
-                    }
+                } catch (Exception e) {
+                    log.error("Error calculating abstract meter: " + meter.getName().name() + " for: " + meter.getDomain().name(), e);
                 }
-
-                var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
-
-                influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
-
-                HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
-
-                if (response != null && response.statusCode() < 300) {
-                    AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
-                    data.getData().put(time, value.doubleValue());
-                    configuredMeters.add(data);
-                } else if (response != null)
-                    log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meterLabel, meter.getDomain().toString(), response.statusCode()));
-                else
-                    log.error(String.format("Error retrieving data from Influx for abstract meter %s with domain %s: NULL response", meter.getName().meterLabel, meter.getDomain().toString()));
-
-            } catch (Exception e) {
-                log.error("Error calculating abstract meter: " + meter.getName().name() + " for: " + meter.getDomain().name(), e);
             }
-        }
-        return configuredMeters;
+
+        } return configuredMeters;
     }
 
-    public HashMap<String, String> calculateAbstractMeters(Long ts) {
+    public DataWrapperDAO calculateAbstractMeters(Domain domain, Long ts) {
         var span = MeterTimespan.init(meterPeriod, ts);
+        List<AbstractMeterConfig> meters = abstractMeterRepository.findAll().stream().filter(it -> it.getDomain() == domain).toList();
+        return new DataWrapperDAO(this.calculateAbstractMeters(meters, span),domain.name(),span);
+    }
 
-        List<AbstractMeterConfig> meters = abstractMeterRepository.findAll();
-        HashMap<String, String> calculated = new HashMap<>();
+    public HashMap<String, String> calculateAbstractMeters(List<AbstractMeterConfig> meters, MeterTimespan span) {
+
         if (meters.isEmpty())
             throw new NotFoundException("There aren't abstract meters configured");
-
+        HashMap<String, String> calculated = new HashMap<>();
 //        meters.sort(
-//                (m1, m2) ->
-//                        m1.getDomain().equals(m2.getDomain()) ?
-//                                0 : Integer.compare(m1.getDomain().value, m2.getDomain().value));
-        meters.sort(
-                Comparator.comparing(AbstractMeterConfig::getDomain));
+//                Comparator.comparing(AbstractMeterConfig::getDomain));
 
         for (AbstractMeterConfig meter : meters) {
-
-            MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
-
-
-            influxRequest.getFields().put("time", DateConverter.toString(span.getTsTo()));
 
             BigDecimal value = new BigDecimal(0);
             if (meter.getCondition() == null || calculator.compare(meter.getCondition(), span.getTsFrom(), span.getTsTo())) {
@@ -303,23 +240,53 @@ public class AbstractMeterDataService {
                 if (meter.getMeasurement() != null) {
 //                    convert to user defined scale
                     var type = meter.getMeasurement().getType();
-                    value = value.multiply(BigDecimal.valueOf(1 / type.getFactor()));
+                    var value2 = value.multiply(BigDecimal.valueOf(1 / type.getFactor()));
+                    log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value2) + ";" + calculator.bigDecimalToDoubleString(value) + " * " + meter.getMeasurement().getType().getFactor());
+
+                    value = value2;
+                } else {
+                    log.info("Abstract meter: " + meter.getName().name() + "-" + meter.getDomain().name() + " = " + calculator.bigDecimalToDoubleString(value) + "  - no defined measurement");
+
                 }
             }
-            var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
-            influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
             calculated.put(meter.getName().name(), calculator.bigDecimalToDoubleString(value));
-//            HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
-//
-//            if (response != null && response.statusCode() < 300) {
-//                AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
-//                data.getData().put(time, value.doubleValue());
-//                configuredMeters.add(data);
-//            } else if (response != null)
-//                log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meterLabel, meter.getDomain().toString(), response.statusCode()));
-//            else
-//                log.error(String.format("Error retrieving data from Influx for abstract meter %s with domain %s: NULL response", meter.getName().meterLabel, meter.getDomain().toString()));
         }
         return calculated;
     }
+
+
+//    public AbstractMeterDataDAO calculateAndInsert(String name, Domain domain, Long from, Long to, Long time) {
+//        Map<String, String> headers = Map.of("Content-Type", "application/json");
+//
+//        AbstractMeterConfig meter = abstractMeterRepository.findByNameAndDomain(AbstractMeter.obtain(name), domain)
+//                .orElseThrow(() -> new NotFoundException("The abstract meter with name %s and domain %s isn't configured", name, domain));
+//
+//        AbstractMeterDataDAO ret = AbstractMeterDataDAO.create(meter);
+//        MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
+//
+//        if (time != null)
+//            influxRequest.getFields().put("time", DateConverter.toString(time));
+//
+////        BigDecimal value = calculator.calcFormula(meter.getFormula(), from, to);
+//        BigDecimal value = calculator.calcFormula(meter.getFormula(), from, to);
+////          value = calculator.calculateFormula(meter.getFormula(), from, to);
+//
+//        var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
+//        var multiplier = meter.getMeasurement() != null ? meter.getMeasurement().getType().getFactor() : 1.0;
+//        value = value.divide(BigDecimal.valueOf(multiplier));
+//
+//        influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
+//
+//
+//        HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
+//
+//        if (response != null && response.statusCode() < 300) {
+//            ret.getData().put(time, value.doubleValue());
+//        } else if (response != null)
+//            throw new HttpRuntimeException("Influx request failed with status code %d", response.statusCode());
+//        else throw new HttpRuntimeException("Influx request failed with NULL response");
+//
+//        return ret;
+//    }
+
 }

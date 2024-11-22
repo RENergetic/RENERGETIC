@@ -5,6 +5,7 @@ import com.renergetic.common.model.Domain;
 import com.renergetic.common.repository.MeasurementRepository;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.HttpAPIs;
+import com.renergetic.kpiapi.dao.DataWrapperDAO;
 import com.renergetic.kpiapi.dao.KPIDataDAO;
 import com.renergetic.kpiapi.dao.MeasurementDAORequest;
 import com.renergetic.kpiapi.exception.HttpRuntimeException;
@@ -15,20 +16,20 @@ import com.renergetic.kpiapi.repository.KPIConstantRepository;
 import com.renergetic.kpiapi.service.kpi.*;
 import com.renergetic.kpiapi.service.utils.MathCalculator;
 
+import com.renergetic.kpiapi.service.utils.MeterTimespan;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.net.http.HttpResponse;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Slf4j
@@ -44,7 +45,10 @@ public class KPIService {
     @Autowired
     private KPIConstantRepository constantRepository;
 
-
+    @Value("${scheduled.calculation.period}")
+    private Integer meterPeriod;
+    @Value("${scheduled.kpi.frequency}")
+    private Integer meterFrequency;
     @Autowired
     private MathCalculator calculator;
     @Autowired
@@ -282,6 +286,66 @@ public class KPIService {
         return configuredMeters;
     }
 
+
+    public DataWrapperDAO calculateKPIs(Domain domain, Long ts) {
+        var span = MeterTimespan.init(meterPeriod * meterFrequency, ts);
+        return new DataWrapperDAO(this.calculateKPIMeters(domain, span), domain.name(), span);
+    }
+
+    public HashMap<String, String> calculateKPIMeters(Domain domain, MeterTimespan span) {
+        Set<Thread> threads = new HashSet<>();
+        HashMap<String, String> calculatedKPIs = new HashMap<>();
+        AbstractMeterDataWrapper dataWrapper = new AbstractMeterDataWrapper();
+        dataWrapper.values.forEach((key, value) -> threads.add(new Thread(() ->
+                dataWrapper.values.put(key, this.getAbstractMeterData(key, domain, span.getTsFrom(), span.getTsTo(), InfluxFunction.SUM)))));
+
+        dataWrapper.previousValues.forEach((key, value) -> threads.add(new Thread(() ->
+                dataWrapper.previousValues.put(key, this.getAbstractMeterData(key, domain, span.getTsFrom() - (span.getTsTo() - span.getTsFrom()), span.getTsFrom(), InfluxFunction.SUM)))));
+
+        dataWrapper.maxValues.forEach((key, value) -> threads.add(new Thread(() ->
+                dataWrapper.maxValues.put(key, this.getAbstractMeterData(key, domain, span.getTsFrom(), span.getTsTo(), InfluxFunction.MAX)))));
+
+        threads.forEach(Thread::start);
+        threads.forEach(thread -> {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                thread.interrupt();
+                e.printStackTrace();
+            }
+        });
+        var kpis = Arrays.stream(KPI.values()).toList();
+        if (domain == Domain.none) {
+            kpis = Stream.of(ESS.Instance, ESC.Instance, EP.Instance).map(KPIFormula::getKPI).toList();
+        }
+        // Calculate and save each KPI
+        for (KPI kpi : kpis) {
+            try {
+                log.info("Start Calculate: " + kpi.kpi + " for: " + domain.name());
+                BigDecimal value = calculateKPI(kpi, domain, span.getTsFrom(), span.getTsTo(),
+                        dataWrapper.values, dataWrapper.previousValues, dataWrapper.maxValues);
+
+                //some fields aren't optional because there would be no sense to mix them -> can be discussed
+                //TODO: not sure if user id and connection is required here - unless we want to check here if the user can view the data/strcuture of the panel
+
+                MeasurementDAO m = null;
+                try {
+                    m = measurementRepository.findMeasurements(null, null, kpi.name().toLowerCase(), "kpi", domain.name(), null, null, null, 0, 1).get(0);
+
+                } catch (Exception ex) {
+                    log.error("Error calculating KPI: " + kpi.kpi + " for domain: " + domain.name() + " measurement not found");
+                }
+                var kpiValue = calculator.bigDecimalToDoubleString(value);
+                //kpi. TODO: link KPI with measurements
+                calculatedKPIs.put(kpi.kpi, kpiValue);
+
+            } catch (Exception e) {
+                log.error("Error calculating KPI: " + kpi.kpi + " for domain: " + domain.name(), e);
+            }
+        }
+        return calculatedKPIs;
+    }
+
     public List<KPIDataDAO> calculateAndInsert(Domain domain, List<KPIFormula> kpis, Long from, Long to, Long time) {
 
         AbstractMeterKPIConfig[] meters = KPIFormula.getRequiredAbstractMeters(kpis);
@@ -342,8 +406,8 @@ public class KPIService {
         return configuredMeters;
     }
 
-    public BigDecimal calculateKPI(KPI kpi, Domain domain, Long from, Long to, Map<AbstractMeter, Double> values,
-                                   Map<AbstractMeter, Double> previousValues, Map<AbstractMeter, Double> maxValues) {
+    private BigDecimal calculateKPI(KPI kpi, Domain domain, Long from, Long to, Map<AbstractMeter, Double> values,
+                                    Map<AbstractMeter, Double> previousValues, Map<AbstractMeter, Double> maxValues) {
 
         // Calculate each KPI with the values retrieved before
         return switch (kpi) {
@@ -465,5 +529,33 @@ public class KPIService {
             }
         }
         return 0.;
+    }
+
+    private static class AbstractMeterDataWrapper {
+        public final Map<AbstractMeter, Double> values = new EnumMap<>(AbstractMeter.class);
+        public final Map<AbstractMeter, Double> previousValues = new EnumMap<>(AbstractMeter.class);
+        public final Map<AbstractMeter, Double> maxValues = new EnumMap<>(AbstractMeter.class);
+
+        public AbstractMeterDataWrapper() {
+
+            values.put(AbstractMeter.LOAD, 0.);
+            values.put(AbstractMeter.LOSSES, 0.);
+            values.put(AbstractMeter.STORAGE, 0.);
+            values.put(AbstractMeter.ENS, 0.);
+            values.put(AbstractMeter.ERS, 0.);
+            values.put(AbstractMeter.EXCESS, 0.);
+            values.put(AbstractMeter.RES, 0.);
+            values.put(AbstractMeter.LNS, 0.);
+            values.put(AbstractMeter.LRS, 0.);
+
+            previousValues.put(AbstractMeter.LOAD, 0.);
+            previousValues.put(AbstractMeter.LOSSES, 0.);
+            previousValues.put(AbstractMeter.STORAGE, 0.);
+
+            maxValues.put(AbstractMeter.LOAD, 0.);
+            maxValues.put(AbstractMeter.LOSSES, 0.);
+            maxValues.put(AbstractMeter.STORAGE, 0.);
+
+        }
     }
 }

@@ -40,8 +40,8 @@ public class ScheduledProcesses {
     @Value("${scheduled.calculation.period}")
     private Integer meterPeriod;
 
-    @Value("${scheduled.kpi.frecuency}")
-    private Integer kpiFrecuency;
+    @Value("${scheduled.kpi.frequency}")
+    private Integer kpiFrequency;
 
     @Scheduled(fixedDelayString = "${scheduled.calculation.period}", timeUnit = TimeUnit.MINUTES)
     public void calculateKpisAndAbstractMeters() {
@@ -49,10 +49,10 @@ public class ScheduledProcesses {
 //        long tsNow = Instant.now().toEpochMilli();
 //        long tsFrom = tsNow - 60000 * meterPeriod;
 
-        calcAbstractMeter(ts.getTsFrom(), ts.getTsTo());
+        calcAbstractMeter(ts);
 
         // KPIs CALCULATION
-        if (nextKpiCalculation.equals(kpiFrecuency - 1)) {
+        if (nextKpiCalculation.equals(kpiFrequency - 1)) {
             log.info("Start Calculate KPIs ");
             List<KPIDataDAO> electricityData = kpiService
                     .calculateAndInsertAll(Domain.electricity, ts.getTsFrom(), ts.getTsTo(), ts.getTsTo());
@@ -89,9 +89,9 @@ public class ScheduledProcesses {
         }
     }
 
-    private void calcAbstractMeter(long tsFrom, long tsNow) {
+    private void calcAbstractMeter(MeterTimespan ts) {
         List<AbstractMeterDataDAO> data = meterService
-                .calculateAndInsertAll(tsFrom, tsNow, tsNow);
+                .calculateAndInsertAll(ts);
 
         log.info(String.format("Abstract meters calculated (Period: %d minutes)", meterPeriod));
         data.forEach(obj -> obj.getData().forEach((time, value) ->

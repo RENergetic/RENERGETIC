@@ -4545,7 +4545,7 @@ data:
           ]
         },
         {
-          "endpoint": "/api-kpi/1.0/api/meter/data/calculate",
+          "endpoint": "/api-kpi/1.0/api/meter/data/calculate/{domain}",
           "method": "POST",
           "output_encoding": "no-op",
           "input_headers": [
@@ -4558,7 +4558,7 @@ data:
           ],
           "backend": [
             {
-              "url_pattern": "/api/meter/data/calculate",
+              "url_pattern": "/api/meter/data/calculate/{domain}",
               "encoding": "no-op",
               "method": "POST",
               "host": [
@@ -4568,7 +4568,7 @@ data:
           ]
         },
         {
-          "endpoint": "/api-kpi/1.0/api/meter/kpi/calculate",
+          "endpoint": "/api-kpi/1.0/api/kpi/data/calculate/{domain}",
           "method": "POST",
           "output_encoding": "no-op",
           "input_headers": [
@@ -4581,7 +4581,7 @@ data:
           ],
           "backend": [
             {
-              "url_pattern": "/api/meter/kpi/calculate",
+              "url_pattern": "/api/kpi/data/calculate/{domain}",
               "encoding": "no-op",
               "method": "POST",
               "host": [

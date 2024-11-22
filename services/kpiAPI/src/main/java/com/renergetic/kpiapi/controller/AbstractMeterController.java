@@ -3,8 +3,7 @@ package com.renergetic.kpiapi.controller;
 import java.util.*;
 
 import com.renergetic.common.model.Domain;
-import com.renergetic.kpiapi.dao.AbstractMeterIdentifier;
-import com.renergetic.kpiapi.dao.AbstractMeterTypeDAO;
+import com.renergetic.kpiapi.dao.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.renergetic.kpiapi.dao.AbstractMeterDAO;
-import com.renergetic.kpiapi.dao.AbstractMeterDataDAO;
 import com.renergetic.kpiapi.model.InfluxFunction;
 import com.renergetic.kpiapi.service.AbstractMeterDataService;
 import com.renergetic.kpiapi.service.AbstractMeterService;
@@ -148,47 +145,38 @@ public class AbstractMeterController {
         return ResponseEntity.ok(amDataSv.getAggregated(name, domain, InfluxFunction.obtain(operation), from.orElse(null), to.orElse(null), group));
     }
 
-    @Deprecated
-    @Operation(summary = "Create data for an Abstract meter, it doesn't check the condition for does the calculation")
-    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PostMapping(path = "{domain}/{meter_name}/data", produces = "application/json")
-    public ResponseEntity<AbstractMeterDataDAO> insertAbstractMeterData(
-            @PathVariable("domain") Domain domain,
-            @PathVariable("meter_name") String name,
-            @RequestParam(name = "from", required = false) Optional<Long> from,
-            @RequestParam(name = "to", required = false) Optional<Long> to,
-            @RequestParam(name = "time", required = false) Optional<Long> time) {
-
-        return ResponseEntity.ok(amDataSv.calculateAndInsert(name, domain, from.orElse(null), to.orElse(null), time.orElse(null)));
-    }
+//    @Deprecated
+//    @Operation(summary = "Create data for an Abstract meter, it doesn't check the condition for does the calculation")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @PostMapping(path = "{domain}/{meter_name}/data", produces = "application/json")
+//    public ResponseEntity<AbstractMeterDataDAO> insertAbstractMeterData(
+//            @PathVariable("domain") Domain domain,
+//            @PathVariable("meter_name") String name,
+//            @RequestParam(name = "from", required = false) Optional<Long> from,
+//            @RequestParam(name = "to", required = false) Optional<Long> to,
+//            @RequestParam(name = "time", required = false) Optional<Long> time) {
+//
+//        return ResponseEntity.ok(amDataSv.calculateAndInsert(name, domain, from.orElse(null), to.orElse(null), time.orElse(null)));
+//    }
 
     @Deprecated
     @Operation(summary = "Create data for all configured Abstract meters, this method is executed periodically so its use isn't recommended")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = "/data", produces = "application/json")
     public ResponseEntity<List<AbstractMeterDataDAO>> insertAllAbstractMeterData(
-            @RequestParam(name = "from", required = false) Optional<Long> from,
-            @RequestParam(name = "to", required = false) Optional<Long> to,
-            @RequestParam(name = "time", required = false) Optional<Long> time) {
-
-        return ResponseEntity.ok(amDataSv.calculateAndInsertAll(from.orElse(null), to.orElse(null), time.orElse(null)));
+            @RequestParam(name = "ts", required = false) Optional<Long> ts) {
+        return ResponseEntity.ok(amDataSv.calculateAndInsertAll(ts.orElse(null)));
     }
 
-    @Operation(summary = " Calculate online the abstract meters ")
+    @Operation(summary = " Calculate and return abstract meters ")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
-    @PostMapping(path = "/data/calculate", produces = "application/json")
-    public ResponseEntity<HashMap<String, String>> calculateAbstractMeters(
-            @RequestParam(name = "ts", required = false) Optional<Long> ts ) {
+    @PostMapping(path = "/data/calculate/{domain}", produces = "application/json")
+    public ResponseEntity<DataWrapperDAO> calculateAbstractMeters(
+            @PathVariable(name = "domain", required = true) String domain,
+            @RequestParam(name = "ts", required = false) Optional<Long> ts) {
 
-        return ResponseEntity.ok(amDataSv.calculateAbstractMeters(ts.orElse(null)  ));
+        return ResponseEntity.ok(amDataSv.calculateAbstractMeters(Domain.valueOf(domain.toLowerCase()), ts.orElse(null)));
     }
 
-//    @Operation(summary = " Calculate online the abstract meters ")
-//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
-//    @PostMapping(path = "/kpi/calculate", produces = "application/json")
-//    public ResponseEntity<HashMap<String, String>> calculateAbstractMeters(
-//            @RequestParam(name = "ts", required = false) Optional<Long> ts ) {
-//
-//        return ResponseEntity.ok(amDataSv.calculateKPIs(ts.orElse(null)  ));
-//    }
+
 }
