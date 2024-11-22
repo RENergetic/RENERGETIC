@@ -182,4 +182,13 @@ public class AbstractMeterController {
 
         return ResponseEntity.ok(amDataSv.calculateAbstractMeters(ts.orElse(null)  ));
     }
+
+//    @Operation(summary = " Calculate online the abstract meters ")
+//    @ApiResponse(responseCode = "200", description = "Request executed correctly")
+//    @PostMapping(path = "/kpi/calculate", produces = "application/json")
+//    public ResponseEntity<HashMap<String, String>> calculateAbstractMeters(
+//            @RequestParam(name = "ts", required = false) Optional<Long> ts ) {
+//
+//        return ResponseEntity.ok(amDataSv.calculateKPIs(ts.orElse(null)  ));
+//    }
 }

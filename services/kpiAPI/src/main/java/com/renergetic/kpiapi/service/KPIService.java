@@ -269,7 +269,7 @@ public class KPIService {
 
                 if (response != null && response.statusCode() < 300) {
                     KPIDataDAO data = KPIDataDAO.create(kpi, domain);
-                    data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+                    data.getData().put(time, value.doubleValue());
                     configuredMeters.add(data);
                 } else if (response != null)
                     log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.kpi, domain.toString(), response.statusCode()));
@@ -332,7 +332,7 @@ public class KPIService {
 
             if (response != null && response.statusCode() < 300) {
                 KPIDataDAO data = KPIDataDAO.create(kpi, domain);
-                data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+                data.getData().put(time, value.doubleValue());
                 configuredMeters.add(data);
             } else if (response != null)
                 log.error(String.format("Error saving data in Influx for KPI %s with domain %s: %s", kpi.kpi, domain.toString(), response.statusCode()));

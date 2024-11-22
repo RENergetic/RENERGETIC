@@ -203,7 +203,7 @@ public class AbstractMeterDataService {
         HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
 
         if (response != null && response.statusCode() < 300) {
-            ret.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+            ret.getData().put(time, value.doubleValue());
         } else if (response != null)
             throw new HttpRuntimeException("Influx request failed with status code %d", response.statusCode());
         else throw new HttpRuntimeException("Influx request failed with NULL response");
@@ -212,6 +212,11 @@ public class AbstractMeterDataService {
     }
 
     public List<AbstractMeterDataDAO> calculateAndInsertAll(Long from, Long to, Long time) {
+        if (time == null) {
+            time = Instant.now().getEpochSecond() * 1000;
+        }
+        log.info("Calc Abstract meter, from: " + from + " to: " + to + "(" + time + ")");
+
         Map<String, String> headers = Map.of("Content-Type", "application/json");
 
         List<AbstractMeterDataDAO> configuredMeters = new LinkedList<>();
@@ -254,7 +259,7 @@ public class AbstractMeterDataService {
 
                 if (response != null && response.statusCode() < 300) {
                     AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
-                    data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+                    data.getData().put(time, value.doubleValue());
                     configuredMeters.add(data);
                 } else if (response != null)
                     log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meterLabel, meter.getDomain().toString(), response.statusCode()));
@@ -268,8 +273,8 @@ public class AbstractMeterDataService {
         return configuredMeters;
     }
 
-    public HashMap<String, String> calculateAbstractMeters(Long ts ) {
-       var span =  MeterTimespan.init(meterPeriod,ts);
+    public HashMap<String, String> calculateAbstractMeters(Long ts) {
+        var span = MeterTimespan.init(meterPeriod, ts);
 
         List<AbstractMeterConfig> meters = abstractMeterRepository.findAll();
         HashMap<String, String> calculated = new HashMap<>();
@@ -288,7 +293,7 @@ public class AbstractMeterDataService {
             MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
 
 
-                influxRequest.getFields().put("time", DateConverter.toString(span.getTsTo()));
+            influxRequest.getFields().put("time", DateConverter.toString(span.getTsTo()));
 
             BigDecimal value = new BigDecimal(0);
             if (meter.getCondition() == null || calculator.compare(meter.getCondition(), span.getTsFrom(), span.getTsTo())) {
@@ -308,7 +313,7 @@ public class AbstractMeterDataService {
 //
 //            if (response != null && response.statusCode() < 300) {
 //                AbstractMeterDataDAO data = AbstractMeterDataDAO.create(meter);
-//                data.getData().put(Instant.now().getEpochSecond() * 1000, value.doubleValue());
+//                data.getData().put(time, value.doubleValue());
 //                configuredMeters.add(data);
 //            } else if (response != null)
 //                log.error(String.format("Error saving data in Influx for abstract meter %s with domain %s: %d", meter.getName().meterLabel, meter.getDomain().toString(), response.statusCode()));

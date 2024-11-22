@@ -3,7 +3,7 @@ package com.renergetic.kpiapi.config;
 import com.renergetic.common.model.security.KeycloakAuthenticationToken;
 import com.renergetic.common.model.security.KeycloakRole;
 import com.renergetic.common.model.security.KeycloakUser;
-import com.renergetic.kpiapi.service.utils.Json;
+import com.renergetic.common.utilities.Json;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
