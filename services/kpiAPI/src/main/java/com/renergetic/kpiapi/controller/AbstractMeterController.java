@@ -178,10 +178,8 @@ public class AbstractMeterController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @PostMapping(path = "/data/calculate", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> calculateAbstractMeters(
-            @RequestParam(name = "from", required = false) Optional<Long> from,
-            @RequestParam(name = "to", required = false) Optional<Long> to,
-            @RequestParam(name = "time", required = false) Optional<Long> time) {
+            @RequestParam(name = "ts", required = false) Optional<Long> ts ) {
 
-        return ResponseEntity.ok(amDataSv.calculateAbstractMeters(from.orElse(null), to.orElse(null), time.orElse(null)));
+        return ResponseEntity.ok(amDataSv.calculateAbstractMeters(ts.orElse(null)  ));
     }
 }

@@ -6,7 +6,9 @@ import java.time.Instant;
 import java.util.*;
 
 import com.renergetic.common.model.Domain;
+import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.HttpAPIs;
+import com.renergetic.kpiapi.service.utils.MeterTimespan;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,6 @@ import com.renergetic.kpiapi.model.AbstractMeter;
 import com.renergetic.kpiapi.model.AbstractMeterConfig;
 import com.renergetic.kpiapi.model.InfluxFunction;
 import com.renergetic.kpiapi.repository.AbstractMeterRepository;
-import com.renergetic.kpiapi.service.utils.DateConverter;
 import com.renergetic.kpiapi.service.utils.MathCalculator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,8 @@ public class AbstractMeterDataService {
 
     @Value("${influx.api.url}")
     private String influxURL;
+    @Value("${scheduled.calculation.period}")
+    private Integer meterPeriod;
 
     @Autowired
     private AbstractMeterRepository abstractMeterRepository;
@@ -265,8 +268,8 @@ public class AbstractMeterDataService {
         return configuredMeters;
     }
 
-    public HashMap<String, String> calculateAbstractMeters(Long from, Long to, Long time) {
-
+    public HashMap<String, String> calculateAbstractMeters(Long ts ) {
+       var span =  MeterTimespan.init(meterPeriod,ts);
 
         List<AbstractMeterConfig> meters = abstractMeterRepository.findAll();
         HashMap<String, String> calculated = new HashMap<>();
@@ -284,14 +287,14 @@ public class AbstractMeterDataService {
 
             MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
 
-            if (time != null)
-                influxRequest.getFields().put("time", DateConverter.toString(time));
+
+                influxRequest.getFields().put("time", DateConverter.toString(span.getTsTo()));
 
             BigDecimal value = new BigDecimal(0);
-            if (meter.getCondition() == null || calculator.compare(meter.getCondition(), from, to)) {
+            if (meter.getCondition() == null || calculator.compare(meter.getCondition(), span.getTsFrom(), span.getTsTo())) {
 
 //                value = calculator.calculateFormula(meter.getFormula(), from, to);
-                value = calculator.calcFormula(meter.getFormula(), from, to);
+                value = calculator.calcFormula(meter.getFormula(), span.getTsFrom(), span.getTsTo());
                 if (meter.getMeasurement() != null) {
 //                    convert to user defined scale
                     var type = meter.getMeasurement().getType();

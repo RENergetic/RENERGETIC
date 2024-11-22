@@ -9,6 +9,7 @@ import com.renergetic.kpiapi.service.KPIService;
 import com.renergetic.kpiapi.service.kpi.EP;
 import com.renergetic.kpiapi.service.kpi.ESC;
 import com.renergetic.kpiapi.service.kpi.ESS;
+import com.renergetic.kpiapi.service.utils.MeterTimespan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,22 +45,19 @@ public class ScheduledProcesses {
 
     @Scheduled(fixedDelayString = "${scheduled.calculation.period}", timeUnit = TimeUnit.MINUTES)
     public void calculateKpisAndAbstractMeters() {
+        var ts = MeterTimespan.init(meterPeriod);
+//        long tsNow = Instant.now().toEpochMilli();
+//        long tsFrom = tsNow - 60000 * meterPeriod;
 
-        // ABSTRACT METERS CALCULATION
-
-        long tsNow = Instant.now().toEpochMilli();
-        // var tsNow = ( (int)(Instant.now().toEpochMilli()/60000)*60000); round to minutes ? TODO:
-        long tsFrom = tsNow - 60000 * meterPeriod;
-
-        calcAbstractMeter(tsFrom, tsNow);
+        calcAbstractMeter(ts.getTsFrom(), ts.getTsTo());
 
         // KPIs CALCULATION
         if (nextKpiCalculation.equals(kpiFrecuency - 1)) {
             log.info("Start Calculate KPIs ");
             List<KPIDataDAO> electricityData = kpiService
-                    .calculateAndInsertAll(Domain.electricity, tsFrom, tsNow, tsNow);
+                    .calculateAndInsertAll(Domain.electricity, ts.getTsFrom(), ts.getTsTo(), ts.getTsTo());
             List<KPIDataDAO> heatData = kpiService
-                    .calculateAndInsertAll(Domain.heat, tsFrom, tsNow, tsNow);
+                    .calculateAndInsertAll(Domain.heat, ts.getTsFrom(), ts.getTsTo(), ts.getTsTo());
             //TODO: comments if its not calculating properly the following KPIS
             electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
                             log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
@@ -71,10 +69,10 @@ public class ScheduledProcesses {
                             log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
                     )
             );
- 
+
             try {
                 List<KPIDataDAO> allDomain = kpiService
-                        .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance, EP.Instance), tsFrom, tsNow, tsNow);
+                        .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance, EP.Instance), ts.getTsFrom(), ts.getTsTo(), ts.getTsTo());
                 log.info("All domain KPIs calculated");
                 allDomain.forEach(obj -> obj.getData().forEach((time, value) ->
                                 log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
