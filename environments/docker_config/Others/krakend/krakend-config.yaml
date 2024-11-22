@@ -4568,6 +4568,29 @@ data:
           ]
         },
         {
+          "endpoint": "/api-kpi/1.0/api/meter/kpi/calculate",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": [
+            "authorization",
+            "accept",
+            "content-type"
+          ],
+          "input_query_strings": [
+            "*"
+          ],
+          "backend": [
+            {
+              "url_pattern": "/api/meter/kpi/calculate",
+              "encoding": "no-op",
+              "method": "POST",
+              "host": [
+                "http://kpi-api-sv:8082"
+              ]
+            }
+          ]
+        },
+        {
           "endpoint": "/api-kpi/1.0/api/meter",
           "method": "POST",
           "output_encoding": "no-op",

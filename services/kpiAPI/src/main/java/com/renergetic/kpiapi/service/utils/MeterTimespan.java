@@ -19,16 +19,16 @@ public class MeterTimespan {
 
     private MeterTimespan(Integer meterPeriod, Long ts) {
         if (ts == null) {
-            ts = DateConverter.now();// Instant.now().toEpochMilli();
+            ts = DateConverter.now();
         }
-        var interval = 60000l * meterPeriod;
+        var interval = 60000L * meterPeriod.longValue();//meterPeriod - timespan in minutes
         this.tsTo = ts - (ts % interval);
         this.tsFrom = this.tsTo - interval;
 
     }
 
     public static MeterTimespan init(Integer meterPeriod) {
-        return MeterTimespan.init(meterPeriod,null);
+        return MeterTimespan.init(meterPeriod, null);
     }
 
     public static MeterTimespan init(Integer meterPeriod, Long ts) {
