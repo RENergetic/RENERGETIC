@@ -218,8 +218,6 @@ public class AbstractMeterDataService {
 
         meters.sort(
                 Comparator.comparing(AbstractMeterConfig::getDomain));
-//                        m1.getDomain().equals(m2.getDomain()) ?
-//                                0 : Integer.compare(m1.getDomain().name(), m2.getDomain().name()));
 
         for (AbstractMeterConfig meter : meters) {
             try {
@@ -246,6 +244,7 @@ public class AbstractMeterDataService {
                 }
 
                 var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
+
                 influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
 
                 HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
