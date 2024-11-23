@@ -5,11 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
 public class DataWrapperDAO {
-    HashMap<String, String> data;
+    Map<String, String> data;
 
     String domain;
 

@@ -17,8 +17,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -46,52 +44,32 @@ public class ScheduledProcesses {
     @Scheduled(fixedDelayString = "${scheduled.calculation.period}", timeUnit = TimeUnit.MINUTES)
     public void calculateKpisAndAbstractMeters() {
         var ts = MeterTimespan.init(meterPeriod);
-//        long tsNow = Instant.now().toEpochMilli();
-//        long tsFrom = tsNow - 60000 * meterPeriod;
-
-        calcAbstractMeter(ts);
-
+        calcAndInsertAbstractMeter(ts);
         // KPIs CALCULATION
         if (nextKpiCalculation.equals(kpiFrequency - 1)) {
+            ts.setTsFrom(ts.getTsTo() - (long) meterPeriod * kpiFrequency);
             log.info("Start Calculate KPIs ");
-            List<KPIDataDAO> electricityData = kpiService
-                    .calculateAndInsertAll(Domain.electricity, ts.getTsFrom(), ts.getTsTo(), ts.getTsTo());
-            List<KPIDataDAO> heatData = kpiService
-                    .calculateAndInsertAll(Domain.heat, ts.getTsFrom(), ts.getTsTo(), ts.getTsTo());
-            //TODO: comments if its not calculating properly the following KPIS
-            electricityData.forEach(obj -> obj.getData().forEach((time, value) ->
-                            log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
-                    )
-            );
-            log.info(String.format("Electricity KPIs calculated (Period: %d minutes)", meterPeriod));
-            log.info("Heat KPIs calculated");
-            heatData.forEach(obj -> obj.getData().forEach((time, value) ->
-                            log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
-                    )
-            );
-
-            try {
-                List<KPIDataDAO> allDomain = kpiService
-                        .calculateAndInsert(Domain.none, List.of(ESS.Instance, ESC.Instance, EP.Instance), ts.getTsFrom(), ts.getTsTo(), ts.getTsTo());
-                log.info("All domain KPIs calculated");
-                allDomain.forEach(obj -> obj.getData().forEach((time, value) ->
-                                log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
-                        )
-                );
-            } catch (Exception ex) {
-                log.error("Error while calculating all domain KPI" + ex.getMessage());
-
+            for (var domain : List.of(Domain.heat, Domain.electricity, Domain.none)) {
+                try {
+                    List<KPIDataDAO> dataDAO = kpiService.calculateAndInsertAll(domain, ts);
+                    log.info(String.format(domain.name() + " KPIs calculated (Period: %d minutes)", meterPeriod));
+                    dataDAO.forEach(obj -> obj.getData().forEach((time, value) ->
+                                    log.info(String.format(LOG_FORMAT, obj.getName(), obj.getDomain(), value, time))
+                            )
+                    );
+                } catch (Exception ex) {
+                    log.error(String.format("KPI calc error: %s : err: %s", domain.name(), ex.getMessage()));
+                }
             }
-
             nextKpiCalculation = 0;
         } else {
             nextKpiCalculation++;
         }
     }
 
-    private void calcAbstractMeter(MeterTimespan ts) {
-        List<AbstractMeterDataDAO> data = meterService
-                .calculateAndInsertAll(ts);
+    private void calcAndInsertAbstractMeter(MeterTimespan ts) {
+
+        List<AbstractMeterDataDAO> data = meterService.calculateAndInsertAll(ts);
 
         log.info(String.format("Abstract meters calculated (Period: %d minutes)", meterPeriod));
         data.forEach(obj -> obj.getData().forEach((time, value) ->

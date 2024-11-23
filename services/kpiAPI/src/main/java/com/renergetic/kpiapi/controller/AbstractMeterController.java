@@ -4,7 +4,9 @@ import java.util.*;
 
 import com.renergetic.common.model.Domain;
 import com.renergetic.kpiapi.dao.*;
+import com.renergetic.kpiapi.service.utils.MeterTimespan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,6 +38,8 @@ public class AbstractMeterController {
 
     @Autowired
     AbstractMeterDataService amDataSv;
+    @Value("${scheduled.calculation.period}")
+    private Integer meterPeriod;
 
     @Operation(summary = "Get all Abstract Meters configuration")
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
@@ -165,7 +169,8 @@ public class AbstractMeterController {
     @PostMapping(path = "/data", produces = "application/json")
     public ResponseEntity<List<AbstractMeterDataDAO>> insertAllAbstractMeterData(
             @RequestParam(name = "ts", required = false) Optional<Long> ts) {
-        return ResponseEntity.ok(amDataSv.calculateAndInsertAll(ts.orElse(null)));
+        var span = MeterTimespan.init(meterPeriod, ts.orElse(null));
+        return ResponseEntity.ok(amDataSv.calculateAndInsertAll(span));
     }
 
     @Operation(summary = " Calculate and return abstract meters ")

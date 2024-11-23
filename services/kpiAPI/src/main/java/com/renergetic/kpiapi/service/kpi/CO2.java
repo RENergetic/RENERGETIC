@@ -42,7 +42,7 @@ public class CO2 implements KPIFormula {
 
     @Override
     public BigDecimal calculate(Map<AbstractMeter, Double> values) {
-////        todo review this kpi
+////        todo: review this kpi formula
         KPIConstant c = constantRepository.findAll().stream().findFirst().orElse(new KPIConstant(1L, 1., 1., 1., 1.));
 
 //        log.debug(String.format("Constants: a -> %.2f | b -> %.2f | g -> %.2f | d -> %.2f", c.getAlpha(), c.getBeta(), c.getGamma(), c.getDelta()));

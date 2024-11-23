@@ -177,17 +177,17 @@ public class AbstractMeterDataService {
         return ret;
     }
 
-    public List<AbstractMeterDataDAO> calculateAndInsertAll(Long ts) {
-        var span = MeterTimespan.init(meterPeriod, ts);
-        return this.calculateAndInsertAll(span);
-    }
+//    public List<AbstractMeterDataDAO> calculateAll(Long ts) {
+//        var span = MeterTimespan.init(meterPeriod, ts);
+//        return this.calculateAll(span);
+//    }
 
     public List<AbstractMeterDataDAO> calculateAndInsertAll(MeterTimespan ts) {
         log.info("Calc Abstract meter, from: " + ts.getTsFrom() + " to: " + ts.getTsTo());
         Map<String, String> headers = Map.of("Content-Type", "application/json");
         List<AbstractMeterDataDAO> configuredMeters = new LinkedList<>();
         List<AbstractMeterConfig> meters = abstractMeterRepository.findAll();
-        for (var domain : Domain.values()) {
+        for (var domain : List.of(Domain.heat,Domain.electricity,Domain.none) ) {
 
             var filtered = meters.stream().filter(it -> it.getDomain() == domain).toList();
             var data = this.calculateAbstractMeters(filtered, ts);
@@ -198,6 +198,7 @@ public class AbstractMeterDataService {
                     MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
                     var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
                     influxRequest.getFields().put(fieldName, value);
+                    influxRequest.getFields().put("time", DateConverter.toString(ts.getTsTo()));
                     HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
                     if (response != null && response.statusCode() < 300) {
                         AbstractMeterDataDAO meterDataDAO = AbstractMeterDataDAO.create(meter);
@@ -227,8 +228,6 @@ public class AbstractMeterDataService {
         if (meters.isEmpty())
             throw new NotFoundException("There aren't abstract meters configured");
         HashMap<String, String> calculated = new HashMap<>();
-//        meters.sort(
-//                Comparator.comparing(AbstractMeterConfig::getDomain));
 
         for (AbstractMeterConfig meter : meters) {
 
@@ -254,39 +253,5 @@ public class AbstractMeterDataService {
         return calculated;
     }
 
-
-//    public AbstractMeterDataDAO calculateAndInsert(String name, Domain domain, Long from, Long to, Long time) {
-//        Map<String, String> headers = Map.of("Content-Type", "application/json");
-//
-//        AbstractMeterConfig meter = abstractMeterRepository.findByNameAndDomain(AbstractMeter.obtain(name), domain)
-//                .orElseThrow(() -> new NotFoundException("The abstract meter with name %s and domain %s isn't configured", name, domain));
-//
-//        AbstractMeterDataDAO ret = AbstractMeterDataDAO.create(meter);
-//        MeasurementDAORequest influxRequest = MeasurementDAORequest.create(meter);
-//
-//        if (time != null)
-//            influxRequest.getFields().put("time", DateConverter.toString(time));
-//
-////        BigDecimal value = calculator.calcFormula(meter.getFormula(), from, to);
-//        BigDecimal value = calculator.calcFormula(meter.getFormula(), from, to);
-////          value = calculator.calculateFormula(meter.getFormula(), from, to);
-//
-//        var fieldName = meter.getMeasurement() != null ? meter.getMeasurement().getType().getName() : "value";
-//        var multiplier = meter.getMeasurement() != null ? meter.getMeasurement().getType().getFactor() : 1.0;
-//        value = value.divide(BigDecimal.valueOf(multiplier));
-//
-//        influxRequest.getFields().put(fieldName, calculator.bigDecimalToDoubleString(value));
-//
-//
-//        HttpResponse<String> response = httpAPIs.sendRequest(influxURL + "/api/measurement", "POST", null, influxRequest, headers);
-//
-//        if (response != null && response.statusCode() < 300) {
-//            ret.getData().put(time, value.doubleValue());
-//        } else if (response != null)
-//            throw new HttpRuntimeException("Influx request failed with status code %d", response.statusCode());
-//        else throw new HttpRuntimeException("Influx request failed with NULL response");
-//
-//        return ret;
-//    }
 
 }

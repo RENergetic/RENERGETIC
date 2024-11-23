@@ -69,6 +69,6 @@ public class KPIController {
             @PathVariable(name = "domain", required = true) String domain,
             @RequestParam(name = "ts", required = false) Optional<Long> ts) {
 
-        return ResponseEntity.ok(kpiSv.calculateKPIs(Domain.valueOf(domain.toLowerCase()), ts.orElse(null)));
+        return ResponseEntity.ok(kpiSv.calculateAllKPIs(Domain.valueOf(domain.toLowerCase()), ts.orElse(null)));
     }
 }
