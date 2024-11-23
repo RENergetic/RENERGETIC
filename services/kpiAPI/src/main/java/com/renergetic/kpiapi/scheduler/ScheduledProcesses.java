@@ -47,7 +47,8 @@ public class ScheduledProcesses {
         calcAndInsertAbstractMeter(ts);
         // KPIs CALCULATION
         if (nextKpiCalculation.equals(kpiFrequency - 1)) {
-            ts.setTsFrom(ts.getTsTo() - (long) meterPeriod * kpiFrequency);
+            var intervalMs = (60000L * meterPeriod.longValue()) * kpiFrequency;
+            ts.setTsFrom(ts.getTsTo() - intervalMs);
             log.info("Start Calculate KPIs ");
             for (var domain : List.of(Domain.heat, Domain.electricity, Domain.none)) {
                 try {

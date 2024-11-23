@@ -143,9 +143,9 @@ public class KPIService {
         // Calculate and save each KPI
         for (KPI kpi : kpis) {
             try {
-                log.info("Start Calculate: " + kpi.kpi + " for: " + domain.name());
                 BigDecimal value = calculateKPI(kpi, domain, span.getTsFrom(), span.getTsTo(),
                         dataWrapper.values, dataWrapper.previousValues, dataWrapper.maxValues);
+                log.info("Calculate: " + kpi.kpi + " for: " + domain.name() + " = " + value.toString());//Start Calculate:
 
                 //some fields aren't optional because there would be no sense to mix them -> can be discussed
                 //TODO: not sure if user id and connection is required here - unless we want to check here if the user can view the data/strcuture of the panel
@@ -167,7 +167,6 @@ public class KPIService {
         }
         return calculatedKPIs;
     }
-
 
 
     private BigDecimal calculateKPI(KPI kpi, Domain domain, Long from, Long to, Map<AbstractMeter, Double> values,

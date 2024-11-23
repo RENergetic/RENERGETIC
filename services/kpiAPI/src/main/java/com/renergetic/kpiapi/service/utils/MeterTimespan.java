@@ -17,21 +17,21 @@ public class MeterTimespan {
     long tsFrom;
     long tsTo;
 
-    private MeterTimespan(Integer meterPeriod, Long ts) {
+    private MeterTimespan(Integer meterMinPeriod, Long ts) {
         if (ts == null) {
             ts = DateConverter.now();
         }
-        var interval = 60000L * meterPeriod.longValue();//meterPeriod - timespan in minutes
-        this.tsTo = ts - (ts % interval);
-        this.tsFrom = this.tsTo - interval;
+        var intervalMs = 60000L * meterMinPeriod.longValue();//meterPeriod - timespan in minutes
+        this.tsTo = ts - (ts % intervalMs);
+        this.tsFrom = this.tsTo - intervalMs;
 
     }
 
-    public static MeterTimespan init(Integer meterPeriod) {
-        return MeterTimespan.init(meterPeriod, null);
+    public static MeterTimespan init(Integer meterMinPeriod) {
+        return MeterTimespan.init(meterMinPeriod, null);
     }
 
-    public static MeterTimespan init(Integer meterPeriod, Long ts) {
-        return new MeterTimespan(meterPeriod, ts);
+    public static MeterTimespan init(Integer meterMinPeriod, Long ts) {
+        return new MeterTimespan(meterMinPeriod, ts);
     }
 }
