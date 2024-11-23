@@ -2360,8 +2360,8 @@ data:
           ]
         },
         {
-          "endpoint": "/api-base/1.0/api/measurements/{id}/copy",
-          "method": "POST",
+          "endpoint": "/api-base/1.0/api/measurements/id/{id}",
+          "method": "PUT",
           "output_encoding": "no-op",
           "input_headers": [
             "authorization",
@@ -2375,7 +2375,7 @@ data:
             {
               "url_pattern": "/api/measurements/id/{id}",
               "encoding": "no-op",
-              "method": "POST",
+              "method": "PUT",
               "host": [
                 "http://base-api-sv:8082"
               ]
