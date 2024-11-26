@@ -31,6 +31,8 @@ public class HDRRecommendationDAO {
     @JsonProperty(required = false)
     private String label;
     @JsonProperty(required = false)
+    private Long rank;
+    @JsonProperty(required = false)
     private Map<String, ?> properties;
 
     public static HDRRecommendationDAO create(HDRRecommendation recommendation) {
@@ -43,6 +45,7 @@ public class HDRRecommendationDAO {
             dao.setLabel(recommendation.getLabel());
             dao.setTag(TagDAO.create(recommendation.getTag()));
             dao.setId(recommendation.getId());
+            dao.setRank(recommendation.getRank());
             if (recommendation.getProperties() != null && !recommendation.getProperties().isEmpty()) {
                 try {
                     dao.setProperties(Json.parse(recommendation.getProperties()).toMap());
@@ -59,6 +62,7 @@ public class HDRRecommendationDAO {
         HDRRecommendation recommendation = new HDRRecommendation();
         recommendation.setTag(this.getTag().mapToEntity());
         recommendation.setLabel(this.getLabel());
+        recommendation.setRank(this.getRank());
         if (this.id != null)
             recommendation.setId(this.id);
         recommendation.setTimestamp(this.getTimestamp());

@@ -41,6 +41,8 @@ public class HDRRecommendation {
     private MeasurementTags tag;
     @Column(name = "label")
     private String label;
+    @Column(name = "rank")
+    private Long rank;
     @Column(name = "properties",columnDefinition = "text")
     private String properties;
 

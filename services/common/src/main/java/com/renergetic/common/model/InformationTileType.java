@@ -6,5 +6,5 @@ public enum InformationTileType {
     chart,
     doughnut,
     list, panel,single,
-    notification_list, multi_doughnut, multi_knob,image,qrcode
+    notification_list, multi_doughnut, multi_knob,image,qrcode,formula
 }
