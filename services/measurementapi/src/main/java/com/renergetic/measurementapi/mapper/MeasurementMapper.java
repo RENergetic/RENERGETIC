@@ -13,7 +13,7 @@ import com.renergetic.measurementapi.service.utils.FieldsFormat;
 
 public abstract class MeasurementMapper {
 
-	private MeasurementMapper() {}
+//	private MeasurementMapper() {}
 
 	/**
 	 * Converts a list of FluxTable objects into a list of MeasurementDAOResponse objects.

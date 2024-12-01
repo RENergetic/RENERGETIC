@@ -15,6 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ import com.renergetic.dataapi.service.utils.DummyDataGenerator;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-
+@Slf4j
 @Service
 public class DataService {
     @Value("${influx.api.url}")
@@ -126,7 +127,7 @@ public class DataService {
                         Collectors.toMap(m -> m.getFunction() + "_" + m.getId(), Function.identity(),
                                 (m1, m2) -> m1)).values();
         DataDAO res = this.getData(values, from, to);
-        return new DataWrapperDAO(res,assetTemplate);
+        return new DataWrapperDAO(res, assetTemplate);
     }
     //TODO: get data for chosen measurements
 //    public DataWrapperDAO getMeasurementData(List<Long> measurementIds, Long from, Optional<Long> to) {
@@ -300,7 +301,12 @@ public class DataService {
                         params.putAll(tags.stream()
                                 .filter(tag -> !params.containsKey(tag.getValue()))
                                 .collect(Collectors.toMap(tag -> tag.getKey(), tag -> tag.getValue())));
-
+                    var mSetting = measurement.getDetails().stream()
+                            .filter(it -> it.getKey().equalsIgnoreCase("cumulative"))
+                            .findFirst().orElse(null);
+                    if (mSetting != null) {
+                        params.put("cumulative", mSetting.getValue());
+                    }
                     // INFLUX API REQUEST
                     HttpResponse<String> response =
                             httpAPIs.sendRequest(influxURL + "/api/measurement/data", "GET", params, null, null);
