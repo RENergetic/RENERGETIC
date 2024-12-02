@@ -11,10 +11,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.renergetic.common.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,11 +30,6 @@ import com.renergetic.common.dao.InformationPanelDAOResponse;
 import com.renergetic.common.dao.InformationTileDAOResponse;
 import com.renergetic.common.dao.MeasurementDAOResponse;
 import com.renergetic.common.dao.TimeseriesDAO;
-import com.renergetic.common.model.AssetCategory;
-import com.renergetic.common.model.Details;
-import com.renergetic.common.model.InformationTileMeasurement;
-import com.renergetic.common.model.Measurement;
-import com.renergetic.common.model.MeasurementType;
 import com.renergetic.common.model.details.MeasurementTags;
 import com.renergetic.common.repository.AssetCategoryRepository;
 import com.renergetic.common.repository.AssetRepository;
@@ -255,12 +252,10 @@ public class DataService {
                             Collectors.toList()),
                     from, to);
         } else {
-            Map<String, JSONArray> responses = new HashMap<>();
-            TimeseriesDAO ret = new TimeseriesDAO();
-            Set<Thread> threads = new HashSet<>();
+            Map<String, JSONArray> responses = new ConcurrentHashMap<>();
+            Set<Thread> threads = ConcurrentHashMap.newKeySet();//new HashSet<>();
 
-            List<String> types = measurementTypeRepository.findAll().stream().map(MeasurementType::getName).collect(
-                    Collectors.toList());
+            List<String> types = measurementTypeRepository.findAll().stream().map(MeasurementType::getName).toList();
 
             for (final Measurement measurement : measurements) {
                 Thread thread = new Thread(() -> {
@@ -273,7 +268,7 @@ public class DataService {
                         assetNames.add(measurement.getAsset().getName());
                     if (measurement.getAssetCategory() != null)
                         assetNames.addAll(assetRepository.findByAssetCategoryId(measurement.getAssetCategory().getId())
-                                .stream().map(asset -> asset.getName()).collect(Collectors.toList()));
+                                .stream().map(Asset::getName).toList());
 
                     // GET MEASUREMENT TAGS
                     List<MeasurementTags> tags = measurementTagsRepository.findByMeasurementId(measurement.getId());
@@ -295,8 +290,8 @@ public class DataService {
                         params.put("domain", measurement.getDomain().name());
                     if (measurement.getSensorId() != null)
                         params.put("sensor_id", measurement.getSensorId());
-                    if (assetNames != null && !assetNames.isEmpty())
-                        params.put("asset_name", assetNames.stream().collect(Collectors.joining(",")));
+                    if (!assetNames.isEmpty())
+                        params.put("asset_name", String.join(",", assetNames));
                     if (tags != null && !tags.isEmpty())
                         params.putAll(tags.stream()
                                 .filter(tag -> !params.containsKey(tag.getValue()))
@@ -315,8 +310,8 @@ public class DataService {
                         responses.put(measurement.getId().toString(), new JSONArray(response.body()));
                     }
                 });
-                thread.start();
                 threads.add(thread);
+                thread.start();
             }
             threads.forEach(thread -> {
                 try {
@@ -331,20 +326,28 @@ public class DataService {
                 if (response.length() > 0) {
                     response.forEach(obj -> {
                         if (obj instanceof JSONObject) {
-                            JSONObject json = ((JSONObject) obj).getJSONObject("fields");
+
+                            final JSONObject json = ((JSONObject) obj).getJSONObject("fields");
 
                             for (String type : types) {
                                 if (json.has(type)) {
-                                    Long timestamp = DateConverter.toEpoch(json.getString("time"));
-
+                                    Long timestamp;
+                                    var str = json.getString("time");
+                                    try {
+                                        timestamp = DateConverter.toEpoch(str);
+                                    } catch (Exception ex) {
+                                        timestamp = DateConverter.toEpoch(str);
+                                        ex.printStackTrace();
+                                    }
+                                    var ts = timestamp;
                                     if (!formattedResponse.containsKey(timestamp)) {
                                         formattedResponse.put(timestamp, new TreeMap<>());
 
                                         measurements.forEach(measurement -> {
                                             if (measurementId.equals(measurement.getId().toString()))
-                                                formattedResponse.get(timestamp).put(measurementId,
+                                                formattedResponse.get(ts).put(measurementId,
                                                         json.getDouble(type));
-                                            else formattedResponse.get(timestamp).put(measurement.getId().toString(),
+                                            else formattedResponse.get(ts).put(measurement.getId().toString(),
                                                     null);
                                         });
                                     } else {
@@ -356,6 +359,8 @@ public class DataService {
                     });
                 }
             });
+
+            TimeseriesDAO ret = new TimeseriesDAO();
             ret.setTimestamps(new ArrayList<>(formattedResponse.keySet()));
             ret.setCurrent(Basic.combineMaps(formattedResponse.values()));
             return ret;
