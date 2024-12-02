@@ -99,6 +99,10 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+<!--						<jvmArguments>-->
+<!--							-Xms128m-->
+<!--							-Xmx800m-->
+<!--						</jvmArguments>-->
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
