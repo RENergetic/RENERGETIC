@@ -338,9 +338,7 @@ public class DataService {
                                 if (json.has(type)) {
                                     Long timestamp;
                                     var str = json.getString("time");
-                                    try {
-                                        System.out.println(str);
-                                        System.out.println("yyyy-MM-dd HH:mm:ss");
+                                    try { 
                                         timestamp = DateConverter.toEpoch(str);
                                     } catch (Exception ex) {
                                         ex.printStackTrace();

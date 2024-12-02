@@ -55,7 +55,10 @@ public class PipelineRunDAO {
             PipelineDefinitionDAO pipelineDefinitionDAO = new PipelineDefinitionDAO();
             pipelineDefinitionDAO.setPipelineId(wd.getPipelineDefinition().getPipelineId());
             pipelineDefinitionDAO.setName(wd.getPipelineDefinition().getName());
+            if (wd.getPipelineDefinition().getInformationPanel() != null)
+                pipelineDefinitionDAO.setInformationPanel(InformationPanelDAOSimple.create(wd.getPipelineDefinition().getInformationPanel()));
             dao.setPipelineDefinitionDAO(pipelineDefinitionDAO);
+
         }
         dao.setState(wd.getState());
         if (wd.getParams() != null && !wd.getParams().isEmpty()) {
