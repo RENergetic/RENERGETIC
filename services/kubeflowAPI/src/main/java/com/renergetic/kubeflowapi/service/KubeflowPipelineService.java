@@ -14,6 +14,7 @@ import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.common.utilities.Json;
 import com.renergetic.kubeflowapi.dao.RunRequestDAO;
 import com.renergetic.kubeflowapi.service.utils.DummyDataGenerator;
+import org.apache.http.HttpException;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -138,7 +139,7 @@ public class KubeflowPipelineService {
 
     }
 
-    public PipelineRunDAO getRun(String pipelineId) throws IllegalAccessException {
+    public PipelineRunDAO getRun(String pipelineId) throws IllegalAccessException, HttpException {
         var wd = pipelineRepository.findById(pipelineId)
                 .orElseThrow(() -> new NotFoundException(
                         "Pipeline: " + pipelineId + " not available outside kubeflow or not exists"));
@@ -147,7 +148,7 @@ public class KubeflowPipelineService {
     }
 
 
-    public PipelineRunDAO getRunById(String runId) throws IllegalAccessException {
+    public PipelineRunDAO getRunById(String runId) throws IllegalAccessException, HttpException {
         var pipelineRun = pipelineRunRepository.findById(runId)
                 .orElseThrow(() -> new NotFoundException(
                         "Run: " + runId + " not available outside kubeflow or not exists"));
@@ -165,16 +166,24 @@ public class KubeflowPipelineService {
     }
 
 
-    private PipelineRunDAO processRun(PipelineRun pipelineRun) throws IllegalAccessException {
+    private PipelineRunDAO processRun(PipelineRun pipelineRun) throws IllegalAccessException, HttpException {
 
         if (pipelineRun != null) {
             if (pipelineRun.getEndTime() == null && !generateDummy) {
 
-                PipelineRunDAO kubeflowRun = kubeflowService.getRun(pipelineRun.getRunId());
-                pipelineRun.setState(kubeflowRun.getState());
-                if (kubeflowRun.getEndTime() != null)
-                    pipelineRun.setEndTime(kubeflowRun.getEndTime());
+                PipelineRunDAO kubeflowRun = null;
+
+                kubeflowRun = kubeflowService.getRun(pipelineRun.getRunId());
+                if (kubeflowRun == null) {
+                    pipelineRun.setState("error");
+                } else {
+                    pipelineRun.setState(kubeflowRun.getState());
+                    if (kubeflowRun.getEndTime() != null)
+                        pipelineRun.setEndTime(kubeflowRun.getEndTime());
+                }
                 pipelineRunRepository.save(pipelineRun); //update the db state
+
+
             }
             return PipelineRunDAO.create(pipelineRun);
         }
@@ -441,11 +450,24 @@ public class KubeflowPipelineService {
 
                 var kubeflowRunId = workflowRun.getRunId();
                 kubeflowService.stopRun(kubeflowRunId);
-                var kubeflowRun = kubeflowService.getRun(kubeflowRunId);
-                if (kubeflowRun.getEndTime() != null) {
-                    workflowRun.setEndTime(kubeflowRun.getEndTime());
+                PipelineRunDAO kubeflowRun = null;
+                try {
+                    kubeflowRun = kubeflowService.getRun(kubeflowRunId);
+                    if (kubeflowRun == null) {
+                        workflowRun.setState("error");
+                    } else {
+                        if (kubeflowRun.getEndTime() != null) {
+                            workflowRun.setEndTime(kubeflowRun.getEndTime());
+                        }
+                        workflowRun.setState(kubeflowRun.getState());
+                    }
+
+                } catch (HttpException | NullPointerException e) {
+                    if (workflowRun.getStartTime() + (3600 * 1000 * 24) > DateConverter.now()) {
+                        workflowRun.setState("error");
+                    }
                 }
-                workflowRun.setState(kubeflowRun.getState());
+
                 pipelineRunRepository.save(workflowRun);
             }
 
@@ -502,25 +524,33 @@ public class KubeflowPipelineService {
         PipelineDefinitionDAO dao = PipelineDefinitionDAO.create(item);
         ;
         if (kbfPipeline != null) {
-//            var kb = kubeflowMap.get(item.getPipelineId());
             if (item.getPipelineRun() != null && item.getPipelineRun().getEndTime() == null) {
-                if (generateDummy) { //
-                } else {
+                try {
                     var run = item.getPipelineRun();
                     var runId = run.getRunId();
+                    PipelineRunDAO kbfRun = null;
+                    kbfRun = kubeflowService.getRun(runId);
+                    if (kbfRun == null) {
+                        item.setPipelineRun(null);
+                        run.setState("error");
+//                        run.setState("N/A");
+                        pipelineRunRepository.save(run);
+                    } else {
+                        if (kbfRun.getEndTime() != null)
+                            run.setEndTime(kbfRun.getEndTime());
 
-                    PipelineRunDAO kbfRun = kubeflowService.getRun(runId);
-                    if (kbfRun.getEndTime() != null)
-                        run.setEndTime(kbfRun.getEndTime());
+                        run.setState(kbfRun.getState());
+                        pipelineRunRepository.save(run);
+                    }
 
-                    run.setState(kbfRun.getState());
-                    pipelineRunRepository.save(run);
+                } catch (HttpException e) {
+                    log.error("Cannot update kubeflow run state: " + e.getMessage());
                 }
+//                }
             }
             item.setParameters(this.mergeParameters(item, kbfPipeline.getParameters()));
 
             dao = PipelineDefinitionDAO.create(item);
-//            if(kbfPipeline.getName().equals())
             dao.setName(kbfPipeline.getName());
             dao.setVersion(kbfPipeline.getVersion());
             dao.setDescription(kbfPipeline.getDescription());
@@ -549,8 +579,14 @@ public class KubeflowPipelineService {
 
         if (wd.getPipelineRun() != null && wd.getPipelineRun().getStartTime() != null && wd.getPipelineRun().getEndTime() == null) {
             //task hasn't finished
-            PipelineRunDAO run = this.getRun(wd.getPipelineId());
-            if (run.getEndTime() == null)
+            PipelineRunDAO run = null;
+            try {
+                run = this.getRun(wd.getPipelineId());
+            } catch (HttpException e) {
+                throw new RuntimeException("Cannot get the state of the current task  ");
+            }
+            var isError = run.getState() != null && run.getState().equals("error");
+            if (run.getEndTime() == null && !isError)
                 throw new RuntimeException("Current task is still running");
         }
     }

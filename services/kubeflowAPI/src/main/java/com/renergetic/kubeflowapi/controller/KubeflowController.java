@@ -11,6 +11,7 @@ import com.renergetic.kubeflowapi.service.KubeflowPipelineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.http.HttpException;
 import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -143,7 +144,7 @@ public class KubeflowController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/pipeline/{pipeline_id}/run", produces = "application/json")
     public ResponseEntity<PipelineRunDAO> getExperimentRun(
-            @PathVariable(name = "pipeline_id") String pipelineId) throws IllegalAccessException {
+            @PathVariable(name = "pipeline_id") String pipelineId) throws IllegalAccessException, HttpException {
         PipelineRunDAO res = kubeflowPipelineService.getRun(pipelineId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
@@ -152,7 +153,7 @@ public class KubeflowController {
     @ApiResponse(responseCode = "200", description = "Request executed correctly")
     @GetMapping(path = "/run/{run_id}", produces = "application/json")
     public ResponseEntity<PipelineRunDAO> getExperimentRunById(
-            @PathVariable(name = "run_id") String runId) throws IllegalAccessException {
+            @PathVariable(name = "run_id") String runId) throws IllegalAccessException, HttpException {
         PipelineRunDAO res = kubeflowPipelineService.getRunById(runId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }

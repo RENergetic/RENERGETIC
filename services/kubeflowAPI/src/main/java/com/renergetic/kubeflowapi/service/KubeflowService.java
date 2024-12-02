@@ -9,6 +9,7 @@ import com.renergetic.common.dao.PipelineParameterDAO;
 import com.renergetic.common.dao.PipelineRunDAO;
 import com.renergetic.common.utilities.DateConverter;
 import com.renergetic.kubeflowapi.dao.*;
+import org.apache.http.HttpException;
 import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -113,7 +114,7 @@ public class KubeflowService {
         return pipelineMap;
     }
 
-    public PipelineDefinitionDAO getPipeline(String id) throws ParseException , IllegalAccessException{
+    public PipelineDefinitionDAO getPipeline(String id) throws ParseException, IllegalAccessException {
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/pipelines/" + id;
         //TODO check response if pipeline id is empty
         String httpsMethod = "GET";
@@ -134,15 +135,25 @@ public class KubeflowService {
 
     }
 
-    public PipelineRunDAO getRun(String id) throws IllegalAccessException {
+    public PipelineRunDAO getRun(String id) throws IllegalAccessException, HttpException {
+//        id = "a9f8e192-4a74-46b0-8f13-7efa155196701";
         String urlString = kubeflowUrl + "/pipeline/apis/v1beta1/runs/" + id;
         String httpsMethod = "GET";
-        String pipelinesJSON =
-                KubeflowUtils.sendRequest(urlString, httpsMethod, null, null, this.initHeaders()).getResponseBody();
+
+        var resp = KubeflowUtils.sendRequest(urlString, httpsMethod, null, null, this.initHeaders());
+        if (resp.getResponseCode() == 404) {
+            return null;
+        }
+
+        if (resp.getResponseCode() != 200  ) {
+            throw new HttpException("Invalid kubeflow run api response: " + resp.getResponseCode() + " for: " + id);
+        }
 
         PipelineRunDAO runObj = null;
         try {
-            runObj = this.parseRunObj(Json.parse(pipelinesJSON));
+            if (resp.getResponseCode() == 200)
+                runObj = this.parseRunObj(Json.parse(resp.getResponseBody()));
+
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -314,7 +325,7 @@ public class KubeflowService {
         // Step 4
         urlString = homeUrl + "dex/auth/ldap/login";
         httpsMethod = "POST";
-        body = "login=" + user + "&password=" + password ;
+        body = "login=" + user + "&password=" + password;
 
         headers.clear();
         headers.put("Accept", "*/*");
@@ -329,7 +340,7 @@ public class KubeflowService {
         if (response.getResponseCode() != 302) {
             if (response.getResponseBody() != null && (
                     response.getResponseBody().contains("Invalid LDAP Username and password.")
-                    ||  response.getResponseBody().contains("login-error")
+                            || response.getResponseBody().contains("login-error")
             )) {
                 throw new java.lang.IllegalAccessException("invalid credentials");
             }
