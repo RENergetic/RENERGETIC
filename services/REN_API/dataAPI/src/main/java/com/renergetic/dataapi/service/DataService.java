@@ -301,6 +301,11 @@ public class DataService {
                             .findFirst().orElse(null);
                     if (mSetting != null) {
                         params.put("cumulative", mSetting.getValue());
+                    } else if (measurement.getSensorName() != null
+                            && (measurement.getSensorName().equals("abstract_meter") || measurement.getSensorName().equals("kpi")))
+                    {
+                        //TODO: its hotfix
+                        params.put("cumulative", "false");
                     }
                     // INFLUX API REQUEST
                     HttpResponse<String> response =
@@ -334,8 +339,10 @@ public class DataService {
                                     Long timestamp;
                                     var str = json.getString("time");
                                     try {
+                                        System.out.println(str);
+                                        System.out.println("yyyy-MM-dd HH:mm:ss");
                                         timestamp = DateConverter.toEpoch(str);
-                                    } catch (Exception ex) { 
+                                    } catch (Exception ex) {
                                         ex.printStackTrace();
                                         throw ex;
                                     }
