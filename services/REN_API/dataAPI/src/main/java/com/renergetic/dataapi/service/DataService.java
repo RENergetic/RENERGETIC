@@ -335,9 +335,9 @@ public class DataService {
                                     var str = json.getString("time");
                                     try {
                                         timestamp = DateConverter.toEpoch(str);
-                                    } catch (Exception ex) {
-                                        timestamp = DateConverter.toEpoch(str);
+                                    } catch (Exception ex) { 
                                         ex.printStackTrace();
+                                        throw ex;
                                     }
                                     var ts = timestamp;
                                     if (!formattedResponse.containsKey(timestamp)) {
